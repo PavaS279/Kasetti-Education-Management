@@ -10,6 +10,8 @@ Read access is always granted when an object is listed.
 # Picklist value sets shared across objects (single source of truth)
 # ---------------------------------------------------------------------------
 DELIVERY_MODES = ["Classroom", "Online", "Hybrid"]
+FEE_TYPES = ["Tuition", "Admission", "Materials", "Assessment", "Other"]
+BILLING_FREQUENCIES = ["One-time", "Monthly", "Term"]
 GUARDIAN_RELATIONSHIPS = ["Mother", "Father", "Guardian", "Grandparent", "Sibling", "Other"]
 
 OBJECTS = [
@@ -89,6 +91,62 @@ OBJECTS = [
         ],
         "validationRules": [
             {"name": "User_Required", "formula": "ISBLANK(User__c)", "field": "User__c", "message": "Select the user for this branch assignment."},
+        ],
+    },
+    {
+        "name": "Fee_Price__c", "label": "Fee Price", "plural": "Fee Prices", "sharing": "Read", "externalSharing": "Read", "history": True,
+        "nameField": {"label": "Price Number", "type": "AutoNumber", "format": "PRC-{00000}"},
+        "description": "Price of a fee type for a course, optionally specific to a branch and delivery mode, valid for an effective date range.",
+        "fields": [
+            {"name": "Learning_Course__c", "label": "Course", "type": "Lookup", "ref": "LearningCourse", "relName": "Fee_Prices", "relLabel": "Fee Prices"},
+            {"name": "Branch__c", "label": "Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Fee_Prices", "relLabel": "Fee Prices",
+             "help": "Leave blank for a price that applies to every branch. A branch-specific price takes precedence."},
+            {"name": "Fee_Type__c", "label": "Fee Type", "type": "Picklist", "values": FEE_TYPES, "default": "Tuition", "required": True},
+            {"name": "Delivery_Mode__c", "label": "Delivery Mode", "type": "Picklist", "values": DELIVERY_MODES,
+             "help": "Leave blank for all delivery modes. A mode-specific price takes precedence."},
+            {"name": "Billing_Frequency__c", "label": "Billing Frequency", "type": "Picklist", "values": BILLING_FREQUENCIES, "default": "One-time", "required": True},
+            {"name": "Amount__c", "label": "Amount", "type": "Currency", "precision": 16, "scale": 2, "required": True, "track": True},
+            {"name": "Effective_From__c", "label": "Effective From", "type": "Date", "required": True, "track": True},
+            {"name": "Effective_To__c", "label": "Effective To", "type": "Date", "track": True},
+            {"name": "Active__c", "label": "Active", "type": "Checkbox", "default": True, "track": True},
+            {"name": "Description__c", "label": "Description", "type": "Text", "length": 255},
+            {"name": "External_Id__c", "label": "External ID", "type": "Text", "length": 80, "unique": True, "externalId": True},
+        ],
+        "validationRules": [
+            {"name": "Course_Required", "formula": "ISBLANK(Learning_Course__c)", "field": "Learning_Course__c", "message": "Select the course this price belongs to."},
+            {"name": "Amount_Not_Negative", "formula": "Amount__c < 0", "field": "Amount__c", "message": "Amount cannot be negative."},
+            {"name": "Effective_Range_Valid", "formula": "AND(NOT(ISBLANK(Effective_To__c)), Effective_To__c < Effective_From__c)",
+             "field": "Effective_To__c", "message": "Effective To must be on or after Effective From."},
+        ],
+    },
+    {
+        "name": "Discount__c", "label": "Discount", "plural": "Discounts", "sharing": "Read", "externalSharing": "Read", "history": True,
+        "description": "Discount code with type, value, validity, scope, and usage limits.",
+        "fields": [
+            {"name": "Code__c", "label": "Code", "type": "Text", "length": 30, "unique": True, "externalId": True, "required": True,
+             "help": "Code entered at enrolment, for example SIBLING10. Stored in upper case."},
+            {"name": "Discount_Type__c", "label": "Discount Type", "type": "Picklist", "values": ["Percentage", "Fixed Amount"], "default": "Percentage", "required": True},
+            {"name": "Value__c", "label": "Value", "type": "Number", "precision": 16, "scale": 2, "required": True, "track": True,
+             "help": "Percentage (0-100) or fixed amount in the org currency."},
+            {"name": "Fee_Type__c", "label": "Applies to Fee Type", "type": "Picklist", "values": FEE_TYPES,
+             "help": "Leave blank to apply to every fee line."},
+            {"name": "Applies_To_Course__c", "label": "Applies to Course", "type": "Lookup", "ref": "LearningCourse", "relName": "Discounts", "relLabel": "Discounts"},
+            {"name": "Applies_To_Branch__c", "label": "Applies to Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Discounts", "relLabel": "Discounts"},
+            {"name": "Valid_From__c", "label": "Valid From", "type": "Date"},
+            {"name": "Valid_To__c", "label": "Valid To", "type": "Date"},
+            {"name": "Active__c", "label": "Active", "type": "Checkbox", "default": True, "track": True},
+            {"name": "Max_Uses__c", "label": "Maximum Uses", "type": "Number", "precision": 6, "scale": 0, "help": "Blank for unlimited."},
+            {"name": "Times_Used__c", "label": "Times Used", "type": "Number", "precision": 6, "scale": 0, "systemManaged": True},
+            {"name": "Requires_Approval__c", "label": "Requires Approval", "type": "Checkbox", "default": False,
+             "help": "Enrolments using this discount need finance approval before invoicing."},
+            {"name": "Description__c", "label": "Description", "type": "Text", "length": 255},
+        ],
+        "validationRules": [
+            {"name": "Value_Positive", "formula": "Value__c <= 0", "field": "Value__c", "message": "Discount value must be greater than zero."},
+            {"name": "Percentage_Max_100", "formula": "AND(ISPICKVAL(Discount_Type__c, 'Percentage'), Value__c > 100)", "field": "Value__c",
+             "message": "A percentage discount cannot exceed 100%."},
+            {"name": "Valid_Range", "formula": "AND(NOT(ISBLANK(Valid_From__c)), NOT(ISBLANK(Valid_To__c)), Valid_To__c < Valid_From__c)",
+             "field": "Valid_To__c", "message": "Valid To must be on or after Valid From."},
         ],
     },
     {
@@ -246,6 +304,7 @@ COMMON_CLASSES = {
 
 ENQUIRY_CLASSES = ["EnquiryController", "ApplicationController"]
 LEARNER_CLASSES = ["Learner360Controller"]
+PRICING_CLASSES = ["PricingController"]
 
 # Education Cloud objects are only granted through permission sets tied to these licences.
 STAFF_LICENSE = "EducationCloudAccessPsl"
@@ -260,32 +319,32 @@ EDU_OBJECTS = {
     "ContactContactRelation", "PartyRoleRelation", "CourseOffering", "CourseOfferingParticipant",
     "CourseOfferingSchedule", "AcademicTerm", "AcademicSession", "LearnerProfile", "DocumentChecklistItem",
 }
-STAFF_TABS = ["Branch__c", "Room__c", "Branch_Staff__c"]
+STAFF_TABS = ["Branch__c", "Room__c", "Branch_Staff__c", "Fee_Price__c", "Discount__c"]
 
 PERMISSION_SETS = [
     {"name": "KEM_Administrator", "label": "KEM Administrator",
      "description": "Institution administrator: configures branches, policies, and has full access to Kasetti Education Management data.",
-     "license": STAFF_LICENSE, "objects": {"DocumentChecklistItem": "CEDV", "Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "LearnerProfile": "CEDV", "CourseOffering": "CEDV", "CourseOfferingParticipant": "CEDV", "CourseOfferingSchedule": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
+     "license": STAFF_LICENSE, "objects": {"Fee_Price__c": "CEDM", "Discount__c": "CEDM", "DocumentChecklistItem": "CEDV", "Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "LearnerProfile": "CEDV", "CourseOffering": "CEDV", "CourseOfferingParticipant": "CEDV", "CourseOfferingSchedule": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
                  "IndividualApplication": "CEDV", "ContactContactRelation": "CEDV"},
-     "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications", "Error_Log__c"]},
+     "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications", "Error_Log__c"]},
     {"name": "KEM_Branch_Manager", "label": "KEM Branch Manager",
      "description": "Branch manager: manages rooms, classes, staff allocation, and learners for their branch.",
-     "license": STAFF_LICENSE, "objects": {"DocumentChecklistItem": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "CED", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "E", "Room__c": "CED", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
-                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
+     "license": STAFF_LICENSE, "objects": {"Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "CED", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "E", "Room__c": "CED", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
+                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
     {"name": "KEM_Admissions_Counsellor", "label": "KEM Admissions Counsellor",
      "description": "Admissions counsellor: works enquiries, applications, offers, and follow-ups.",
-     "license": STAFF_LICENSE, "objects": {"DocumentChecklistItem": "CED", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
-                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
+     "license": STAFF_LICENSE, "objects": {"Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "CED", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
+                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
     {"name": "KEM_Academic_Coordinator", "label": "KEM Academic Coordinator",
      "description": "Academic coordinator: maintains curriculum, timetable, enrolments, and academic oversight.",
-     "license": STAFF_LICENSE, "objects": {"DocumentChecklistItem": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "CE", "LearningCourse": "CE", "LearningProgram": "CE", "LearnerProfile": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "CE", "Branch__c": "", "Room__c": "CE", "Lead": "", "Account": "E", "Contact": "E", "IndividualApplication": "",
-                 "ContactContactRelation": ""}, "classes": LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "CE", "LearningCourse": "CE", "LearningProgram": "CE", "LearnerProfile": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "CE", "Branch__c": "", "Room__c": "CE", "Lead": "", "Account": "E", "Contact": "E", "IndividualApplication": "",
+                 "ContactContactRelation": ""}, "classes": LEARNER_CLASSES + PRICING_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Teacher", "label": "KEM Teacher",
      "description": "Teacher: views assigned classes, marks attendance, and enters assessment results.",
-     "license": STAFF_LICENSE, "objects": {"CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": ""}, "classes": LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"Fee_Price__c": "", "Discount__c": "", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": ""}, "classes": LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Finance", "label": "KEM Finance",
      "description": "Finance user: manages fees, invoices, payments, allocations, and reconciliation.",
-     "license": STAFF_LICENSE, "objects": {"CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": "", "ContactContactRelation": ""}, "classes": LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"Fee_Price__c": "CEDV", "Discount__c": "CEDV", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": "", "ContactContactRelation": ""}, "classes": LEARNER_CLASSES + PRICING_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Eligibility_Override", "label": "KEM Eligibility Override",
      "description": "Allows overriding a failed eligibility check on an application. Grant to administrators and branch managers.",
      "objects": {}, "custom": ["KEM_Override_Eligibility"]},

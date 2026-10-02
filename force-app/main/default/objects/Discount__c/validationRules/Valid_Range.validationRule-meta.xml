@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Valid_Range</fullName>
+    <active>true</active>
+    <description>Valid To must be on or after Valid From.</description>
+    <errorConditionFormula
+  >AND(NOT(ISBLANK(Valid_From__c)), NOT(ISBLANK(Valid_To__c)), Valid_To__c &lt; Valid_From__c)</errorConditionFormula>
+    <errorDisplayField>Valid_To__c</errorDisplayField>
+    <errorMessage>Valid To must be on or after Valid From.</errorMessage>
+</ValidationRule>

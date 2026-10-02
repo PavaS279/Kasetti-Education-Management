@@ -1,0 +1,206 @@
+<template>
+  <div class="pricing kem-fade-in">
+    <section class="kem-hero">
+      <div class="hero">
+        <div class="hero-icon">
+          <lightning-icon
+            icon-name="utility:moneybag"
+            variant="inverse"
+            size="medium"
+          ></lightning-icon>
+        </div>
+        <div class="hero-text">
+          <div class="kem-hero__title">Course Pricing</div>
+          <div class="kem-hero__subtitle">
+            Effective-dated fees by branch and delivery mode, with a live quote.
+          </div>
+        </div>
+        <div class="kem-kpi">
+          <div class="kem-kpi__value">{activeCount}</div>
+          <div class="kem-kpi__label">Active prices</div>
+        </div>
+        <lightning-button
+          variant="brand-outline"
+          class="new-button"
+          label="New price"
+          icon-name="utility:add"
+          onclick={handleNewPrice}
+        ></lightning-button>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="kem-card panel">
+        <div class="kem-section-title">Prices</div>
+        <div class="price-list">
+          <template for:each={priceCards} for:item="p">
+            <article key={p.Id} class={p.cardClass}>
+              <div class="price-top">
+                <div>
+                  <div class="price-type">
+                    {p.Fee_Type__c}
+                    <span class="kem-muted small"
+                      >· {p.Billing_Frequency__c}</span
+                    >
+                  </div>
+                  <div class="kem-muted small">{p.Name} · {p.period}</div>
+                </div>
+                <div class="price-amount">
+                  <lightning-formatted-number
+                    value={p.Amount__c}
+                    format-style="currency"
+                    currency-code={currencyCode}
+                  ></lightning-formatted-number>
+                </div>
+              </div>
+              <div class="chips">
+                <span class={p.stateClass}>{p.state}</span>
+                <span class="kem-badge">{p.branchLabel}</span>
+                <span class="kem-badge">{p.modeLabel}</span>
+                <template lwc:if={p.canEnd}>
+                  <lightning-button
+                    variant="base"
+                    label="End price"
+                    data-id={p.Id}
+                    onclick={handleEndPrice}
+                  ></lightning-button>
+                </template>
+              </div>
+            </article>
+          </template>
+          <template lwc:if={noPrices}
+            ><div class="kem-empty">
+              No prices yet. Add the first price.
+            </div></template
+          >
+        </div>
+      </section>
+
+      <section class="kem-card panel simulator" aria-label="Quote simulator">
+        <div class="kem-section-title">Quote simulator</div>
+        <div class="sim-form">
+          <lightning-combobox
+            label="Branch"
+            value={branchId}
+            options={branchOptions}
+            onchange={handleBranch}
+          ></lightning-combobox>
+          <lightning-combobox
+            label="Delivery mode"
+            value={deliveryMode}
+            options={modeOptions}
+            onchange={handleMode}
+          ></lightning-combobox>
+          <lightning-input
+            type="date"
+            label="Date"
+            value={quoteDate}
+            onchange={handleDate}
+          ></lightning-input>
+          <lightning-input
+            label="Discount code"
+            value={discountCode}
+            onchange={handleCode}
+            placeholder="e.g. SIBLING10"
+          ></lightning-input>
+        </div>
+        <template lwc:if={quote}>
+          <table class="quote" aria-label="Quote breakdown">
+            <thead>
+              <tr>
+                <th>Fee</th>
+                <th class="num">Amount</th>
+                <th class="num">Discount</th>
+                <th class="num">Tax</th>
+                <th class="num">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={quote.lines} for:item="line">
+                <tr key={line.feePriceId}>
+                  <td>
+                    <div>{line.feeType}</div>
+                    <div class="kem-muted small">{line.frequency}</div>
+                  </td>
+                  <td class="num">
+                    <lightning-formatted-number
+                      value={line.unitAmount}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                  </td>
+                  <td class="num discount">
+                    <lightning-formatted-number
+                      value={line.discountAmount}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                  </td>
+                  <td class="num">
+                    <lightning-formatted-number
+                      value={line.taxAmount}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                  </td>
+                  <td class="num strong">
+                    <lightning-formatted-number
+                      value={line.total}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+          <div class="totals">
+            <div>
+              <span class="kem-muted">Subtotal</span
+              ><lightning-formatted-number
+                value={quote.subtotal}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+            </div>
+            <div>
+              <span class="kem-muted">Discount</span
+              ><lightning-formatted-number
+                value={quote.discountTotal}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+            </div>
+            <div>
+              <span class="kem-muted">Tax</span
+              ><lightning-formatted-number
+                value={quote.taxTotal}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+            </div>
+            <div class="grand">
+              <span>Total</span
+              ><lightning-formatted-number
+                value={quote.grandTotal}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+            </div>
+          </div>
+          <template lwc:if={quote.approvalRequired}
+            ><div class="kem-badge kem-badge_warning slds-m-top_small">
+              Discount needs finance approval
+            </div></template
+          >
+          <template for:each={quote.warnings} for:item="w">
+            <div key={w} class="warning small">{w}</div>
+          </template>
+        </template>
+        <template lwc:if={quoteError}
+          ><div class="warning small">{quoteError}</div></template
+        >
+      </section>
+    </div>
+  </div>
+</template>

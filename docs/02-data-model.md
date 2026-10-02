@@ -75,3 +75,10 @@ Guardian link convention: `ContactId` = guardian's person contact, `RelatedConta
 4. Payment processing is idempotent on `Gateway_Transaction_Id__c` (unique external ID).
 5. Published assessment results keep the grade that was calculated at publication time.
 6. Every object that may be migrated has a unique `External_Id__c`.
+
+### F1.4 Pricing (deployed)
+
+| Object         | Sharing          | Key fields                                                                                                                                                                                                             |
+| -------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Fee_Price__c` | Public Read Only | `Learning_Course__c`, `Branch__c` (blank = all), `Fee_Type__c`, `Delivery_Mode__c` (blank = all), `Billing_Frequency__c`, `Amount__c`, `Effective_From__c`, `Effective_To__c`, `Active__c`, `External_Id__c`           |
+| `Discount__c`  | Public Read Only | `Code__c` (unique, upper case), `Discount_Type__c`, `Value__c`, `Fee_Type__c`, `Applies_To_Course__c`, `Applies_To_Branch__c`, `Valid_From__c`, `Valid_To__c`, `Max_Uses__c`, `Times_Used__c`*, `Requires_Approval__c` |

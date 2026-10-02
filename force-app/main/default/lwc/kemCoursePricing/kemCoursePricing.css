@@ -1,0 +1,168 @@
+@import "c/kemStyles";
+
+.pricing {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hero {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hero-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.9rem;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.hero-text {
+  flex: 1 1 14rem;
+}
+
+.new-button {
+  --slds-c-button-brand-color-background: #fff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.panel {
+  padding: 1rem;
+}
+
+.price-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
+.price {
+  padding: 0.75rem 0.9rem;
+  border-left: 4px solid var(--kem-line);
+}
+
+.price_active {
+  border-left-color: var(--kem-green);
+}
+
+.price_muted {
+  opacity: 0.75;
+}
+
+.price-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.price-type {
+  font-weight: 700;
+}
+
+.price-amount {
+  font-size: 1.15rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.sim-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.5rem 0.75rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.quote {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.quote th {
+  text-align: left;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--kem-muted);
+  padding: 0.4rem 0.25rem;
+  border-bottom: 1px solid var(--kem-line);
+}
+
+.quote td {
+  padding: 0.5rem 0.25rem;
+  border-bottom: 1px solid var(--kem-line);
+  vertical-align: top;
+}
+
+.num {
+  text-align: right;
+}
+
+.discount {
+  color: var(--kem-green);
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.totals {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.75rem;
+  align-items: flex-end;
+}
+
+.totals div {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+  min-width: 14rem;
+}
+
+.grand {
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding-top: 0.4rem;
+  border-top: 2px solid var(--kem-ink);
+}
+
+.warning {
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--kem-radius-sm);
+  background: #fdf0dc;
+  color: #7a4a00;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+@media (max-width: 64em) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

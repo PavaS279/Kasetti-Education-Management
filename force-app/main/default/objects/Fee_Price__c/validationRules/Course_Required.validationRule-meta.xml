@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Course_Required</fullName>
+    <active>true</active>
+    <description>Select the course this price belongs to.</description>
+    <errorConditionFormula>ISBLANK(Learning_Course__c)</errorConditionFormula>
+    <errorDisplayField>Learning_Course__c</errorDisplayField>
+    <errorMessage>Select the course this price belongs to.</errorMessage>
+</ValidationRule>
