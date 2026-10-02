@@ -1,5 +1,7 @@
 # Progress Tracker
 
+> **Status 2026-10-03:** Phase 0 complete. Phase 1 features 1.1–1.7 complete (deployed, tested, end-to-end checked). Next: 1.8 Assessments — see [NEXT-STEPS.md](NEXT-STEPS.md).
+
 Legend: ✅ done · 🟡 in progress · ⬜ not started
 
 Each feature is complete only when it is **built, deployed to the org, unit-tested, and checked end to end**.

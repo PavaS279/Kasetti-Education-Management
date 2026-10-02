@@ -15,3 +15,15 @@ Delivery documentation for the Salesforce Education Cloud implementation. Read i
 | 9   | [adr/](adr/)                                               | Architecture decision records                                          |
 
 Target org: Kasetti Technologies Pvt Ltd (Enterprise Edition, Education Cloud), My Domain `kasettitechnologiespvtltd.my.salesforce.com`.
+
+## Feature guides
+
+| Feature                   | Guide                                                                      |
+| ------------------------- | -------------------------------------------------------------------------- |
+| F1.1 Enquiries            | [features/F1.1-enquiries.md](features/F1.1-enquiries.md)                   |
+| F1.2 Learners & guardians | [features/F1.2-learners-guardians.md](features/F1.2-learners-guardians.md) |
+| F1.3 Applications         | [features/F1.3-applications.md](features/F1.3-applications.md)             |
+| F1.4 Pricing & discounts  | [features/F1.4-pricing-discounts.md](features/F1.4-pricing-discounts.md)   |
+| F1.5 Enrolment            | [features/F1.5-enrolment.md](features/F1.5-enrolment.md)                   |
+| F1.6 Scheduling           | [features/F1.6-scheduling.md](features/F1.6-scheduling.md)                 |
+| F1.7 Attendance           | [features/F1.7-attendance.md](features/F1.7-attendance.md)                 |
