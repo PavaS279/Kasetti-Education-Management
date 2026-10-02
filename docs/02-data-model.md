@@ -58,6 +58,13 @@ Added feature by feature; see [PROGRESS.md](PROGRESS.md) for what is deployed.
 
 \* system-managed (read-only to users, set by Apex).
 
+### F1.2 Learners & guardians (deployed)
+
+| Object                              | New fields                                                                                                          |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `Contact` (person accounts: `__pc`) | `Preferred_Channel__c`, `Preferred_Language__c`, `SMS_Opt_In__c`, `WhatsApp_Opt_In__c`, `Emergency_Instructions__c` |
+| `LearnerProfile`                    | `Student_Number__c` (auto number `STU-{00000}`), `Branch__c`                                                        |
+
 Guardian link convention: `ContactId` = guardian's person contact, `RelatedContactId` = learner's person contact, `PartyRoleRelation` = Guardian/Child.
 
 ### Design rules applied

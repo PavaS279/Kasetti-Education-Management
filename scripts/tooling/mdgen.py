@@ -20,6 +20,9 @@ PS_DIR = os.path.join(ROOT, "force-app", "main", "default", "permissionsets")
 NS = 'xmlns="http://soap.sforce.com/2006/04/metadata"'
 HEADER = '<?xml version="1.0" encoding="UTF-8"?>\n'
 
+# Objects that receive field permissions only (object permissions are not grantable).
+NO_OBJECT_PERMS = {"User"}
+
 # Field types that never accept field-level security entries.
 NO_FLS_TYPES = {"MasterDetail"}
 
@@ -74,6 +77,10 @@ def field_xml(obj, f):
             x += tag("scale", f.get("scale", 2))
         x += tag("type", rt)
         x += tag("unique", False) if False else ""
+    elif t == "AutoNumber":
+        x += tag("displayFormat", f["format"])
+        x += tag("externalId", False) if not f.get("externalId") else ""
+        x += tag("type", "AutoNumber")
     elif t == "Summary":
         x += tag("summarizedField", f.get("summarizedField"))
         for flt in f.get("filters", []):
@@ -273,7 +280,7 @@ def gen_permsets():
             for f in o["fields"]:
                 if f["type"] in NO_FLS_TYPES or f.get("required"):
                     continue
-                readonly_type = f["type"] in ("Formula", "Summary") or f.get("systemManaged")
+                readonly_type = f["type"] in ("Formula", "Summary", "AutoNumber") or f.get("systemManaged")
                 editable = ("E" in access or "C" in access) and not readonly_type and f["name"] not in ro_fields
                 fls.append((f"{oname}.{f['name']}", editable))
         for oname, fields in getattr(specs, "STANDARD_FIELD_ACCESS", {}).items():
@@ -289,7 +296,7 @@ def gen_permsets():
         if ps.get("license"):
             x += tag("license", ps["license"])
         for oname, access in sorted(ps["objects"].items()):
-            if idx.get(oname, {}).get("standard") and oname not in specs.STANDARD_OBJECT_PERMS:
+            if oname in NO_OBJECT_PERMS:
                 continue
             x += "    <objectPermissions>\n"
             x += tag("allowCreate", "C" in access, 8)

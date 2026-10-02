@@ -1,0 +1,47 @@
+@import "c/kemStyles";
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.75rem;
+}
+
+.flags {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.results {
+  margin-top: 0.5rem;
+  max-height: 15rem;
+  overflow-y: auto;
+}
+
+.result {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--kem-radius-sm);
+  cursor: pointer;
+  transition: background 0.15s var(--kem-ease);
+}
+
+.result:hover {
+  background: var(--kem-canvas);
+}
+
+.result_selected {
+  background: var(--kem-sky);
+  outline: 2px solid var(--kem-blue);
+}
+
+.person-name {
+  font-weight: 600;
+}
+
+.small {
+  font-size: 0.75rem;
+}

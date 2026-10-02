@@ -154,6 +154,26 @@ OBJECTS = [
         ],
     },
     {
+        "name": "Contact", "label": "Contact", "plural": "Contacts", "standard": True,
+        "fields": [
+            {"name": "Preferred_Channel__c", "label": "Preferred Channel", "type": "Picklist", "values": ["Email", "SMS", "WhatsApp", "Phone"], "default": "Email"},
+            {"name": "Preferred_Language__c", "label": "Preferred Language", "type": "Picklist",
+             "values": ["English", "Hindi", "Kannada", "Tamil", "Telugu", "Malayalam", "Marathi", "Bengali", "Other"], "default": "English"},
+            {"name": "SMS_Opt_In__c", "label": "SMS Opt-in", "type": "Checkbox", "default": False},
+            {"name": "WhatsApp_Opt_In__c", "label": "WhatsApp Opt-in", "type": "Checkbox", "default": False},
+            {"name": "Emergency_Instructions__c", "label": "Emergency Instructions", "type": "LongTextArea", "length": 2000, "lines": 3,
+             "help": "Medical or safety information staff must know, for example allergies or authorised pickup notes."},
+        ],
+    },
+    {
+        "name": "LearnerProfile", "label": "Learner Profile", "plural": "Learner Profiles", "standard": True,
+        "fields": [
+            {"name": "Student_Number__c", "label": "Student Number", "type": "AutoNumber", "format": "STU-{00000}",
+             "help": "Institution-wide learner number, generated when the learner profile is created."},
+            {"name": "Branch__c", "label": "Home Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Learner_Profiles", "relLabel": "Learner Profiles"},
+        ],
+    },
+    {
         "name": "IndividualApplication", "label": "Application", "plural": "Applications", "standard": True,
         "fields": [
             {"name": "Branch__c", "label": "Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Applications", "relLabel": "Applications"},
@@ -182,8 +202,8 @@ from edu_fields import EDU_STANDARD_FIELDS  # noqa: E402
 STANDARD_FIELD_ACCESS = {
     **EDU_STANDARD_FIELDS,
     "Lead": ["Email", "Phone", "MobilePhone", "Description", "LeadSource", "Company"],
-    "Account": ["Phone", "PersonEmail", "PersonMobilePhone", "PersonBirthdate", "Description"],
-    "Contact": ["Email", "Phone", "MobilePhone", "Birthdate"],
+    "Account": ["Phone", "PersonEmail", "PersonMobilePhone", "PersonBirthdate", "Description", "PersonHasOptedOutOfEmail"],
+    "Contact": ["Email", "Phone", "MobilePhone", "Birthdate", "HasOptedOutOfEmail"],
 }
 
 # Object permissions that Salesforce requires alongside others (read access is added automatically).
@@ -200,6 +220,7 @@ COMMON_CLASSES = {
 }
 
 ENQUIRY_CLASSES = ["EnquiryController"]
+LEARNER_CLASSES = ["Learner360Controller"]
 
 # Education Cloud objects are only granted through permission sets tied to these licences.
 STAFF_LICENSE = "EducationCloudAccessPsl"
@@ -219,27 +240,27 @@ STAFF_TABS = ["Branch__c", "Room__c", "Branch_Staff__c"]
 PERMISSION_SETS = [
     {"name": "KEM_Administrator", "label": "KEM Administrator",
      "description": "Institution administrator: configures branches, policies, and has full access to Kasetti Education Management data.",
-     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
+     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "LearnerProfile": "CEDV", "CourseOffering": "CEDV", "CourseOfferingParticipant": "CEDV", "CourseOfferingSchedule": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
                  "IndividualApplication": "CEDV", "ContactContactRelation": "CEDV"},
-     "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "Error_Log__c"]},
+     "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "Error_Log__c"]},
     {"name": "KEM_Branch_Manager", "label": "KEM Branch Manager",
      "description": "Branch manager: manages rooms, classes, staff allocation, and learners for their branch.",
-     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "CED", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "E", "Room__c": "CED", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
-                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions"]},
+     "license": STAFF_LICENSE, "objects": {"CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "CED", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "E", "Room__c": "CED", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
+                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions"]},
     {"name": "KEM_Admissions_Counsellor", "label": "KEM Admissions Counsellor",
      "description": "Admissions counsellor: works enquiries, applications, offers, and follow-ups.",
-     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
-                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions"]},
+     "license": STAFF_LICENSE, "objects": {"CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
+                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions"]},
     {"name": "KEM_Academic_Coordinator", "label": "KEM Academic Coordinator",
      "description": "Academic coordinator: maintains curriculum, timetable, enrolments, and academic oversight.",
-     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "CE", "LearningCourse": "CE", "LearningProgram": "CE", "Branch__c": "", "Room__c": "CE", "Lead": "", "Account": "E", "Contact": "E", "IndividualApplication": "",
-                 "ContactContactRelation": ""}, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "CE", "LearningCourse": "CE", "LearningProgram": "CE", "LearnerProfile": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "CE", "Branch__c": "", "Room__c": "CE", "Lead": "", "Account": "E", "Contact": "E", "IndividualApplication": "",
+                 "ContactContactRelation": ""}, "classes": LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Teacher", "label": "KEM Teacher",
      "description": "Teacher: views assigned classes, marks attendance, and enters assessment results.",
-     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": ""}, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": ""}, "classes": LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Finance", "label": "KEM Finance",
      "description": "Finance user: manages fees, invoices, payments, allocations, and reconciliation.",
-     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": "", "ContactContactRelation": ""}, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": "", "ContactContactRelation": ""}, "classes": LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Portal_User", "label": "KEM Portal User", "classAccess": "portal",
      "description": "Learner or guardian portal access. Record visibility is enforced in Apex through explicit guardian relationships.",
      "license": PORTAL_LICENSE, "objects": {"Log_Event__e": "C"}},

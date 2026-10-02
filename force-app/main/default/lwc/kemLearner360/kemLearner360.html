@@ -1,0 +1,311 @@
+<template>
+  <template lwc:if={view}>
+    <div class="learner kem-fade-in">
+      <section class="kem-hero">
+        <div class="hero">
+          <span class={avatarClass} aria-hidden="true">{avatarInitials}</span>
+          <div class="hero-text">
+            <div class="kem-hero__title">{person.Name}</div>
+            <div class="chips">
+              <template lwc:if={studentNumber}>
+                <span class="hero-chip"
+                  ><lightning-icon
+                    icon-name="utility:identity"
+                    size="xx-small"
+                    variant="inverse"
+                  ></lightning-icon
+                  >{studentNumber}</span
+                >
+              </template>
+              <template for:each={roleChips} for:item="role">
+                <span key={role} class="hero-chip">{role}</span>
+              </template>
+              <template lwc:if={branchName}>
+                <span class="hero-chip"
+                  ><lightning-icon
+                    icon-name="utility:location"
+                    size="xx-small"
+                    variant="inverse"
+                  ></lightning-icon
+                  >{branchName}</span
+                >
+              </template>
+            </div>
+          </div>
+          <div class="hero-stats">
+            <div class="kem-kpi">
+              <div class="kem-kpi__value">{view.guardians.length}</div>
+              <div class="kem-kpi__label">Guardians</div>
+            </div>
+            <div class="kem-kpi">
+              <div class="kem-kpi__value">{view.applications.length}</div>
+              <div class="kem-kpi__label">Applications</div>
+            </div>
+            <div class="kem-kpi">
+              <div class="kem-kpi__value">{activeClassCount}</div>
+              <div class="kem-kpi__label">Active classes</div>
+            </div>
+          </div>
+        </div>
+        <div class="contact-row">
+          <span
+            ><lightning-icon
+              icon-name="utility:email"
+              size="xx-small"
+              variant="inverse"
+            ></lightning-icon>
+            {email}</span
+          >
+          <span
+            ><lightning-icon
+              icon-name="utility:phone_portrait"
+              size="xx-small"
+              variant="inverse"
+            ></lightning-icon>
+            {phone}</span
+          >
+          <span
+            ><lightning-icon
+              icon-name="utility:event"
+              size="xx-small"
+              variant="inverse"
+            ></lightning-icon>
+            {birthdate}</span
+          >
+        </div>
+      </section>
+
+      <template lwc:if={emergencyInstructions}>
+        <div class="alert kem-card" role="note">
+          <lightning-icon
+            icon-name="utility:warning"
+            size="x-small"
+            variant="error"
+            alternative-text="Important"
+          ></lightning-icon>
+          <div>
+            <strong>Emergency instructions:</strong> {emergencyInstructions}
+          </div>
+        </div>
+      </template>
+
+      <lightning-tabset variant="scoped">
+        <lightning-tab label="Overview">
+          <div class="tab-body">
+            <template lwc:if={view.isLearner}>
+              <div class="section-head">
+                <div class="kem-section-title">Guardians</div>
+                <lightning-button
+                  label="Add guardian"
+                  icon-name="utility:add"
+                  onclick={handleAddGuardian}
+                ></lightning-button>
+              </div>
+              <div class="cards">
+                <template for:each={guardianCards} for:item="g">
+                  <article
+                    key={g.relationId}
+                    class="kem-card kem-card_interactive person"
+                  >
+                    <div class="person-top">
+                      <span class={g.avatarClass}>{g.initials}</span>
+                      <div class="person-text">
+                        <a
+                          href="#"
+                          data-id={g.accountId}
+                          onclick={handleNavigate}
+                          >{g.name}</a
+                        >
+                        <div class="kem-muted small">{g.relationshipLabel}</div>
+                      </div>
+                      <lightning-button-menu
+                        alternative-text="Guardian actions"
+                        icon-size="x-small"
+                        menu-alignment="right"
+                        data-relation={g.relationId}
+                        onselect={handleGuardianMenu}
+                      >
+                        <lightning-menu-item
+                          value="edit"
+                          label="Edit link"
+                        ></lightning-menu-item>
+                        <lightning-menu-item
+                          value="end"
+                          label="End relationship"
+                        ></lightning-menu-item>
+                      </lightning-button-menu>
+                    </div>
+                    <div class="kem-muted small contact">{g.contactLine}</div>
+                    <div class="flags">
+                      <span class={g.feePayerClass}>Fee payer</span>
+                      <span class={g.portalClass}>Portal access</span>
+                      <span class={g.emergencyClass}>Emergency contact</span>
+                    </div>
+                  </article>
+                </template>
+                <template lwc:if={noGuardians}>
+                  <div class="kem-empty kem-card">No guardians linked yet.</div>
+                </template>
+              </div>
+              <template lwc:if={hasSiblings}>
+                <div class="kem-section-title section-gap">Siblings</div>
+                <div class="pill-row">
+                  <template for:each={view.siblings} for:item="s">
+                    <a
+                      key={s.accountId}
+                      class="pill"
+                      href="#"
+                      data-id={s.accountId}
+                      onclick={handleNavigate}
+                      >{s.name}</a
+                    >
+                  </template>
+                </div>
+              </template>
+            </template>
+            <template lwc:if={view.isGuardian}>
+              <div class="kem-section-title section-gap">Children</div>
+              <div class="cards">
+                <template for:each={childCards} for:item="c">
+                  <article
+                    key={c.relationId}
+                    class="kem-card kem-card_interactive person"
+                  >
+                    <div class="person-top">
+                      <span class={c.avatarClass}>{c.initials}</span>
+                      <div class="person-text">
+                        <a
+                          href="#"
+                          data-id={c.accountId}
+                          onclick={handleNavigate}
+                          >{c.name}</a
+                        >
+                        <div class="kem-muted small">{c.relationshipLabel}</div>
+                      </div>
+                    </div>
+                    <div class="flags">
+                      <span class={c.feePayerClass}>Fee payer</span>
+                      <span class={c.portalClass}>Portal access</span>
+                    </div>
+                  </article>
+                </template>
+              </div>
+            </template>
+            <template lwc:if={isNotPerson}>
+              <div class="kem-empty">
+                Learner 360 applies to person accounts.
+              </div>
+            </template>
+          </div>
+        </lightning-tab>
+        <lightning-tab label="Applications">
+          <div class="tab-body">
+            <template for:each={applicationRows} for:item="a">
+              <div key={a.Id} class="row kem-card">
+                <div class="row-main">
+                  <a href="#" data-id={a.Id} onclick={handleNavigate}
+                    >{a.Name}</a
+                  >
+                  <div class="kem-muted small">
+                    {a.courseLabel} · {a.branchLabel}
+                  </div>
+                </div>
+                <span class={a.statusClass}>{a.Status}</span>
+                <span class="kem-muted small">{a.appliedLabel}</span>
+              </div>
+            </template>
+            <template lwc:if={noApplications}>
+              <div class="kem-empty">No applications.</div>
+            </template>
+          </div>
+        </lightning-tab>
+        <lightning-tab label="Classes">
+          <div class="tab-body">
+            <template for:each={enrolmentRows} for:item="e">
+              <div key={e.Id} class="row kem-card">
+                <div class="row-main">
+                  <a href="#" data-id={e.Id} onclick={handleNavigate}
+                    >{e.offeringLabel}</a
+                  >
+                  <div class="kem-muted small">{e.periodLabel}</div>
+                </div>
+                <span class={e.statusClass}>{e.ParticipationStatus}</span>
+              </div>
+            </template>
+            <template lwc:if={noEnrolments}>
+              <div class="kem-empty">Not enrolled in any classes yet.</div>
+            </template>
+          </div>
+        </lightning-tab>
+        <lightning-tab label="Preferences">
+          <div class="tab-body prefs">
+            <lightning-combobox
+              label="Preferred channel"
+              name="preferredChannel"
+              value={prefs.preferredChannel}
+              options={channelOptions}
+              onchange={handlePref}
+            ></lightning-combobox>
+            <lightning-combobox
+              label="Preferred language"
+              name="preferredLanguage"
+              value={prefs.preferredLanguage}
+              options={languageOptions}
+              onchange={handlePref}
+            ></lightning-combobox>
+            <lightning-input
+              type="toggle"
+              label="SMS opt-in"
+              name="smsOptIn"
+              checked={prefs.smsOptIn}
+              onchange={handlePrefToggle}
+            ></lightning-input>
+            <lightning-input
+              type="toggle"
+              label="WhatsApp opt-in"
+              name="whatsAppOptIn"
+              checked={prefs.whatsAppOptIn}
+              onchange={handlePrefToggle}
+            ></lightning-input>
+            <lightning-input
+              type="toggle"
+              label="Opted out of email"
+              name="emailOptOut"
+              checked={prefs.emailOptOut}
+              onchange={handlePrefToggle}
+            ></lightning-input>
+            <lightning-textarea
+              class="span-all"
+              label="Emergency instructions"
+              name="emergencyInstructions"
+              value={prefs.emergencyInstructions}
+              max-length="2000"
+              onchange={handlePref}
+            ></lightning-textarea>
+            <div class="span-all actions">
+              <lightning-button
+                variant="brand"
+                label="Save preferences"
+                disabled={isSavingPrefs}
+                onclick={handleSavePrefs}
+              ></lightning-button>
+            </div>
+          </div>
+        </lightning-tab>
+      </lightning-tabset>
+    </div>
+  </template>
+  <template lwc:elseif={errorMessage}>
+    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+      {errorMessage}
+    </div>
+  </template>
+  <template lwc:else>
+    <div class="loading">
+      <lightning-spinner
+        alternative-text="Loading learner"
+        size="small"
+      ></lightning-spinner>
+    </div>
+  </template>
+</template>

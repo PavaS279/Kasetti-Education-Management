@@ -1,0 +1,179 @@
+@import "c/kemStyles";
+
+.learner {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hero {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.hero-text {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.hero-chip {
+  display: inline-flex;
+  gap: 0.3rem;
+  align-items: center;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.contact-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 0.9rem;
+  font-size: 0.8125rem;
+  opacity: 0.92;
+}
+
+.alert {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #fff5f5;
+  border-color: #f2c4c2;
+}
+
+.tab-body {
+  padding: 0.75rem 0.25rem;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.section-gap {
+  margin: 1.25rem 0 0.75rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.75rem;
+}
+
+.person {
+  padding: 0.875rem 1rem;
+}
+
+.person-top {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.person-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.person-text a {
+  font-weight: 700;
+  color: var(--kem-ink);
+}
+
+.contact {
+  margin-top: 0.5rem;
+}
+
+.flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.6rem;
+}
+
+.flag-off {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pill {
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: var(--kem-sky);
+  color: var(--kem-blue);
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.row-main {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.row-main a {
+  font-weight: 600;
+}
+
+.prefs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.75rem 1rem;
+  align-items: end;
+}
+
+.span-all {
+  grid-column: 1 / -1;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.loading {
+  position: relative;
+  min-height: 5rem;
+}
