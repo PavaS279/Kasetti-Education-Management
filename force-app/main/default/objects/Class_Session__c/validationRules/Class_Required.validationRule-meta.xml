@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Class_Required</fullName>
+    <active>true</active>
+    <description>Select the class this session belongs to.</description>
+    <errorConditionFormula>ISBLANK(Course_Offering__c)</errorConditionFormula>
+    <errorDisplayField>Course_Offering__c</errorDisplayField>
+    <errorMessage>Select the class this session belongs to.</errorMessage>
+</ValidationRule>

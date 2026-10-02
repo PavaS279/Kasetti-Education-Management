@@ -1,0 +1,56 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <lightning-record-edit-form
+      object-api-name="CourseOfferingSchedule"
+      onsubmit={handleSubmit}
+      onsuccess={handleSuccess}
+      onerror={handleError}
+    >
+      <lightning-messages></lightning-messages>
+      <lightning-input-field
+        field-name="Description"
+        value={defaultDescription}
+        required
+      ></lightning-input-field>
+      <div class="days" role="group" aria-label="Days of the week">
+        <lightning-input-field field-name="IsMonday"></lightning-input-field>
+        <lightning-input-field field-name="IsTuesday"></lightning-input-field>
+        <lightning-input-field field-name="IsWednesday"></lightning-input-field>
+        <lightning-input-field field-name="IsThursday"></lightning-input-field>
+        <lightning-input-field field-name="IsFriday"></lightning-input-field>
+        <lightning-input-field field-name="IsSaturday"></lightning-input-field>
+        <lightning-input-field field-name="IsSunday"></lightning-input-field>
+      </div>
+      <div class="times">
+        <lightning-input-field
+          field-name="StartTime"
+          required
+        ></lightning-input-field>
+        <lightning-input-field
+          field-name="EndTime"
+          required
+        ></lightning-input-field>
+        <lightning-input-field field-name="StartDate"></lightning-input-field>
+        <lightning-input-field field-name="Type"></lightning-input-field>
+      </div>
+      <p class="kem-muted small">
+        Sessions are generated from the start date (or the class start) until
+        the class end date, skipping calendar closures.
+      </p>
+      <div class="footer">
+        <lightning-button
+          label="Cancel"
+          onclick={handleCancel}
+        ></lightning-button>
+        <lightning-button
+          class="slds-m-left_x-small"
+          variant="brand"
+          type="submit"
+          label="Save pattern"
+          disabled={isSaving}
+        ></lightning-button>
+      </div>
+    </lightning-record-edit-form>
+  </lightning-modal-body>
+</template>

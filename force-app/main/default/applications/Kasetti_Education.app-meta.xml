@@ -62,6 +62,9 @@
     <tabs>standard-Account</tabs>
     <tabs>standard-LearningCourse</tabs>
     <tabs>standard-CourseOffering</tabs>
+    <tabs>KEM_Timetable</tabs>
+    <tabs>Class_Session__c</tabs>
+    <tabs>Calendar_Closure__c</tabs>
     <tabs>Branch__c</tabs>
     <tabs>Room__c</tabs>
     <tabs>Branch_Staff__c</tabs>

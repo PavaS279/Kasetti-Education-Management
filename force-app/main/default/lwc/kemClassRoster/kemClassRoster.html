@@ -22,14 +22,36 @@
             <div class="meter-bar"><span style={meterStyle}></span></div>
             <div class="meter-caption">{seatsLeftLabel}</div>
           </div>
-          <lightning-button
-            variant="brand-outline"
-            class="enrol-button"
-            label="Enrol learner"
-            icon-name="utility:adduser"
-            onclick={handleEnrol}
-            disabled={isClosed}
-          ></lightning-button>
+          <div class="hero-actions">
+            <lightning-button
+              variant="brand-outline"
+              class="enrol-button"
+              label="Enrol learner"
+              icon-name="utility:adduser"
+              onclick={handleEnrol}
+              disabled={isClosed}
+            ></lightning-button>
+            <lightning-button-menu
+              alternative-text="Scheduling actions"
+              icon-name="utility:event"
+              variant="border-inverse"
+              menu-alignment="right"
+              onselect={handleScheduleAction}
+            >
+              <lightning-menu-item
+                value="pattern"
+                label="Add weekly pattern"
+              ></lightning-menu-item>
+              <lightning-menu-item
+                value="generate"
+                label="Generate sessions"
+              ></lightning-menu-item>
+              <lightning-menu-item
+                value="timetable"
+                label="Open timetable"
+              ></lightning-menu-item>
+            </lightning-button-menu>
+          </div>
         </div>
       </section>
 

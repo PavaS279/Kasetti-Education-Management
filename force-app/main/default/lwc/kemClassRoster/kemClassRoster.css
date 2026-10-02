@@ -150,3 +150,9 @@
   position: relative;
   min-height: 5rem;
 }
+
+.hero-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}

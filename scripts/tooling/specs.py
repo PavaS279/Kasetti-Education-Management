@@ -203,6 +203,52 @@ OBJECTS = [
         ],
     },
     {
+        "name": "Class_Session__c", "label": "Class Session", "plural": "Class Sessions", "sharing": "Read", "externalSharing": "Read", "history": True,
+        "description": "One scheduled teaching session of a class, generated from its weekly pattern or added ad hoc.",
+        "fields": [
+            {"name": "Course_Offering__c", "label": "Class", "type": "Lookup", "ref": "CourseOffering", "relName": "Sessions", "relLabel": "Sessions"},
+            {"name": "Branch__c", "label": "Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Sessions", "relLabel": "Sessions"},
+            {"name": "Room__c", "label": "Room", "type": "Lookup", "ref": "Room__c", "relName": "Sessions", "relLabel": "Sessions", "track": True},
+            {"name": "Teacher_User__c", "label": "Teacher", "type": "Lookup", "ref": "User", "relName": "Taught_Sessions", "relLabel": "Taught Sessions", "track": True},
+            {"name": "Start__c", "label": "Start", "type": "DateTime", "required": True, "track": True},
+            {"name": "End__c", "label": "End", "type": "DateTime", "required": True, "track": True},
+            {"name": "Status__c", "label": "Status", "type": "Picklist", "values": ["Scheduled", "Completed", "Cancelled"], "default": "Scheduled", "track": True},
+            {"name": "Session_Type__c", "label": "Session Type", "type": "Picklist", "values": ["Class", "Lab", "Exam", "Extra", "Make-up"], "default": "Class"},
+            {"name": "Delivery_Mode__c", "label": "Delivery Mode", "type": "Picklist", "values": DELIVERY_MODES},
+            {"name": "Schedule__c", "label": "Weekly Pattern", "type": "Lookup", "ref": "CourseOfferingSchedule", "relName": "Sessions", "relLabel": "Sessions"},
+            {"name": "Original_Start__c", "label": "Original Start", "type": "DateTime", "systemManaged": True},
+            {"name": "Rescheduled__c", "label": "Rescheduled", "type": "Checkbox", "default": False, "systemManaged": True},
+            {"name": "Cancellation_Reason__c", "label": "Change Reason", "type": "TextArea"},
+            {"name": "Meeting_Url__c", "label": "Meeting URL", "type": "Url"},
+            {"name": "Attendance_Marked__c", "label": "Attendance Marked", "type": "Checkbox", "default": False, "systemManaged": True},
+            {"name": "Teacher_Attendance__c", "label": "Teacher Attendance", "type": "Picklist", "values": ["Present", "Late", "Absent", "Substituted"], "systemManaged": True},
+            {"name": "Notes__c", "label": "Session Notes", "type": "LongTextArea", "length": 5000, "lines": 4},
+            {"name": "Duration_Minutes__c", "label": "Duration (Minutes)", "type": "Formula", "returnType": "Number", "scale": 0,
+             "formula": "ROUND((End__c - Start__c) * 1440, 0)"},
+            {"name": "External_Id__c", "label": "External ID", "type": "Text", "length": 120, "unique": True, "externalId": True,
+             "help": "Generated sessions use class ID + start time so regeneration never duplicates a session."},
+        ],
+        "validationRules": [
+            {"name": "Class_Required", "formula": "ISBLANK(Course_Offering__c)", "field": "Course_Offering__c", "message": "Select the class this session belongs to."},
+            {"name": "End_After_Start", "formula": "End__c <= Start__c", "field": "End__c", "message": "End must be after Start."},
+            {"name": "Reason_For_Cancellation", "formula": "AND(ISPICKVAL(Status__c, 'Cancelled'), ISBLANK(Cancellation_Reason__c))",
+             "field": "Cancellation_Reason__c", "message": "Enter a reason when cancelling a session."},
+        ],
+    },
+    {
+        "name": "Calendar_Closure__c", "label": "Calendar Closure", "plural": "Calendar Closures", "sharing": "Read", "externalSharing": "Read",
+        "description": "Holiday or closure dates. Session generation skips them. Blank branch applies to every branch.",
+        "fields": [
+            {"name": "Branch__c", "label": "Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Closures", "relLabel": "Closures"},
+            {"name": "Start_Date__c", "label": "Start Date", "type": "Date", "required": True},
+            {"name": "End_Date__c", "label": "End Date", "type": "Date", "required": True},
+            {"name": "Closure_Type__c", "label": "Type", "type": "Picklist", "values": ["Public Holiday", "Term Break", "Branch Closure", "Other"], "default": "Public Holiday"},
+        ],
+        "validationRules": [
+            {"name": "End_On_Or_After_Start", "formula": "End_Date__c < Start_Date__c", "field": "End_Date__c", "message": "End Date must be on or after Start Date."},
+        ],
+    },
+    {
         "name": "Error_Log__c", "label": "Error Log", "plural": "Error Logs", "sharing": "Private", "search": False,
         "nameField": {"label": "Log Number", "type": "AutoNumber", "format": "LOG-{000000}"},
         "description": "Persistent application log written asynchronously from Log_Event__e so that entries survive transaction rollback.",
@@ -359,6 +405,7 @@ ENQUIRY_CLASSES = ["EnquiryController", "ApplicationController"]
 LEARNER_CLASSES = ["Learner360Controller"]
 PRICING_CLASSES = ["PricingController"]
 ENROLMENT_CLASSES = ["EnrolmentController"]
+SCHEDULE_CLASSES = ["TimetableController"]
 
 # Education Cloud objects are only granted through permission sets tied to these licences.
 STAFF_LICENSE = "EducationCloudAccessPsl"
@@ -373,32 +420,32 @@ EDU_OBJECTS = {
     "ContactContactRelation", "PartyRoleRelation", "CourseOffering", "CourseOfferingParticipant",
     "CourseOfferingSchedule", "AcademicTerm", "AcademicSession", "LearnerProfile", "DocumentChecklistItem",
 }
-STAFF_TABS = ["Branch__c", "Room__c", "Branch_Staff__c", "Fee_Price__c", "Discount__c"]
+STAFF_TABS = ["Branch__c", "Room__c", "Branch_Staff__c", "Fee_Price__c", "Discount__c", "Class_Session__c", "Calendar_Closure__c", "KEM_Timetable"]
 
 PERMISSION_SETS = [
     {"name": "KEM_Administrator", "label": "KEM Administrator",
      "description": "Institution administrator: configures branches, policies, and has full access to Kasetti Education Management data.",
-     "license": STAFF_LICENSE, "objects": {"Fee_Price__c": "CEDM", "Discount__c": "CEDM", "Enrolment_Fee_Line__c": "CEDM", "DocumentChecklistItem": "CEDV", "Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "LearnerProfile": "CEDV", "CourseOffering": "CEDV", "CourseOfferingParticipant": "CEDV", "CourseOfferingSchedule": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
+     "license": STAFF_LICENSE, "objects": {"Class_Session__c": "CEDM", "Calendar_Closure__c": "CEDM", "Fee_Price__c": "CEDM", "Discount__c": "CEDM", "Enrolment_Fee_Line__c": "CEDM", "DocumentChecklistItem": "CEDV", "Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "LearnerProfile": "CEDV", "CourseOffering": "CEDV", "CourseOfferingParticipant": "CEDV", "CourseOfferingSchedule": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
                  "IndividualApplication": "CEDV", "ContactContactRelation": "CEDV"},
      "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES, "custom": ["KEM_Approve_Discounts"], "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications", "Error_Log__c"]},
     {"name": "KEM_Branch_Manager", "label": "KEM Branch Manager",
      "description": "Branch manager: manages rooms, classes, staff allocation, and learners for their branch.",
-     "license": STAFF_LICENSE, "objects": {"Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "CED", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "E", "Room__c": "CED", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
-                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
+     "license": STAFF_LICENSE, "objects": {"Class_Session__c": "CEDM", "Calendar_Closure__c": "CED", "Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "CED", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "E", "Room__c": "CED", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
+                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
     {"name": "KEM_Admissions_Counsellor", "label": "KEM Admissions Counsellor",
      "description": "Admissions counsellor: works enquiries, applications, offers, and follow-ups.",
-     "license": STAFF_LICENSE, "objects": {"Enrolment_Fee_Line__c": "CE", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "CED", "CourseOffering": "", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
-                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
+     "license": STAFF_LICENSE, "objects": {"Class_Session__c": "", "Calendar_Closure__c": "", "Enrolment_Fee_Line__c": "CE", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "CED", "CourseOffering": "", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
+                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
     {"name": "KEM_Academic_Coordinator", "label": "KEM Academic Coordinator",
      "description": "Academic coordinator: maintains curriculum, timetable, enrolments, and academic oversight.",
-     "license": STAFF_LICENSE, "objects": {"Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "CE", "LearningCourse": "CE", "LearningProgram": "CE", "LearnerProfile": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "CE", "Branch__c": "", "Room__c": "CE", "Lead": "", "Account": "E", "Contact": "E", "IndividualApplication": "",
-                 "ContactContactRelation": ""}, "classes": LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"Class_Session__c": "CEDM", "Calendar_Closure__c": "CEDM", "Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "CE", "LearningCourse": "CE", "LearningProgram": "CE", "LearnerProfile": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "CE", "Branch__c": "", "Room__c": "CE", "Lead": "", "Account": "E", "Contact": "E", "IndividualApplication": "",
+                 "ContactContactRelation": ""}, "classes": LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Teacher", "label": "KEM Teacher",
      "description": "Teacher: views assigned classes, marks attendance, and enters assessment results.",
-     "license": STAFF_LICENSE, "objects": {"Fee_Price__c": "", "Discount__c": "", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": ""}, "classes": LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"Class_Session__c": "", "Calendar_Closure__c": "", "Fee_Price__c": "", "Discount__c": "", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": ""}, "classes": LEARNER_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Finance", "label": "KEM Finance",
      "description": "Finance user: manages fees, invoices, payments, allocations, and reconciliation.",
-     "license": STAFF_LICENSE, "objects": {"Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "CEDV", "Discount__c": "CEDV", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": "", "ContactContactRelation": ""}, "classes": LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES, "custom": ["KEM_Approve_Discounts"], "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"Class_Session__c": "", "Calendar_Closure__c": "", "Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "CEDV", "Discount__c": "CEDV", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": "", "ContactContactRelation": ""}, "classes": LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES, "custom": ["KEM_Approve_Discounts"], "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Eligibility_Override", "label": "KEM Eligibility Override",
      "description": "Allows overriding a failed eligibility check on an application. Grant to administrators and branch managers.",
      "objects": {}, "custom": ["KEM_Override_Eligibility"]},
@@ -428,6 +475,9 @@ TRANSITIONS = {
     ("CourseOfferingParticipant", "ParticipationStatus"): [
         ("Enrolled", "Withdrew"), ("Enrolled", "Completed"), ("Enrolled", "On Hold"), ("Enrolled", "Failed"),
         ("On Hold", "Enrolled"), ("On Hold", "Withdrew"),
+    ],
+    ("Class_Session__c", "Status__c"): [
+        ("Scheduled", "Completed"), ("Scheduled", "Cancelled"), ("Cancelled", "Scheduled"), ("Completed", "Scheduled"),
     ],
     ("Lead", "Status"): [
         ("New", "Contacted"), ("New", "Nurturing"), ("New", "Unqualified"), ("New", "Qualified"),

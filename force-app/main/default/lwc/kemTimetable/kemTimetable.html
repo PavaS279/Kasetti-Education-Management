@@ -1,0 +1,209 @@
+<template>
+  <div class="timetable">
+    <section class="kem-hero kem-fade-in">
+      <div class="hero-row">
+        <div>
+          <div class="kem-hero__title">Timetable</div>
+          <div class="kem-hero__subtitle">
+            {weekLabel} · {sessionCount} sessions
+          </div>
+        </div>
+        <div class="nav">
+          <lightning-button-icon
+            icon-name="utility:chevronleft"
+            variant="border-inverse"
+            alternative-text="Previous week"
+            title="Previous week"
+            onclick={handlePrev}
+          ></lightning-button-icon>
+          <lightning-button
+            variant="inverse"
+            label="Today"
+            onclick={handleToday}
+          ></lightning-button>
+          <lightning-button-icon
+            icon-name="utility:chevronright"
+            variant="border-inverse"
+            alternative-text="Next week"
+            title="Next week"
+            onclick={handleNext}
+          ></lightning-button-icon>
+        </div>
+      </div>
+      <div class="filters">
+        <lightning-combobox
+          label="Branch"
+          variant="label-hidden"
+          placeholder="All branches"
+          value={branchId}
+          options={branchOptions}
+          onchange={handleBranch}
+        ></lightning-combobox>
+        <lightning-combobox
+          label="Teacher"
+          variant="label-hidden"
+          placeholder="All teachers"
+          value={teacherId}
+          options={teacherOptions}
+          onchange={handleTeacher}
+        ></lightning-combobox>
+        <lightning-combobox
+          label="Room"
+          variant="label-hidden"
+          placeholder="All rooms"
+          value={roomId}
+          options={roomOptions}
+          onchange={handleRoom}
+        ></lightning-combobox>
+      </div>
+    </section>
+
+    <template lwc:if={errorMessage}>
+      <div
+        class="slds-m-top_small slds-notify slds-notify_alert slds-alert_error"
+        role="alert"
+      >
+        {errorMessage}
+      </div>
+    </template>
+
+    <div class="layout">
+      <div class="grid-wrap kem-card">
+        <div class="day-pills" role="tablist" aria-label="Days">
+          <template for:each={days} for:item="day">
+            <button
+              key={day.key}
+              type="button"
+              role="tab"
+              class={day.pillClass}
+              aria-selected={day.selectedAttr}
+              data-key={day.key}
+              onclick={handlePickDay}
+            >
+              <span class="pill-dow">{day.dow}</span
+              ><span class="pill-date">{day.dom}</span>
+            </button>
+          </template>
+        </div>
+        <div class="grid" style={gridStyle}>
+          <div class="corner"></div>
+          <template for:each={days} for:item="day">
+            <div key={day.key} class={day.headClass}>
+              <span class="dow">{day.dow}</span>
+              <span class="dom">{day.dom}</span>
+            </div>
+          </template>
+          <div class="hours">
+            <template for:each={hours} for:item="h">
+              <div key={h.label} class="hour-label" style={h.style}>
+                {h.label}
+              </div>
+            </template>
+          </div>
+          <template for:each={days} for:item="day">
+            <div
+              key={day.key}
+              class={day.columnClass}
+              data-key={day.key}
+              ondragover={handleDragOver}
+              ondragleave={handleDragLeave}
+              ondrop={handleDrop}
+            >
+              <template for:each={hours} for:item="h">
+                <div key={h.label} class="hour-line" style={h.style}></div>
+              </template>
+              <template lwc:if={day.isToday}>
+                <div class="now-line" style={nowStyle}><span></span></div>
+              </template>
+              <template for:each={day.sessions} for:item="s">
+                <article
+                  key={s.id}
+                  class={s.className}
+                  style={s.style}
+                  draggable={s.draggable}
+                  data-id={s.id}
+                  tabindex="0"
+                  role="button"
+                  aria-label={s.ariaLabel}
+                  ondragstart={handleDragStart}
+                  onclick={handleSelect}
+                  onkeydown={handleKey}
+                >
+                  <div class="session-time">{s.timeLabel}</div>
+                  <div class="session-title">{s.className_}</div>
+                  <div class="session-meta">{s.roomName}</div>
+                  <div class="session-flags">
+                    <template lwc:if={s.rescheduled}
+                      ><lightning-icon
+                        icon-name="utility:replace"
+                        size="xx-small"
+                        alternative-text="Rescheduled"
+                        title="Rescheduled"
+                      ></lightning-icon
+                    ></template>
+                    <template lwc:if={s.attendanceMarked}
+                      ><lightning-icon
+                        icon-name="utility:check"
+                        size="xx-small"
+                        alternative-text="Attendance marked"
+                        title="Attendance marked"
+                      ></lightning-icon
+                    ></template>
+                  </div>
+                </article>
+              </template>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <template lwc:if={selected}>
+        <aside class="drawer kem-card kem-fade-in" aria-label="Session details">
+          <div class="drawer-head">
+            <div>
+              <div class="kem-section-title">{selected.sessionType}</div>
+              <div class="drawer-title">{selected.className_}</div>
+            </div>
+            <lightning-button-icon
+              icon-name="utility:close"
+              variant="bare"
+              alternative-text="Close"
+              onclick={handleCloseDrawer}
+            ></lightning-button-icon>
+          </div>
+          <dl class="facts">
+            <dt>When</dt>
+            <dd>{selected.dayLabel}, {selected.timeLabel}</dd>
+            <dt>Course</dt>
+            <dd>{selected.courseName}</dd>
+            <dt>Teacher</dt>
+            <dd>{selected.teacherName}</dd>
+            <dt>Room</dt>
+            <dd>{selected.roomName}</dd>
+            <dt>Status</dt>
+            <dd><span class={selected.statusClass}>{selected.status}</span></dd>
+          </dl>
+          <div class="drawer-actions">
+            <lightning-button
+              label="Open class"
+              icon-name="utility:open"
+              data-id={selected.classId}
+              onclick={handleOpenClass}
+            ></lightning-button>
+            <template lwc:if={selected.isScheduled}>
+              <lightning-button
+                variant="destructive-text"
+                label="Cancel session"
+                onclick={handleCancelSession}
+              ></lightning-button>
+            </template>
+          </div>
+          <p class="kem-muted small">
+            Drag a session to another day or time to reschedule. Teacher and
+            room clashes are blocked; learner clashes ask for confirmation.
+          </p>
+        </aside>
+      </template>
+    </div>
+  </div>
+</template>

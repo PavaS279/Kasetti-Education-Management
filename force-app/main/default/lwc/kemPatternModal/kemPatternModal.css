@@ -1,0 +1,23 @@
+@import "c/kemStyles";
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  margin: 0.5rem 0;
+}
+
+.times {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0 1rem;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.small {
+  font-size: 0.75rem;
+}

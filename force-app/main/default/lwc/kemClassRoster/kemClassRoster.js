@@ -6,6 +6,8 @@ import getRoster from "@salesforce/apex/EnrolmentController.getRoster";
 import withdraw from "@salesforce/apex/EnrolmentController.withdraw";
 import decideDiscount from "@salesforce/apex/EnrolmentController.decideDiscount";
 import EnrolModal from "c/kemEnrolModal";
+import PatternModal from "c/kemPatternModal";
+import generateSessions from "@salesforce/apex/TimetableController.generateSessions";
 import ReasonModal from "c/kemReasonModal";
 import { reduceErrors, toast, toastError, initials, toneFor } from "c/kemUtils";
 
@@ -145,6 +147,58 @@ export default class KemClassRoster extends NavigationMixin(LightningElement) {
           : "The enrolment and agreed price were saved."
       );
       await refreshApex(this.wiredResult);
+    }
+  }
+
+  async handleScheduleAction(event) {
+    const action = event.detail.value;
+
+    if (action === "timetable") {
+      this[NavigationMixin.Navigate]({
+        type: "standard__navItemPage",
+        attributes: { apiName: "KEM_Timetable" }
+      });
+
+      return;
+    }
+
+    if (action === "pattern") {
+      const id = await PatternModal.open({
+        size: "medium",
+        label: "Add weekly pattern",
+        offeringId: this.recordId,
+        offeringName: this.offering.Name
+      });
+
+      if (id) {
+        toast(
+          this,
+          "Pattern saved",
+          "Generate sessions to fill the timetable."
+        );
+      }
+
+      return;
+    }
+
+    try {
+      const result = await generateSessions({ offeringId: this.recordId });
+
+      const extra = result.conflicts.length
+        ? ` ${result.conflicts.length} could not be scheduled: ${result.conflicts.join("; ")}`
+        : "";
+
+      toast(
+        this,
+
+        "Sessions generated",
+
+        `${result.created} created, ${result.skippedExisting} already existed, ${result.skippedClosures} skipped for closures.${extra}`,
+
+        result.conflicts.length ? "warning" : "success"
+      );
+    } catch (error) {
+      toastError(this, error, "Sessions could not be generated");
     }
   }
 

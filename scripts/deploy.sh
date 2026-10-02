@@ -24,21 +24,17 @@ fi
 command=(sf project deploy start)
 [[ "${CHECK_ONLY:-}" == "1" ]] && command=(sf project deploy validate)
 
-# Production blocks deploying Apex that scheduled jobs depend on: pause KEM jobs,
-# deploy, then reschedule them (KemJobs.scheduleAll is idempotent).
-if [[ "${CHECK_ONLY:-}" != "1" ]]; then
-  sf apex run --file scripts/apex/unschedule-kem-jobs.apex --target-org "$target" >/dev/null 2>&1 || true
-fi
+# Production blocks deploying (and validating) Apex that scheduled jobs depend on:
+# pause KEM jobs, deploy, then reschedule them (KemJobs.scheduleAll is idempotent).
+sf apex run --file scripts/apex/unschedule-kem-jobs.apex --target-org "$target" >/dev/null 2>&1 || true
 
 status=0
 "${command[@]}" "${sources[@]}" --target-org "$target" \
   --test-level RunSpecifiedTests "${tests[@]}" --wait 60 --json | node scripts/tooling/deploy-summary.js || status=$?
 
-if [[ "${CHECK_ONLY:-}" != "1" ]]; then
-  if sf apex run --file scripts/apex/schedule-kem-jobs.apex --target-org "$target" >/dev/null 2>&1; then
-    echo "KEM scheduled jobs: ensured"
-  else
-    echo "WARNING: could not reschedule KEM jobs; run scripts/apex/schedule-kem-jobs.apex" >&2
-  fi
+if sf apex run --file scripts/apex/schedule-kem-jobs.apex --target-org "$target" >/dev/null 2>&1; then
+  echo "KEM scheduled jobs: ensured"
+else
+  echo "WARNING: could not reschedule KEM jobs; run scripts/apex/schedule-kem-jobs.apex" >&2
 fi
 exit $status
