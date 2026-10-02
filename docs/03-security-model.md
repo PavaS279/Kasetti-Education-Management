@@ -1,0 +1,52 @@
+# 03 — Security Model
+
+## Principles
+
+- Access is granted **only** through permission sets (`KEM_*`); profiles are not modified.
+- Custom objects default to the most restrictive sharing that supports the process.
+- Apex runs `with sharing` (services, controllers) and queries `WITH USER_MODE`; DML uses `AccessLevel.USER_MODE` unless a documented system operation needs elevated rights (logging, managed sharing).
+- Portal access is decided by explicit relationships ([ADR-003](adr/ADR-003-portal-access.md)).
+
+## Personas and permission sets
+
+| Persona                   | Permission set              | Summary                                                             |
+| ------------------------- | --------------------------- | ------------------------------------------------------------------- |
+| Institution administrator | `KEM_Administrator`         | Full access including View/Modify All on KEM objects and error logs |
+| Branch manager            | `KEM_Branch_Manager`        | Edits own branch (Apex managed share), manages rooms in own branch  |
+| Admissions counsellor     | `KEM_Admissions_Counsellor` | Enquiries, applications, offers                                     |
+| Academic coordinator      | `KEM_Academic_Coordinator`  | Classes, timetable, enrolments, rooms                               |
+| Teacher                   | `KEM_Teacher`               | Assigned sessions, attendance, results entry                        |
+| Finance user              | `KEM_Finance`               | Prices, invoices, payments, reconciliation                          |
+| Learner / guardian        | `KEM_Portal_User`           | Portal components only; data filtered by relationship               |
+
+Education Cloud objects additionally require the **Education Cloud – Full Access** permission set licence (staff) or **Education Cloud for Experience Cloud User** (portal).
+
+## Object access matrix (Phase 0)
+
+| Object       | Admin             | Branch Mgr                       | Admissions | Academic    | Teacher | Finance |
+| ------------ | ----------------- | -------------------------------- | ---------- | ----------- | ------- | ------- |
+| Branch__c    | CRUD + Modify All | Read/Edit (own branch via share) | Read       | Read        | Read    | Read    |
+| Room__c      | CRUD + Modify All | CRUD (own branch)                | Read       | Create/Edit | Read    | Read    |
+| Error_Log__c | CRUD + Modify All | —                                | —          | —           | —       | —       |
+
+The matrix is extended per feature in `scripts/tooling/specs.py` (`PERMISSION_SETS`).
+
+## Sharing
+
+| Object       | OWD                  | Extra sharing                                                                             |
+| ------------ | -------------------- | ----------------------------------------------------------------------------------------- |
+| Branch__c    | Public Read Only     | `Branch__Share` row cause `Branch_Manager__c` (Edit) maintained by `BranchTriggerHandler` |
+| Room__c      | Controlled by parent | —                                                                                         |
+| Error_Log__c | Private              | Admins via View All                                                                       |
+
+## Validated access scenarios (`SecurityModelTest`)
+
+| Scenario                                                          | Result                     |
+| ----------------------------------------------------------------- | -------------------------- |
+| Branch manager creates and edits a room in their own branch       | Allowed                    |
+| Branch manager creates a room in another branch                   | Denied                     |
+| Teacher reads branches                                            | Allowed                    |
+| Teacher creates a room or a branch                                | Denied                     |
+| Teacher reads error logs                                          | Denied                     |
+| Administrator reads all error logs                                | Allowed                    |
+| Branch manager edits own branch; share moves when manager changes | Allowed / share re-pointed |

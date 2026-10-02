@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Invoice_Due_Days_Positive</fullName>
+    <active>true</active>
+    <description>Invoice due days cannot be negative.</description>
+    <errorConditionFormula
+  >AND(NOT(ISBLANK(Invoice_Due_Days__c)), Invoice_Due_Days__c &lt; 0)</errorConditionFormula>
+    <errorDisplayField>Invoice_Due_Days__c</errorDisplayField>
+    <errorMessage>Invoice due days cannot be negative.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Organisation-wide defaults and policies. Branch fields override these where present.</description>
+    <label>Education Setting</label>
+    <pluralLabel>Education Settings</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Learner or guardian portal access. Record visibility is enforced in Apex through explicit guardian relationships.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>KEM Portal User</label>
+</PermissionSet>

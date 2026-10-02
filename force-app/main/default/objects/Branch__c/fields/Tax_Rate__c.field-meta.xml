@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tax_Rate__c</fullName>
+    <inlineHelpText
+  >Tax rate applied to invoice lines raised for this branch.</inlineHelpText>
+    <label>Tax Rate</label>
+    <required>false</required>
+    <precision>5</precision>
+    <scale>2</scale>
+    <trackHistory>true</trackHistory>
+    <type>Percent</type>
+</CustomField>
