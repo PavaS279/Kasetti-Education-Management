@@ -221,6 +221,16 @@
         </lightning-tab>
         <lightning-tab label="Classes">
           <div class="tab-body">
+            <template lwc:if={view.isLearner}>
+              <div class="section-head">
+                <div class="kem-section-title">Class enrolments</div>
+                <lightning-button
+                  label="Enrol in class"
+                  icon-name="utility:adduser"
+                  onclick={handleEnrol}
+                ></lightning-button>
+              </div>
+            </template>
             <template for:each={enrolmentRows} for:item="e">
               <div key={e.Id} class="row kem-card">
                 <div class="row-main">

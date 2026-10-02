@@ -232,4 +232,30 @@ public class TestDataFactory {
     insert course;
     return course;
   }
+
+  /** Creates an open class for a course at a branch. */
+  public static CourseOffering createOffering(
+    Id courseId,
+    Id branchId,
+    Integer capacity
+  ) {
+    CourseOffering offering = new CourseOffering(
+      Name = unique('Class').left(80),
+      LearningCourseId = courseId,
+      Branch__c = branchId,
+      EnrollmentCapacity = capacity,
+      Delivery_Mode__c = 'Classroom',
+      Class_Status__c = 'Open',
+      StartDate = DateTime.newInstance(
+        Date.today().addDays(-7),
+        Time.newInstance(9, 0, 0, 0)
+      ),
+      EndDate = DateTime.newInstance(
+        Date.today().addDays(90),
+        Time.newInstance(17, 0, 0, 0)
+      )
+    );
+    insert offering;
+    return offering;
+  }
 }

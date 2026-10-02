@@ -6,6 +6,7 @@ import getLearner360 from "@salesforce/apex/Learner360Controller.getLearner360";
 import endGuardianLink from "@salesforce/apex/Learner360Controller.endGuardianLink";
 import updatePreferences from "@salesforce/apex/Learner360Controller.updatePreferences";
 import GuardianModal from "c/kemGuardianModal";
+import EnrolModal from "c/kemEnrolModal";
 import { reduceErrors, toast, toastError, initials, toneFor } from "c/kemUtils";
 
 const DASH = "—";
@@ -202,6 +203,30 @@ export default class KemLearner360 extends NavigationMixin(LightningElement) {
         actionName: "view"
       }
     });
+  }
+
+  async handleEnrol() {
+    const result = await EnrolModal.open({
+      size: "medium",
+
+      label: `Enrol ${this.person.Name}`,
+
+      learnerId: this.recordId,
+
+      learnerName: this.person.Name,
+
+      branchId: this.person.Branch__c
+    });
+
+    if (result?.enrolmentId) {
+      toast(
+        this,
+        "Learner enrolled",
+        "The enrolment and agreed price were saved."
+      );
+
+      await refreshApex(this.wiredResult);
+    }
   }
 
   async handleAddGuardian() {

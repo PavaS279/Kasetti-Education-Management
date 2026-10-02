@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Enrolment__c</fullName>
+    <label>Enrolment</label>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <referenceTo>CourseOfferingParticipant</referenceTo>
+    <relationshipLabel>Fee Lines</relationshipLabel>
+    <relationshipName>Fee_Lines</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

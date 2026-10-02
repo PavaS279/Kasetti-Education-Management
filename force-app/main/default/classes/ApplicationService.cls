@@ -412,6 +412,15 @@ public with sharing class ApplicationService {
     );
   }
 
+  /** Marks an accepted application as enrolled (called by EnrolmentService). */
+  public static void markEnrolled(Id applicationId) {
+    IndividualApplication application = load(applicationId);
+    if (application.Status == 'Enrolled') {
+      return;
+    }
+    write(new IndividualApplication(Id = applicationId, Status = 'Enrolled'));
+  }
+
   /** Expires open offers whose expiry date has passed. Used by OfferExpiryJob. */
   public static Integer expireOffers(List<IndividualApplication> applications) {
     List<IndividualApplication> updates = new List<IndividualApplication>();

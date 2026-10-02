@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Enrolment_Required</fullName>
+    <active>true</active>
+    <description>A fee line must belong to an enrolment.</description>
+    <errorConditionFormula>ISBLANK(Enrolment__c)</errorConditionFormula>
+    <errorDisplayField>Enrolment__c</errorDisplayField>
+    <errorMessage>A fee line must belong to an enrolment.</errorMessage>
+</ValidationRule>

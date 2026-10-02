@@ -1,0 +1,152 @@
+@import "c/kemStyles";
+
+.roster {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hero {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.hero-text {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.hero-chip {
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.meter {
+  min-width: 12rem;
+}
+
+.meter-numbers {
+  display: flex;
+  gap: 0.35rem;
+  align-items: baseline;
+}
+
+.meter-big {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.meter-bar {
+  height: 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  margin: 0.35rem 0;
+}
+
+.meter-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7ef0c9, #ffffff);
+  transition: width 0.5s var(--kem-ease);
+}
+
+.meter-caption {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.enrol-button {
+  --slds-c-button-brand-color-background: #fff;
+}
+
+.panel {
+  padding: 1rem;
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.table th {
+  text-align: left;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--kem-muted);
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--kem-line);
+}
+
+.table td {
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid var(--kem-line);
+  vertical-align: middle;
+}
+
+.table tbody tr {
+  transition: background 0.15s var(--kem-ease);
+}
+
+.table tbody tr:hover {
+  background: var(--kem-canvas);
+}
+
+.learner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.kem-avatar_sm {
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 0.6875rem;
+}
+
+.num {
+  text-align: right;
+}
+
+.actions-col {
+  width: 3rem;
+  text-align: right;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.loading {
+  position: relative;
+  min-height: 5rem;
+}

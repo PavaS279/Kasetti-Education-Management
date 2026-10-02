@@ -82,3 +82,11 @@ Guardian link convention: `ContactId` = guardian's person contact, `RelatedConta
 | -------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Fee_Price__c` | Public Read Only | `Learning_Course__c`, `Branch__c` (blank = all), `Fee_Type__c`, `Delivery_Mode__c` (blank = all), `Billing_Frequency__c`, `Amount__c`, `Effective_From__c`, `Effective_To__c`, `Active__c`, `External_Id__c`           |
 | `Discount__c`  | Public Read Only | `Code__c` (unique, upper case), `Discount_Type__c`, `Value__c`, `Fee_Type__c`, `Applies_To_Course__c`, `Applies_To_Branch__c`, `Valid_From__c`, `Valid_To__c`, `Max_Uses__c`, `Times_Used__c`*, `Requires_Approval__c` |
+
+### F1.5 Enrolment (deployed)
+
+| Object                                  | Fields                                                                                                                                                                                                               |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CourseOffering` (class)                | `Branch__c`, `Room__c`, `Delivery_Mode__c`, `Class_Status__c`, `Seats_Taken__c`*, `Seats_Available__c` (formula), `Teacher_User__c`                                                                                  |
+| `CourseOfferingParticipant` (enrolment) | `Application__c`_, `Branch__c`_, `Discount__c`_, `Discount_Approval_Status__c`_, `Agreed_Subtotal__c`_, `Agreed_Discount__c`_, `Agreed_Tax__c`_, `Agreed_Total__c`_, `Withdrawal_Reason__c`_, `Billing_Status__c`_   |
+| `Enrolment_Fee_Line__c` (Private)       | `Enrolment__c`, `Fee_Price__c`, `Fee_Type__c`, `Billing_Frequency__c`, `Description__c`, `Unit_Amount__c`, `Discount_Amount__c`, `Tax_Rate__c`, `Tax_Amount__c`, `Line_Total__c`, `Invoiced__c` — all system-managed |

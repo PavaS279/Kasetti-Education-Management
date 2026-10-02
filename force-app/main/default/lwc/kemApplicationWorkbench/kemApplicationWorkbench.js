@@ -9,6 +9,7 @@ import updateChecklistItem from "@salesforce/apex/ApplicationController.updateCh
 import addChecklistItem from "@salesforce/apex/ApplicationController.addChecklistItem";
 import ReasonModal from "c/kemReasonModal";
 import DecisionModal from "c/kemDecisionModal";
+import EnrolModal from "c/kemEnrolModal";
 import { reduceErrors, toast, toastError, formatDateTime } from "c/kemUtils";
 
 const STAGES = [
@@ -223,6 +224,17 @@ export default class KemApplicationWorkbench extends NavigationMixin(
         icon: "utility:dislike"
       });
     }
+    if (
+      status === "Application Decision" &&
+      this.app.Offer_Status__c === "Accepted"
+    ) {
+      list.push({
+        name: "enrol",
+        label: "Enrol in class",
+        variant: "brand-outline",
+        icon: "utility:adduser"
+      });
+    }
     if (!CLOSED.includes(status) && status !== "Enrolled") {
       list.push({
         name: "withdraw",
@@ -265,6 +277,27 @@ export default class KemApplicationWorkbench extends NavigationMixin(
 
   async handleAction(event) {
     const name = event.currentTarget.dataset.name;
+    if (name === "enrol") {
+      const result = await EnrolModal.open({
+        size: "medium",
+        label: `Enrol ${this.applicantName}`,
+        learnerId: this.app.AccountId,
+        learnerName: this.applicantName,
+        courseId: this.app.Learning_Course__c,
+        branchId: this.app.Branch__c,
+        offeringId: this.app.Requested_Offering__c,
+        applicationId: this.recordId
+      });
+      if (result?.enrolmentId) {
+        toast(
+          this,
+          "Learner enrolled",
+          "The application is now Enrolled and the agreed price was saved."
+        );
+        await this.refresh();
+      }
+      return;
+    }
     if (name === "decide") {
       const result = await DecisionModal.open({
         size: "small",

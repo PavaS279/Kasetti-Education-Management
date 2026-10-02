@@ -1,0 +1,140 @@
+<template>
+  <template lwc:if={roster}>
+    <div class="roster kem-fade-in">
+      <section class="kem-hero">
+        <div class="hero">
+          <div class="hero-text">
+            <div class="kem-hero__subtitle">{courseName}</div>
+            <div class="kem-hero__title">{offering.Name}</div>
+            <div class="chips">
+              <span class="hero-chip">{statusLabel}</span>
+              <span class="hero-chip">{branchName}</span>
+              <span class="hero-chip">{offering.Delivery_Mode__c}</span>
+              <span class="hero-chip">{teacherName}</span>
+              <span class="hero-chip">{roomName}</span>
+            </div>
+          </div>
+          <div class="meter" aria-label={meterLabel}>
+            <div class="meter-numbers">
+              <span class="meter-big">{roster.seatsTaken}</span
+              ><span>/ {capacityLabel} seats</span>
+            </div>
+            <div class="meter-bar"><span style={meterStyle}></span></div>
+            <div class="meter-caption">{seatsLeftLabel}</div>
+          </div>
+          <lightning-button
+            variant="brand-outline"
+            class="enrol-button"
+            label="Enrol learner"
+            icon-name="utility:adduser"
+            onclick={handleEnrol}
+            disabled={isClosed}
+          ></lightning-button>
+        </div>
+      </section>
+
+      <section class="kem-card panel">
+        <div class="panel-head">
+          <div class="kem-section-title">Roster</div>
+          <span class="kem-muted small">{periodLabel}</span>
+        </div>
+        <div class="table-wrap">
+          <table class="table" aria-label="Class roster">
+            <thead>
+              <tr>
+                <th>Learner</th>
+                <th>Status</th>
+                <th>Start</th>
+                <th class="num">Agreed total</th>
+                <th>Discount</th>
+                <th>Billing</th>
+                <th class="actions-col">
+                  <span class="slds-assistive-text">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={rows} for:item="r">
+                <tr key={r.enrolmentId}>
+                  <td>
+                    <div class="learner">
+                      <span class={r.avatarClass}>{r.initials}</span>
+                      <a
+                        href="#"
+                        data-id={r.learnerAccountId}
+                        onclick={handleNavigate}
+                        >{r.learnerName}</a
+                      >
+                    </div>
+                  </td>
+                  <td><span class={r.statusClass}>{r.status}</span></td>
+                  <td>{r.startLabel}</td>
+                  <td class="num">
+                    <lightning-formatted-number
+                      value={r.agreedTotal}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                  </td>
+                  <td>
+                    <template lwc:if={r.discountCode}>
+                      <span class="kem-badge">{r.discountCode}</span>
+                      <span class={r.approvalClass}>{r.discountApproval}</span>
+                    </template>
+                  </td>
+                  <td><span class="kem-badge">{r.billingStatus}</span></td>
+                  <td class="actions-col">
+                    <lightning-button-menu
+                      alternative-text="Enrolment actions"
+                      icon-size="x-small"
+                      menu-alignment="right"
+                      data-id={r.enrolmentId}
+                      onselect={handleRowAction}
+                    >
+                      <template lwc:if={r.isActive}
+                        ><lightning-menu-item
+                          value="withdraw"
+                          label="Withdraw"
+                        ></lightning-menu-item
+                      ></template>
+                      <template lwc:if={r.canDecide}>
+                        <lightning-menu-item
+                          value="approve"
+                          label="Approve discount"
+                        ></lightning-menu-item>
+                        <lightning-menu-item
+                          value="reject"
+                          label="Reject discount"
+                        ></lightning-menu-item>
+                      </template>
+                      <lightning-menu-item
+                        value="open"
+                        label="Open enrolment"
+                      ></lightning-menu-item>
+                    </lightning-button-menu>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+          <template lwc:if={isEmpty}
+            ><div class="kem-empty">No learners enrolled yet.</div></template
+          >
+        </div>
+      </section>
+    </div>
+  </template>
+  <template lwc:elseif={errorMessage}>
+    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+      {errorMessage}
+    </div>
+  </template>
+  <template lwc:else>
+    <div class="loading">
+      <lightning-spinner
+        alternative-text="Loading roster"
+        size="small"
+      ></lightning-spinner>
+    </div>
+  </template>
+</template>
