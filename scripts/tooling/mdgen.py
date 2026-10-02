@@ -225,7 +225,7 @@ def split_permsets():
             "objects": {k: v for k, v in ps["objects"].items() if k in edu},
             "readOnlyFields": ps.get("readOnlyFields", {}),
             # GroupMembershipPsl is required for ContactContactRelation and PartyRoleRelation (found by probe).
-            "userPermissions": ["AccessEducationCloud", "GroupMembershipPsl"],
+            "userPermissions": ["AccessEducationCloud", "GroupMembershipPsl", "DocumentChecklistUserAccess"],
         }
         if licensed["objects"]:
             # Education Cloud objects depend on read access to people records in the same set.
@@ -259,12 +259,18 @@ def gen_permsets():
     permsets = split_permsets()
     gen_groups(permsets)
     for ps in permsets:
-        for oname in list(ps["objects"]):
-            for dep in getattr(specs, "OBJECT_DEPENDENCIES", {}).get(oname, []):
-                parent = ps["objects"][oname]
-                needed = "V" if ("V" in parent or "M" in parent) else ""
-                current = ps["objects"].get(dep, "")
-                ps["objects"][dep] = current + needed if needed not in current else current
+        changed = True
+        while changed:  # resolve transitive dependencies (e.g. checklist -> relation -> role)
+            changed = False
+            for oname in list(ps["objects"]):
+                for dep in getattr(specs, "OBJECT_DEPENDENCIES", {}).get(oname, []):
+                    parent = ps["objects"][oname]
+                    needed = "V" if ("V" in parent or "M" in parent) else ""
+                    current = ps["objects"].get(dep)
+                    updated = (current or "") + needed if needed not in (current or "") else (current or "")
+                    if current is None or updated != current:
+                        ps["objects"][dep] = updated
+                        changed = True
         x = HEADER + f"<PermissionSet {NS}>\n"
         for cls in sorted(set(ps.get("classes", []) + specs.COMMON_CLASSES.get(ps.get("classAccess", "staff"), []))):
             x += "    <classAccesses>\n" + tag("apexClass", cls, 8) + tag("enabled", True, 8) + "    </classAccesses>\n"
@@ -334,12 +340,29 @@ def reorder_permset(x):
     return HEADER + f"<PermissionSet {NS}>\n" + "".join(items[i][1] for i in order) + "</PermissionSet>\n"
 
 
+def transition_name(short, frm, to):
+    """Developer name for a transition record: <= 40 chars, alphanumeric/underscore, no trailing or double underscores."""
+    def clean(value):
+        return "".join(ch for ch in value.replace(" ", "_").replace("-", "_") if ch.isalnum() or ch == "_").strip("_")
+
+    def abbreviate(value):
+        return "".join(word[:4].capitalize() for word in value.replace("-", " ").split())
+
+    name = f"{short}_{clean(frm)}_{clean(to)}"
+    if len(name) > 40:
+        initials = "".join(ch for ch in short if ch.isupper()) or short[:4]
+        name = f"{initials}_{abbreviate(frm)}_{abbreviate(to)}"
+    while "__" in name:
+        name = name.replace("__", "_")
+    return name[:40].rstrip("_")
+
+
 def gen_transitions():
     cmd_dir = os.path.join(ROOT, "force-app", "main", "default", "customMetadata")
     for (obj, field), pairs in specs.TRANSITIONS.items():
         short = obj.replace("__c", "").replace("_", "")
         for frm, to in pairs:
-            dev = "".join(ch for ch in f"{short}_{frm}_{to}".replace(" ", "_").replace("-", "_") if ch.isalnum() or ch == "_")[:40]
+            dev = transition_name(short, frm, to)
             values = {"Active__c": ("boolean", "true"), "Field_Name__c": ("string", field), "From_Status__c": ("string", frm),
                       "Object_Name__c": ("string", obj), "To_Status__c": ("string", to)}
             x = HEADER + ('<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" '

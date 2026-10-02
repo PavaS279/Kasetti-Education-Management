@@ -1,0 +1,109 @@
+@import "c/kemStyles";
+
+.hero-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.kpis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.toolbar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  align-items: center;
+}
+
+.toolbar-branch {
+  min-width: 12rem;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(15rem, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.column {
+  scroll-snap-align: start;
+  background: var(--kem-canvas);
+  border-radius: var(--kem-radius);
+  padding: 0.75rem;
+  min-height: 14rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.column-title {
+  font-weight: 700;
+}
+
+.card {
+  padding: 0.75rem;
+  cursor: pointer;
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--kem-blue);
+  outline-offset: 2px;
+}
+
+.card-top {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.card-text {
+  min-width: 0;
+}
+
+.card-name {
+  font-weight: 600;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.6rem;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.6875rem;
+  margin-top: 0.6rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--kem-line);
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+@media (max-width: 48em) {
+  .board {
+    grid-template-columns: repeat(4, 85%);
+  }
+}

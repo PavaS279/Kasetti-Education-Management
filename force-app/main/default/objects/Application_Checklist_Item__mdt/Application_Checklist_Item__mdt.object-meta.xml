@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Template of documents and items collected for every application. New applications receive one checklist item per active record.</description>
+    <label>Application Checklist Item</label>
+    <pluralLabel>Application Checklist Items</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

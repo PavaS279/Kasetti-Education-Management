@@ -91,4 +91,43 @@ private class StatusTransitionServiceTest {
       'Ungoverned field allowed'
     );
   }
+
+  @IsTest
+  static void treatsBlankLegacyValuesAsDefault() {
+    configure();
+    Id roomId = TestUtil.fakeId(Room__c.SObjectType);
+    Room__c oldRoom = new Room__c(Id = roomId);
+    Room__c newRoom = new Room__c(Id = roomId, Room_Type__c = 'Hall');
+    StatusTransitionService.validate(
+      new List<Room__c>{ newRoom },
+      new Map<Id, SObject>{ roomId => oldRoom },
+      Room__c.Room_Type__c,
+      'Classroom'
+    );
+    Assert.isFalse(
+      newRoom.hasErrors(),
+      'Blank legacy value treated as Classroom'
+    );
+    Room__c unchanged = new Room__c(Id = roomId);
+    StatusTransitionService.validate(
+      new List<Room__c>{ unchanged },
+      new Map<Id, SObject>{ roomId => oldRoom },
+      Room__c.Room_Type__c,
+      'Classroom'
+    );
+    Assert.isFalse(
+      unchanged.hasErrors(),
+      'An unchanged blank value is not a transition'
+    );
+    Room__c strictRoom = new Room__c(Id = roomId, Room_Type__c = 'Hall');
+    StatusTransitionService.validate(
+      new List<Room__c>{ strictRoom },
+      new Map<Id, SObject>{ roomId => oldRoom },
+      Room__c.Room_Type__c
+    );
+    Assert.isTrue(
+      strictRoom.hasErrors(),
+      'Without a legacy default, blank to Hall is undeclared'
+    );
+  }
 }

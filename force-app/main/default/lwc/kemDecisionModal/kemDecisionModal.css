@@ -1,0 +1,52 @@
+@import "c/kemStyles";
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.75rem;
+}
+
+.choice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius);
+  background: var(--kem-surface);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s var(--kem-ease),
+    box-shadow 0.15s var(--kem-ease),
+    transform 0.15s var(--kem-ease);
+}
+
+.choice:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--kem-shadow);
+}
+
+.choice-label {
+  font-weight: 700;
+}
+
+.choice_selected.choice_admit {
+  border-color: var(--kem-green);
+  box-shadow: 0 0 0 2px #cdeedb;
+}
+
+.choice_selected.choice_waitlist {
+  border-color: var(--kem-amber);
+  box-shadow: 0 0 0 2px #f8e2bd;
+}
+
+.choice_selected.choice_reject {
+  border-color: var(--kem-red);
+  box-shadow: 0 0 0 2px #f6d0ce;
+}
+
+.small {
+  font-size: 0.75rem;
+}

@@ -180,6 +180,31 @@ OBJECTS = [
             {"name": "Learning_Course__c", "label": "Learning Course", "type": "Lookup", "ref": "LearningCourse", "relName": "Applications", "relLabel": "Applications"},
             {"name": "Learning_Program__c", "label": "Learning Program", "type": "Lookup", "ref": "LearningProgram", "relName": "Applications", "relLabel": "Applications"},
             {"name": "Source_Enquiry__c", "label": "Source Enquiry", "type": "Lookup", "ref": "Lead", "relName": "Applications", "relLabel": "Applications", "systemManaged": True},
+            {"name": "Requested_Offering__c", "label": "Preferred Class", "type": "Lookup", "ref": "CourseOffering", "relName": "Applications", "relLabel": "Applications",
+             "help": "The class (course offering) the applicant would like to join."},
+            {"name": "Reviewer__c", "label": "Reviewer", "type": "Lookup", "ref": "User", "relName": "Reviewed_Applications", "relLabel": "Reviewed Applications"},
+            {"name": "Eligibility_Status__c", "label": "Eligibility", "type": "Picklist", "values": ["Not Checked", "Eligible", "Not Eligible", "Overridden"],
+             "default": "Not Checked", "systemManaged": True},
+            {"name": "Eligibility_Notes__c", "label": "Eligibility Notes", "type": "TextArea", "systemManaged": True},
+            {"name": "Checklist_Complete__c", "label": "Checklist Complete", "type": "Checkbox", "default": False, "systemManaged": True,
+             "help": "All required checklist items are accepted or waived."},
+            {"name": "Decision__c", "label": "Decision", "type": "Picklist", "values": ["Admit", "Waitlist", "Reject"], "systemManaged": True},
+            {"name": "Decision_Reason__c", "label": "Decision Reason", "type": "TextArea", "systemManaged": True},
+            {"name": "Decision_Date__c", "label": "Decision Date", "type": "DateTime", "systemManaged": True},
+            {"name": "Decided_By__c", "label": "Decided By", "type": "Lookup", "ref": "User", "relName": "Decided_Applications", "relLabel": "Decided Applications", "systemManaged": True},
+            {"name": "Offer_Status__c", "label": "Offer Status", "type": "Picklist", "values": ["Not Offered", "Offered", "Accepted", "Declined", "Expired"],
+             "default": "Not Offered", "systemManaged": True},
+            {"name": "Offer_Expiry_Date__c", "label": "Offer Expiry Date", "type": "Date", "systemManaged": True},
+            {"name": "Offer_Responded_Date__c", "label": "Offer Responded", "type": "DateTime", "systemManaged": True},
+        ],
+    },
+    {
+        "name": "LearningCourse", "label": "Learning Course", "plural": "Learning Courses", "standard": True,
+        "fields": [
+            {"name": "Minimum_Age__c", "label": "Minimum Age", "type": "Number", "precision": 3, "scale": 0,
+             "help": "Applicants younger than this (in years, at application) are not eligible."},
+            {"name": "Maximum_Age__c", "label": "Maximum Age", "type": "Number", "precision": 3, "scale": 0},
+            {"name": "Entry_Requirements__c", "label": "Entry Requirements", "type": "TextArea"},
         ],
     },
     {
@@ -207,7 +232,7 @@ STANDARD_FIELD_ACCESS = {
 }
 
 # Object permissions that Salesforce requires alongside others (read access is added automatically).
-OBJECT_DEPENDENCIES = {"ContactContactRelation": ["PartyRoleRelation"]}
+OBJECT_DEPENDENCIES = {"ContactContactRelation": ["PartyRoleRelation"], "DocumentChecklistItem": ["ContactContactRelation"]}
 
 EDU_CURRICULUM = ["Learning", "LearningCourse", "LearningProgram"]
 
@@ -219,7 +244,7 @@ COMMON_CLASSES = {
     "portal": [],
 }
 
-ENQUIRY_CLASSES = ["EnquiryController"]
+ENQUIRY_CLASSES = ["EnquiryController", "ApplicationController"]
 LEARNER_CLASSES = ["Learner360Controller"]
 
 # Education Cloud objects are only granted through permission sets tied to these licences.
@@ -240,20 +265,20 @@ STAFF_TABS = ["Branch__c", "Room__c", "Branch_Staff__c"]
 PERMISSION_SETS = [
     {"name": "KEM_Administrator", "label": "KEM Administrator",
      "description": "Institution administrator: configures branches, policies, and has full access to Kasetti Education Management data.",
-     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "LearnerProfile": "CEDV", "CourseOffering": "CEDV", "CourseOfferingParticipant": "CEDV", "CourseOfferingSchedule": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
+     "license": STAFF_LICENSE, "objects": {"DocumentChecklistItem": "CEDV", "Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "LearnerProfile": "CEDV", "CourseOffering": "CEDV", "CourseOfferingParticipant": "CEDV", "CourseOfferingSchedule": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
                  "IndividualApplication": "CEDV", "ContactContactRelation": "CEDV"},
-     "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "Error_Log__c"]},
+     "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications", "Error_Log__c"]},
     {"name": "KEM_Branch_Manager", "label": "KEM Branch Manager",
      "description": "Branch manager: manages rooms, classes, staff allocation, and learners for their branch.",
-     "license": STAFF_LICENSE, "objects": {"CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "CED", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "E", "Room__c": "CED", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
-                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions"]},
+     "license": STAFF_LICENSE, "objects": {"DocumentChecklistItem": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "CED", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "E", "Room__c": "CED", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
+                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
     {"name": "KEM_Admissions_Counsellor", "label": "KEM Admissions Counsellor",
      "description": "Admissions counsellor: works enquiries, applications, offers, and follow-ups.",
-     "license": STAFF_LICENSE, "objects": {"CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
-                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions"]},
+     "license": STAFF_LICENSE, "objects": {"DocumentChecklistItem": "CED", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
+                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
     {"name": "KEM_Academic_Coordinator", "label": "KEM Academic Coordinator",
      "description": "Academic coordinator: maintains curriculum, timetable, enrolments, and academic oversight.",
-     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "CE", "LearningCourse": "CE", "LearningProgram": "CE", "LearnerProfile": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "CE", "Branch__c": "", "Room__c": "CE", "Lead": "", "Account": "E", "Contact": "E", "IndividualApplication": "",
+     "license": STAFF_LICENSE, "objects": {"DocumentChecklistItem": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "CE", "LearningCourse": "CE", "LearningProgram": "CE", "LearnerProfile": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "CE", "Branch__c": "", "Room__c": "CE", "Lead": "", "Account": "E", "Contact": "E", "IndividualApplication": "",
                  "ContactContactRelation": ""}, "classes": LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Teacher", "label": "KEM Teacher",
      "description": "Teacher: views assigned classes, marks attendance, and enters assessment results.",
@@ -261,6 +286,9 @@ PERMISSION_SETS = [
     {"name": "KEM_Finance", "label": "KEM Finance",
      "description": "Finance user: manages fees, invoices, payments, allocations, and reconciliation.",
      "license": STAFF_LICENSE, "objects": {"CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": "", "ContactContactRelation": ""}, "classes": LEARNER_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+    {"name": "KEM_Eligibility_Override", "label": "KEM Eligibility Override",
+     "description": "Allows overriding a failed eligibility check on an application. Grant to administrators and branch managers.",
+     "objects": {}, "custom": ["KEM_Override_Eligibility"]},
     {"name": "KEM_Portal_User", "label": "KEM Portal User", "classAccess": "portal",
      "description": "Learner or guardian portal access. Record visibility is enforced in Apex through explicit guardian relationships.",
      "license": PORTAL_LICENSE, "objects": {"Log_Event__e": "C"}},
@@ -269,6 +297,17 @@ PERMISSION_SETS = [
 
 # Allowed status transitions (object, field) -> list of (from, to).
 TRANSITIONS = {
+    ("IndividualApplication", "Status"): [
+        ("Processing", "In Review"), ("Processing", "Withdrawn"), ("Processing", "Canceled"),
+        ("In Review", "Processing"), ("In Review", "Ready For Decision"), ("In Review", "Withdrawn"), ("In Review", "Canceled"),
+        ("Ready For Decision", "In Review"), ("Ready For Decision", "Application Decision"), ("Ready For Decision", "Withdrawn"),
+        ("Application Decision", "Enrolled"), ("Application Decision", "Withdrawn"), ("Application Decision", "Enrollment Failed"),
+        ("Enrollment Failed", "Enrolled"), ("Enrollment Failed", "Withdrawn"),
+    ],
+    ("IndividualApplication", "Offer_Status__c"): [
+        ("Not Offered", "Offered"), ("Offered", "Accepted"), ("Offered", "Declined"), ("Offered", "Expired"),
+        ("Expired", "Offered"), ("Accepted", "Declined"),
+    ],
     ("Lead", "Status"): [
         ("New", "Contacted"), ("New", "Nurturing"), ("New", "Unqualified"), ("New", "Qualified"),
         ("Contacted", "Nurturing"), ("Contacted", "Qualified"), ("Contacted", "Unqualified"),

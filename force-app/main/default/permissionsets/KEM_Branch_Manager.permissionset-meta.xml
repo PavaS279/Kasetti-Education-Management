@@ -5,6 +5,10 @@
         <visible>true</visible>
     </applicationVisibilities>
     <classAccesses>
+        <apexClass>ApplicationController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>EnquiryController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -439,6 +443,10 @@
     </tabSettings>
     <tabSettings>
         <tab>KEM_Admissions</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <tabSettings>
+        <tab>KEM_Applications</tab>
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>

@@ -1,0 +1,196 @@
+<template>
+  <template lwc:if={app}>
+    <div class="workbench kem-fade-in">
+      <section class="kem-hero">
+        <div class="hero">
+          <div class="ring" style={ringStyle} role="img" aria-label={ringLabel}>
+            <div class="ring-inner">
+              <span class="ring-value"
+                >{checklistDone}/{checklistRequired}</span
+              >
+              <span class="ring-caption">required</span>
+            </div>
+          </div>
+          <div class="hero-text">
+            <div class="kem-hero__subtitle">{app.Name} · {appliedLabel}</div>
+            <div class="kem-hero__title">
+              <a
+                class="hero-link"
+                href="#"
+                data-id={app.AccountId}
+                onclick={handleNavigate}
+                >{applicantName}</a
+              >
+            </div>
+            <div class="kem-hero__subtitle">{courseLabel} · {branchLabel}</div>
+          </div>
+          <div class="hero-actions">
+            <template for:each={actions} for:item="action">
+              <lightning-button
+                key={action.name}
+                variant={action.variant}
+                label={action.label}
+                icon-name={action.icon}
+                data-name={action.name}
+                onclick={handleAction}
+                disabled={isBusy}
+              ></lightning-button>
+            </template>
+          </div>
+        </div>
+        <ol class="path" aria-label="Application stage">
+          <template for:each={pathSteps} for:item="step">
+            <li
+              key={step.label}
+              class={step.className}
+              aria-current={step.ariaCurrent}
+            >
+              <span class="path-dot"></span>
+              <span>{step.label}</span>
+            </li>
+          </template>
+        </ol>
+      </section>
+
+      <div class="grid">
+        <section class="kem-card panel checklist">
+          <div class="panel-head">
+            <div class="kem-section-title">Checklist</div>
+            <lightning-button-icon
+              icon-name="utility:add"
+              alternative-text="Add checklist item"
+              title="Add checklist item"
+              onclick={handleAddItem}
+            ></lightning-button-icon>
+          </div>
+          <ul class="items">
+            <template for:each={checklistRows} for:item="item">
+              <li key={item.id} class="item">
+                <div class="item-main">
+                  <div class="item-title">
+                    <span>{item.name}</span>
+                    <template lwc:if={item.required}
+                      ><span class="kem-badge">Required</span></template
+                    >
+                    <span class={item.statusClass}>{item.statusLabel}</span>
+                  </div>
+                  <div class="kem-muted small">{item.instruction}</div>
+                  <template lwc:if={item.rejectReason}>
+                    <div class="reject small">
+                      Rejected: {item.rejectReason}
+                    </div>
+                  </template>
+                </div>
+                <div class="item-actions">
+                  <lightning-file-upload
+                    label={item.fileLabel}
+                    name="checklistFile"
+                    record-id={item.id}
+                    onuploadfinished={handleUploadFinished}
+                  ></lightning-file-upload>
+                  <lightning-button-group>
+                    <lightning-button-icon
+                      icon-name="utility:check"
+                      alternative-text="Accept"
+                      title="Accept"
+                      data-id={item.id}
+                      data-status="Accepted"
+                      onclick={handleItemStatus}
+                    ></lightning-button-icon>
+                    <lightning-button-icon
+                      icon-name="utility:close"
+                      alternative-text="Reject"
+                      title="Reject"
+                      data-id={item.id}
+                      data-status="Rejected"
+                      onclick={handleItemStatus}
+                    ></lightning-button-icon>
+                    <lightning-button-icon
+                      icon-name="utility:skip"
+                      alternative-text="Waive"
+                      title="Waive"
+                      data-id={item.id}
+                      data-status="Waived"
+                      onclick={handleItemStatus}
+                    ></lightning-button-icon>
+                    <lightning-button-icon
+                      icon-name="utility:undo"
+                      alternative-text="Reset to pending"
+                      title="Reset to pending"
+                      data-id={item.id}
+                      data-status="Pending"
+                      onclick={handleItemStatus}
+                    ></lightning-button-icon>
+                  </lightning-button-group>
+                </div>
+              </li>
+            </template>
+          </ul>
+        </section>
+
+        <div class="side">
+          <section class="kem-card panel">
+            <div class="kem-section-title">Eligibility</div>
+            <div class="side-value">
+              <span class={eligibilityClass}>{app.Eligibility_Status__c}</span>
+            </div>
+            <div class="kem-muted small">{app.Eligibility_Notes__c}</div>
+            <template lwc:if={canOverride}>
+              <lightning-button
+                class="slds-m-top_small"
+                variant="base"
+                label="Override eligibility"
+                data-name="override"
+                onclick={handleAction}
+              ></lightning-button>
+            </template>
+          </section>
+          <section class="kem-card panel">
+            <div class="kem-section-title">Decision</div>
+            <template lwc:if={app.Decision__c}>
+              <div class="side-value">
+                <span class={decisionClass}>{app.Decision__c}</span>
+              </div>
+              <div class="kem-muted small">{decisionLine}</div>
+              <template lwc:if={app.Decision_Reason__c}
+                ><div class="small">{app.Decision_Reason__c}</div></template
+              >
+            </template>
+            <template lwc:else>
+              <div class="kem-muted small">
+                No decision yet. Reviewer: {reviewerName}
+              </div>
+            </template>
+          </section>
+          <section class="kem-card panel">
+            <div class="kem-section-title">Offer</div>
+            <div class="side-value">
+              <span class={offerClass}>{app.Offer_Status__c}</span>
+            </div>
+            <template lwc:if={offerCountdown}
+              ><div class="kem-muted small">{offerCountdown}</div></template
+            >
+            <template lwc:if={app.Requested_Offering__r}
+              ><div class="kem-muted small">
+                Preferred class: {app.Requested_Offering__r.Name}
+              </div></template
+            >
+          </section>
+        </div>
+      </div>
+    </div>
+  </template>
+  <template lwc:elseif={errorMessage}>
+    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+      {errorMessage}
+    </div>
+  </template>
+  <template lwc:else>
+    <div class="loading">
+      <lightning-spinner
+        alternative-text="Loading application"
+        size="small"
+      ></lightning-spinner>
+    </div>
+  </template>
+</template>

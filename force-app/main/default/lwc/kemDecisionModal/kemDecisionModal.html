@@ -1,0 +1,55 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <div class="choices" role="radiogroup" aria-label="Decision">
+      <template for:each={choices} for:item="choice">
+        <button
+          key={choice.value}
+          type="button"
+          class={choice.className}
+          role="radio"
+          aria-checked={choice.checked}
+          data-value={choice.value}
+          onclick={handleChoice}
+        >
+          <lightning-icon
+            icon-name={choice.icon}
+            size="small"
+            alternative-text=""
+          ></lightning-icon>
+          <span class="choice-label">{choice.label}</span>
+          <span class="kem-muted small">{choice.hint}</span>
+        </button>
+      </template>
+    </div>
+    <template lwc:if={isAdmit}>
+      <lightning-input
+        class="slds-m-top_medium"
+        type="number"
+        min="1"
+        max="90"
+        label="Offer valid for (days)"
+        value={validDays}
+        onchange={handleDays}
+      ></lightning-input>
+    </template>
+    <lightning-textarea
+      class="slds-m-top_small"
+      label={reasonLabel}
+      required={isReasonRequired}
+      value={reason}
+      max-length="255"
+      onchange={handleReason}
+    ></lightning-textarea>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Record decision"
+      disabled={isInvalid}
+      onclick={handleConfirm}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

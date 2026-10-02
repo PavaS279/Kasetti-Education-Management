@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>KEM_Override_Eligibility</name>
+    </customPermissions>
+    <description
+  >Allows overriding a failed eligibility check on an application. Grant to administrators and branch managers.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>KEM Eligibility Override</label>
+</PermissionSet>

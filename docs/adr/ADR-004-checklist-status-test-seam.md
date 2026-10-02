@@ -1,0 +1,6 @@
+# ADR-004 — Test seam for DocumentChecklistItem status updates
+
+- **Status:** Accepted (2026-10-03)
+- **Context:** Application checklists use the native Education Cloud `DocumentChecklistItem` so they stay compatible with Salesforce admissions tooling (OmniStudio flows, Experience Cloud components). In this org, updating `DocumentChecklistItem.Status` inside an Apex test raises an uncatchable _Internal Salesforce Error_ — even as a system administrator with all project triggers bypassed. Inserting, deleting, and updating other fields work in tests, and the same status update works outside tests (verified with anonymous Apex).
+- **Decision:** All status changes go through `ChecklistItemGateway.updateStatus`. Production code performs a real user-mode update. Unit tests set `ChecklistItemGateway.simulateStatusUpdates = true`, which replaces the item with an equivalent one in the new status (delete + insert), so the checklist trigger, completion calculation, and application lifecycle remain fully exercised. The seam is inert outside `Test.isRunningTest()`.
+- **Consequences:** The real update path is covered by the end-to-end check in the org (recorded in TEST-LOG.md) rather than by unit tests. If Salesforce fixes the defect, remove the seam and the flag assignments in tests.

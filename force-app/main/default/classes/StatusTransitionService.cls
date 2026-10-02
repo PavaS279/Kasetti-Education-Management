@@ -13,6 +13,20 @@ public inherited sharing class StatusTransitionService {
     Map<Id, SObject> oldMap,
     SObjectField field
   ) {
+    validate(newRecords, oldMap, field, null);
+  }
+
+  /**
+   * As validate(), treating a blank previous value as legacyDefault. Used for
+   * fields added after records already existed (for example an offer status
+   * that legacy applications never had).
+   */
+  public static void validate(
+    List<SObject> newRecords,
+    Map<Id, SObject> oldMap,
+    SObjectField field,
+    String legacyDefault
+  ) {
     if (oldMap == null) {
       return;
     }
@@ -30,6 +44,12 @@ public inherited sharing class StatusTransitionService {
       Object toValue = record.get(field);
       if (fromValue == toValue) {
         continue;
+      }
+      if (fromValue == null && legacyDefault != null) {
+        fromValue = legacyDefault;
+        if (fromValue == toValue) {
+          continue;
+        }
       }
       String transition = (String.valueOf(fromValue) +
         '->' +
