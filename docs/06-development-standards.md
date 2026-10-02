@@ -32,3 +32,13 @@
 - `CHECK_ONLY=1 scripts/deploy.sh` validates without saving.
 - Authentication: `scripts/ci/sf-login.sh` (client credentials flow).
 - Every deployment is recorded in [TEST-LOG.md](TEST-LOG.md).
+
+## Platform lessons (this org)
+
+- Fields deployed with a permission set are invisible to the deploying admin's profile; tests therefore run as `TestDataFactory.admin()` (a Standard User with the KEM administrator persona), while setup objects are created as the deployer.
+- `WITH USER_MODE` queries fail when the running user lacks field access (fields appear as "No such column"); grant standard fields explicitly through `STANDARD_FIELD_ACCESS` / `EDU_STANDARD_FIELDS` in the spec.
+- Education Cloud objects need licensed permission sets plus `AccessEducationCloud`; `ContactContactRelation`/`PartyRoleRelation` additionally need `GroupMembershipPsl`.
+- `WITH USER_MODE` with bind variables on `ContactContactRelation` reports "Variable does not exist: tmpVar1" — check access explicitly and query in system mode.
+- A permission set's licence cannot be changed after creation.
+- Tests cannot see org configuration records such as `PartyRoleRelation`; `TestDataFactory.createReferenceData()` creates them.
+- Lightning Web Component unit tests: `npm run test:unit` (Jest), lint with `npm run lint`. CSS modules and `lightning/modal` are stubbed in `jest-mocks/`.

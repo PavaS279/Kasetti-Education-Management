@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Institution administrator: configures branches, policies, and has full access to Kasetti Education Management data.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>KEM Administrator Persona</label>
+    <permissionSets>KEM_Administrator</permissionSets>
+    <permissionSets>KEM_Administrator_Edu</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

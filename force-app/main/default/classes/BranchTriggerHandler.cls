@@ -28,13 +28,17 @@ public without sharing class BranchTriggerHandler extends TriggerHandler {
   ) {
     String rowCause = Schema.Branch__Share.RowCause.Branch_Manager__c;
     if (oldMap != null) {
-      delete [
-        SELECT Id
-        FROM Branch__Share
-        WHERE
-          ParentId IN :new Map<Id, Branch__c>(branches).keySet()
-          AND RowCause = :rowCause
-      ];
+      Database.delete(
+        [
+          SELECT Id
+          FROM Branch__Share
+          WHERE
+            ParentId IN :new Map<Id, Branch__c>(branches).keySet()
+            AND RowCause = :rowCause
+          WITH SYSTEM_MODE
+        ],
+        AccessLevel.SYSTEM_MODE
+      );
     }
     List<Branch__Share> shares = new List<Branch__Share>();
     for (Branch__c branch : branches) {
@@ -52,7 +56,11 @@ public without sharing class BranchTriggerHandler extends TriggerHandler {
         );
       }
     }
-    List<Database.SaveResult> results = Database.insert(shares, false);
+    List<Database.SaveResult> results = Database.insert(
+      shares,
+      false,
+      AccessLevel.SYSTEM_MODE
+    );
     Logger.errors('BranchTriggerHandler.syncManagerShares', results);
   }
 }

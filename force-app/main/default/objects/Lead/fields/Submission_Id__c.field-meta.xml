@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Submission_Id__c</fullName>
+    <externalId>true</externalId>
+    <inlineHelpText
+  >Idempotency key supplied by the website or another channel. Repeated submissions with the same key update the same enquiry.</inlineHelpText>
+    <label>Submission ID</label>
+    <required>false</required>
+    <length>80</length>
+    <caseSensitive>false</caseSensitive>
+    <unique>true</unique>
+    <type>Text</type>
+</CustomField>

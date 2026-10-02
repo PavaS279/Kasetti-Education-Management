@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Admissions counsellor: works enquiries, applications, offers, and follow-ups.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>KEM Admissions Counsellor Persona</label>
+    <permissionSets>KEM_Admissions_Counsellor</permissionSets>
+    <permissionSets>KEM_Admissions_Counsellor_Edu</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

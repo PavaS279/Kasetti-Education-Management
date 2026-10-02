@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Learning_Program__c</fullName>
+    <label>Learning Program</label>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <referenceTo>LearningProgram</referenceTo>
+    <relationshipLabel>Applications</relationshipLabel>
+    <relationshipName>Applications</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

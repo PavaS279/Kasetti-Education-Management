@@ -104,7 +104,8 @@ def field_xml(obj, f):
         elif t == "Checkbox":
             x += tag("defaultValue", f.get("default", False))
         elif t == "Lookup":
-            x += tag("deleteConstraint", f.get("deleteConstraint", "SetNull" if not f.get("required") else "Restrict"))
+            if f["ref"] != "User":
+                x += tag("deleteConstraint", f.get("deleteConstraint", "SetNull" if not f.get("required") else "Restrict"))
             x += tag("referenceTo", f["ref"])
             x += tag("relationshipLabel", f.get("relLabel", obj["plural"]))
             x += tag("relationshipName", f.get("relName", obj["name"].replace("__c", "").replace("_", "") + "s"))
@@ -198,9 +199,65 @@ def obj_index():
     return {o["name"]: o for o in specs.OBJECTS}
 
 
+def split_permsets():
+    """Splits licensed persona permission sets into a licence-free base set and a licensed _Edu set."""
+    result = []
+    edu = getattr(specs, "EDU_OBJECTS", set())
+    for ps in specs.PERMISSION_SETS:
+        if not ps.get("license"):
+            result.append(ps)
+            continue
+        base = dict(ps)
+        base.pop("license")
+        base["objects"] = {k: v for k, v in ps["objects"].items() if k not in edu}
+        licensed = {
+            "name": ps["name"] + "_Edu",
+            "label": ps["label"] + " (Education Cloud)",
+            "description": "Education Cloud object access for the " + ps["label"] + " persona. Requires the Education Cloud licence.",
+            "license": ps["license"],
+            "objects": {k: v for k, v in ps["objects"].items() if k in edu},
+            "readOnlyFields": ps.get("readOnlyFields", {}),
+            # GroupMembershipPsl is required for ContactContactRelation and PartyRoleRelation (found by probe).
+            "userPermissions": ["AccessEducationCloud", "GroupMembershipPsl"],
+        }
+        if licensed["objects"]:
+            # Education Cloud objects depend on read access to people records in the same set.
+            licensed["objects"].update({"Account": "", "Contact": ""})
+        result.append(base)
+        if licensed["objects"]:
+            result.append(licensed)
+            base["group"] = [base["name"], licensed["name"]]
+    return result
+
+
+def gen_groups(permsets):
+    group_dir = os.path.join(ROOT, "force-app", "main", "default", "permissionsetgroups")
+    for ps in permsets:
+        members = ps.get("group")
+        if not members:
+            continue
+        x = HEADER + f"<PermissionSetGroup {NS}>\n"
+        x += tag("description", ps["description"])
+        x += tag("hasActivationRequired", False)
+        x += tag("label", ps["label"] + " Persona")
+        for m in members:
+            x += tag("permissionSets", m)
+        x += tag("status", "Updated")
+        x += "</PermissionSetGroup>\n"
+        write(os.path.join(group_dir, ps["name"] + "_Persona.permissionsetgroup-meta.xml"), x)
+
+
 def gen_permsets():
     idx = obj_index()
-    for ps in specs.PERMISSION_SETS:
+    permsets = split_permsets()
+    gen_groups(permsets)
+    for ps in permsets:
+        for oname in list(ps["objects"]):
+            for dep in getattr(specs, "OBJECT_DEPENDENCIES", {}).get(oname, []):
+                parent = ps["objects"][oname]
+                needed = "V" if ("V" in parent or "M" in parent) else ""
+                current = ps["objects"].get(dep, "")
+                ps["objects"][dep] = current + needed if needed not in current else current
         x = HEADER + f"<PermissionSet {NS}>\n"
         for cls in sorted(set(ps.get("classes", []) + specs.COMMON_CLASSES.get(ps.get("classAccess", "staff"), []))):
             x += "    <classAccesses>\n" + tag("apexClass", cls, 8) + tag("enabled", True, 8) + "    </classAccesses>\n"
@@ -219,6 +276,12 @@ def gen_permsets():
                 readonly_type = f["type"] in ("Formula", "Summary") or f.get("systemManaged")
                 editable = ("E" in access or "C" in access) and not readonly_type and f["name"] not in ro_fields
                 fls.append((f"{oname}.{f['name']}", editable))
+        for oname, fields in getattr(specs, "STANDARD_FIELD_ACCESS", {}).items():
+            access = ps["objects"].get(oname)
+            if access is None:
+                continue
+            for fname in fields:
+                fls.append((f"{oname}.{fname}", "E" in access or "C" in access))
         for name, editable in sorted(fls):
             x += "    <fieldPermissions>\n" + tag("editable", editable, 8) + tag("field", name, 8) + tag("readable", True, 8) + "    </fieldPermissions>\n"
         x += tag("hasActivationRequired", False)
@@ -239,6 +302,8 @@ def gen_permsets():
             x += "    </objectPermissions>\n"
         for page in sorted(ps.get("pages", [])):
             x += "    <pageAccesses>\n" + tag("apexPage", page, 8) + tag("enabled", True, 8) + "    </pageAccesses>\n"
+        for perm in sorted(ps.get("userPermissions", [])):
+            x += "    <userPermissions>\n" + tag("enabled", True, 8) + tag("name", perm, 8) + "    </userPermissions>\n"
         for tab in sorted(ps.get("tabs", [])):
             x += "    <tabSettings>\n" + tag("tab", tab, 8) + tag("visibility", "Visible", 8) + "    </tabSettings>\n"
         for app in sorted(ps.get("apps", [])):
@@ -262,7 +327,31 @@ def reorder_permset(x):
     return HEADER + f"<PermissionSet {NS}>\n" + "".join(items[i][1] for i in order) + "</PermissionSet>\n"
 
 
+def gen_transitions():
+    cmd_dir = os.path.join(ROOT, "force-app", "main", "default", "customMetadata")
+    for (obj, field), pairs in specs.TRANSITIONS.items():
+        short = obj.replace("__c", "").replace("_", "")
+        for frm, to in pairs:
+            dev = "".join(ch for ch in f"{short}_{frm}_{to}".replace(" ", "_").replace("-", "_") if ch.isalnum() or ch == "_")[:40]
+            values = {"Active__c": ("boolean", "true"), "Field_Name__c": ("string", field), "From_Status__c": ("string", frm),
+                      "Object_Name__c": ("string", obj), "To_Status__c": ("string", to)}
+            x = HEADER + ('<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" '
+                          'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">\n')
+            x += tag("label", f"{short} {frm} > {to}"[:40])
+            x += tag("protected", False)
+            for name, (typ, val) in values.items():
+                x += f'    <values>\n        <field>{name}</field>\n        <value xsi:type="xsd:{typ}">{escape(val)}</value>\n    </values>\n'
+            x += "</CustomMetadata>\n"
+            write(os.path.join(cmd_dir, f"Status_Transition.{dev}.md-meta.xml"), x)
+
+
 if __name__ == "__main__":
+    gen_transitions()
     gen_objects()
     gen_permsets()
+    # Match the repository formatting (lint-staged runs Prettier on commit) so regeneration causes no churn.
+    import subprocess
+    subprocess.run(["npx", "--no-install", "prettier", "--log-level", "warn", "--write",
+                    "force-app/main/default/objects", "force-app/main/default/permissionsets",
+                    "force-app/main/default/customMetadata", "force-app/main/default/permissionsetgroups"], cwd=ROOT, check=False)
     print(f"Generated {len(specs.OBJECTS)} object specs and {len(specs.PERMISSION_SETS)} permission sets.")

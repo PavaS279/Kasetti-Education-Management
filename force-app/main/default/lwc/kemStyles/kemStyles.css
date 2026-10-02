@@ -1,0 +1,222 @@
+/* Kasetti Education Management design tokens and shared styles.
+   Import with: @import 'c/kemStyles'; */
+:host {
+  --kem-navy: #1b3a6b;
+  --kem-blue: #2e6fd8;
+  --kem-sky: #e8f0fd;
+  --kem-teal: #0f9d8a;
+  --kem-amber: #c77700;
+  --kem-red: #c23934;
+  --kem-green: #2e844a;
+  --kem-ink: #16243a;
+  --kem-muted: #5f6b7a;
+  --kem-line: #e3e8ef;
+  --kem-surface: #ffffff;
+  --kem-canvas: #f4f7fb;
+  --kem-radius: 14px;
+  --kem-radius-sm: 10px;
+  --kem-shadow:
+    0 1px 2px rgba(22, 36, 58, 0.06), 0 4px 14px rgba(22, 36, 58, 0.06);
+  --kem-shadow-hover:
+    0 2px 4px rgba(22, 36, 58, 0.08), 0 10px 28px rgba(22, 36, 58, 0.12);
+  --kem-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  display: block;
+  color: var(--kem-ink);
+}
+
+.kem-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--kem-radius);
+  padding: 1.25rem 1.5rem;
+  color: #fff;
+  background: linear-gradient(
+    120deg,
+    var(--kem-navy) 0%,
+    #24508f 55%,
+    var(--kem-blue) 100%
+  );
+  box-shadow: var(--kem-shadow);
+}
+
+.kem-hero::after {
+  content: "";
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0)
+  );
+  pointer-events: none;
+}
+
+.kem-hero__title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.kem-hero__subtitle {
+  opacity: 0.85;
+  font-size: 0.8125rem;
+  margin-top: 0.15rem;
+}
+
+.kem-card {
+  background: var(--kem-surface);
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius);
+  box-shadow: var(--kem-shadow);
+  transition:
+    box-shadow 0.2s var(--kem-ease),
+    transform 0.2s var(--kem-ease),
+    border-color 0.2s var(--kem-ease);
+}
+
+.kem-card_interactive:hover {
+  box-shadow: var(--kem-shadow-hover);
+  transform: translateY(-2px);
+  border-color: #c9d6ea;
+}
+
+.kem-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--kem-muted);
+}
+
+.kem-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  background: #eef2f7;
+  color: var(--kem-muted);
+  white-space: nowrap;
+}
+
+.kem-badge_success {
+  background: #e3f4ea;
+  color: var(--kem-green);
+}
+
+.kem-badge_warning {
+  background: #fdf0dc;
+  color: var(--kem-amber);
+}
+
+.kem-badge_danger {
+  background: #fbe6e5;
+  color: var(--kem-red);
+}
+
+.kem-badge_info {
+  background: var(--kem-sky);
+  color: var(--kem-blue);
+}
+
+.kem-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  color: #fff;
+}
+
+.kem-avatar_lg {
+  width: 3.25rem;
+  height: 3.25rem;
+  font-size: 1.1rem;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+}
+
+.tone-1 {
+  background: linear-gradient(135deg, #2e6fd8, #5b93ec);
+}
+.tone-2 {
+  background: linear-gradient(135deg, #0f9d8a, #3cc4b0);
+}
+.tone-3 {
+  background: linear-gradient(135deg, #7b4fd6, #a07ef0);
+}
+.tone-4 {
+  background: linear-gradient(135deg, #d9631e, #f08c4a);
+}
+.tone-5 {
+  background: linear-gradient(135deg, #c23968, #e66a91);
+}
+.tone-6 {
+  background: linear-gradient(135deg, #1b3a6b, #3f6aa8);
+}
+
+.kem-kpi {
+  padding: 0.75rem 1rem;
+  border-radius: var(--kem-radius-sm);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(4px);
+  min-width: 7rem;
+}
+
+.kem-kpi__value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.kem-kpi__label {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+
+.kem-muted {
+  color: var(--kem-muted);
+}
+
+.kem-empty {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: var(--kem-muted);
+  font-size: 0.8125rem;
+}
+
+.kem-fade-in {
+  animation: kem-fade-in 0.35s var(--kem-ease) both;
+}
+
+@keyframes kem-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kem-fade-in,
+  .kem-card {
+    animation: none;
+    transition: none;
+  }
+}

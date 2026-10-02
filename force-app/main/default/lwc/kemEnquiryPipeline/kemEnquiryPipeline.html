@@ -1,0 +1,184 @@
+<template>
+  <div class="pipeline">
+    <section class="kem-hero kem-fade-in">
+      <div class="hero-row">
+        <div>
+          <div class="kem-hero__title">Admissions Pipeline</div>
+          <div class="kem-hero__subtitle">
+            Drag enquiries between stages. Overdue follow-ups rise to the top.
+          </div>
+        </div>
+        <div class="kpis" role="list">
+          <div class="kem-kpi" role="listitem">
+            <div class="kem-kpi__value">{metrics.open}</div>
+            <div class="kem-kpi__label">Open</div>
+          </div>
+          <div class="kem-kpi" role="listitem">
+            <div class="kem-kpi__value">{metrics.overdue}</div>
+            <div class="kem-kpi__label">Overdue</div>
+          </div>
+          <div class="kem-kpi" role="listitem">
+            <div class="kem-kpi__value">{metrics.dueToday}</div>
+            <div class="kem-kpi__label">Due today</div>
+          </div>
+          <div class="kem-kpi" role="listitem">
+            <div class="kem-kpi__value">{metrics.duplicates}</div>
+            <div class="kem-kpi__label">Possible duplicates</div>
+          </div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <lightning-combobox
+          class="toolbar-branch"
+          label="Branch"
+          variant="label-hidden"
+          placeholder="All branches"
+          value={branchId}
+          options={branchOptions}
+          onchange={handleBranchChange}
+        ></lightning-combobox>
+        <lightning-input
+          class="toolbar-search"
+          type="search"
+          label="Search enquiries"
+          variant="label-hidden"
+          placeholder="Search name, course, phone…"
+          value={searchTerm}
+          onchange={handleSearch}
+        ></lightning-input>
+        <lightning-input
+          class="toolbar-toggle"
+          type="toggle"
+          label="My enquiries"
+          message-toggle-active=""
+          message-toggle-inactive=""
+          checked={mineOnly}
+          onchange={handleMineToggle}
+        ></lightning-input>
+        <lightning-button-icon
+          icon-name="utility:refresh"
+          variant="border-inverse"
+          alternative-text="Refresh"
+          title="Refresh"
+          onclick={handleRefresh}
+        ></lightning-button-icon>
+      </div>
+    </section>
+
+    <template lwc:if={isLoading}>
+      <div class="loading">
+        <lightning-spinner
+          alternative-text="Loading pipeline"
+          size="medium"
+        ></lightning-spinner>
+      </div>
+    </template>
+
+    <template lwc:if={errorMessage}>
+      <div
+        class="slds-m-top_medium slds-notify slds-notify_alert slds-alert_error"
+        role="alert"
+      >
+        {errorMessage}
+      </div>
+    </template>
+
+    <div class="board" role="list" aria-label="Enquiry stages">
+      <template for:each={columns} for:item="column">
+        <section
+          key={column.status}
+          class={column.className}
+          role="listitem"
+          aria-label={column.status}
+          data-status={column.status}
+          ondragover={handleDragOver}
+          ondragleave={handleDragLeave}
+          ondrop={handleDrop}
+        >
+          <header class="column-header">
+            <span class="column-dot" data-status={column.status}></span>
+            <span class="column-title">{column.status}</span>
+            <span class="kem-badge">{column.count}</span>
+          </header>
+          <div class="column-body">
+            <template for:each={column.cards} for:item="card">
+              <article
+                key={card.Id}
+                class="kem-card kem-card_interactive enquiry kem-fade-in"
+                draggable="true"
+                data-id={card.Id}
+                data-status={card.Status}
+                ondragstart={handleDragStart}
+                ondragend={handleDragEnd}
+              >
+                <div class="enquiry-top">
+                  <span class={card.avatarClass} aria-hidden="true"
+                    >{card.initials}</span
+                  >
+                  <div class="enquiry-name">
+                    <a href="#" data-id={card.Id} onclick={handleOpen}
+                      >{card.Name}</a
+                    >
+                    <div class="kem-muted enquiry-sub">{card.courseLabel}</div>
+                  </div>
+                  <lightning-button-menu
+                    alternative-text="Enquiry actions"
+                    icon-size="x-small"
+                    menu-alignment="right"
+                    data-id={card.Id}
+                    onselect={handleMenuSelect}
+                  >
+                    <template for:each={card.moveOptions} for:item="option">
+                      <lightning-menu-item
+                        key={option.value}
+                        value={option.value}
+                        label={option.label}
+                      ></lightning-menu-item>
+                    </template>
+                    <lightning-menu-divider></lightning-menu-divider>
+                    <lightning-menu-item
+                      value="convert"
+                      label="Convert to learner"
+                    ></lightning-menu-item>
+                    <lightning-menu-item
+                      value="unqualified"
+                      label="Mark unqualified"
+                    ></lightning-menu-item>
+                  </lightning-button-menu>
+                </div>
+                <div class="enquiry-meta">
+                  <span class={card.followUpClass}>{card.followUpLabel}</span>
+                  <template lwc:if={card.Enquiry_Channel__c}>
+                    <span class="kem-badge kem-badge_info"
+                      >{card.Enquiry_Channel__c}</span
+                    >
+                  </template>
+                  <template lwc:if={card.Possible_Duplicate__c}>
+                    <span
+                      class="kem-badge kem-badge_warning"
+                      title="Possible duplicate"
+                    >
+                      <lightning-icon
+                        icon-name="utility:warning"
+                        size="xx-small"
+                        alternative-text="Possible duplicate"
+                      ></lightning-icon>
+                      Duplicate?
+                    </span>
+                  </template>
+                </div>
+                <div class="enquiry-footer kem-muted">
+                  <span>{card.branchLabel}</span>
+                  <span>{card.ownerLabel}</span>
+                </div>
+              </article>
+            </template>
+            <template lwc:if={column.isEmpty}>
+              <div class="kem-empty">No enquiries</div>
+            </template>
+          </div>
+        </section>
+      </template>
+    </div>
+  </div>
+</template>

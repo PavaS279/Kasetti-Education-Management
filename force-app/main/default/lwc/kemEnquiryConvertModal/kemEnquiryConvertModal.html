@@ -1,0 +1,117 @@
+<template>
+  <lightning-modal-header label={label}>
+    <p class="kem-muted">
+      Creates the learner, links the guardian, and opens an admissions
+      application in one step.
+    </p>
+  </lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={isLoading}>
+      <div class="spinner-holder">
+        <lightning-spinner
+          alternative-text="Loading"
+          size="small"
+        ></lightning-spinner>
+      </div>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div
+        class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_small"
+        role="alert"
+      >
+        {errorMessage}
+      </div>
+    </template>
+    <template lwc:if={preview}>
+      <template lwc:if={preview.enquiry.Possible_Duplicate__c}>
+        <div class="dup-banner slds-m-bottom_medium" role="status">
+          <lightning-icon
+            icon-name="utility:warning"
+            size="x-small"
+            variant="warning"
+            alternative-text="Warning"
+          ></lightning-icon>
+          <div>
+            <strong>Possible duplicate</strong>
+            <div class="dup-details">
+              {preview.enquiry.Duplicate_Details__c}
+            </div>
+          </div>
+        </div>
+      </template>
+      <div class="grid">
+        <section class="kem-card person">
+          <div class="kem-section-title">Learner</div>
+          <div class="person-row">
+            <span class={learnerAvatarClass}>{learnerInitials}</span>
+            <div>
+              <div class="person-name">{learnerName}</div>
+              <div class="kem-muted small">{preview.enquiry.Email}</div>
+            </div>
+          </div>
+          <template lwc:if={preview.learnerMatch}>
+            <lightning-radio-group
+              name="learnerChoice"
+              label="Existing record found"
+              options={learnerOptions}
+              value={learnerChoice}
+              onchange={handleLearnerChoice}
+            ></lightning-radio-group>
+          </template>
+          <template lwc:else>
+            <span class="kem-badge kem-badge_success">New learner record</span>
+          </template>
+        </section>
+        <section class="kem-card person">
+          <div class="kem-section-title">Guardian</div>
+          <template lwc:if={preview.hasGuardianDetails}>
+            <div class="person-row">
+              <span class={guardianAvatarClass}>{guardianInitials}</span>
+              <div>
+                <div class="person-name">{guardianName}</div>
+                <div class="kem-muted small">
+                  {preview.enquiry.Guardian_Relationship__c}
+                </div>
+              </div>
+            </div>
+            <lightning-radio-group
+              name="guardianChoice"
+              label="Guardian record"
+              options={guardianOptions}
+              value={guardianChoice}
+              onchange={handleGuardianChoice}
+            ></lightning-radio-group>
+          </template>
+          <template lwc:else>
+            <div class="kem-empty">No guardian details on this enquiry.</div>
+          </template>
+        </section>
+      </div>
+      <div class="kem-card options">
+        <lightning-input
+          type="toggle"
+          label="Create admissions application"
+          checked={createApplication}
+          onchange={handleApplicationToggle}
+        ></lightning-input>
+        <div class="kem-muted small">
+          Course: {courseLabel} · Branch: {branchLabel}
+        </div>
+      </div>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button
+      label="Cancel"
+      onclick={handleCancel}
+      disabled={isSaving}
+    ></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Convert"
+      onclick={handleConvert}
+      disabled={isConvertDisabled}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

@@ -1,0 +1,25 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <p class="slds-m-bottom_small kem-muted">
+      Closing an enquiry keeps it for reporting. Choose why it did not proceed.
+    </p>
+    <lightning-combobox
+      label="Lost reason"
+      required
+      value={reason}
+      options={options}
+      onchange={handleChange}
+    ></lightning-combobox>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="destructive"
+      label="Mark unqualified"
+      disabled={isInvalid}
+      onclick={handleConfirm}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

@@ -1,0 +1,140 @@
+<template>
+  <template lwc:if={lead}>
+    <div class="workbench kem-fade-in">
+      <section class="kem-hero">
+        <div class="hero">
+          <span class={avatarClass} aria-hidden="true">{avatarInitials}</span>
+          <div class="hero-text">
+            <div class="kem-hero__title">{name}</div>
+            <div class="kem-hero__subtitle">{courseLabel} · {branchLabel}</div>
+          </div>
+          <div class="hero-actions">
+            <template lwc:if={isOpen}>
+              <lightning-button
+                variant="inverse"
+                label="Log follow-up"
+                icon-name="utility:call"
+                onclick={toggleFollowUp}
+              ></lightning-button>
+              <lightning-button
+                variant="inverse"
+                label="Mark unqualified"
+                onclick={handleUnqualified}
+              ></lightning-button>
+              <lightning-button
+                variant="brand-outline"
+                class="convert-button"
+                label="Convert"
+                icon-name="utility:change_record_type"
+                onclick={handleConvert}
+              ></lightning-button>
+            </template>
+          </div>
+        </div>
+        <ol class="path" aria-label="Enquiry stage">
+          <template for:each={pathSteps} for:item="step">
+            <li
+              key={step.label}
+              class={step.className}
+              aria-current={step.ariaCurrent}
+            >
+              <span class="path-dot"></span>
+              <span>{step.label}</span>
+            </li>
+          </template>
+        </ol>
+      </section>
+
+      <template lwc:if={isDuplicate}>
+        <div class="dup kem-card" role="status">
+          <lightning-icon
+            icon-name="utility:warning"
+            size="x-small"
+            variant="warning"
+            alternative-text="Warning"
+          ></lightning-icon>
+          <div>
+            <strong>Possible duplicate.</strong>
+            <span class="kem-muted"> Review before converting.</span>
+            <div class="dup-details">{duplicateDetails}</div>
+          </div>
+        </div>
+      </template>
+
+      <div class="grid">
+        <section class="kem-card tile">
+          <div class="kem-section-title">Follow-up</div>
+          <div class="tile-value">
+            <span class={followUpBadgeClass}>{followUpStatus}</span>
+          </div>
+          <div class="kem-muted small">Next: {nextFollowUp}</div>
+          <div class="kem-muted small">Last contacted: {lastContacted}</div>
+        </section>
+        <section class="kem-card tile">
+          <div class="kem-section-title">Learner</div>
+          <div class="tile-value">{name}</div>
+          <div class="kem-muted small">{email}</div>
+          <div class="kem-muted small">{phone}</div>
+        </section>
+        <section class="kem-card tile">
+          <div class="kem-section-title">Guardian</div>
+          <div class="tile-value">{guardianName}</div>
+          <div class="kem-muted small">{guardianRelationship}</div>
+          <div class="kem-muted small">{guardianContact}</div>
+        </section>
+        <section class="kem-card tile">
+          <div class="kem-section-title">Source</div>
+          <div class="tile-value">{channel}</div>
+          <div class="kem-muted small">Preferred mode: {deliveryMode}</div>
+        </section>
+      </div>
+
+      <template lwc:if={showFollowUp}>
+        <section
+          class="kem-card follow-up kem-fade-in"
+          aria-label="Log follow-up"
+        >
+          <div class="kem-section-title">Log follow-up</div>
+          <div class="follow-grid">
+            <lightning-combobox
+              label="Outcome"
+              required
+              options={outcomeOptions}
+              value={outcome}
+              onchange={handleOutcome}
+            ></lightning-combobox>
+            <lightning-input
+              type="datetime"
+              label="Next follow-up"
+              value={nextFollowUpValue}
+              onchange={handleNextFollowUp}
+            ></lightning-input>
+          </div>
+          <lightning-textarea
+            label="Notes"
+            value={notes}
+            onchange={handleNotes}
+            max-length="2000"
+          ></lightning-textarea>
+          <div class="follow-actions">
+            <lightning-button
+              label="Cancel"
+              onclick={toggleFollowUp}
+            ></lightning-button>
+            <lightning-button
+              variant="brand"
+              label="Save follow-up"
+              disabled={isSaveDisabled}
+              onclick={handleSaveFollowUp}
+            ></lightning-button>
+          </div>
+        </section>
+      </template>
+    </div>
+  </template>
+  <template lwc:elseif={errorMessage}>
+    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+      {errorMessage}
+    </div>
+  </template>
+</template>

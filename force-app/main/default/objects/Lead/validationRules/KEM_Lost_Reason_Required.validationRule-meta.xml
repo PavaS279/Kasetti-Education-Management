@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>KEM_Lost_Reason_Required</fullName>
+    <active>true</active>
+    <description
+  >Select a lost reason when marking an enquiry as Unqualified.</description>
+    <errorConditionFormula
+  >AND(ISPICKVAL(Status, 'Unqualified'), ISBLANK(TEXT(Lost_Reason__c)))</errorConditionFormula>
+    <errorDisplayField>Lost_Reason__c</errorDisplayField>
+    <errorMessage
+  >Select a lost reason when marking an enquiry as Unqualified.</errorMessage>
+</ValidationRule>

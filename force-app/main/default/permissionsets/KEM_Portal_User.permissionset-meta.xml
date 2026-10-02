@@ -4,4 +4,13 @@
   >Learner or guardian portal access. Record visibility is enforced in Apex through explicit guardian relationships.</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>KEM Portal User</label>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Log_Event__e</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
 </PermissionSet>

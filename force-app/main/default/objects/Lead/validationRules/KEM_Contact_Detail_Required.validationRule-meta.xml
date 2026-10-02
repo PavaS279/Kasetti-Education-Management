@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>KEM_Contact_Detail_Required</fullName>
+    <active>true</active>
+    <description
+  >Provide at least one email address or phone number for the learner or guardian.</description>
+    <errorConditionFormula
+  >AND(NOT(ISBLANK(Branch__c)), ISBLANK(Email), ISBLANK(Phone), ISBLANK(MobilePhone), ISBLANK(Guardian_Email__c), ISBLANK(Guardian_Phone__c))</errorConditionFormula>
+    <errorMessage
+  >Provide at least one email address or phone number for the learner or guardian.</errorMessage>
+</ValidationRule>

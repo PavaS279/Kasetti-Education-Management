@@ -1,0 +1,51 @@
+@import "c/kemStyles";
+
+.spinner-holder {
+  position: relative;
+  min-height: 5rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.person,
+.options {
+  padding: 1rem;
+}
+
+.options {
+  margin-top: 1rem;
+}
+
+.person-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 0.75rem 0;
+}
+
+.person-name {
+  font-weight: 700;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.dup-banner {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.75rem 1rem;
+  border-radius: var(--kem-radius-sm);
+  background: #fdf0dc;
+  color: #7a4a00;
+}
+
+.dup-details {
+  white-space: pre-line;
+  font-size: 0.75rem;
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Follow_Up_Status__c</fullName>
+    <label>Follow-up Status</label>
+    <formula
+  >IF(IsConverted, 'Converted', IF(ISBLANK(Next_Follow_Up__c), 'Not Scheduled', IF(Next_Follow_Up__c &lt; NOW(), 'Overdue', IF(DATEVALUE(Next_Follow_Up__c) &lt;= TODAY(), 'Due Today', 'Scheduled'))))</formula>
+    <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+    <type>Text</type>
+</CustomField>

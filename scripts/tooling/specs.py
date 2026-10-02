@@ -10,6 +10,7 @@ Read access is always granted when an object is listed.
 # Picklist value sets shared across objects (single source of truth)
 # ---------------------------------------------------------------------------
 DELIVERY_MODES = ["Classroom", "Online", "Hybrid"]
+GUARDIAN_RELATIONSHIPS = ["Mother", "Father", "Guardian", "Grandparent", "Sibling", "Other"]
 
 OBJECTS = [
     # ------------------------------------------------------------------ Phase 0
@@ -73,6 +74,24 @@ OBJECTS = [
         ],
     },
     {
+        "name": "Branch_Staff__c", "label": "Branch Staff", "plural": "Branch Staff", "sharing": "ControlledByParent",
+        "externalSharing": "ControlledByParent",
+        "nameField": {"label": "Assignment Number", "type": "AutoNumber", "format": "BST-{00000}"},
+        "description": "Assigns a user to a branch in a role. Drives enquiry routing, branch-scoped views, and teacher allocation.",
+        "fields": [
+            {"name": "Branch__c", "label": "Branch", "type": "MasterDetail", "ref": "Branch__c", "relName": "Staff", "relLabel": "Staff"},
+            {"name": "User__c", "label": "User", "type": "Lookup", "ref": "User", "relName": "Branch_Assignments", "relLabel": "Branch Assignments"},
+            {"name": "Role__c", "label": "Role", "type": "Picklist", "required": True,
+             "values": ["Admissions Counsellor", "Teacher", "Academic Coordinator", "Finance", "Branch Manager"]},
+            {"name": "Active__c", "label": "Active", "type": "Checkbox", "default": True},
+            {"name": "Unique_Key__c", "label": "Unique Key", "type": "Text", "length": 80, "unique": True, "systemManaged": True,
+             "help": "Branch, user, and role. Prevents duplicate assignments."},
+        ],
+        "validationRules": [
+            {"name": "User_Required", "formula": "ISBLANK(User__c)", "field": "User__c", "message": "Select the user for this branch assignment."},
+        ],
+    },
+    {
         "name": "Error_Log__c", "label": "Error Log", "plural": "Error Logs", "sharing": "Private", "search": False,
         "nameField": {"label": "Log Number", "type": "AutoNumber", "format": "LOG-{000000}"},
         "description": "Persistent application log written asynchronously from Log_Event__e so that entries survive transaction rollback.",
@@ -89,10 +108,90 @@ OBJECTS = [
             {"name": "Resolved__c", "label": "Resolved", "type": "Checkbox", "default": False},
         ],
     },
+    # ------------------------------------------------------------ Phase 1.1
+    {
+        "name": "Lead", "label": "Enquiry", "plural": "Enquiries", "standard": True,
+        "fields": [
+            {"name": "Branch__c", "label": "Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Enquiries", "relLabel": "Enquiries"},
+            {"name": "Interested_Course__c", "label": "Interested Course", "type": "Lookup", "ref": "LearningCourse", "relName": "Enquiries", "relLabel": "Enquiries"},
+            {"name": "Interested_Program__c", "label": "Interested Program", "type": "Lookup", "ref": "LearningProgram", "relName": "Enquiries", "relLabel": "Enquiries"},
+            {"name": "Enquiry_Channel__c", "label": "Enquiry Channel", "type": "Picklist",
+             "values": ["Walk-in", "Phone", "Website", "Referral", "Social Media", "Campaign", "Event", "Other"], "default": "Phone"},
+            {"name": "Preferred_Delivery_Mode__c", "label": "Preferred Delivery Mode", "type": "Picklist", "values": DELIVERY_MODES},
+            {"name": "Learner_Birthdate__c", "label": "Learner Date of Birth", "type": "Date"},
+            {"name": "Guardian_First_Name__c", "label": "Guardian First Name", "type": "Text", "length": 40},
+            {"name": "Guardian_Last_Name__c", "label": "Guardian Last Name", "type": "Text", "length": 80},
+            {"name": "Guardian_Email__c", "label": "Guardian Email", "type": "Email"},
+            {"name": "Guardian_Phone__c", "label": "Guardian Phone", "type": "Phone"},
+            {"name": "Guardian_Relationship__c", "label": "Guardian Relationship", "type": "Picklist", "values": GUARDIAN_RELATIONSHIPS},
+            {"name": "Next_Follow_Up__c", "label": "Next Follow-up", "type": "DateTime"},
+            {"name": "Last_Contacted__c", "label": "Last Contacted", "type": "DateTime"},
+            {"name": "Trial_Session_Date__c", "label": "Trial Session Date", "type": "DateTime"},
+            {"name": "Lost_Reason__c", "label": "Lost Reason", "type": "Picklist",
+             "values": ["Price", "Schedule", "Location", "Chose Competitor", "Not Interested", "Unreachable", "Duplicate", "Other"]},
+            {"name": "Possible_Duplicate__c", "label": "Possible Duplicate", "type": "Checkbox", "default": False, "systemManaged": True},
+            {"name": "Duplicate_Details__c", "label": "Duplicate Details", "type": "TextArea", "systemManaged": True},
+            {"name": "Converted_Learner__c", "label": "Converted Learner", "type": "Lookup", "ref": "Account", "relName": "Converted_Enquiries", "relLabel": "Converted Enquiries", "systemManaged": True},
+            {"name": "Converted_Application__c", "label": "Converted Application", "type": "Lookup", "ref": "IndividualApplication", "relName": "Source_Enquiries", "relLabel": "Source Enquiries", "systemManaged": True},
+            {"name": "Submission_Id__c", "label": "Submission ID", "type": "Text", "length": 80, "unique": True, "externalId": True,
+             "help": "Idempotency key supplied by the website or another channel. Repeated submissions with the same key update the same enquiry."},
+            {"name": "Follow_Up_Status__c", "label": "Follow-up Status", "type": "Formula", "returnType": "Text", "blanks": "BlankAsBlank",
+             "formula": "IF(IsConverted, 'Converted', IF(ISBLANK(Next_Follow_Up__c), 'Not Scheduled', IF(Next_Follow_Up__c < NOW(), 'Overdue', IF(DATEVALUE(Next_Follow_Up__c) <= TODAY(), 'Due Today', 'Scheduled'))))"},
+        ],
+        "validationRules": [
+            {"name": "KEM_Lost_Reason_Required", "formula": "AND(ISPICKVAL(Status, 'Unqualified'), ISBLANK(TEXT(Lost_Reason__c)))",
+             "field": "Lost_Reason__c", "message": "Select a lost reason when marking an enquiry as Unqualified."},
+            {"name": "KEM_Contact_Detail_Required", "formula": "AND(NOT(ISBLANK(Branch__c)), ISBLANK(Email), ISBLANK(Phone), ISBLANK(MobilePhone), ISBLANK(Guardian_Email__c), ISBLANK(Guardian_Phone__c))",
+             "message": "Provide at least one email address or phone number for the learner or guardian."},
+        ],
+    },
+    {
+        "name": "Account", "label": "Account", "plural": "Accounts", "standard": True,
+        "fields": [
+            {"name": "Branch__c", "label": "Home Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Accounts", "relLabel": "Learners and Guardians"},
+            {"name": "KEM_Role__c", "label": "Education Role", "type": "Picklist", "values": ["Learner", "Guardian", "Learner and Guardian"],
+             "help": "Whether this person is a learner, a guardian, or both."},
+        ],
+    },
+    {
+        "name": "IndividualApplication", "label": "Application", "plural": "Applications", "standard": True,
+        "fields": [
+            {"name": "Branch__c", "label": "Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Applications", "relLabel": "Applications"},
+            {"name": "Learning_Course__c", "label": "Learning Course", "type": "Lookup", "ref": "LearningCourse", "relName": "Applications", "relLabel": "Applications"},
+            {"name": "Learning_Program__c", "label": "Learning Program", "type": "Lookup", "ref": "LearningProgram", "relName": "Applications", "relLabel": "Applications"},
+            {"name": "Source_Enquiry__c", "label": "Source Enquiry", "type": "Lookup", "ref": "Lead", "relName": "Applications", "relLabel": "Applications", "systemManaged": True},
+        ],
+    },
+    {
+        "name": "ContactContactRelation", "label": "Contact Contact Relationship", "plural": "Contact Contact Relationships", "standard": True,
+        "fields": [
+            {"name": "Is_Fee_Payer__c", "label": "Fee Payer", "type": "Checkbox", "default": False, "help": "This guardian receives invoices for the learner."},
+            {"name": "Is_Emergency_Contact__c", "label": "Emergency Contact", "type": "Checkbox", "default": False},
+            {"name": "Portal_Access__c", "label": "Portal Access", "type": "Checkbox", "default": False,
+             "help": "Grants this guardian portal visibility of the learner's records. Access is never inferred from household membership."},
+            {"name": "Guardian_Relationship__c", "label": "Guardian Relationship", "type": "Picklist", "values": GUARDIAN_RELATIONSHIPS},
+        ],
+    },
+
 ]
 
 # Standard objects that permission sets may grant object-level access to.
-STANDARD_OBJECT_PERMS = set()
+from edu_fields import EDU_STANDARD_FIELDS  # noqa: E402
+
+# Standard fields that may be hidden by profiles in this org; permission sets grant them explicitly.
+STANDARD_FIELD_ACCESS = {
+    **EDU_STANDARD_FIELDS,
+    "Lead": ["Email", "Phone", "MobilePhone", "Description", "LeadSource", "Company"],
+    "Account": ["Phone", "PersonEmail", "PersonMobilePhone", "PersonBirthdate", "Description"],
+    "Contact": ["Email", "Phone", "MobilePhone", "Birthdate"],
+}
+
+# Object permissions that Salesforce requires alongside others (read access is added automatically).
+OBJECT_DEPENDENCIES = {"ContactContactRelation": ["PartyRoleRelation"]}
+
+EDU_CURRICULUM = ["Learning", "LearningCourse", "LearningProgram"]
+
+STANDARD_OBJECT_PERMS = {"Learning", "LearningCourse", "LearningProgram", "PartyRoleRelation", "Lead", "Account", "Contact", "IndividualApplication", "ContactContactRelation"}
 
 # Apex classes every staff persona needs.
 COMMON_CLASSES = {
@@ -100,30 +199,59 @@ COMMON_CLASSES = {
     "portal": [],
 }
 
+ENQUIRY_CLASSES = ["EnquiryController"]
+
+# Education Cloud objects are only granted through permission sets tied to these licences.
+STAFF_LICENSE = "EducationCloudAccessPsl"
+PORTAL_LICENSE = "EducationCloudExprcCloudAccessPsl"
 STAFF_APPS = ["Kasetti_Education"]
-STAFF_TABS = ["Branch__c", "Room__c"]
+
+# Objects governed by the Education Cloud licences. Each persona permission set
+# with a "license" is split into <name> (licence-free: custom and CRM objects,
+# tabs, apps, classes, user permissions) and <name>_Edu (licensed: these objects).
+EDU_OBJECTS = {
+    "Learning", "LearningCourse", "LearningProgram", "LearningProgramPlan", "IndividualApplication",
+    "ContactContactRelation", "PartyRoleRelation", "CourseOffering", "CourseOfferingParticipant",
+    "CourseOfferingSchedule", "AcademicTerm", "AcademicSession", "LearnerProfile", "DocumentChecklistItem",
+}
+STAFF_TABS = ["Branch__c", "Room__c", "Branch_Staff__c"]
 
 PERMISSION_SETS = [
     {"name": "KEM_Administrator", "label": "KEM Administrator",
      "description": "Institution administrator: configures branches, policies, and has full access to Kasetti Education Management data.",
-     "objects": {"Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM"},
-     "apps": STAFF_APPS, "tabs": STAFF_TABS + ["Error_Log__c"]},
+     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
+                 "IndividualApplication": "CEDV", "ContactContactRelation": "CEDV"},
+     "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "Error_Log__c"]},
     {"name": "KEM_Branch_Manager", "label": "KEM Branch Manager",
      "description": "Branch manager: manages rooms, classes, staff allocation, and learners for their branch.",
-     "objects": {"Branch__c": "E", "Room__c": "CED"}, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "CED", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "E", "Room__c": "CED", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
+                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions"]},
     {"name": "KEM_Admissions_Counsellor", "label": "KEM Admissions Counsellor",
      "description": "Admissions counsellor: works enquiries, applications, offers, and follow-ups.",
-     "objects": {"Branch__c": "", "Room__c": ""}, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
+                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions"]},
     {"name": "KEM_Academic_Coordinator", "label": "KEM Academic Coordinator",
      "description": "Academic coordinator: maintains curriculum, timetable, enrolments, and academic oversight.",
-     "objects": {"Branch__c": "", "Room__c": "CE"}, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "CE", "LearningCourse": "CE", "LearningProgram": "CE", "Branch__c": "", "Room__c": "CE", "Lead": "", "Account": "E", "Contact": "E", "IndividualApplication": "",
+                 "ContactContactRelation": ""}, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Teacher", "label": "KEM Teacher",
      "description": "Teacher: views assigned classes, marks attendance, and enters assessment results.",
-     "objects": {"Branch__c": "", "Room__c": ""}, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": ""}, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Finance", "label": "KEM Finance",
      "description": "Finance user: manages fees, invoices, payments, allocations, and reconciliation.",
-     "objects": {"Branch__c": "", "Room__c": ""}, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": "", "ContactContactRelation": ""}, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Portal_User", "label": "KEM Portal User", "classAccess": "portal",
      "description": "Learner or guardian portal access. Record visibility is enforced in Apex through explicit guardian relationships.",
-     "objects": {}},
+     "license": PORTAL_LICENSE, "objects": {"Log_Event__e": "C"}},
 ]
+
+
+# Allowed status transitions (object, field) -> list of (from, to).
+TRANSITIONS = {
+    ("Lead", "Status"): [
+        ("New", "Contacted"), ("New", "Nurturing"), ("New", "Unqualified"), ("New", "Qualified"),
+        ("Contacted", "Nurturing"), ("Contacted", "Qualified"), ("Contacted", "Unqualified"),
+        ("Nurturing", "Contacted"), ("Nurturing", "Qualified"), ("Nurturing", "Unqualified"),
+        ("Unqualified", "Nurturing"), ("Unqualified", "Contacted"),
+    ],
+}

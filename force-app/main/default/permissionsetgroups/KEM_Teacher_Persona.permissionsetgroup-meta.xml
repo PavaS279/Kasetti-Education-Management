@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Teacher: views assigned classes, marks attendance, and enters assessment results.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>KEM Teacher Persona</label>
+    <permissionSets>KEM_Teacher</permissionSets>
+    <permissionSets>KEM_Teacher_Edu</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

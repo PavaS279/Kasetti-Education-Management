@@ -1,6 +1,11 @@
-const { jestConfig } = require('@salesforce/sfdx-lwc-jest/config');
+const { jestConfig } = require("@salesforce/sfdx-lwc-jest/config");
 
 module.exports = {
-    ...jestConfig,
-    modulePathIgnorePatterns: ['<rootDir>/.localdevserver']
+  ...jestConfig,
+  moduleNameMapper: {
+    ...(jestConfig.moduleNameMapper || {}),
+    "^c/kemStyles$": "<rootDir>/jest-mocks/cssModule.js",
+    "^lightning/modal$": "<rootDir>/jest-mocks/lightningModal.js"
+  },
+  modulePathIgnorePatterns: ["<rootDir>/.localdevserver"]
 };
