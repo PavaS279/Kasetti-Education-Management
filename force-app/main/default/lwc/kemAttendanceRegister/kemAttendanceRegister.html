@@ -1,0 +1,142 @@
+<template>
+  <template lwc:if={register}>
+    <div class="register kem-fade-in">
+      <section class="kem-hero">
+        <div class="hero">
+          <div class="hero-text">
+            <div class="kem-hero__subtitle">{sessionWhen}</div>
+            <div class="kem-hero__title">
+              {register.session.Course_Offering__r.Name}
+            </div>
+            <div class="kem-hero__subtitle">{roomName} · {teacherName}</div>
+          </div>
+          <div class="counters" role="list" aria-label="Attendance summary">
+            <template for:each={counters} for:item="c">
+              <div key={c.label} class={c.className} role="listitem">
+                <span class="counter-value">{c.value}</span>
+                <span class="counter-label">{c.label}</span>
+              </div>
+            </template>
+          </div>
+        </div>
+      </section>
+
+      <template lwc:if={readOnly}>
+        <div class="notice kem-card">
+          You can view this register. Only the session teacher or an academic
+          coordinator can mark attendance.
+        </div>
+      </template>
+
+      <section class="kem-card panel">
+        <div class="panel-head">
+          <div class="kem-section-title">Learners ({register.rows.length})</div>
+          <template lwc:if={canEdit}>
+            <lightning-button
+              variant="neutral"
+              label="Mark all present"
+              icon-name="utility:check"
+              onclick={handleAllPresent}
+            ></lightning-button>
+          </template>
+        </div>
+        <ul class="rows">
+          <template for:each={rows} for:item="row">
+            <li key={row.learnerContactId} class="row">
+              <div class="who">
+                <span class={row.avatarClass}>{row.initials}</span>
+                <div>
+                  <div class="name">{row.learnerName}</div>
+                  <div class="rate">
+                    <span class={row.rateClass}>{row.rateLabel}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="choices" role="group" aria-label={row.groupLabel}>
+                <template for:each={row.options} for:item="o">
+                  <button
+                    key={o.value}
+                    type="button"
+                    class={o.className}
+                    aria-pressed={o.pressed}
+                    data-id={row.learnerContactId}
+                    data-value={o.value}
+                    disabled={readOnly}
+                    onclick={handleChoice}
+                  >
+                    {o.label}
+                  </button>
+                </template>
+              </div>
+              <div class="extras">
+                <template lwc:if={row.isLate}>
+                  <lightning-input
+                    class="late"
+                    type="number"
+                    min="1"
+                    max="240"
+                    label="Minutes late"
+                    variant="label-inline"
+                    value={row.minutesLate}
+                    data-id={row.learnerContactId}
+                    onchange={handleMinutes}
+                    disabled={readOnly}
+                  ></lightning-input>
+                </template>
+                <lightning-input
+                  class="note"
+                  label="Note"
+                  variant="label-hidden"
+                  placeholder="Note (optional)"
+                  value={row.note}
+                  data-id={row.learnerContactId}
+                  onchange={handleNote}
+                  disabled={readOnly}
+                  max-length="255"
+                ></lightning-input>
+              </div>
+            </li>
+          </template>
+        </ul>
+        <template lwc:if={isEmpty}
+          ><div class="kem-empty">
+            No learners are enrolled in this class on the session date.
+          </div></template
+        >
+      </section>
+
+      <template lwc:if={canEdit}>
+        <div class="savebar kem-card">
+          <lightning-combobox
+            class="teacher"
+            label="Teacher attendance"
+            variant="label-inline"
+            value={teacherAttendance}
+            options={teacherOptions}
+            onchange={handleTeacher}
+          ></lightning-combobox>
+          <span class="kem-muted small">{unmarkedLabel}</span>
+          <lightning-button
+            variant="brand"
+            label={saveLabel}
+            onclick={handleSave}
+            disabled={isSaving}
+          ></lightning-button>
+        </div>
+      </template>
+    </div>
+  </template>
+  <template lwc:elseif={errorMessage}>
+    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+      {errorMessage}
+    </div>
+  </template>
+  <template lwc:else>
+    <div class="loading">
+      <lightning-spinner
+        alternative-text="Loading register"
+        size="small"
+      ></lightning-spinner>
+    </div>
+  </template>
+</template>

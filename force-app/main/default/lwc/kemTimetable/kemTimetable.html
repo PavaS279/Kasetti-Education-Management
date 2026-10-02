@@ -190,6 +190,13 @@
               data-id={selected.classId}
               onclick={handleOpenClass}
             ></lightning-button>
+            <lightning-button
+              variant="brand"
+              label="Attendance"
+              icon-name="utility:groups"
+              data-id={selected.id}
+              onclick={handleOpenClass}
+            ></lightning-button>
             <template lwc:if={selected.isScheduled}>
               <lightning-button
                 variant="destructive-text"

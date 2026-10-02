@@ -264,6 +264,16 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>CourseOfferingParticipant.Attendance_Rate__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CourseOfferingParticipant.Below_Attendance_Threshold__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>CourseOfferingParticipant.Billing_Status__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -330,6 +340,16 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>CourseOfferingParticipant.RegistrationDateTime</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CourseOfferingParticipant.Sessions_Attended__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CourseOfferingParticipant.Sessions_Missed__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
