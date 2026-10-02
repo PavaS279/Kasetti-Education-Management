@@ -59,23 +59,33 @@ Org credentials are stored by the Salesforce CLI on **your machine** (in `~/.sf`
 
 In VS Code you can use **SFDX: Authorize an Org** from the Command Palette instead of step 2.
 
-### CI or headless environments
+### Deploy from GitHub (no local machine needed)
 
-If there is no browser, for example in CI, log in once locally, then export the SFDX auth URL:
+`.github/workflows/salesforce-deploy.yml` deploys `force-app/` straight from this repo:
 
-```bash
-sf org display --target-org edu-dev --verbose --json   # copy result.sfdxAuthUrl
-```
+- **Push to `main`** (changes under `force-app/`): deploys to the org.
+- **Pull request**: validates the deployment without saving changes.
+- **Actions tab → Salesforce Deploy → Run workflow**: deploys on demand.
 
-Store that value as a secret (for example, the GitHub secret `SFDX_AUTH_URL`) and authorize in the pipeline:
+The workflow authorizes with the OAuth client credentials flow (`scripts/ci/sf-login.sh`), so it needs no browser login. One-time setup, all done in a web browser:
 
-```bash
-echo "$SFDX_AUTH_URL" > auth.txt
-sf org login sfdx-url --sfdx-url-file auth.txt --alias edu-dev --set-default
-rm auth.txt
-```
+1. **In Salesforce Setup**, open **External Client App Manager** and select **New External Client App**:
+   - Enable OAuth, with any callback URL (for example `https://login.salesforce.com/services/oauth2/success`).
+   - OAuth scopes: **Manage user data via APIs (api)** and **Perform requests at any time (refresh_token, offline_access)**.
+   - Select **Enable Client Credentials Flow**.
+2. Open the app's **Policies** tab, select **Enable Client Credentials Flow**, and set **Run As** to an admin user who has permission to deploy metadata (for example **Modify All Data** or **Modify Metadata Through Metadata API Functions**).
+3. On the **Settings** tab, select **Consumer Key and Secret** and copy both values.
+4. In **GitHub → Settings → Secrets and variables → Actions**, add these repository secrets:
 
-The auth URL contains a refresh token that grants access to the org. Never commit it.
+   | Secret | Value |
+   | --- | --- |
+   | `SF_INSTANCE_URL` | Your My Domain URL, for example `https://kasetti.my.salesforce.com` (from Setup → My Domain) |
+   | `SF_CLIENT_ID` | Consumer key |
+   | `SF_CLIENT_SECRET` | Consumer secret |
+
+5. Run the workflow from the **Actions** tab to confirm that the login works.
+
+The client credentials flow requires the My Domain URL; `login.salesforce.com` and `test.salesforce.com` do not work for it. Never commit the consumer secret.
 
 ## Common Salesforce CLI Commands
 

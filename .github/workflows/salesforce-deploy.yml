@@ -1,0 +1,56 @@
+name: Salesforce Deploy
+
+on:
+  push:
+    branches: [main]
+    paths: ["force-app/**"]
+  pull_request:
+    paths: ["force-app/**"]
+  workflow_dispatch:
+
+concurrency:
+  group: salesforce-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SF_INSTANCE_URL: ${{ secrets.SF_INSTANCE_URL }}
+      SF_CLIENT_ID: ${{ secrets.SF_CLIENT_ID }}
+      SF_CLIENT_SECRET: ${{ secrets.SF_CLIENT_SECRET }}
+      SF_ORG_ALIAS: edu-org
+      SF_DISABLE_TELEMETRY: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for metadata
+        id: metadata
+        run: |
+          if find force-app -type f ! -name .gitkeep | grep -q .; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No metadata in force-app yet; skipping deploy."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.metadata.outputs.present == 'true'
+        with:
+          node-version: 22
+
+      - name: Install Salesforce CLI
+        if: steps.metadata.outputs.present == 'true'
+        run: npm install --global @salesforce/cli
+
+      - name: Authorize org
+        if: steps.metadata.outputs.present == 'true'
+        run: ./scripts/ci/sf-login.sh
+
+      - name: Validate deployment (pull requests)
+        if: steps.metadata.outputs.present == 'true' && github.event_name == 'pull_request'
+        run: sf project deploy validate --source-dir force-app --target-org edu-org --wait 30
+
+      - name: Deploy (main or manual run)
+        if: steps.metadata.outputs.present == 'true' && github.event_name != 'pull_request'
+        run: sf project deploy start --source-dir force-app --target-org edu-org --wait 30
