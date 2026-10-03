@@ -1,6 +1,6 @@
 # Progress Tracker
 
-> **Status 2026-10-03:** Phase 0 complete. Phase 1 features 1.1–1.10 complete (deployed, tested, end-to-end checked). Next: 1.11 Basic portal — see [NEXT-STEPS.md](NEXT-STEPS.md).
+> **Status 2026-10-03:** Phase 0 complete. Phase 1 features 1.1–1.11 complete (deployed, tested, end-to-end checked). Next: 1.12 Dashboards — see [NEXT-STEPS.md](NEXT-STEPS.md).
 
 Legend: ✅ done · 🟡 in progress · ⬜ not started
 
@@ -21,18 +21,18 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 
 ## Phase 1 — Operational MVP
 
-| #    | Feature                                               | Built | Deployed | Tests | E2E check | Notes                                                             |
-| ---- | ----------------------------------------------------- | ----- | -------- | ----- | --------- | ----------------------------------------------------------------- |
-| 1.1  | Enquiries: capture, assignment, follow-up, conversion | ✅    | ✅       | ✅    | ✅        | [F1.1-enquiries.md](features/F1.1-enquiries.md)                   |
-| 1.2  | Learner & guardian records, Learner 360               | ✅    | ✅       | ✅    | ✅        | [F1.2-learners-guardians.md](features/F1.2-learners-guardians.md) |
-| 1.3  | Applications: checklist, decision, offer, acceptance  | ✅    | ✅       | ✅    | ✅        | [F1.3-applications.md](features/F1.3-applications.md)             |
-| 1.4  | Course prices and discounts                           | ✅    | ✅       | ✅    | ✅        | [F1.4-pricing-discounts.md](features/F1.4-pricing-discounts.md)   |
-| 1.5  | Enrolment with seat control and agreed price          | ✅    | ✅       | ✅    | ✅        | [F1.5-enrolment.md](features/F1.5-enrolment.md)                   |
-| 1.6  | Scheduling: sessions, conflicts, calendar             | ✅    | ✅       | ✅    | ✅        | [F1.6-scheduling.md](features/F1.6-scheduling.md)                 |
-| 1.7  | Attendance                                            | ✅    | ✅       | ✅    | ✅        | [F1.7-attendance.md](features/F1.7-attendance.md)                 |
-| 1.8  | Basic assessments                                     | ✅    | ✅       | ✅    | ✅        | [F1.8-assessments.md](features/F1.8-assessments.md)               |
-| 1.9  | Invoices, payments, reconciliation                    | ✅    | ✅       | ✅    | ✅        | [F1.9-billing.md](features/F1.9-billing.md)                       |
-| 1.10 | Documents                                             | ✅    | ✅       | ✅    | ✅        | [F1.10-documents.md](features/F1.10-documents.md)                 |
-| 1.11 | Basic portal                                          | ⬜    | ⬜       | ⬜    | ⬜        |                                                                   |
-| 1.12 | Dashboards                                            | ⬜    | ⬜       | ⬜    | ⬜        |                                                                   |
-| 1.13 | Full learner journey with financial reconciliation    | ⬜    | ⬜       | ⬜    | ⬜        |                                                                   |
+| #    | Feature                                               | Built | Deployed | Tests | E2E check | Notes                                                                                 |
+| ---- | ----------------------------------------------------- | ----- | -------- | ----- | --------- | ------------------------------------------------------------------------------------- |
+| 1.1  | Enquiries: capture, assignment, follow-up, conversion | ✅    | ✅       | ✅    | ✅        | [F1.1-enquiries.md](features/F1.1-enquiries.md)                                       |
+| 1.2  | Learner & guardian records, Learner 360               | ✅    | ✅       | ✅    | ✅        | [F1.2-learners-guardians.md](features/F1.2-learners-guardians.md)                     |
+| 1.3  | Applications: checklist, decision, offer, acceptance  | ✅    | ✅       | ✅    | ✅        | [F1.3-applications.md](features/F1.3-applications.md)                                 |
+| 1.4  | Course prices and discounts                           | ✅    | ✅       | ✅    | ✅        | [F1.4-pricing-discounts.md](features/F1.4-pricing-discounts.md)                       |
+| 1.5  | Enrolment with seat control and agreed price          | ✅    | ✅       | ✅    | ✅        | [F1.5-enrolment.md](features/F1.5-enrolment.md)                                       |
+| 1.6  | Scheduling: sessions, conflicts, calendar             | ✅    | ✅       | ✅    | ✅        | [F1.6-scheduling.md](features/F1.6-scheduling.md)                                     |
+| 1.7  | Attendance                                            | ✅    | ✅       | ✅    | ✅        | [F1.7-attendance.md](features/F1.7-attendance.md)                                     |
+| 1.8  | Basic assessments                                     | ✅    | ✅       | ✅    | ✅        | [F1.8-assessments.md](features/F1.8-assessments.md)                                   |
+| 1.9  | Invoices, payments, reconciliation                    | ✅    | ✅       | ✅    | ✅        | [F1.9-billing.md](features/F1.9-billing.md)                                           |
+| 1.10 | Documents                                             | ✅    | ✅       | ✅    | ✅        | [F1.10-documents.md](features/F1.10-documents.md)                                     |
+| 1.11 | Basic portal                                          | ✅    | ✅       | ✅    | ✅        | [F1.11-portal.md](features/F1.11-portal.md) — site placement is a manual Builder step |
+| 1.12 | Dashboards                                            | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                       |
+| 1.13 | Full learner journey with financial reconciliation    | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                       |

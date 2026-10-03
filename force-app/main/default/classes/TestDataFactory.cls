@@ -81,6 +81,61 @@ public class TestDataFactory {
     return user;
   }
 
+  /** Gives the user a role; portal users need their account owner to have one. */
+  public static void giveRole(Id userId) {
+    System.runAs(DEPLOYER) {
+      UserRole role = new UserRole(Name = unique('KEM Role').left(80));
+      insert role;
+      update new User(Id = userId, UserRoleId = role.Id);
+    }
+  }
+
+  /**
+   * Creates a portal user (EDC Community User profile, Customer Community Plus
+   * licence) for the contact, with the Education Cloud experience licence and
+   * the KEM Portal User permission set.
+   * The contact's account owner must have a role (see giveRole).
+   */
+  public static User createPortalUser(Id contactId) {
+    User user;
+    System.runAs(DEPLOYER) {
+      Profile profile = [
+        SELECT Id
+        FROM Profile
+        WHERE Name = 'EDC Community User'
+        LIMIT 1
+      ];
+      String key = String.valueOf(Crypto.getRandomInteger()).replace('-', '');
+      user = new User(
+        Alias = ('p' + key).left(8),
+        Email = 'kem.portal' + key + '@example.com',
+        EmailEncodingKey = 'UTF-8',
+        LastName = 'Portal ' + key,
+        LanguageLocaleKey = 'en_US',
+        LocaleSidKey = 'en_IN',
+        ProfileId = profile.Id,
+        TimeZoneSidKey = 'Asia/Kolkata',
+        Username = 'kem.portal' + key + '@kasetti.test',
+        ContactId = contactId
+      );
+      insert user;
+      List<PermissionSetLicense> licenses = [
+        SELECT Id
+        FROM PermissionSetLicense
+        WHERE DeveloperName = 'EducationCloudExprcCloudAccessPsl'
+        LIMIT 1
+      ];
+      if (!licenses.isEmpty()) {
+        insert new PermissionSetLicenseAssign(
+          AssigneeId = user.Id,
+          PermissionSetLicenseId = licenses[0].Id
+        );
+      }
+      assignPermissionSets(user.Id, new List<String>{ 'KEM_Portal_User' });
+    }
+    return user;
+  }
+
   /** Creates an admissions counsellor assigned to the branch through Branch_Staff__c. */
   public static User createCounsellor(Id branchId) {
     User counsellor = createUserWithLicense(

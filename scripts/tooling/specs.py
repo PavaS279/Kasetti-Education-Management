@@ -544,7 +544,7 @@ STANDARD_OBJECT_PERMS = {"Learning", "LearningCourse", "LearningProgram", "Party
 # Apex classes every staff persona needs.
 COMMON_CLASSES = {
     "staff": [],
-    "portal": [],
+    "portal": ["PortalController"],
 }
 
 ENQUIRY_CLASSES = ["EnquiryController", "ApplicationController"]

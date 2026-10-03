@@ -30,3 +30,4 @@ Target org: Kasetti Technologies Pvt Ltd (Enterprise Edition, Education Cloud), 
 | F1.8 Assessments          | [features/F1.8-assessments.md](features/F1.8-assessments.md)               |
 | F1.9 Billing              | [features/F1.9-billing.md](features/F1.9-billing.md)                       |
 | F1.10 Documents           | [features/F1.10-documents.md](features/F1.10-documents.md)                 |
+| F1.11 Portal              | [features/F1.11-portal.md](features/F1.11-portal.md)                       |
