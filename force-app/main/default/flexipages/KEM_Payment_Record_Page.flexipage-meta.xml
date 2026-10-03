@@ -13,12 +13,6 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentName>kemApplicationWorkbench</componentName>
-                <identifier>c_kemApplicationWorkbench</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
                 <componentName>force:detailPanel</componentName>
                 <identifier>force_detailPanel</identifier>
             </componentInstance>
@@ -42,8 +36,8 @@
         <name>sidebar</name>
         <type>Region</type>
     </flexiPageRegions>
-    <masterLabel>KEM Application Record Page</masterLabel>
-    <sobjectType>IndividualApplication</sobjectType>
+    <masterLabel>KEM Payment Record Page</masterLabel>
+    <sobjectType>Student_Payment__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
     </template>

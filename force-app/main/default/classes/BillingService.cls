@@ -174,6 +174,12 @@ public with sharing class BillingService {
     writer.insertRecords(lines);
     writer.updateRecords(updates);
     refreshInvoices(new Set<Id>{ invoice.Id });
+    if (issueNow == true) {
+      DocumentService.enqueue(
+        new Set<Id>{ invoice.Id },
+        DocumentService.INVOICE
+      );
+    }
     return invoice.Id;
   }
 
@@ -187,6 +193,7 @@ public with sharing class BillingService {
     stampIssue(change, new BranchPolicy(loadBranch(invoice.Branch__c)));
     new Writer().updateRecords(new List<SObject>{ change });
     refreshInvoices(new Set<Id>{ invoiceId });
+    DocumentService.enqueue(new Set<Id>{ invoiceId }, DocumentService.INVOICE);
   }
 
   /** Cancels an unpaid invoice and releases its fee lines so they can be invoiced again. */
@@ -336,6 +343,7 @@ public with sharing class BillingService {
         }
       );
     allocate(paymentId);
+    DocumentService.enqueue(new Set<Id>{ paymentId }, DocumentService.RECEIPT);
     return result(paymentId);
   }
 

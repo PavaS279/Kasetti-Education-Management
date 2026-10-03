@@ -1,6 +1,6 @@
 # Progress Tracker
 
-> **Status 2026-10-03:** Phase 0 complete. Phase 1 features 1.1–1.9 complete (deployed, tested, end-to-end checked). Next: 1.10 Documents — see [NEXT-STEPS.md](NEXT-STEPS.md).
+> **Status 2026-10-03:** Phase 0 complete. Phase 1 features 1.1–1.10 complete (deployed, tested, end-to-end checked). Next: 1.11 Basic portal — see [NEXT-STEPS.md](NEXT-STEPS.md).
 
 Legend: ✅ done · 🟡 in progress · ⬜ not started
 
@@ -32,7 +32,7 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 | 1.7  | Attendance                                            | ✅    | ✅       | ✅    | ✅        | [F1.7-attendance.md](features/F1.7-attendance.md)                 |
 | 1.8  | Basic assessments                                     | ✅    | ✅       | ✅    | ✅        | [F1.8-assessments.md](features/F1.8-assessments.md)               |
 | 1.9  | Invoices, payments, reconciliation                    | ✅    | ✅       | ✅    | ✅        | [F1.9-billing.md](features/F1.9-billing.md)                       |
-| 1.10 | Documents                                             | ⬜    | ⬜       | ⬜    | ⬜        |                                                                   |
+| 1.10 | Documents                                             | ✅    | ✅       | ✅    | ✅        | [F1.10-documents.md](features/F1.10-documents.md)                 |
 | 1.11 | Basic portal                                          | ⬜    | ⬜       | ⬜    | ⬜        |                                                                   |
 | 1.12 | Dashboards                                            | ⬜    | ⬜       | ⬜    | ⬜        |                                                                   |
 | 1.13 | Full learner journey with financial reconciliation    | ⬜    | ⬜       | ⬜    | ⬜        |                                                                   |

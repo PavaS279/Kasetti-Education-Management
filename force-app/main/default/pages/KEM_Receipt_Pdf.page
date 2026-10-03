@@ -1,0 +1,248 @@
+<apex:page
+  controller="KemDocumentController"
+  renderAs="pdf"
+  applyHtmlTag="false"
+  applyBodyTag="false"
+  showHeader="false"
+  sidebar="false"
+  standardStylesheets="false"
+>
+  <html>
+    <head>
+      <style type="text/css">
+        @page {
+          size: A4;
+          margin: 18mm 16mm 20mm 16mm;
+          @bottom-center {
+            content: "Page " counter(page) " of " counter(pages);
+            font-family: sans-serif;
+            font-size: 8pt;
+            color: #8a94a3;
+          }
+        }
+        body {
+          font-family:
+            Arial Unicode MS,
+            sans-serif;
+          font-size: 10pt;
+          color: #16243a;
+        }
+        .band {
+          background-color: #1b3a6b;
+          color: #ffffff;
+          padding: 14px 18px;
+        }
+        .band-table {
+          width: 100%;
+        }
+        .brand {
+          font-size: 18pt;
+          font-weight: bold;
+        }
+        .brand-sub {
+          font-size: 9pt;
+          color: #c9d8f2;
+        }
+        .doc-title {
+          font-size: 16pt;
+          font-weight: bold;
+          text-align: right;
+          letter-spacing: 1px;
+        }
+        .doc-number {
+          font-size: 10pt;
+          text-align: right;
+          color: #c9d8f2;
+        }
+        .section {
+          margin-top: 18px;
+        }
+        .label {
+          font-size: 8pt;
+          color: #5f6b7a;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        .value {
+          font-size: 10.5pt;
+          font-weight: bold;
+        }
+        .muted {
+          color: #5f6b7a;
+          font-size: 9pt;
+        }
+        .grid {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        .grid td {
+          vertical-align: top;
+          padding: 0 10px 0 0;
+        }
+        table.lines {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 8px;
+        }
+        table.lines th {
+          background-color: #e8f0fd;
+          color: #1b3a6b;
+          font-size: 8pt;
+          text-transform: uppercase;
+          text-align: left;
+          padding: 7px 8px;
+        }
+        table.lines td {
+          padding: 7px 8px;
+          border-bottom: 1px solid #e3e8ef;
+        }
+        .num {
+          text-align: right;
+        }
+        .totals {
+          width: 45%;
+          margin-left: 55%;
+          border-collapse: collapse;
+          margin-top: 10px;
+        }
+        .totals td {
+          padding: 5px 8px;
+        }
+        .totals .grand td {
+          border-top: 2px solid #1b3a6b;
+          font-size: 12pt;
+          font-weight: bold;
+        }
+        .stamp {
+          display: inline-block;
+          padding: 4px 10px;
+          border: 2px solid #2e844a;
+          color: #2e844a;
+          font-weight: bold;
+          font-size: 11pt;
+          letter-spacing: 1px;
+        }
+        .stamp-due {
+          border-color: #c77700;
+          color: #c77700;
+        }
+        .note {
+          margin-top: 20px;
+          padding: 10px 12px;
+          background-color: #f4f7fb;
+          border-left: 3px solid #2e6fd8;
+          font-size: 9pt;
+        }
+        .footer {
+          margin-top: 30px;
+          font-size: 8pt;
+          color: #8a94a3;
+          border-top: 1px solid #e3e8ef;
+          padding-top: 8px;
+        }
+        .signature {
+          margin-top: 40px;
+        }
+        .signature-line {
+          width: 200px;
+          border-top: 1px solid #16243a;
+          padding-top: 4px;
+          font-size: 9pt;
+        }
+      </style>
+    </head>
+    <body>
+      <c:KEM_Document_Header
+        institution="{!institutionName}"
+        branchName="{!branchName}"
+        branchAddress="{!branchAddress}"
+        branchContact="{!branchContact}"
+        title="PAYMENT RECEIPT"
+        number="{!payment.Receipt_Number__c}"
+      />
+
+      <div class="section">
+        <table class="grid">
+          <tr>
+            <td style="width: 50%">
+              <div class="label">Received from</div>
+              <div class="value">{!payment.Payer__r.Name}</div>
+              <apex:outputPanel rendered="{!NOT(ISBLANK(payment.Learner__c))}"
+                ><div class="muted">
+                  For learner {!payment.Learner__r.Name}
+                </div></apex:outputPanel
+              >
+            </td>
+            <td style="text-align: right">
+              <div class="label">Payment date</div>
+              <div class="value">
+                <apex:outputText value="{0, date, dd MMM yyyy}"
+                  ><apex:param value="{!payment.Payment_Date__c}"
+                /></apex:outputText>
+              </div>
+              <div class="label" style="margin-top: 6px">Method</div>
+              <div class="value">{!payment.Method__c}</div>
+              <div class="muted">{!payment.Reference__c}</div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="section" style="text-align: center">
+        <div class="label">Amount received</div>
+        <div style="font-size: 22pt; font-weight: bold; margin: 6px 0">
+          {!currencyCode}
+          <apex:outputText value="{0, number, ###,###,##0.00}"
+            ><apex:param value="{!payment.Amount__c}"
+          /></apex:outputText>
+        </div>
+        <span class="stamp">RECEIVED WITH THANKS</span>
+      </div>
+
+      <div class="section">
+        <div class="label">Applied to</div>
+        <table class="lines">
+          <thead>
+            <tr>
+              <th>Invoice</th>
+              <th class="num">Applied ({!currencyCode})</th>
+              <th class="num">Balance remaining</th>
+            </tr>
+          </thead>
+          <tbody>
+            <apex:repeat value="{!allocations}" var="a">
+              <tr>
+                <td>{!a.Student_Invoice__r.Name}</td>
+                <td class="num">
+                  <apex:outputText value="{0, number, ###,###,##0.00}"
+                    ><apex:param value="{!a.Amount__c}"
+                  /></apex:outputText>
+                </td>
+                <td class="num">
+                  <apex:outputText value="{0, number, ###,###,##0.00}"
+                    ><apex:param value="{!a.Student_Invoice__r.Balance_Due__c}"
+                  /></apex:outputText>
+                </td>
+              </tr>
+            </apex:repeat>
+          </tbody>
+        </table>
+        <apex:outputPanel
+          layout="block"
+          styleClass="note"
+          rendered="{!payment.Unallocated_Amount__c > 0}"
+        >
+          <apex:outputText value="{0, number, ###,###,##0.00}"
+            ><apex:param value="{!payment.Unallocated_Amount__c}"
+          /></apex:outputText>
+          is held on account and will be applied to future invoices or refunded.
+        </apex:outputPanel>
+      </div>
+
+      <div class="footer">
+        Payment {!payment.Name}. Computer-generated receipt issued by
+        {!institutionName}. No signature required.
+      </div>
+    </body>
+  </html>
+</apex:page>

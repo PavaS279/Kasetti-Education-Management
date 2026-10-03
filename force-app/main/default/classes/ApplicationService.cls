@@ -366,6 +366,12 @@ public with sharing class ApplicationService {
       changes.ApprovedDate = System.now();
     }
     write(changes);
+    if (decision == DECISION_ADMIT) {
+      DocumentService.enqueue(
+        new Set<Id>{ applicationId },
+        DocumentService.OFFER_LETTER
+      );
+    }
   }
 
   public static void respondToOffer(Id applicationId, Boolean accept) {

@@ -1,0 +1,42 @@
+<apex:component>
+  <apex:attribute
+    name="institution"
+    type="String"
+    description="Institution name"
+    required="true"
+  />
+  <apex:attribute name="branchName" type="String" description="Branch name" />
+  <apex:attribute
+    name="branchAddress"
+    type="String"
+    description="Branch address"
+  />
+  <apex:attribute
+    name="branchContact"
+    type="String"
+    description="Branch phone and email"
+  />
+  <apex:attribute
+    name="title"
+    type="String"
+    description="Document title"
+    required="true"
+  />
+  <apex:attribute name="number" type="String" description="Document number" />
+  <div class="band">
+    <table class="band-table">
+      <tr>
+        <td>
+          <div class="brand">{!institution}</div>
+          <div class="brand-sub">{!branchName}</div>
+          <div class="brand-sub">{!branchAddress}</div>
+          <div class="brand-sub">{!branchContact}</div>
+        </td>
+        <td>
+          <div class="doc-title">{!title}</div>
+          <div class="doc-number">{!number}</div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</apex:component>
