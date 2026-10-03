@@ -1,0 +1,209 @@
+<template>
+  <div class="desk">
+    <section class="kem-hero">
+      <div class="hero">
+        <div>
+          <div class="kem-hero__subtitle">Receivables and reconciliation</div>
+          <div class="kem-hero__title">Finance Desk</div>
+        </div>
+        <lightning-button-icon
+          icon-name="utility:refresh"
+          variant="border-inverse"
+          alternative-text="Refresh"
+          onclick={handleRefresh}
+        ></lightning-button-icon>
+      </div>
+    </section>
+
+    <template lwc:if={desk}>
+      <div class="kpis kem-fade-in">
+        <template for:each={kpis} for:item="k">
+          <div key={k.key} class={k.className}>
+            <span class="kpi-label">{k.label}</span>
+            <lightning-formatted-number
+              class="kpi-value"
+              value={k.value}
+              format-style="currency"
+              currency-code={currencyCode}
+              maximum-fraction-digits="0"
+            ></lightning-formatted-number>
+          </div>
+        </template>
+      </div>
+
+      <section class="kem-card panel kem-fade-in">
+        <div class="tabs" role="tablist" aria-label="Finance work queues">
+          <template for:each={tabs} for:item="t">
+            <button
+              key={t.value}
+              type="button"
+              role="tab"
+              class={t.className}
+              aria-selected={t.selected}
+              data-value={t.value}
+              onclick={handleTab}
+            >
+              {t.label}<span class="count">{t.count}</span>
+            </button>
+          </template>
+        </div>
+
+        <ul class="rows" role="tabpanel">
+          <template lwc:if={showPending}>
+            <template for:each={pendingRows} for:item="p">
+              <li key={p.Id} class="row">
+                <div class="main">
+                  <a
+                    href="#"
+                    data-id={p.Id}
+                    onclick={handleNavigate}
+                    class="strong"
+                    >{p.Name}</a
+                  >
+                  <div class="kem-muted small">
+                    {p.payer} · {p.Method__c} · {p.Reference__c} · {p.dateLabel}
+                  </div>
+                </div>
+                <span class="kem-badge">{p.invoiceName}</span>
+                <lightning-formatted-number
+                  class="money"
+                  value={p.Amount__c}
+                  format-style="currency"
+                  currency-code={currencyCode}
+                ></lightning-formatted-number>
+                <template lwc:if={desk.canManage}>
+                  <lightning-button-group>
+                    <lightning-button
+                      label="Confirm"
+                      data-id={p.Id}
+                      onclick={handleConfirm}
+                      disabled={isBusy}
+                    ></lightning-button>
+                    <lightning-button
+                      label="Failed"
+                      data-id={p.Id}
+                      onclick={handleFail}
+                      disabled={isBusy}
+                    ></lightning-button>
+                  </lightning-button-group>
+                </template>
+              </li>
+            </template>
+          </template>
+
+          <template lwc:if={showExceptions}>
+            <template for:each={exceptionRows} for:item="p">
+              <li key={p.Id} class="row row_alert">
+                <div class="main">
+                  <a
+                    href="#"
+                    data-id={p.Id}
+                    onclick={handleNavigate}
+                    class="strong"
+                    >{p.Receipt_Number__c}</a
+                  >
+                  <div class="kem-muted small">
+                    {p.payer} · {p.Reconciliation_Note__c}
+                  </div>
+                </div>
+                <div class="unallocated">
+                  <span class="kem-muted small">Unallocated</span>
+                  <lightning-formatted-number
+                    class="money"
+                    value={p.Unallocated_Amount__c}
+                    format-style="currency"
+                    currency-code={currencyCode}
+                  ></lightning-formatted-number>
+                </div>
+                <template lwc:if={desk.canManage}>
+                  <lightning-button-group>
+                    <lightning-button
+                      label="Retry allocation"
+                      data-id={p.Id}
+                      onclick={handleRetry}
+                      disabled={isBusy}
+                    ></lightning-button>
+                    <lightning-button
+                      label="Close"
+                      data-id={p.Id}
+                      onclick={handleClose}
+                      disabled={isBusy}
+                    ></lightning-button>
+                  </lightning-button-group>
+                </template>
+              </li>
+            </template>
+          </template>
+
+          <template lwc:if={showOverdue}>
+            <template for:each={overdueRows} for:item="i">
+              <li key={i.Id} class="row">
+                <div class="main">
+                  <a
+                    href="#"
+                    data-id={i.Id}
+                    onclick={handleNavigate}
+                    class="strong"
+                    >{i.Name}</a
+                  >
+                  <div class="kem-muted small">
+                    {i.payer} · {i.learner} · due {i.dueLabel}
+                  </div>
+                </div>
+                <span class={i.ageClass}>{i.daysLabel}</span>
+                <lightning-formatted-number
+                  class="money"
+                  value={i.Balance_Due__c}
+                  format-style="currency"
+                  currency-code={currencyCode}
+                ></lightning-formatted-number>
+              </li>
+            </template>
+          </template>
+
+          <template lwc:if={showRecent}>
+            <template for:each={recentRows} for:item="p">
+              <li key={p.Id} class="row">
+                <div class="main">
+                  <a
+                    href="#"
+                    data-id={p.Id}
+                    onclick={handleNavigate}
+                    class="strong"
+                    >{p.Receipt_Number__c}</a
+                  >
+                  <div class="kem-muted small">
+                    {p.payer} · {p.Method__c} · {p.dateLabel}
+                  </div>
+                </div>
+                <span class="kem-badge">{p.Reconciliation_Status__c}</span>
+                <lightning-formatted-number
+                  class="money"
+                  value={p.Amount__c}
+                  format-style="currency"
+                  currency-code={currencyCode}
+                ></lightning-formatted-number>
+              </li>
+            </template>
+          </template>
+        </ul>
+        <template lwc:if={currentEmpty}>
+          <div class="kem-empty">{emptyMessage}</div>
+        </template>
+      </section>
+    </template>
+    <template lwc:elseif={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <template lwc:else>
+      <div class="loading">
+        <lightning-spinner
+          alternative-text="Loading finance desk"
+          size="small"
+        ></lightning-spinner>
+      </div>
+    </template>
+  </div>
+</template>

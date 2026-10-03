@@ -30,6 +30,8 @@ public with sharing class EnrolmentController {
     public Integer seatsTaken;
     @AuraEnabled
     public Boolean canApproveDiscounts;
+    @AuraEnabled
+    public Boolean canManageBilling;
   }
 
   @AuraEnabled(cacheable=true)
@@ -64,6 +66,9 @@ public with sharing class EnrolmentController {
       roster.offering = offerings[0];
       roster.canApproveDiscounts = FeatureManagement.checkPermission(
         EnrolmentService.APPROVE_PERMISSION
+      );
+      roster.canManageBilling = FeatureManagement.checkPermission(
+        BillingService.MANAGE_PERMISSION
       );
       Integer taken = 0;
       for (CourseOfferingParticipant p : [

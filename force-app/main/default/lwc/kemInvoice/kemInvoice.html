@@ -1,0 +1,308 @@
+<template>
+  <template lwc:if={view}>
+    <div class="invoice kem-fade-in">
+      <section class="kem-hero">
+        <div class="hero">
+          <div class="hero-text">
+            <div class="kem-hero__subtitle">Invoice · {branchName}</div>
+            <div class="kem-hero__title">{invoice.Name}</div>
+            <div class="chips">
+              <span class={statusClass}>{status}</span>
+              <template lwc:if={isOverdue}
+                ><span class="kem-badge kem-badge_danger"
+                  >Overdue</span
+                ></template
+              >
+              <span class="hero-chip">Issued {issueLabel}</span>
+              <span class="hero-chip">Due {dueLabel}</span>
+            </div>
+          </div>
+          <div class="amounts">
+            <div class="amount">
+              <span class="amount-label">Total</span>
+              <lightning-formatted-number
+                class="amount-value"
+                value={total}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+            </div>
+            <div class="amount">
+              <span class="amount-label">Paid</span>
+              <lightning-formatted-number
+                class="amount-value"
+                value={paid}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+            </div>
+            <div class="amount amount_due">
+              <span class="amount-label">Balance due</span>
+              <lightning-formatted-number
+                class="amount-value balance"
+                value={balance}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+            </div>
+            <div
+              class="progress"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow={paidPercent}
+              aria-label={progressLabel}
+            >
+              <span style={progressStyle}></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <section class="kem-card panel parties">
+          <div class="party">
+            <span class="kem-muted small">Bill to</span>
+            <a href="#" data-id={invoice.Bill_To__c} onclick={handleNavigate}
+              >{billTo}</a
+            >
+            <span class="kem-muted small">{billToEmail}</span>
+          </div>
+          <div class="party">
+            <span class="kem-muted small">Learner</span>
+            <a
+              href="#"
+              data-id={invoice.Learner_Account__c}
+              onclick={handleNavigate}
+              >{learnerName}</a
+            >
+            <span class="kem-muted small">{className}</span>
+          </div>
+          <template lwc:if={hasActions}>
+            <div class="actions">
+              <template lwc:if={canIssue}>
+                <lightning-button
+                  variant="brand"
+                  label="Issue invoice"
+                  icon-name="utility:send"
+                  onclick={handleIssue}
+                  disabled={isBusy}
+                ></lightning-button>
+              </template>
+              <template lwc:if={canPay}>
+                <lightning-button
+                  variant="brand"
+                  label="Record payment"
+                  icon-name="utility:moneybag"
+                  onclick={handlePay}
+                  disabled={isBusy}
+                ></lightning-button>
+              </template>
+              <template lwc:if={canCancel}>
+                <lightning-button
+                  variant="destructive-text"
+                  label="Cancel invoice"
+                  onclick={handleCancel}
+                  disabled={isBusy}
+                ></lightning-button>
+              </template>
+            </div>
+          </template>
+          <template lwc:if={isCancelled}>
+            <div class="cancelled">
+              Cancelled: {invoice.Cancellation_Reason__c}
+            </div>
+          </template>
+        </section>
+
+        <section class="kem-card panel">
+          <div class="kem-section-title">Charges</div>
+          <div class="table-wrap">
+            <table class="table" aria-label="Invoice lines">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th class="num">Amount</th>
+                  <th class="num">Discount</th>
+                  <th class="num">Tax</th>
+                  <th class="num">Line total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={lines} for:item="l">
+                  <tr key={l.Id}>
+                    <td>
+                      <div class="strong">{l.label}</div>
+                      <div class="kem-muted small">{l.Fee_Type__c}</div>
+                    </td>
+                    <td class="num">
+                      <lightning-formatted-number
+                        value={l.Unit_Amount__c}
+                        format-style="currency"
+                        currency-code={currencyCode}
+                      ></lightning-formatted-number>
+                    </td>
+                    <td class="num discount">
+                      <template lwc:if={l.hasDiscount}
+                        >−<lightning-formatted-number
+                          value={l.Discount_Amount__c}
+                          format-style="currency"
+                          currency-code={currencyCode}
+                        ></lightning-formatted-number
+                      ></template>
+                    </td>
+                    <td class="num">
+                      <lightning-formatted-number
+                        value={l.Tax_Amount__c}
+                        format-style="currency"
+                        currency-code={currencyCode}
+                      ></lightning-formatted-number>
+                    </td>
+                    <td class="num strong">
+                      <lightning-formatted-number
+                        value={l.Line_Total__c}
+                        format-style="currency"
+                        currency-code={currencyCode}
+                      ></lightning-formatted-number>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td>Total</td>
+                  <td class="num">
+                    <lightning-formatted-number
+                      value={invoice.Subtotal__c}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                  </td>
+                  <td class="num discount">
+                    <lightning-formatted-number
+                      value={invoice.Discount_Total__c}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                  </td>
+                  <td class="num">
+                    <lightning-formatted-number
+                      value={invoice.Tax_Total__c}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                  </td>
+                  <td class="num">
+                    <lightning-formatted-number
+                      value={total}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <template lwc:if={hasPending}>
+        <section class="kem-card panel pending">
+          <div class="kem-section-title">Awaiting confirmation</div>
+          <ul>
+            <template for:each={pending} for:item="p">
+              <li key={p.Id} class="pay-row">
+                <span class="pay-icon pay-icon_pending" aria-hidden="true"
+                  ><lightning-icon
+                    icon-name="utility:clock"
+                    size="x-small"
+                  ></lightning-icon
+                ></span>
+                <div class="pay-main">
+                  <div class="strong">{p.Name} · {p.Method__c}</div>
+                  <div class="kem-muted small">
+                    {p.dateLabel} · {p.Reference__c}
+                  </div>
+                </div>
+                <lightning-formatted-number
+                  class="strong"
+                  value={p.Amount__c}
+                  format-style="currency"
+                  currency-code={currencyCode}
+                ></lightning-formatted-number>
+                <template lwc:if={view.canManage}>
+                  <lightning-button-group>
+                    <lightning-button
+                      label="Confirm"
+                      data-id={p.Id}
+                      onclick={handleConfirm}
+                      title={p.confirmLabel}
+                      disabled={isBusy}
+                    ></lightning-button>
+                    <lightning-button
+                      label="Failed"
+                      data-id={p.Id}
+                      onclick={handleFail}
+                      title={p.failLabel}
+                      disabled={isBusy}
+                    ></lightning-button>
+                  </lightning-button-group>
+                </template>
+              </li>
+            </template>
+          </ul>
+        </section>
+      </template>
+
+      <section class="kem-card panel">
+        <div class="kem-section-title">Payments</div>
+        <ul>
+          <template for:each={payments} for:item="p">
+            <li key={p.Id} class="pay-row">
+              <span class="pay-icon" aria-hidden="true"
+                ><lightning-icon
+                  icon-name="utility:check"
+                  size="x-small"
+                ></lightning-icon
+              ></span>
+              <div class="pay-main">
+                <a
+                  href="#"
+                  class="strong"
+                  data-id={p.Student_Payment__c}
+                  onclick={handleNavigate}
+                  >{p.receipt}</a
+                >
+                <div class="kem-muted small">
+                  {p.dateLabel} · {p.method} · {p.reference}
+                </div>
+              </div>
+              <lightning-formatted-number
+                class="strong paid"
+                value={p.Amount__c}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+            </li>
+          </template>
+        </ul>
+        <template lwc:if={noPayments}>
+          <div class="kem-empty">No payments allocated yet.</div>
+        </template>
+      </section>
+    </div>
+  </template>
+  <template lwc:elseif={errorMessage}>
+    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+      {errorMessage}
+    </div>
+  </template>
+  <template lwc:else>
+    <div class="loading">
+      <lightning-spinner
+        alternative-text="Loading invoice"
+        size="small"
+      ></lightning-spinner>
+    </div>
+  </template>
+</template>

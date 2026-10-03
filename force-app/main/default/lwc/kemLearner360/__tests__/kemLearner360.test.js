@@ -3,6 +3,7 @@ import KemLearner360 from "c/kemLearner360";
 import getLearner360 from "@salesforce/apex/Learner360Controller.getLearner360";
 import updatePreferences from "@salesforce/apex/Learner360Controller.updatePreferences";
 import getLearnerResults from "@salesforce/apex/AssessmentController.getLearnerResults";
+import getLearnerInvoices from "@salesforce/apex/BillingController.getLearnerInvoices";
 
 jest.mock(
   "@salesforce/apex/Learner360Controller.getLearner360",
@@ -14,6 +15,14 @@ jest.mock(
 );
 jest.mock(
   "@salesforce/apex/AssessmentController.getLearnerResults",
+  () => {
+    const { createApexTestWireAdapter } = require("@salesforce/sfdx-lwc-jest");
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/BillingController.getLearnerInvoices",
   () => {
     const { createApexTestWireAdapter } = require("@salesforce/sfdx-lwc-jest");
     return { default: createApexTestWireAdapter(jest.fn()) };
@@ -155,6 +164,36 @@ describe("c-kem-learner-360", () => {
     expect(
       element.shadowRoot.querySelector(".kem-badge_success").textContent
     ).toBeTruthy();
+  });
+
+  it("shows invoices with the balance due", async () => {
+    const element = createElement("c-kem-learner-360", { is: KemLearner360 });
+    element.recordId = "001000000000001";
+    document.body.appendChild(element);
+    getLearner360.emit(VIEW);
+    getLearnerInvoices.emit([
+      {
+        Id: "a0I000000000001",
+        Name: "BLR-000001",
+        Status__c: "Partially Paid",
+        Balance_Due__c: 4080,
+        Overdue__c: true,
+        Due_Date__c: "2026-09-30",
+        Enrolment__r: { CourseOffering: { Name: "Maths Sat AM" } }
+      },
+      {
+        Id: "a0I000000000002",
+        Name: "BLR-000002",
+        Status__c: "Paid",
+        Balance_Due__c: 0,
+        Overdue__c: false
+      }
+    ]);
+    await flush();
+    const text = element.shadowRoot.textContent;
+    expect(text).toContain("BLR-000001");
+    expect(text).toContain("1 overdue");
+    expect(element.shadowRoot.querySelector(".fee-balance").value).toBe(4080);
   });
 
   it("saves communication preferences", async () => {

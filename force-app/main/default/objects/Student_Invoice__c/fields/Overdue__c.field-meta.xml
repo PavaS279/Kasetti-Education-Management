@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Overdue__c</fullName>
+    <label>Overdue</label>
+    <formula
+  >AND(OR(ISPICKVAL(Status__c, 'Issued'), ISPICKVAL(Status__c, 'Partially Paid')), NOT(ISBLANK(Due_Date__c)), Due_Date__c &lt; TODAY())</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <type>Checkbox</type>
+</CustomField>

@@ -8,6 +8,7 @@ import decideDiscount from "@salesforce/apex/EnrolmentController.decideDiscount"
 import EnrolModal from "c/kemEnrolModal";
 import PatternModal from "c/kemPatternModal";
 import generateSessions from "@salesforce/apex/TimetableController.generateSessions";
+import createInvoice from "@salesforce/apex/BillingController.createInvoice";
 import ReasonModal from "c/kemReasonModal";
 import { reduceErrors, toast, toastError, initials, toneFor } from "c/kemUtils";
 
@@ -111,7 +112,12 @@ export default class KemClassRoster extends NavigationMixin(LightningElement) {
       startLabel: formatDate(r.startDate),
       isActive: ACTIVE.includes(r.status),
       canDecide:
-        this.roster.canApproveDiscounts && r.discountApproval === "Pending"
+        this.roster.canApproveDiscounts && r.discountApproval === "Pending",
+      canInvoice:
+        this.roster.canManageBilling &&
+        r.billingStatus === "Not Invoiced" &&
+        r.status !== "Withdrew" &&
+        r.discountApproval !== "Pending"
     }));
   }
   get isEmpty() {
@@ -208,6 +214,17 @@ export default class KemClassRoster extends NavigationMixin(LightningElement) {
     try {
       if (action === "open") {
         this.navigate(enrolmentId);
+        return;
+      }
+      if (action === "invoice") {
+        const invoiceId = await createInvoice({ enrolmentId, issueNow: true });
+        toast(
+          this,
+          "Invoice issued",
+          "The invoice was raised to the fee payer."
+        );
+        this.navigate(invoiceId);
+        await refreshApex(this.wiredResult);
         return;
       }
       if (action === "withdraw") {

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Gateway_Transaction_Id__c</fullName>
+    <externalId>true</externalId>
+    <inlineHelpText
+  >Unique transaction ID from the bank or gateway. A repeated notification never creates a second payment.</inlineHelpText>
+    <label>Gateway Transaction ID</label>
+    <required>false</required>
+    <length>100</length>
+    <caseSensitive>false</caseSensitive>
+    <unique>true</unique>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+</CustomField>

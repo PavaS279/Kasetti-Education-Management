@@ -269,6 +269,43 @@
             </template>
           </div>
         </lightning-tab>
+        <lightning-tab label="Fees">
+          <div class="tab-body">
+            <template lwc:if={hasInvoices}>
+              <div class="fee-summary kem-card">
+                <span class="kem-muted small">Balance due</span>
+                <lightning-formatted-number
+                  class="fee-balance"
+                  value={balanceDue}
+                  format-style="currency"
+                  currency-code={currencyCode}
+                ></lightning-formatted-number>
+                <template lwc:if={overdueCount}>
+                  <span class="kem-badge kem-badge_danger">{overdueLabel}</span>
+                </template>
+              </div>
+            </template>
+            <template for:each={invoiceRows} for:item="i">
+              <div key={i.Id} class="row kem-card">
+                <div class="row-main">
+                  <a href="#" data-id={i.Id} onclick={handleNavigate}
+                    >{i.Name}</a
+                  >
+                  <div class="kem-muted small">{i.metaLabel}</div>
+                </div>
+                <lightning-formatted-number
+                  value={i.Balance_Due__c}
+                  format-style="currency"
+                  currency-code={currencyCode}
+                ></lightning-formatted-number>
+                <span class={i.statusClass}>{i.Status__c}</span>
+              </div>
+            </template>
+            <template lwc:if={noInvoices}>
+              <div class="kem-empty">No invoices.</div>
+            </template>
+          </div>
+        </lightning-tab>
         <lightning-tab label="Preferences">
           <div class="tab-body prefs">
             <lightning-combobox

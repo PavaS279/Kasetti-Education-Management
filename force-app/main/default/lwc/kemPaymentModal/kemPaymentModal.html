@@ -1,0 +1,86 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <div class="summary">
+      <div>
+        <div class="kem-muted small">Payer</div>
+        <div class="strong">{payerName}</div>
+      </div>
+      <div class="right">
+        <div class="kem-muted small">Balance due</div>
+        <lightning-formatted-number
+          class="strong"
+          value={balance}
+          format-style="currency"
+          currency-code={currencyCode}
+        ></lightning-formatted-number>
+      </div>
+    </div>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <div class="form-grid">
+      <lightning-input
+        type="number"
+        label="Amount"
+        formatter="currency"
+        step="0.01"
+        min="0.01"
+        required
+        value={amount}
+        onchange={handleAmount}
+      ></lightning-input>
+      <lightning-combobox
+        label="Method"
+        options={methodOptions}
+        value={method}
+        onchange={handleMethod}
+        required
+      ></lightning-combobox>
+      <lightning-input
+        label="Reference"
+        placeholder="UTR, cheque or slip number"
+        value={reference}
+        onchange={handleReference}
+        required={needsReference}
+        max-length="100"
+      ></lightning-input>
+      <lightning-input
+        type="date"
+        label="Payment date"
+        value={paymentDate}
+        onchange={handleDate}
+        required
+      ></lightning-input>
+    </div>
+    <template lwc:if={isOverpayment}>
+      <div class="warning">
+        The amount is more than the balance. The extra is applied to the payer's
+        other open invoices, or flagged for reconciliation.
+      </div>
+    </template>
+    <div class="cleared">
+      <lightning-input
+        type="toggle"
+        label="Funds received"
+        checked={cleared}
+        onchange={handleCleared}
+        message-toggle-active="Confirmed"
+        message-toggle-inactive="Pending"
+      ></lightning-input>
+      <span class="kem-muted small">{clearedHelp}</span>
+    </div>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Record payment"
+      onclick={handleSave}
+      disabled={isSaving}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

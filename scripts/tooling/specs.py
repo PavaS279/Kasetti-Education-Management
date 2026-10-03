@@ -313,6 +313,87 @@ OBJECTS = [
             {"name": "Unique_Key__c", "label": "Unique Key", "type": "Text", "length": 40, "unique": True, "externalId": True, "systemManaged": True},
         ],
     },
+    # ------------------------------------------------------------------ F1.9 Billing (ADR-002)
+    {
+        "name": "Student_Invoice__c", "label": "Student Invoice", "plural": "Student Invoices", "sharing": "Private", "externalSharing": "Private", "history": True,
+        "nameField": {"label": "Invoice Number", "type": "Text"},
+        "description": "Invoice raised from the prices agreed at enrolment. Billed to the learner's fee-paying guardian (or the learner).",
+        "fields": [
+            {"name": "Bill_To__c", "label": "Bill To", "type": "Lookup", "ref": "Contact", "relName": "Invoices_Billed", "relLabel": "Invoices (Bill To)", "systemManaged": True},
+            {"name": "Learner__c", "label": "Learner", "type": "Lookup", "ref": "Contact", "relName": "Invoices", "relLabel": "Invoices", "systemManaged": True},
+            {"name": "Learner_Account__c", "label": "Learner Account", "type": "Lookup", "ref": "Account", "relName": "Invoices", "relLabel": "Invoices", "systemManaged": True},
+            {"name": "Enrolment__c", "label": "Enrolment", "type": "Lookup", "ref": "CourseOfferingParticipant", "relName": "Invoices", "relLabel": "Invoices", "systemManaged": True},
+            {"name": "Branch__c", "label": "Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Invoices", "relLabel": "Invoices", "systemManaged": True},
+            {"name": "Sequence__c", "label": "Sequence", "type": "AutoNumber", "format": "{000000}"},
+            {"name": "Status__c", "label": "Status", "type": "Picklist", "values": ["Draft", "Issued", "Partially Paid", "Paid", "Cancelled"], "default": "Draft", "systemManaged": True, "track": True},
+            {"name": "Issue_Date__c", "label": "Issue Date", "type": "Date", "systemManaged": True, "track": True},
+            {"name": "Due_Date__c", "label": "Due Date", "type": "Date", "systemManaged": True, "track": True},
+            {"name": "Subtotal__c", "label": "Subtotal", "type": "Summary", "summarizedField": "Invoice_Line__c.Unit_Amount__c", "foreignKey": "Invoice_Line__c.Student_Invoice__c", "operation": "sum"},
+            {"name": "Discount_Total__c", "label": "Discount", "type": "Summary", "summarizedField": "Invoice_Line__c.Discount_Amount__c", "foreignKey": "Invoice_Line__c.Student_Invoice__c", "operation": "sum"},
+            {"name": "Tax_Total__c", "label": "Tax", "type": "Summary", "summarizedField": "Invoice_Line__c.Tax_Amount__c", "foreignKey": "Invoice_Line__c.Student_Invoice__c", "operation": "sum"},
+            {"name": "Total__c", "label": "Total", "type": "Summary", "summarizedField": "Invoice_Line__c.Line_Total__c", "foreignKey": "Invoice_Line__c.Student_Invoice__c", "operation": "sum"},
+            {"name": "Amount_Paid__c", "label": "Amount Paid", "type": "Summary", "summarizedField": "Payment_Allocation__c.Amount__c", "foreignKey": "Payment_Allocation__c.Student_Invoice__c", "operation": "sum"},
+            {"name": "Balance_Due__c", "label": "Balance Due", "type": "Formula", "returnType": "Currency", "scale": 2,
+             "formula": "IF(ISPICKVAL(Status__c, 'Cancelled'), 0, BLANKVALUE(Total__c, 0) - BLANKVALUE(Amount_Paid__c, 0))"},
+            {"name": "Overdue__c", "label": "Overdue", "type": "Formula", "returnType": "Checkbox",
+             "formula": "AND(OR(ISPICKVAL(Status__c, 'Issued'), ISPICKVAL(Status__c, 'Partially Paid')), NOT(ISBLANK(Due_Date__c)), Due_Date__c < TODAY())"},
+            {"name": "Cancellation_Reason__c", "label": "Cancellation Reason", "type": "TextArea", "systemManaged": True},
+            {"name": "Notes__c", "label": "Notes", "type": "TextArea"},
+        ],
+    },
+    {
+        "name": "Invoice_Line__c", "label": "Invoice Line", "plural": "Invoice Lines", "sharing": "ControlledByParent", "externalSharing": "ControlledByParent",
+        "nameField": {"label": "Line Number", "type": "AutoNumber", "format": "INL-{0000000}"},
+        "description": "One charge on an invoice, copied from the enrolment fee line.",
+        "fields": [
+            {"name": "Student_Invoice__c", "label": "Invoice", "type": "MasterDetail", "ref": "Student_Invoice__c", "relName": "Lines", "relLabel": "Lines"},
+            {"name": "Enrolment_Fee_Line__c", "label": "Enrolment Fee Line", "type": "Lookup", "ref": "Enrolment_Fee_Line__c", "relName": "Invoice_Lines", "relLabel": "Invoice Lines", "systemManaged": True},
+            {"name": "Fee_Type__c", "label": "Fee Type", "type": "Picklist", "values": FEE_TYPES, "systemManaged": True},
+            {"name": "Description__c", "label": "Description", "type": "Text", "length": 255, "systemManaged": True},
+            {"name": "Unit_Amount__c", "label": "Amount", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True},
+            {"name": "Discount_Amount__c", "label": "Discount", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True},
+            {"name": "Tax_Amount__c", "label": "Tax", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True},
+            {"name": "Line_Total__c", "label": "Line Total", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True},
+        ],
+    },
+    {
+        "name": "Student_Payment__c", "label": "Student Payment", "plural": "Student Payments", "sharing": "Private", "externalSharing": "Private", "history": True,
+        "nameField": {"label": "Payment Number", "type": "AutoNumber", "format": "PAY-{000000}"},
+        "description": "Money received from a payer. Idempotent on the gateway transaction ID; allocated to invoices oldest-due-first and reconciled.",
+        "fields": [
+            {"name": "Payer__c", "label": "Payer", "type": "Lookup", "ref": "Contact", "relName": "Payments_Made", "relLabel": "Payments Made", "systemManaged": True},
+            {"name": "Learner__c", "label": "Learner", "type": "Lookup", "ref": "Contact", "relName": "Payments", "relLabel": "Payments", "systemManaged": True},
+            {"name": "Student_Invoice__c", "label": "Invoice", "type": "Lookup", "ref": "Student_Invoice__c", "relName": "Payments", "relLabel": "Payments", "systemManaged": True,
+             "help": "The invoice the payer intended to pay. Allocation starts here."},
+            {"name": "Branch__c", "label": "Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Payments", "relLabel": "Payments", "systemManaged": True},
+            {"name": "Amount__c", "label": "Amount", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True, "track": True},
+            {"name": "Method__c", "label": "Method", "type": "Picklist", "values": ["Cash", "Card", "UPI", "Bank Transfer", "Cheque", "Online Gateway"], "systemManaged": True},
+            {"name": "Status__c", "label": "Status", "type": "Picklist", "values": ["Pending", "Confirmed", "Failed"], "default": "Pending", "systemManaged": True, "track": True},
+            {"name": "Payment_Date__c", "label": "Payment Date", "type": "Date", "systemManaged": True},
+            {"name": "Reference__c", "label": "Reference", "type": "Text", "length": 100, "systemManaged": True, "help": "Cheque number, bank reference, or card slip."},
+            {"name": "Gateway_Transaction_Id__c", "label": "Gateway Transaction ID", "type": "Text", "length": 100, "unique": True, "externalId": True, "systemManaged": True,
+             "help": "Unique transaction ID from the bank or gateway. A repeated notification never creates a second payment."},
+            {"name": "Allocated_Amount__c", "label": "Allocated", "type": "Summary", "summarizedField": "Payment_Allocation__c.Amount__c", "foreignKey": "Payment_Allocation__c.Student_Payment__c", "operation": "sum"},
+            {"name": "Unallocated_Amount__c", "label": "Unallocated", "type": "Formula", "returnType": "Currency", "scale": 2,
+             "formula": "IF(ISPICKVAL(Status__c, 'Confirmed'), BLANKVALUE(Amount__c, 0) - BLANKVALUE(Allocated_Amount__c, 0), 0)"},
+            {"name": "Reconciliation_Status__c", "label": "Reconciliation", "type": "Picklist", "values": ["Unreconciled", "Reconciled", "Exception"], "default": "Unreconciled", "systemManaged": True, "track": True},
+            {"name": "Reconciliation_Note__c", "label": "Reconciliation Note", "type": "TextArea", "systemManaged": True},
+            {"name": "Reconciled_On__c", "label": "Reconciled On", "type": "DateTime", "systemManaged": True},
+            {"name": "Reconciled_By__c", "label": "Reconciled By", "type": "Lookup", "ref": "User", "relName": "Reconciled_Payments", "relLabel": "Reconciled Payments", "systemManaged": True},
+            {"name": "Receipt_Number__c", "label": "Receipt Number", "type": "Text", "length": 30, "unique": True, "systemManaged": True},
+        ],
+    },
+    {
+        "name": "Payment_Allocation__c", "label": "Payment Allocation", "plural": "Payment Allocations", "sharing": "ControlledByParent", "externalSharing": "ControlledByParent",
+        "nameField": {"label": "Allocation Number", "type": "AutoNumber", "format": "ALC-{0000000}"},
+        "description": "The part of a payment applied to one invoice.",
+        "fields": [
+            {"name": "Student_Invoice__c", "label": "Invoice", "type": "MasterDetail", "ref": "Student_Invoice__c", "relName": "Allocations", "relLabel": "Allocations", "order": 0},
+            {"name": "Student_Payment__c", "label": "Payment", "type": "MasterDetail", "ref": "Student_Payment__c", "relName": "Allocations", "relLabel": "Allocations", "order": 1},
+            {"name": "Amount__c", "label": "Amount", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True},
+            {"name": "Allocated_On__c", "label": "Allocated On", "type": "DateTime", "systemManaged": True},
+        ],
+    },
     {
         "name": "Error_Log__c", "label": "Error Log", "plural": "Error Logs", "sharing": "Private", "search": False,
         "nameField": {"label": "Log Number", "type": "AutoNumber", "format": "LOG-{000000}"},
@@ -471,6 +552,7 @@ LEARNER_CLASSES = ["Learner360Controller"]
 PRICING_CLASSES = ["PricingController"]
 ENROLMENT_CLASSES = ["EnrolmentController"]
 SCHEDULE_CLASSES = ["TimetableController", "AttendanceController", "AssessmentController"]
+BILLING_CLASSES = ["BillingController"]
 
 # Education Cloud objects are only granted through permission sets tied to these licences.
 STAFF_LICENSE = "EducationCloudAccessPsl"
@@ -485,22 +567,22 @@ EDU_OBJECTS = {
     "ContactContactRelation", "PartyRoleRelation", "CourseOffering", "CourseOfferingParticipant",
     "CourseOfferingSchedule", "AcademicTerm", "AcademicSession", "LearnerProfile", "DocumentChecklistItem",
 }
-STAFF_TABS = ["Branch__c", "Room__c", "Branch_Staff__c", "Fee_Price__c", "Discount__c", "Class_Session__c", "Calendar_Closure__c", "KEM_Timetable", "Course_Assessment__c"]
+STAFF_TABS = ["Branch__c", "Room__c", "Branch_Staff__c", "Fee_Price__c", "Discount__c", "Class_Session__c", "Calendar_Closure__c", "KEM_Timetable", "Course_Assessment__c", "Student_Invoice__c", "Student_Payment__c"]
 
 PERMISSION_SETS = [
     {"name": "KEM_Administrator", "label": "KEM Administrator",
      "description": "Institution administrator: configures branches, policies, and has full access to Kasetti Education Management data.",
-     "license": STAFF_LICENSE, "objects": {"Course_Assessment__c": "CEDM", "Assessment_Result__c": "CEDM", "Session_Attendance__c": "CEDM", "Class_Session__c": "CEDM", "Calendar_Closure__c": "CEDM", "Fee_Price__c": "CEDM", "Discount__c": "CEDM", "Enrolment_Fee_Line__c": "CEDM", "DocumentChecklistItem": "CEDV", "Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "LearnerProfile": "CEDV", "CourseOffering": "CEDV", "CourseOfferingParticipant": "CEDV", "CourseOfferingSchedule": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
+     "license": STAFF_LICENSE, "objects": {"Student_Invoice__c": "CEDM", "Invoice_Line__c": "CEDM", "Student_Payment__c": "CEDM", "Payment_Allocation__c": "CEDM", "Course_Assessment__c": "CEDM", "Assessment_Result__c": "CEDM", "Session_Attendance__c": "CEDM", "Class_Session__c": "CEDM", "Calendar_Closure__c": "CEDM", "Fee_Price__c": "CEDM", "Discount__c": "CEDM", "Enrolment_Fee_Line__c": "CEDM", "DocumentChecklistItem": "CEDV", "Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "LearnerProfile": "CEDV", "CourseOffering": "CEDV", "CourseOfferingParticipant": "CEDV", "CourseOfferingSchedule": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
                  "IndividualApplication": "CEDV", "ContactContactRelation": "CEDV"},
-     "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES, "custom": ["KEM_Approve_Discounts"], "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications", "Error_Log__c"]},
+     "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES + BILLING_CLASSES, "custom": ["KEM_Approve_Discounts", "KEM_Manage_Billing"], "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications", "Error_Log__c", "KEM_Finance_Desk"]},
     {"name": "KEM_Branch_Manager", "label": "KEM Branch Manager",
      "description": "Branch manager: manages rooms, classes, staff allocation, and learners for their branch.",
-     "license": STAFF_LICENSE, "objects": {"Course_Assessment__c": "CEDV", "Assessment_Result__c": "CEDV", "Session_Attendance__c": "CEDV", "Class_Session__c": "CEDM", "Calendar_Closure__c": "CED", "Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "CED", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "E", "Room__c": "CED", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
-                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
+     "license": STAFF_LICENSE, "objects": {"Student_Invoice__c": "CEV", "Invoice_Line__c": "V", "Student_Payment__c": "CEV", "Payment_Allocation__c": "V", "Course_Assessment__c": "CEDV", "Assessment_Result__c": "CEDV", "Session_Attendance__c": "CEDV", "Class_Session__c": "CEDM", "Calendar_Closure__c": "CED", "Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "CED", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "E", "Room__c": "CED", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
+                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES + BILLING_CLASSES, "custom": ["KEM_Manage_Billing"], "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
     {"name": "KEM_Admissions_Counsellor", "label": "KEM Admissions Counsellor",
      "description": "Admissions counsellor: works enquiries, applications, offers, and follow-ups.",
-     "license": STAFF_LICENSE, "objects": {"Course_Assessment__c": "", "Assessment_Result__c": "", "Session_Attendance__c": "", "Class_Session__c": "", "Calendar_Closure__c": "", "Enrolment_Fee_Line__c": "CE", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "CED", "CourseOffering": "", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
-                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
+     "license": STAFF_LICENSE, "objects": {"Student_Invoice__c": "", "Invoice_Line__c": "", "Student_Payment__c": "", "Payment_Allocation__c": "", "Course_Assessment__c": "", "Assessment_Result__c": "", "Session_Attendance__c": "", "Class_Session__c": "", "Calendar_Closure__c": "", "Enrolment_Fee_Line__c": "CE", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "CED", "CourseOffering": "", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
+                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES + BILLING_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
     {"name": "KEM_Academic_Coordinator", "label": "KEM Academic Coordinator",
      "description": "Academic coordinator: maintains curriculum, timetable, enrolments, and academic oversight.",
      "license": STAFF_LICENSE, "objects": {"Course_Assessment__c": "CEDM", "Assessment_Result__c": "CEDV", "Session_Attendance__c": "CEDV", "Class_Session__c": "CEDM", "Calendar_Closure__c": "CEDM", "Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "CE", "LearningCourse": "CE", "LearningProgram": "CE", "LearnerProfile": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "CE", "Branch__c": "", "Room__c": "CE", "Lead": "", "Account": "E", "Contact": "E", "IndividualApplication": "",
@@ -510,7 +592,7 @@ PERMISSION_SETS = [
      "license": STAFF_LICENSE, "objects": {"Course_Assessment__c": "CE", "Assessment_Result__c": "", "Session_Attendance__c": "", "Class_Session__c": "", "Calendar_Closure__c": "", "Fee_Price__c": "", "Discount__c": "", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": ""}, "classes": LEARNER_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Finance", "label": "KEM Finance",
      "description": "Finance user: manages fees, invoices, payments, allocations, and reconciliation.",
-     "license": STAFF_LICENSE, "objects": {"Course_Assessment__c": "", "Assessment_Result__c": "", "Session_Attendance__c": "", "Class_Session__c": "", "Calendar_Closure__c": "", "Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "CEDV", "Discount__c": "CEDV", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": "", "ContactContactRelation": ""}, "classes": LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES, "custom": ["KEM_Approve_Discounts"], "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"Student_Invoice__c": "CEDM", "Invoice_Line__c": "CEDM", "Student_Payment__c": "CEDM", "Payment_Allocation__c": "CEDM", "Course_Assessment__c": "", "Assessment_Result__c": "", "Session_Attendance__c": "", "Class_Session__c": "", "Calendar_Closure__c": "", "Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "CEDV", "Discount__c": "CEDV", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": "", "ContactContactRelation": ""}, "classes": LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES + BILLING_CLASSES, "custom": ["KEM_Approve_Discounts", "KEM_Manage_Billing"], "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Finance_Desk"]},
     {"name": "KEM_Eligibility_Override", "label": "KEM Eligibility Override",
      "description": "Allows overriding a failed eligibility check on an application. Grant to administrators and branch managers.",
      "objects": {}, "custom": ["KEM_Override_Eligibility"]},
@@ -543,6 +625,13 @@ TRANSITIONS = {
     ],
     ("Class_Session__c", "Status__c"): [
         ("Scheduled", "Completed"), ("Scheduled", "Cancelled"), ("Cancelled", "Scheduled"), ("Completed", "Scheduled"),
+    ],
+    ("Student_Invoice__c", "Status__c"): [
+        ("Draft", "Issued"), ("Draft", "Cancelled"), ("Issued", "Partially Paid"), ("Issued", "Paid"), ("Issued", "Cancelled"),
+        ("Partially Paid", "Paid"), ("Partially Paid", "Issued"), ("Paid", "Partially Paid"),
+    ],
+    ("Student_Payment__c", "Status__c"): [
+        ("Pending", "Confirmed"), ("Pending", "Failed"),
     ],
     ("Lead", "Status"): [
         ("New", "Contacted"), ("New", "Nurturing"), ("New", "Unqualified"), ("New", "Qualified"),

@@ -6,6 +6,8 @@ import getLearner360 from "@salesforce/apex/Learner360Controller.getLearner360";
 import endGuardianLink from "@salesforce/apex/Learner360Controller.endGuardianLink";
 import updatePreferences from "@salesforce/apex/Learner360Controller.updatePreferences";
 import getLearnerResults from "@salesforce/apex/AssessmentController.getLearnerResults";
+import getLearnerInvoices from "@salesforce/apex/BillingController.getLearnerInvoices";
+import CURRENCY from "@salesforce/i18n/currency";
 import GuardianModal from "c/kemGuardianModal";
 import EnrolModal from "c/kemEnrolModal";
 import { reduceErrors, toast, toastError, initials, toneFor } from "c/kemUtils";
@@ -59,6 +61,13 @@ function formatDate(value) {
       )
     : DASH;
 }
+
+const INVOICE_STATUS_CLASS = {
+  Issued: "kem-badge kem-badge_info",
+  "Partially Paid": "kem-badge kem-badge_warning",
+  Paid: "kem-badge kem-badge_success",
+  Cancelled: "kem-badge kem-badge_danger"
+};
 
 export default class KemLearner360 extends NavigationMixin(LightningElement) {
   @api recordId;
@@ -123,6 +132,44 @@ export default class KemLearner360 extends NavigationMixin(LightningElement) {
       };
     });
   }
+  currencyCode = CURRENCY;
+  invoices = [];
+
+  @wire(getLearnerInvoices, { learnerAccountId: "$recordId" })
+  wiredInvoices({ data }) {
+    // Invoices are private to finance; other users simply see none.
+    this.invoices = data || [];
+  }
+
+  get invoiceRows() {
+    return this.invoices.map((i) => ({
+      ...i,
+      metaLabel: [
+        i.Enrolment__r?.CourseOffering?.Name,
+        i.Due_Date__c ? `due ${formatDate(i.Due_Date__c)}` : null,
+        i.Overdue__c ? "overdue" : null
+      ]
+        .filter(Boolean)
+        .join(" · "),
+      statusClass: INVOICE_STATUS_CLASS[i.Status__c] || "kem-badge"
+    }));
+  }
+  get hasInvoices() {
+    return this.invoices.length > 0;
+  }
+  get noInvoices() {
+    return this.invoices.length === 0;
+  }
+  get balanceDue() {
+    return this.invoices.reduce((sum, i) => sum + (i.Balance_Due__c || 0), 0);
+  }
+  get overdueCount() {
+    return this.invoices.filter((i) => i.Overdue__c).length;
+  }
+  get overdueLabel() {
+    return `${this.overdueCount} overdue`;
+  }
+
   get noResults() {
     return this.results.length === 0;
   }

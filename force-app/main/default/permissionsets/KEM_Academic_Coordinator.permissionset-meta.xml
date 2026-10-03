@@ -943,4 +943,12 @@
         <tab>Room__c</tab>
         <visibility>Visible</visibility>
     </tabSettings>
+    <tabSettings>
+        <tab>Student_Invoice__c</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <tabSettings>
+        <tab>Student_Payment__c</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
 </PermissionSet>

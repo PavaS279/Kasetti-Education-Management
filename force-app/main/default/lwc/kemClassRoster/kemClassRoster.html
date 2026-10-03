@@ -129,6 +129,12 @@
                           label="Reject discount"
                         ></lightning-menu-item>
                       </template>
+                      <template lwc:if={r.canInvoice}
+                        ><lightning-menu-item
+                          value="invoice"
+                          label="Create invoice"
+                        ></lightning-menu-item
+                      ></template>
                       <lightning-menu-item
                         value="open"
                         label="Open enrolment"
