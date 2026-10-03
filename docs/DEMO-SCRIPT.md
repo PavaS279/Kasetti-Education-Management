@@ -189,7 +189,7 @@ Last verified: 2026-10-03 (run D2 — IA-0000000034, BLR-000004, RCT-000004).
 
 ## Part E — Portal, reporting data and clean-up
 
-**Portal.** Portal users exist for guardians Rohit Sharma, Priya Sharma and Lakshmi Iyer (`*.kemdemo@kasetti-portal.demo`; reset their passwords to log in). To show the portal, place **KEM Learner & Guardian Home** on a `TrialOrgPortal` page in Experience Builder and publish ([NEXT-STEPS.md](NEXT-STEPS.md)). Expected for **Rohit**: two children (Ananya, Arjun) with timetable, attendance, results (A+ and C) and fees; **Priya** sees only Ananya.
+**Portal.** The portal page is live: `TrialOrgPortal` → **My Learning** (`/my-learning`). Portal users exist for guardians Rohit Sharma, Priya Sharma and Lakshmi Iyer (`*.kemdemo@kasetti-portal.demo`); reset a password (Setup → Users → Reset Password) to log in. Expected: **Rohit** sees Ananya and Arjun; **Priya** sees only Ananya; **Lakshmi** sees Kavya — each with timetable, attendance, results and fees (nothing due).
 
 **Gateway API** (Postman or curl with an OAuth token):
 
