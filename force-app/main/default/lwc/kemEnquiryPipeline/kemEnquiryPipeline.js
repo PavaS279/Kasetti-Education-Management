@@ -6,6 +6,7 @@ import getBranches from "@salesforce/apex/EnquiryController.getBranches";
 import updateStatus from "@salesforce/apex/EnquiryController.updateStatus";
 import LostReasonModal from "c/kemLostReasonModal";
 import ConvertModal from "c/kemEnquiryConvertModal";
+import EnquiryModal from "c/kemEnquiryModal";
 import {
   reduceErrors,
   toast,
@@ -137,6 +138,21 @@ export default class KemEnquiryPipeline extends NavigationMixin(
 
   handleMineToggle(event) {
     this.mineOnly = event.target.checked;
+  }
+
+  async handleNewEnquiry() {
+    const enquiryId = await EnquiryModal.open({
+      size: "medium",
+      branchId: this.branchId || null
+    });
+    if (enquiryId) {
+      toast(
+        this,
+        "Enquiry created",
+        "It was assigned to a counsellor and appears in the New column."
+      );
+      await refreshApex(this.wiredPipeline);
+    }
   }
 
   handleRefresh() {

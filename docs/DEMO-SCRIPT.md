@@ -80,10 +80,14 @@ Last verified: 2026-10-03 (run D2 — IA-0000000034, BLR-000004, RCT-000004).
 
 ### 2. Capture the enquiry (3 min)
 
-1. **Leads → New**. Enter: First name _Meera_, Last name _Rao [KEM Demo]_, Mobile, Email, **Branch** = [KEM Demo] Bengaluru Central, **Interested Course** = [KEM Demo] Mathematics Foundation, **Enquiry Channel** = Walk-in, **Learner Birthdate** = 11 years ago, guardian fields (First/Last name, Email, Phone, Relationship = Father). Save.
-   - ✅ The enquiry is assigned to a counsellor of the branch; status **New**.
-2. Open the **Admissions** tab.
-   - ✅ Meera appears in the **New** column; filters **Branch**, **My enquiries**, search; counters _Due today_ / _Overdue_.
+1. Open the **Admissions** tab → **New enquiry** (blue button in the toolbar).
+   - Do **not** use _Leads → New_: that is Salesforce's standard B2B lead form (it asks for _Company_ and does not show the education fields).
+2. Fill the three sections and click **Save enquiry**:
+   - **Learner:** First name _Meera_, Last name _Rao [KEM Demo]_, Learner Birthdate = 11 years ago, Mobile, Email.
+   - **Parent or guardian:** First/Last name, Relationship = Father, Phone, Email.
+   - **Interest:** Branch = [KEM Demo] Bengaluru Central, Interested Course = [KEM Demo] Mathematics Foundation, Enquiry Channel = Walk-in (default), optional Next Follow-up / Trial Session Date / Description.
+   - ✅ Toast _Enquiry created_; Meera appears in the **New** column, assigned to a counsellor of the branch. Filters **Branch**, **My enquiries**, search; counters _Due today_ / _Overdue_ / _Possible duplicates_.
+   - ✅ Leaving out every email and phone number is refused: “Enter at least one email address or phone number for the learner or guardian.”
 3. Open the enquiry → **Log follow-up** (Outcome, Notes, **Next follow-up** tomorrow) → **Save follow-up**.
    - ✅ Stage moves on; the follow-up task is created.
 

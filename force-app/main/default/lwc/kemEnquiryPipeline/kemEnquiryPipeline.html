@@ -55,6 +55,13 @@
           checked={mineOnly}
           onchange={handleMineToggle}
         ></lightning-input>
+        <lightning-button
+          class="toolbar-new"
+          variant="brand"
+          label="New enquiry"
+          icon-name="utility:add"
+          onclick={handleNewEnquiry}
+        ></lightning-button>
         <lightning-button-icon
           icon-name="utility:refresh"
           variant="border-inverse"

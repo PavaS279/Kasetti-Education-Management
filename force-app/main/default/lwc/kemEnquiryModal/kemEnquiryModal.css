@@ -1,0 +1,36 @@
+@import "c/kemStyles";
+
+.section-title {
+  margin: 1rem 0 0.25rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--kem-line);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--kem-blue);
+}
+
+.section-title:first-of-type {
+  margin-top: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 1rem;
+}
+
+.span-all {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 30em) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tagline {
+  color: var(--kem-muted);
+}

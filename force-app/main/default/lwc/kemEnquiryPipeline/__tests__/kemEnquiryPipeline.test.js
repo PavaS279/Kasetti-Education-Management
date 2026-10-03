@@ -3,6 +3,7 @@ import KemEnquiryPipeline from "c/kemEnquiryPipeline";
 import getPipeline from "@salesforce/apex/EnquiryController.getPipeline";
 import getBranches from "@salesforce/apex/EnquiryController.getBranches";
 import updateStatus from "@salesforce/apex/EnquiryController.updateStatus";
+import EnquiryModal from "c/kemEnquiryModal";
 
 jest.mock(
   "@salesforce/apex/EnquiryController.getPipeline",
@@ -97,6 +98,19 @@ describe("c-kem-enquiry-pipeline", () => {
     expect(kpis).toEqual(["2", "1", "1", "1"]);
     expect(element.shadowRoot.textContent).toContain("Duplicate?");
     expect(element.shadowRoot.textContent).toContain("No enquiries");
+  });
+
+  it("opens the New enquiry form", async () => {
+    const element = await render();
+    EnquiryModal.openResult = "00Q000000000099";
+    const button = [
+      ...element.shadowRoot.querySelectorAll("lightning-button")
+    ].find((b) => b.label === "New enquiry");
+    button.click();
+    await Promise.resolve();
+    expect(EnquiryModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ size: "medium" })
+    );
   });
 
   it("filters cards by search term", async () => {
