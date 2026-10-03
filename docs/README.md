@@ -32,3 +32,4 @@ Target org: Kasetti Technologies Pvt Ltd (Enterprise Edition, Education Cloud), 
 | F1.10 Documents           | [features/F1.10-documents.md](features/F1.10-documents.md)                 |
 | F1.11 Portal              | [features/F1.11-portal.md](features/F1.11-portal.md)                       |
 | F1.12 Dashboards          | [features/F1.12-dashboards.md](features/F1.12-dashboards.md)               |
+| F1.13 Full journey        | [features/F1.13-full-journey.md](features/F1.13-full-journey.md)           |

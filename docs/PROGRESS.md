@@ -1,6 +1,6 @@
 # Progress Tracker
 
-> **Status 2026-10-03:** Phase 0 complete. Phase 1 features 1.1–1.12 complete (deployed, tested, end-to-end checked). Next: 1.13 Full journey — see [NEXT-STEPS.md](NEXT-STEPS.md).
+> **Status 2026-10-03:** Phase 0 and Phase 1 are complete — every feature built, deployed, unit-tested and checked end to end, and one learner has completed the full journey with financial reconciliation (automated and live). See [NEXT-STEPS.md](NEXT-STEPS.md) for the one manual step and suggested next phases.
 
 Legend: ✅ done · 🟡 in progress · ⬜ not started
 
@@ -35,4 +35,6 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 | 1.10 | Documents                                             | ✅    | ✅       | ✅    | ✅        | [F1.10-documents.md](features/F1.10-documents.md)                                     |
 | 1.11 | Basic portal                                          | ✅    | ✅       | ✅    | ✅        | [F1.11-portal.md](features/F1.11-portal.md) — site placement is a manual Builder step |
 | 1.12 | Dashboards                                            | ✅    | ✅       | ✅    | ✅        | [F1.12-dashboards.md](features/F1.12-dashboards.md)                                   |
-| 1.13 | Full learner journey with financial reconciliation    | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                       |
+| 1.13 | Full learner journey with financial reconciliation    | ✅    | ✅       | ✅    | ✅        | [F1.13-full-journey.md](features/F1.13-full-journey.md)                               |
+
+**Phase 1 completion condition — one learner can complete the full journey with financial reconciliation:** ✅ (`FullJourneyTest` and the live run in [F1.13](features/F1.13-full-journey.md))

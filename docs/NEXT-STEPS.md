@@ -1,21 +1,28 @@
-# Next Steps — Hand-over for the next working session
+# Next Steps — Hand-over
 
-_Last updated: 2026-10-03 after F1.7._
+_Last updated: 2026-10-03 after F1.13 (Phase 1 complete)._
 
 ## Where we are
 
-Phase 0 is complete. Phase 1 features **1.1 – 1.7** are built, deployed to the org, unit-tested (75 Apex tests, 95% coverage; 20 Jest tests), and end-to-end checked. See [PROGRESS.md](PROGRESS.md).
+Phase 0 and Phase 1 are **complete**: features 1.1 – 1.13 are built, deployed to the org, unit-tested (101 Apex tests in 22 test classes, 94% coverage; 40 Jest tests in 16 suites) and checked end to end, including a full learner journey with financial reconciliation (automated in `FullJourneyTest` and run live). See [PROGRESS.md](PROGRESS.md) and [TEST-LOG.md](TEST-LOG.md).
 
-## Remaining Phase 1 work (in this order)
+## Actions for you (not done automatically)
 
-| #    | Feature                            | Design already decided                                                                                                                          |
-| ---- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.8  | Basic assessments                  | ✅ Done — see [features/F1.8-assessments.md](features/F1.8-assessments.md)                                                                      |
-| 1.9  | Invoices, payments, reconciliation | ✅ Done — see [features/F1.9-billing.md](features/F1.9-billing.md)                                                                              |
-| 1.10 | Documents                          | ✅ Done — see [features/F1.10-documents.md](features/F1.10-documents.md)                                                                        |
-| 1.11 | Basic portal                       | ✅ Done — see [features/F1.11-portal.md](features/F1.11-portal.md) (place the component on the site in Experience Builder)                      |
-| 1.12 | Dashboards                         | ✅ Done — see [features/F1.12-dashboards.md](features/F1.12-dashboards.md)                                                                      |
-| 1.13 | Full journey                       | One Apex test and one live run: enquiry → application → offer → enrolment → sessions → attendance → assessment → invoice → payment → reconciled |
+| What                                                               | Why it was left manual                                                                                                                                               | How                                                                                                                                                                                       |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Place **KEM Learner & Guardian Home** on the `TrialOrgPortal` site | The live site is not retrievable through the Metadata API in this org (ExperienceBundle metadata off); deploying a site from here could overwrite live configuration | Experience Builder → drag the component onto a page → Publish ([F1.11](features/F1.11-portal.md))                                                                                         |
+| Give real families portal access                                   | Creates users and consumes Customer Community Plus licences                                                                                                          | Enable the guardian's contact as a portal user (EDC Community User profile), assign **KEM Portal User** + Education Cloud experience licence, tick **Portal Access** on the guardian link |
+| Assign personas to staff                                           | People decisions                                                                                                                                                     | Assign the `KEM_<Persona>_Persona` permission set groups (plus `KEM_Eligibility_Override` where appropriate)                                                                              |
+| Optional: allow browser sessions for the integration app           | The build login has no `web` scope, so UI screenshots could not be taken from here                                                                                   | External Client App → OAuth scopes → add _Manage user data via Web browsers (web)_                                                                                                        |
+| Optional: institution name on PDFs                                 | Defaults to the organisation name                                                                                                                                    | Add `Education_Setting__mdt` record `Institution_Name`                                                                                                                                    |
+
+## Suggested next phases (not started)
+
+1. **Payment gateway connector** — signed webhooks (HMAC) in front of `/kem/v1/payments`, hosted payment links on invoices and in the portal.
+2. **Communications** — templated email/SMS/WhatsApp for offers, invoices, receipts, attendance alerts (consent fields already exist).
+3. **Recurring billing** — monthly/term instalment schedules from `Billing_Frequency__c`, credit notes and refunds.
+4. **Portal self-service** — download invoice/receipt PDFs, pay online, update contact preferences.
+5. **Progress reports** — weighted course grades from assessment weights, term report cards (PDF).
 
 ## How to continue in a new session
 
