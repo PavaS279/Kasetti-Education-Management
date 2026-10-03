@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Grade bands per scale. A result gets the grade of the highest band whose minimum percentage it reaches.</description>
+    <label>Grade Band</label>
+    <pluralLabel>Grade Bands</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

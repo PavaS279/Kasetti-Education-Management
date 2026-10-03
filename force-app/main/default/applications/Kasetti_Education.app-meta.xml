@@ -73,6 +73,7 @@
     <tabs>standard-CourseOffering</tabs>
     <tabs>KEM_Timetable</tabs>
     <tabs>Class_Session__c</tabs>
+    <tabs>Course_Assessment__c</tabs>
     <tabs>Calendar_Closure__c</tabs>
     <tabs>Branch__c</tabs>
     <tabs>Room__c</tabs>
