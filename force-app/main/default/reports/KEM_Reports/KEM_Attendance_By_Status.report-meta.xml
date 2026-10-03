@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>CHILD_NAME</field>
+    </columns>
+    <columns>
+        <field>Class_Session__c.Start__c</field>
+    </columns>
+    <columns>
+        <field>Session_Attendance__c.Learner__c</field>
+    </columns>
+    <columns>
+        <field>Session_Attendance__c.Minutes_Late__c</field>
+    </columns>
+    <description>Attendance marks by status.</description>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Session_Attendance__c.Status__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>KEM Attendance by Status</name>
+    <reportType
+  >CustomEntityCustomEntity$Class_Session__c$Session_Attendance__c</reportType>
+    <scope>organization</scope>
+    <showDetails>false</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>CUST_CREATED_DATE</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

@@ -224,6 +224,8 @@ def split_permsets():
             "license": ps["license"],
             "objects": {k: v for k, v in ps["objects"].items() if k in edu},
             "readOnlyFields": ps.get("readOnlyFields", {}),
+            # Licensed sets cannot hold Apex class access; classes stay on the base set.
+            "classAccess": "none",
             # GroupMembershipPsl is required for ContactContactRelation and PartyRoleRelation (found by probe).
             "userPermissions": ["AccessEducationCloud", "GroupMembershipPsl", "DocumentChecklistUserAccess"],
         }

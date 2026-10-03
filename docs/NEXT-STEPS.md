@@ -14,7 +14,7 @@ Phase 0 is complete. Phase 1 features **1.1 – 1.7** are built, deployed to the
 | 1.9  | Invoices, payments, reconciliation | ✅ Done — see [features/F1.9-billing.md](features/F1.9-billing.md)                                                                              |
 | 1.10 | Documents                          | ✅ Done — see [features/F1.10-documents.md](features/F1.10-documents.md)                                                                        |
 | 1.11 | Basic portal                       | ✅ Done — see [features/F1.11-portal.md](features/F1.11-portal.md) (place the component on the site in Experience Builder)                      |
-| 1.12 | Dashboards                         | Reports + dashboard: admissions funnel, class occupancy, attendance, finance (invoiced, collected, outstanding); `Kasetti Education` home page  |
+| 1.12 | Dashboards                         | ✅ Done — see [features/F1.12-dashboards.md](features/F1.12-dashboards.md)                                                                      |
 | 1.13 | Full journey                       | One Apex test and one live run: enquiry → application → offer → enrolment → sessions → attendance → assessment → invoice → payment → reconciled |
 
 ## How to continue in a new session

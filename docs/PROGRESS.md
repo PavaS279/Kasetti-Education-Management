@@ -1,6 +1,6 @@
 # Progress Tracker
 
-> **Status 2026-10-03:** Phase 0 complete. Phase 1 features 1.1–1.11 complete (deployed, tested, end-to-end checked). Next: 1.12 Dashboards — see [NEXT-STEPS.md](NEXT-STEPS.md).
+> **Status 2026-10-03:** Phase 0 complete. Phase 1 features 1.1–1.12 complete (deployed, tested, end-to-end checked). Next: 1.13 Full journey — see [NEXT-STEPS.md](NEXT-STEPS.md).
 
 Legend: ✅ done · 🟡 in progress · ⬜ not started
 
@@ -34,5 +34,5 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 | 1.9  | Invoices, payments, reconciliation                    | ✅    | ✅       | ✅    | ✅        | [F1.9-billing.md](features/F1.9-billing.md)                                           |
 | 1.10 | Documents                                             | ✅    | ✅       | ✅    | ✅        | [F1.10-documents.md](features/F1.10-documents.md)                                     |
 | 1.11 | Basic portal                                          | ✅    | ✅       | ✅    | ✅        | [F1.11-portal.md](features/F1.11-portal.md) — site placement is a manual Builder step |
-| 1.12 | Dashboards                                            | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                       |
+| 1.12 | Dashboards                                            | ✅    | ✅       | ✅    | ✅        | [F1.12-dashboards.md](features/F1.12-dashboards.md)                                   |
 | 1.13 | Full learner journey with financial reconciliation    | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                       |

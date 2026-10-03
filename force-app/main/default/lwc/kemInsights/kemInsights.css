@@ -1,0 +1,267 @@
+@import "c/kemStyles";
+
+.insights {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hero {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.alerts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.alert {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid #f3c9c7;
+  border-radius: 999px;
+  background: #fdf1f0;
+  color: var(--kem-red);
+  font-weight: 600;
+  cursor: pointer;
+  --slds-c-icon-color-foreground-default: var(--kem-red);
+  transition: transform 0.15s var(--kem-ease);
+}
+
+.alert:hover {
+  transform: translateY(-1px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 1rem;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.panel {
+  padding: 1rem;
+}
+
+.panel-head {
+  margin-bottom: 0.5rem;
+}
+
+.session {
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.65rem 0.75rem;
+  margin-bottom: 0.4rem;
+  border: none;
+  border-left: 4px solid var(--kem-blue);
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-canvas);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.15s var(--kem-ease),
+    box-shadow 0.15s var(--kem-ease);
+}
+
+.session:hover {
+  transform: translateX(3px);
+  box-shadow: var(--kem-shadow);
+}
+
+.session:focus-visible {
+  outline: 2px solid var(--kem-blue);
+}
+
+.session_cancelled {
+  border-left-color: var(--kem-red);
+  opacity: 0.7;
+}
+
+.session-time {
+  min-width: 7.5rem;
+  font-weight: 700;
+  color: var(--kem-ink);
+}
+
+.session-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.gauges {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 1rem;
+}
+
+.gauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  --tone: var(--kem-blue);
+}
+
+.gauge_green {
+  --tone: var(--kem-green);
+}
+
+.ring {
+  display: grid;
+  place-items: center;
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--tone) calc(var(--value) * 1%),
+    var(--kem-line) 0
+  );
+  transition: background 0.6s var(--kem-ease);
+}
+
+.ring span {
+  display: grid;
+  place-items: center;
+  width: 4.6rem;
+  height: 4.6rem;
+  border-radius: 50%;
+  background: var(--kem-surface);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--kem-ink);
+}
+
+.gauge-label {
+  margin-top: 0.4rem;
+  font-weight: 700;
+}
+
+.money-row {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.money-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--kem-ink);
+}
+
+.money-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--kem-line);
+}
+
+.money-split > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.overdue {
+  color: var(--kem-red);
+}
+
+.collected {
+  color: var(--kem-green);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 1rem 1.25rem;
+  border: none;
+  border-top: 4px solid var(--kem-teal);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.2s var(--kem-ease),
+    box-shadow 0.2s var(--kem-ease);
+}
+
+.tile:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--kem-shadow-hover);
+}
+
+.tile-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--kem-muted);
+}
+
+.tile-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--kem-ink);
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.loading {
+  position: relative;
+  min-height: 5rem;
+}
+
+@media (max-width: 64em) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 40em) {
+  .tiles {
+    grid-template-columns: 1fr;
+  }
+
+  .session {
+    flex-wrap: wrap;
+  }
+}

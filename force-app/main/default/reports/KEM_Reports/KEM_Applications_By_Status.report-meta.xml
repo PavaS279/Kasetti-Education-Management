@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>IndividualApplication$Name</field>
+    </columns>
+    <columns>
+        <field>IndividualApplication$Learning_Course__c</field>
+    </columns>
+    <columns>
+        <field>IndividualApplication$Offer_Status__c</field>
+    </columns>
+    <description>Applications by status with course and offer.</description>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>IndividualApplication$Status</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>KEM Applications by Status</name>
+    <reportType>KEM_Applications__c</reportType>
+    <scope>organization</scope>
+    <showDetails>false</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>IndividualApplication$CreatedDate</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

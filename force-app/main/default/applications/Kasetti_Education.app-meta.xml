@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionOverrides>
+        <actionName>Tab</actionName>
+        <comment>Kasetti home cockpit</comment>
+        <content>KEM_Home_Page</content>
+        <formFactor>Large</formFactor>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Flexipage</type>
+        <pageOrSobjectType>standard-home</pageOrSobjectType>
+    </actionOverrides>
+    <actionOverrides>
         <actionName>View</actionName>
         <comment>Kasetti payment</comment>
         <content>KEM_Payment_Record_Page</content>
