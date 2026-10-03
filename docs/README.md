@@ -27,3 +27,4 @@ Target org: Kasetti Technologies Pvt Ltd (Enterprise Edition, Education Cloud), 
 | F1.5 Enrolment            | [features/F1.5-enrolment.md](features/F1.5-enrolment.md)                   |
 | F1.6 Scheduling           | [features/F1.6-scheduling.md](features/F1.6-scheduling.md)                 |
 | F1.7 Attendance           | [features/F1.7-attendance.md](features/F1.7-attendance.md)                 |
+| F1.8 Assessments          | [features/F1.8-assessments.md](features/F1.8-assessments.md)               |

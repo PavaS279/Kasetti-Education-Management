@@ -5,6 +5,7 @@ import LightningConfirm from "lightning/confirm";
 import getLearner360 from "@salesforce/apex/Learner360Controller.getLearner360";
 import endGuardianLink from "@salesforce/apex/Learner360Controller.endGuardianLink";
 import updatePreferences from "@salesforce/apex/Learner360Controller.updatePreferences";
+import getLearnerResults from "@salesforce/apex/AssessmentController.getLearnerResults";
 import GuardianModal from "c/kemGuardianModal";
 import EnrolModal from "c/kemEnrolModal";
 import { reduceErrors, toast, toastError, initials, toneFor } from "c/kemUtils";
@@ -85,6 +86,45 @@ export default class KemLearner360 extends NavigationMixin(LightningElement) {
     } else if (result.error) {
       this.errorMessage = reduceErrors(result.error).join(" ");
     }
+  }
+
+  results = [];
+
+  @wire(getLearnerResults, { learnerAccountId: "$recordId" })
+  wiredResults({ data }) {
+    // Results are optional: a guardian or a user without assessment access just sees none.
+    this.results = data || [];
+  }
+
+  get resultRows() {
+    return this.results.map((r) => {
+      const a = r.Course_Assessment__r || {};
+      const grade = r.Grade__c || "—";
+      return {
+        ...r,
+        assessmentId: r.Course_Assessment__c,
+        assessmentName: a.Name,
+        metaLabel: [
+          a.Course_Offering__r?.Name,
+          a.Assessment_Type__c,
+          formatDate(a.Assessment_Date__c)
+        ]
+          .filter(Boolean)
+          .join(" · "),
+        scoreLabel: r.Absent__c
+          ? "Absent"
+          : `${r.Score__c} / ${r.Max_Score__c} (${Math.round(r.Percentage__c)}%)`,
+        gradeLabel: grade,
+        gradeClass: ["F", "ABS"].includes(grade)
+          ? "kem-badge kem-badge_danger"
+          : grade.startsWith("A")
+            ? "kem-badge kem-badge_success"
+            : "kem-badge kem-badge_info"
+      };
+    });
+  }
+  get noResults() {
+    return this.results.length === 0;
   }
 
   get person() {

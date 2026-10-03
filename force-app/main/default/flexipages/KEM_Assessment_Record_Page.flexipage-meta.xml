@@ -13,8 +13,8 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentName>kemClassRoster</componentName>
-                <identifier>c_kemClassRoster</identifier>
+                <componentName>kemGradebook</componentName>
+                <identifier>c_kemGradebook</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>
@@ -29,12 +29,6 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentName>kemClassAssessments</componentName>
-                <identifier>c_kemClassAssessments</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
                 <componentName>force:relatedListContainer</componentName>
                 <identifier>force_relatedListContainer</identifier>
             </componentInstance>
@@ -42,8 +36,8 @@
         <name>sidebar</name>
         <type>Region</type>
     </flexiPageRegions>
-    <masterLabel>KEM Class Record Page</masterLabel>
-    <sobjectType>CourseOffering</sobjectType>
+    <masterLabel>KEM Assessment Record Page</masterLabel>
+    <sobjectType>Course_Assessment__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
     </template>

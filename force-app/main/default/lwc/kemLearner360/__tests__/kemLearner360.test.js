@@ -2,9 +2,18 @@ import { createElement } from "lwc";
 import KemLearner360 from "c/kemLearner360";
 import getLearner360 from "@salesforce/apex/Learner360Controller.getLearner360";
 import updatePreferences from "@salesforce/apex/Learner360Controller.updatePreferences";
+import getLearnerResults from "@salesforce/apex/AssessmentController.getLearnerResults";
 
 jest.mock(
   "@salesforce/apex/Learner360Controller.getLearner360",
+  () => {
+    const { createApexTestWireAdapter } = require("@salesforce/sfdx-lwc-jest");
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/AssessmentController.getLearnerResults",
   () => {
     const { createApexTestWireAdapter } = require("@salesforce/sfdx-lwc-jest");
     return { default: createApexTestWireAdapter(jest.fn()) };
@@ -114,6 +123,38 @@ describe("c-kem-learner-360", () => {
       ...element.shadowRoot.querySelectorAll(".kem-kpi__value")
     ].map((n) => n.textContent);
     expect(kpis).toEqual(["1", "1", "1"]);
+  });
+
+  it("lists published results with grades", async () => {
+    const element = createElement("c-kem-learner-360", { is: KemLearner360 });
+    element.recordId = "001000000000001";
+    document.body.appendChild(element);
+    getLearner360.emit(VIEW);
+    getLearnerResults.emit([
+      {
+        Id: "a0R000000000001",
+        Course_Assessment__c: "a0Q000000000001",
+        Score__c: 47,
+        Max_Score__c: 50,
+        Percentage__c: 94,
+        Grade__c: "A+",
+        Absent__c: false,
+        Feedback__c: "Excellent work",
+        Course_Assessment__r: {
+          Name: "Unit test 1",
+          Assessment_Type__c: "Test",
+          Course_Offering__r: { Name: "Maths Sat AM" }
+        }
+      }
+    ]);
+    await flush();
+    const text = element.shadowRoot.textContent;
+    expect(text).toContain("Unit test 1");
+    expect(text).toContain("47 / 50 (94%)");
+    expect(text).toContain("Excellent work");
+    expect(
+      element.shadowRoot.querySelector(".kem-badge_success").textContent
+    ).toBeTruthy();
   });
 
   it("saves communication preferences", async () => {

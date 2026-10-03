@@ -237,6 +237,7 @@ public with sharing class AssessmentService {
         Grade__c,
         Absent__c,
         Feedback__c,
+        Course_Assessment__c,
         Course_Assessment__r.Name,
         Course_Assessment__r.Assessment_Type__c,
         Course_Assessment__r.Assessment_Date__c,

@@ -1,0 +1,51 @@
+<template>
+  <section class="kem-card panel kem-fade-in">
+    <div class="panel-head">
+      <div class="kem-section-title">{countLabel}</div>
+      <div class="actions">
+        <lightning-button-icon
+          icon-name="utility:refresh"
+          variant="bare"
+          alternative-text="Refresh assessments"
+          onclick={handleRefresh}
+        ></lightning-button-icon>
+        <lightning-button
+          label="New"
+          icon-name="utility:add"
+          onclick={handleNew}
+        ></lightning-button>
+      </div>
+    </div>
+    <template lwc:if={errorMessage}>
+      <div class="slds-text-color_error small">{errorMessage}</div>
+    </template>
+    <ul class="list">
+      <template for:each={items} for:item="a">
+        <li key={a.Id}>
+          <button
+            type="button"
+            class="item"
+            data-id={a.Id}
+            onclick={handleOpen}
+          >
+            <span class="item-main">
+              <span class="item-name">{a.Name}</span>
+              <span class="kem-muted small">{a.meta}</span>
+            </span>
+            <span class="item-side">
+              <span class={a.statusClass}>{a.Status__c}</span>
+              <template lwc:if={a.avgLabel}
+                ><span class="kem-muted small">{a.avgLabel}</span></template
+              >
+            </span>
+          </button>
+        </li>
+      </template>
+    </ul>
+    <template lwc:if={isEmpty}>
+      <div class="kem-empty">
+        No assessments yet. Create one to start a gradebook.
+      </div>
+    </template>
+  </section>
+</template>

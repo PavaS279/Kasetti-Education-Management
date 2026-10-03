@@ -1,0 +1,136 @@
+<template>
+  <template lwc:if={book}>
+    <div class="gradebook kem-fade-in">
+      <section class="kem-hero">
+        <div class="hero">
+          <div class="hero-text">
+            <div class="kem-hero__subtitle">{className}</div>
+            <div class="kem-hero__title">{assessment.Name}</div>
+            <div class="chips">
+              <span class="hero-chip">{typeLabel}</span>
+              <span class="hero-chip">{dateLabel}</span>
+              <span class="hero-chip">Out of {maxScore}</span>
+              <template lwc:if={weightLabel}
+                ><span class="hero-chip">{weightLabel}</span></template
+              >
+              <span class={statusClass}>{assessment.Status__c}</span>
+            </div>
+          </div>
+          <div class="stats" role="list" aria-label="Result summary">
+            <template for:each={stats} for:item="s">
+              <div key={s.label} class="stat" role="listitem">
+                <span class="stat-value">{s.value}</span>
+                <span class="stat-label">{s.label}</span>
+              </div>
+            </template>
+          </div>
+        </div>
+      </section>
+
+      <template lwc:if={readOnly}>
+        <div class="notice kem-card">{readOnlyMessage}</div>
+      </template>
+
+      <section class="kem-card panel">
+        <div class="panel-head">
+          <div class="kem-section-title">Results ({book.rows.length})</div>
+          <span class="kem-muted small">{bandLegend}</span>
+        </div>
+        <ul class="rows">
+          <template for:each={rows} for:item="row">
+            <li key={row.learnerContactId} class="row">
+              <div class="who">
+                <span class={row.avatarClass}>{row.initials}</span>
+                <div class="name">{row.learnerName}</div>
+              </div>
+              <div class="score-cell">
+                <lightning-input
+                  class="score"
+                  type="number"
+                  label={row.scoreLabel}
+                  variant="label-hidden"
+                  placeholder="Score"
+                  min="0"
+                  max={maxScore}
+                  step="0.01"
+                  value={row.score}
+                  data-id={row.learnerContactId}
+                  onchange={handleScore}
+                  disabled={row.scoreDisabled}
+                  message-when-range-overflow="Score cannot exceed the maximum"
+                  message-when-range-underflow="Score cannot be negative"
+                ></lightning-input>
+                <span class="kem-muted small">/ {maxScore}</span>
+              </div>
+              <div class="pct">
+                <div class="bar"><span style={row.barStyle}></span></div>
+                <span class="pct-label">{row.percentLabel}</span>
+              </div>
+              <span class={row.gradeClass} title="Grade">{row.grade}</span>
+              <lightning-input
+                class="absent"
+                type="toggle"
+                label="Absent"
+                message-toggle-active=""
+                message-toggle-inactive=""
+                checked={row.absent}
+                data-id={row.learnerContactId}
+                onchange={handleAbsent}
+                disabled={readOnly}
+                aria-label={row.absentLabel}
+              ></lightning-input>
+              <lightning-input
+                class="feedback"
+                label="Feedback"
+                variant="label-hidden"
+                placeholder="Feedback (optional)"
+                value={row.feedback}
+                data-id={row.learnerContactId}
+                onchange={handleFeedback}
+                disabled={readOnly}
+                max-length="1000"
+              ></lightning-input>
+            </li>
+          </template>
+        </ul>
+        <template lwc:if={isEmpty}>
+          <div class="kem-empty">No learners are enrolled in this class.</div>
+        </template>
+      </section>
+
+      <template lwc:if={book.canEdit}>
+        <div class="savebar kem-card">
+          <span class="kem-muted small hint"
+            >Drafts stay private. Publishing locks the grades and shares them
+            with learners.</span
+          >
+          <lightning-button
+            label="Save draft"
+            onclick={handleSave}
+            disabled={isBusy}
+          ></lightning-button>
+          <lightning-button
+            variant="brand"
+            label="Publish results"
+            icon-name="utility:send"
+            onclick={handlePublish}
+            disabled={isBusy}
+          ></lightning-button>
+        </div>
+      </template>
+    </div>
+  </template>
+  <template lwc:elseif={errorMessage}>
+    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+      {errorMessage}
+    </div>
+  </template>
+  <template lwc:else>
+    <div class="loading">
+      <lightning-spinner
+        alternative-text="Loading gradebook"
+        size="small"
+      ></lightning-spinner>
+    </div>
+  </template>
+</template>

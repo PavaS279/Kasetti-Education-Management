@@ -247,6 +247,28 @@
             </template>
           </div>
         </lightning-tab>
+        <lightning-tab label="Results">
+          <div class="tab-body">
+            <template for:each={resultRows} for:item="r">
+              <div key={r.Id} class="row kem-card">
+                <div class="row-main">
+                  <a href="#" data-id={r.assessmentId} onclick={handleNavigate}
+                    >{r.assessmentName}</a
+                  >
+                  <div class="kem-muted small">{r.metaLabel}</div>
+                  <template lwc:if={r.Feedback__c}>
+                    <div class="small feedback">“{r.Feedback__c}”</div>
+                  </template>
+                </div>
+                <span class="kem-muted small">{r.scoreLabel}</span>
+                <span class={r.gradeClass}>{r.gradeLabel}</span>
+              </div>
+            </template>
+            <template lwc:if={noResults}>
+              <div class="kem-empty">No published results yet.</div>
+            </template>
+          </div>
+        </lightning-tab>
         <lightning-tab label="Preferences">
           <div class="tab-body prefs">
             <lightning-combobox

@@ -2,6 +2,15 @@
 <CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionOverrides>
         <actionName>View</actionName>
+        <comment>Kasetti gradebook</comment>
+        <content>KEM_Assessment_Record_Page</content>
+        <formFactor>Large</formFactor>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Flexipage</type>
+        <pageOrSobjectType>Course_Assessment__c</pageOrSobjectType>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
         <comment>Kasetti attendance register</comment>
         <content>KEM_Session_Record_Page</content>
         <formFactor>Large</formFactor>
