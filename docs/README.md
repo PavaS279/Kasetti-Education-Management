@@ -1,5 +1,7 @@
 # Kasetti Education Management — Documentation
 
+> **Demo & test the full flow:** [DEMO-SCRIPT.md](DEMO-SCRIPT.md) (automated: `scripts/demo/full-journey.sh`)
+
 Delivery documentation for the Salesforce Education Cloud implementation. Read in this order:
 
 | #   | Document                                                   | Purpose                                                                |
