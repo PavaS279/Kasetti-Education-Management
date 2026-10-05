@@ -36,3 +36,4 @@ Target org: Kasetti Technologies Pvt Ltd (Enterprise Edition, Education Cloud), 
 | F1.12 Dashboards          | [features/F1.12-dashboards.md](features/F1.12-dashboards.md)               |
 | F1.13 Full journey        | [features/F1.13-full-journey.md](features/F1.13-full-journey.md)           |
 | F2.1 Waitlists            | [features/F2.1-waitlists.md](features/F2.1-waitlists.md)                   |
+| F2.2 Transfers            | [features/F2.2-transfers.md](features/F2.2-transfers.md)                   |

@@ -46,7 +46,7 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 | #   | Feature                                                          | Built | Deployed | Tests | E2E check | Notes                                           |
 | --- | ---------------------------------------------------------------- | ----- | -------- | ----- | --------- | ----------------------------------------------- |
 | 2.1 | Waitlists: queue, held seats, offers with expiry, accept → enrol | ✅    | ✅       | ✅    | ✅        | [F2.1-waitlists.md](features/F2.1-waitlists.md) |
-| 2.2 | Transfers between classes with price difference                  | ⬜    | ⬜       | ⬜    | ⬜        |                                                 |
+| 2.2 | Transfers between classes with price difference                  | ✅    | ✅       | ✅    | ✅        | [F2.2-transfers.md](features/F2.2-transfers.md) |
 | 2.3 | Recurring billing and instalment plans                           | ⬜    | ⬜       | ⬜    | ⬜        |                                                 |
 | 2.4 | Refund automation and credit notes                               | ⬜    | ⬜       | ⬜    | ⬜        |                                                 |
 | 2.5 | Messaging (templated notifications with consent)                 | ⬜    | ⬜       | ⬜    | ⬜        |                                                 |
