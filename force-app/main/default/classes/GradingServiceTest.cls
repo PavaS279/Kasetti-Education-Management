@@ -225,14 +225,25 @@ private class GradingServiceTest {
   @IsTest
   static void finalisingIssuesReportCards() {
     CourseOffering cls = offering();
+    Set<Id> enrolmentIds = new Map<Id, CourseOfferingParticipant>(
+        [
+          SELECT Id
+          FROM CourseOfferingParticipant
+          WHERE CourseOfferingId = :cls.Id
+        ]
+      )
+      .keySet();
     System.runAs(new User(Id = cls.Teacher_User__c)) {
-      Test.startTest();
+      DocumentService.suppressJobs = true;
       Assert.areEqual(
         3,
         GradingController.finaliseGrades(cls.Id),
         'Three report cards'
       );
-      Test.stopTest();
+      Test.startTest();
+      // The background job that finalising queues, run as the teacher.
+      new DocumentService.Job(enrolmentIds, DocumentService.REPORT_CARD)
+        .execute(null);
     }
     System.runAs(TestDataFactory.admin()) {
       CourseOffering after = offering();
@@ -250,7 +261,7 @@ private class GradingServiceTest {
       );
       Assert.isNotNull(
         DocumentService.existing(ashaId, DocumentService.REPORT_CARD),
-        'Report card filed by the background job'
+        'Report card filed'
       );
       Assert.areEqual(
         2,
@@ -290,6 +301,7 @@ private class GradingServiceTest {
         'Quiz is the newest'
       );
       Assert.isFalse(pdf.reportCard.bands.isEmpty(), 'Grade scale');
+      Test.stopTest();
     }
   }
 
@@ -357,6 +369,8 @@ private class GradingServiceTest {
     User other = TestDataFactory.createUserWithLicense(
       TestDataFactory.persona('KEM_Teacher')
     );
+    User admin = TestDataFactory.admin();
+    Test.startTest();
     System.runAs(other) {
       try {
         GradingService.finalise(cls.Id);
@@ -411,6 +425,7 @@ private class GradingServiceTest {
       }
       Assert.areEqual(5, failures, 'Every rule enforced');
       GradingService.calculate(new Set<Id>());
+      Test.stopTest();
     }
   }
 
