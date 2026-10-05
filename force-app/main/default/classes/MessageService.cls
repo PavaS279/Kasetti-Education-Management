@@ -22,6 +22,9 @@ public with sharing class MessageService {
 
   @TestVisible
   private static Map<String, Message_Template__mdt> templates;
+  /** Lets tests of other features run many operations in one transaction. */
+  @TestVisible
+  private static Boolean disabled = false;
 
   /** One message to render: who receives it, about whom, and the merge values. */
   public class Notice {
@@ -138,6 +141,7 @@ public with sharing class MessageService {
           Learner_Contact__c,
           Learner_Contact__r.Name,
           Branch__c,
+          Branch__r.Name,
           Course_Offering__r.Name,
           Offer_Expires__c,
           Offers_Made__c
@@ -160,6 +164,7 @@ public with sharing class MessageService {
         notice.relatedId = entry.Id;
         notice.dedupSuffix = String.valueOf(entry.Offers_Made__c);
         notice.values.put('LearnerName', entry.Learner_Contact__r?.Name);
+        notice.values.put('BranchName', entry.Branch__r?.Name);
         notice.values.put('ClassName', entry.Course_Offering__r?.Name);
         notice.values.put(
           'OfferExpires',
@@ -536,8 +541,11 @@ public with sharing class MessageService {
 
   @TestVisible
   private static List<Message__c> send(String eventKey, List<Notice> notices) {
+    if (disabled || notices.isEmpty()) {
+      return new List<Message__c>();
+    }
     Message_Template__mdt template = templateFor(eventKey);
-    if (template == null || template.Active__c != true || notices.isEmpty()) {
+    if (template == null || template.Active__c != true) {
       return new List<Message__c>();
     }
     return create(template, notices, false);
@@ -552,9 +560,12 @@ public with sharing class MessageService {
     Set<Id> branchIds = new Set<Id>();
     for (Notice notice : notices) {
       recipientIds.add(notice.recipientId);
-      branchIds.add(notice.branchId);
+      if (notice.values.get('BranchName') == null) {
+        branchIds.add(notice.branchId);
+      }
     }
     recipientIds.remove(null);
+    branchIds.remove(null);
     Map<Id, Contact> recipients = new Map<Id, Contact>(
       [
         SELECT Id, FirstName, Name, Email, HasOptedOutOfEmail
@@ -563,9 +574,16 @@ public with sharing class MessageService {
         WITH SYSTEM_MODE
       ]
     );
-    Map<Id, Branch__c> branches = new Map<Id, Branch__c>(
-      [SELECT Id, Name FROM Branch__c WHERE Id IN :branchIds WITH SYSTEM_MODE]
-    );
+    Map<Id, Branch__c> branches = branchIds.isEmpty()
+      ? new Map<Id, Branch__c>()
+      : new Map<Id, Branch__c>(
+          [
+            SELECT Id, Name
+            FROM Branch__c
+            WHERE Id IN :branchIds
+            WITH SYSTEM_MODE
+          ]
+        );
     Boolean live = emailLive();
     String portalUrl = AppSettings.getString('Portal_URL', '');
     List<Message__c> messages = new List<Message__c>();
@@ -581,12 +599,14 @@ public with sharing class MessageService {
           ? recipient.Name
           : recipient.FirstName
       );
-      values.put(
-        'BranchName',
-        branches.containsKey(notice.branchId)
-          ? branches.get(notice.branchId).Name
-          : 'Kasetti Education'
-      );
+      if (values.get('BranchName') == null) {
+        values.put(
+          'BranchName',
+          branches.containsKey(notice.branchId)
+            ? branches.get(notice.branchId).Name
+            : 'Kasetti Education'
+        );
+      }
       values.put('PortalLink', portalUrl);
       String subject = render(template.Subject__c, values).left(255);
       String body = render(template.Body__c, values);
@@ -732,6 +752,7 @@ public with sharing class MessageService {
         Learner__r.Name,
         Learner_Account__c,
         Branch__c,
+        Branch__r.Name,
         Total__c,
         Balance_Due__c,
         Due_Date__c,
@@ -749,6 +770,7 @@ public with sharing class MessageService {
       notice.relatedId = invoice.Id;
       notice.values.put('LearnerName', invoice.Learner__r?.Name);
       notice.values.put('InvoiceNumber', invoice.Name);
+      notice.values.put('BranchName', invoice.Branch__r?.Name);
       notice.values.put(
         'ClassName',
         invoice.Enrolment__r?.CourseOffering?.Name
@@ -870,7 +892,21 @@ public with sharing class MessageService {
 
   private static Message_Template__mdt templateFor(String eventKey) {
     if (templates == null) {
-      templates = Message_Template__mdt.getAll();
+      // Queried rather than getAll(): getAll() truncates long text fields to 255
+      // characters. Custom metadata queries do not count against SOQL limits.
+      templates = new Map<String, Message_Template__mdt>();
+      for (Message_Template__mdt template : [
+        SELECT
+          DeveloperName,
+          Subject__c,
+          Body__c,
+          Active__c,
+          Send_Email__c,
+          Send_Portal__c
+        FROM Message_Template__mdt
+      ]) {
+        templates.put(template.DeveloperName, template);
+      }
     }
     return templates.get(eventKey);
   }

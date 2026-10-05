@@ -339,12 +339,15 @@ private class MessageServiceTest {
         'Unknown events are ignored'
       );
 
-      insert new Message__c(
-        Recipient__c = e.ParticipantContactId,
-        Channel__c = 'Email',
-        Status__c = 'Queued',
-        Subject__c = 'Queued while delivery was live',
-        Body__c = 'x'
+      Database.insert(
+        new Message__c(
+          Recipient__c = e.ParticipantContactId,
+          Channel__c = 'Email',
+          Status__c = 'Queued',
+          Subject__c = 'Queued while delivery was live',
+          Body__c = 'x'
+        ),
+        AccessLevel.SYSTEM_MODE
       );
       Test.startTest();
       Assert.areEqual(0, MessageService.dispatch(10), 'Delivery is off');

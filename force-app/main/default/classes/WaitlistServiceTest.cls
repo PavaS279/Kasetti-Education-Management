@@ -143,6 +143,9 @@ private class WaitlistServiceTest {
 
   @IsTest
   static void capacityIncreaseDeclineAndExpiry() {
+    // Fifteen waitlist operations in one transaction: notifications are covered
+    // by MessageServiceTest and would only add queries here.
+    MessageService.disabled = true;
     System.runAs(TestDataFactory.admin()) {
       Fixture f = fixture();
       // Fresh limits for the waitlist operations (set-up is its own transaction in use).
