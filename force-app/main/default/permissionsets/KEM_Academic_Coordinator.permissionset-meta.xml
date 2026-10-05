@@ -524,6 +524,16 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Enrolment_Fee_Line__c.Next_Bill_Date__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Enrolment_Fee_Line__c.Periods_Billed__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Enrolment_Fee_Line__c.Tax_Amount__c</field>
         <readable>true</readable>
     </fieldPermissions>

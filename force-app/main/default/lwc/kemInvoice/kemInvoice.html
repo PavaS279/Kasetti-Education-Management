@@ -15,6 +15,9 @@
               >
               <span class="hero-chip">Issued {issueLabel}</span>
               <span class="hero-chip">Due {dueLabel}</span>
+              <template lwc:if={billingPeriod}
+                ><span class="hero-chip">Period {billingPeriod}</span></template
+              >
             </div>
           </div>
           <div class="amounts">
@@ -98,6 +101,14 @@
                   disabled={isBusy}
                 ></lightning-button>
               </template>
+              <template lwc:if={canPlan}>
+                <lightning-button
+                  label="Pay in instalments"
+                  icon-name="utility:date_input"
+                  onclick={handlePlan}
+                  disabled={isBusy}
+                ></lightning-button>
+              </template>
               <template lwc:if={canCancel}>
                 <lightning-button
                   variant="destructive-text"
@@ -133,7 +144,12 @@
                   <tr key={l.Id}>
                     <td>
                       <div class="strong">{l.label}</div>
-                      <div class="kem-muted small">{l.Fee_Type__c}</div>
+                      <div class="kem-muted small">
+                        {l.Fee_Type__c}
+                        <template lwc:if={l.periodLabel}>
+                          · {l.periodLabel}</template
+                        >
+                      </div>
                     </td>
                     <td class="num">
                       <lightning-formatted-number
@@ -205,6 +221,57 @@
           </div>
         </section>
       </div>
+
+      <template lwc:if={hasInstalments}>
+        <section class="kem-card panel">
+          <div class="panel-head">
+            <div>
+              <div class="kem-section-title">Instalments</div>
+              <div class="kem-muted small">
+                {instalmentSummary} · originally due {originalDueLabel}
+              </div>
+            </div>
+            <template lwc:if={canRemovePlan}>
+              <lightning-button
+                variant="base"
+                label="Remove plan"
+                onclick={handleRemovePlan}
+                disabled={isBusy}
+              ></lightning-button>
+            </template>
+          </div>
+          <ol class="instalments">
+            <template for:each={instalments} for:item="i">
+              <li key={i.Id} class={i.rowClass}>
+                <span class="inst-seq">{i.Sequence__c}</span>
+                <div class="inst-main">
+                  <div class="strong">Due {i.dueLabel}</div>
+                  <div class="inst-bar" aria-hidden="true">
+                    <span style={i.barStyle}></span>
+                  </div>
+                </div>
+                <div class="inst-amount">
+                  <lightning-formatted-number
+                    class="strong"
+                    value={i.Amount__c}
+                    format-style="currency"
+                    currency-code={currencyCode}
+                  ></lightning-formatted-number>
+                  <span class="kem-muted small"
+                    >paid
+                    <lightning-formatted-number
+                      value={i.Amount_Paid__c}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number
+                  ></span>
+                </div>
+                <span class={i.statusClass}>{i.statusLabel}</span>
+              </li>
+            </template>
+          </ol>
+        </section>
+      </template>
 
       <template lwc:if={hasPending}>
         <section class="kem-card panel pending">

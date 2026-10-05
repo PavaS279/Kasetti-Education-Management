@@ -228,3 +228,80 @@
     flex-wrap: wrap;
   }
 }
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.instalments {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.inst {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+  transition: border-color 0.2s var(--kem-ease);
+}
+
+.inst:hover {
+  border-color: var(--kem-blue);
+}
+
+.inst_paid {
+  background: var(--kem-canvas);
+}
+
+.inst_overdue {
+  border-color: var(--kem-red);
+}
+
+.inst-seq {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--kem-sky);
+  color: var(--kem-navy);
+  font-weight: 700;
+}
+
+.inst-bar {
+  height: 6px;
+  margin-top: 0.35rem;
+  border-radius: 3px;
+  background: var(--kem-line);
+  overflow: hidden;
+}
+
+.inst-bar span {
+  display: block;
+  height: 100%;
+  background: var(--kem-green);
+  transition: width 0.4s var(--kem-ease);
+}
+
+.inst-amount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+@media (max-width: 30em) {
+  .inst {
+    grid-template-columns: 2rem 1fr;
+  }
+  .inst-amount {
+    align-items: flex-start;
+  }
+}

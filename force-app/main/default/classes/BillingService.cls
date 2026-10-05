@@ -13,6 +13,7 @@ public with sharing class BillingService {
     'Issued',
     'Partially Paid'
   };
+  public static final String MONTHLY = 'Monthly';
   public static final Set<String> BILLABLE_ENROLMENT_STATUSES = new Set<String>{
     'Enrolled',
     'On Hold',
@@ -67,6 +68,8 @@ public with sharing class BillingService {
     @AuraEnabled
     public List<Student_Payment__c> pendingPayments;
     @AuraEnabled
+    public List<Instalment__c> instalments;
+    @AuraEnabled
     public Boolean canManage;
   }
 
@@ -93,10 +96,38 @@ public with sharing class BillingService {
 
   // ------------------------------------------------------------- invoices
 
-  /** Raises an invoice for the enrolment's uninvoiced fee lines; issues it when issueNow is true. */
+  /**
+   * Raises an invoice for the enrolment's uninvoiced fee lines; issues it when
+   * issueNow is true. One-time and term lines are billed once. Monthly lines are
+   * billed one calendar period at a time: the first period when the enrolment is
+   * first invoiced, then every period whose start date has arrived (the
+   * recurring billing job raises those automatically).
+   */
   public static Id createInvoice(Id enrolmentId, Boolean issueNow) {
     RecordAccess.assertPermission(MANAGE_PERMISSION);
-    CourseOfferingParticipant enrolment = loadEnrolment(enrolmentId);
+    return raiseInvoice(
+      loadEnrolment(enrolmentId, true),
+      issueNow,
+      Date.today()
+    );
+  }
+
+  /**
+   * System entry point for RecurringBillingJob: bills the monthly periods due on
+   * or before asOf for an enrolment already on recurring billing.
+   */
+  public static Id billDuePeriods(Id enrolmentId, Date asOf) {
+    return raiseInvoice(loadEnrolment(enrolmentId, false), true, asOf);
+  }
+
+  /** When set (by a batch job), invoice PDFs are collected here instead of queued one by one. */
+  public static Set<Id> deferredDocuments;
+
+  private static Id raiseInvoice(
+    CourseOfferingParticipant enrolment,
+    Boolean issueNow,
+    Date asOf
+  ) {
     if (!BILLABLE_ENROLMENT_STATUSES.contains(enrolment.ParticipationStatus)) {
       throw new AppException(
         'Only active or completed enrolments can be invoiced.'
@@ -111,30 +142,89 @@ public with sharing class BillingService {
       SELECT
         Id,
         Fee_Type__c,
+        Billing_Frequency__c,
         Description__c,
         Unit_Amount__c,
         Discount_Amount__c,
         Tax_Amount__c,
-        Line_Total__c
+        Line_Total__c,
+        Next_Bill_Date__c,
+        Periods_Billed__c
       FROM Enrolment_Fee_Line__c
-      WHERE Enrolment__c = :enrolmentId AND Invoiced__c = FALSE
+      WHERE Enrolment__c = :enrolment.Id AND Invoiced__c = FALSE
       WITH SYSTEM_MODE
       FOR UPDATE
     ];
-    if (feeLines.isEmpty()) {
+    List<Invoice_Line__c> lines = new List<Invoice_Line__c>();
+    List<SObject> updates = new List<SObject>();
+    Date firstPeriod;
+    Date lastPeriod;
+    Date nextDue;
+    for (Enrolment_Fee_Line__c feeLine : feeLines) {
+      if (feeLine.Billing_Frequency__c != MONTHLY) {
+        lines.add(invoiceLine(feeLine, feeLine.Description__c));
+        updates.add(
+          new Enrolment_Fee_Line__c(Id = feeLine.Id, Invoiced__c = true)
+        );
+        continue;
+      }
+      List<Date> periods = duePeriods(feeLine, enrolment, asOf);
+      if (periods.isEmpty()) {
+        nextDue = earliest(nextDue, feeLine.Next_Bill_Date__c);
+        continue;
+      }
+      for (Date periodStart : periods) {
+        Invoice_Line__c line = invoiceLine(
+          feeLine,
+          (nvlText(feeLine.Description__c) +
+            ' (' +
+            periodLabel(periodStart) +
+            ')')
+            .left(255)
+        );
+        line.Period_Start__c = periodStart;
+        line.Period_End__c = periodEnd(periodStart, enrolment.EndDate);
+        lines.add(line);
+        firstPeriod = earliest(firstPeriod, periodStart);
+        lastPeriod = lastPeriod == null ||
+          periodStart > lastPeriod
+          ? periodStart
+          : lastPeriod;
+      }
+      Date following = periods[periods.size() - 1].addMonths(1);
+      updates.add(
+        new Enrolment_Fee_Line__c(
+          Id = feeLine.Id,
+          Next_Bill_Date__c = following,
+          Periods_Billed__c = nvl(feeLine.Periods_Billed__c) + periods.size(),
+          Invoiced__c = enrolment.EndDate != null &&
+            following > enrolment.EndDate
+        )
+      );
+    }
+    if (lines.isEmpty()) {
       throw new AppException(
-        'There is nothing left to invoice on this enrolment.'
+        nextDue == null
+          ? 'There is nothing left to invoice on this enrolment.'
+          : 'Nothing is due yet. The next monthly period is billed on ' +
+            nextDue.format() +
+            '.'
       );
     }
     BranchPolicy policy = new BranchPolicy(loadBranch(enrolment.Branch__c));
     Student_Invoice__c invoice = new Student_Invoice__c(
       Name = 'DRAFT',
-      Enrolment__c = enrolmentId,
+      Enrolment__c = enrolment.Id,
       Learner__c = enrolment.ParticipantContactId,
       Learner_Account__c = enrolment.ParticipantContact.AccountId,
       Bill_To__c = billToFor(enrolment.ParticipantContactId),
       Branch__c = enrolment.Branch__c,
-      Status__c = 'Draft'
+      Status__c = 'Draft',
+      Billing_Period__c = firstPeriod == null
+        ? null
+        : firstPeriod == lastPeriod
+            ? periodLabel(firstPeriod)
+            : periodLabel(firstPeriod) + ' - ' + periodLabel(lastPeriod)
     );
     if (issueNow == true) {
       stampIssue(invoice, policy);
@@ -147,40 +237,94 @@ public with sharing class BillingService {
       WHERE Id = :invoice.Id
       WITH SYSTEM_MODE
     ];
-    List<SObject> updates = new List<SObject>{
+    updates.add(
       new Student_Invoice__c(
         Id = invoice.Id,
         Name = policy.invoicePrefix() + '-' + numbered.Sequence__c
       )
-    };
-    List<Invoice_Line__c> lines = new List<Invoice_Line__c>();
-    for (Enrolment_Fee_Line__c feeLine : feeLines) {
-      lines.add(
-        new Invoice_Line__c(
-          Student_Invoice__c = invoice.Id,
-          Enrolment_Fee_Line__c = feeLine.Id,
-          Fee_Type__c = feeLine.Fee_Type__c,
-          Description__c = feeLine.Description__c,
-          Unit_Amount__c = feeLine.Unit_Amount__c,
-          Discount_Amount__c = feeLine.Discount_Amount__c,
-          Tax_Amount__c = feeLine.Tax_Amount__c,
-          Line_Total__c = feeLine.Line_Total__c
-        )
-      );
-      updates.add(
-        new Enrolment_Fee_Line__c(Id = feeLine.Id, Invoiced__c = true)
-      );
+    );
+    for (Invoice_Line__c line : lines) {
+      line.Student_Invoice__c = invoice.Id;
     }
     writer.insertRecords(lines);
     writer.updateRecords(updates);
     refreshInvoices(new Set<Id>{ invoice.Id });
     if (issueNow == true) {
-      DocumentService.enqueue(
-        new Set<Id>{ invoice.Id },
-        DocumentService.INVOICE
-      );
+      queueInvoiceDocuments(new Set<Id>{ invoice.Id });
     }
     return invoice.Id;
+  }
+
+  /** Start dates of the monthly periods to bill now (at most a year of catch-up). */
+  @TestVisible
+  private static List<Date> duePeriods(
+    Enrolment_Fee_Line__c feeLine,
+    CourseOfferingParticipant enrolment,
+    Date asOf
+  ) {
+    List<Date> periods = new List<Date>();
+    Date next = feeLine.Next_Bill_Date__c;
+    if (next == null) {
+      // First invoice: the first period is billed up front.
+      next = enrolment.StartDate == null ? asOf : enrolment.StartDate;
+      periods.add(next);
+      next = next.addMonths(1);
+    }
+    while (
+      next <= asOf &&
+      (enrolment.EndDate == null ||
+      next <= enrolment.EndDate) &&
+      periods.size() < 12
+    ) {
+      periods.add(next);
+      next = next.addMonths(1);
+    }
+    return periods;
+  }
+
+  private static Invoice_Line__c invoiceLine(
+    Enrolment_Fee_Line__c feeLine,
+    String description
+  ) {
+    return new Invoice_Line__c(
+      Enrolment_Fee_Line__c = feeLine.Id,
+      Fee_Type__c = feeLine.Fee_Type__c,
+      Description__c = description,
+      Unit_Amount__c = feeLine.Unit_Amount__c,
+      Discount_Amount__c = feeLine.Discount_Amount__c,
+      Tax_Amount__c = feeLine.Tax_Amount__c,
+      Line_Total__c = feeLine.Line_Total__c
+    );
+  }
+
+  @TestVisible
+  private static String periodLabel(Date periodStart) {
+    return Datetime.newInstance(periodStart, Time.newInstance(12, 0, 0, 0))
+      .format('MMM yyyy');
+  }
+
+  private static Date periodEnd(Date periodStart, Date enrolmentEnd) {
+    Date periodEnd = periodStart.addMonths(1).addDays(-1);
+    return enrolmentEnd != null &&
+      enrolmentEnd < periodEnd
+      ? enrolmentEnd
+      : periodEnd;
+  }
+
+  private static Date earliest(Date a, Date b) {
+    return a == null || (b != null && b < a) ? b : a;
+  }
+
+  private static String nvlText(String value) {
+    return value == null ? '' : value;
+  }
+
+  private static void queueInvoiceDocuments(Set<Id> invoiceIds) {
+    if (deferredDocuments != null) {
+      deferredDocuments.addAll(invoiceIds);
+    } else {
+      DocumentService.enqueue(invoiceIds, DocumentService.INVOICE);
+    }
   }
 
   public static void issue(Id invoiceId) {
@@ -220,21 +364,276 @@ public with sharing class BillingService {
         Cancellation_Reason__c = reason.left(255)
       )
     };
+    // Released lines become billable again; a monthly line steps back to the
+    // first cancelled period.
+    Map<Id, Enrolment_Fee_Line__c> released = new Map<Id, Enrolment_Fee_Line__c>();
     for (Invoice_Line__c line : [
-      SELECT Enrolment_Fee_Line__c
+      SELECT
+        Enrolment_Fee_Line__c,
+        Enrolment_Fee_Line__r.Periods_Billed__c,
+        Period_Start__c
       FROM Invoice_Line__c
       WHERE Student_Invoice__c = :invoiceId AND Enrolment_Fee_Line__c != NULL
       WITH SYSTEM_MODE
     ]) {
-      updates.add(
-        new Enrolment_Fee_Line__c(
+      Enrolment_Fee_Line__c feeLine = released.get(line.Enrolment_Fee_Line__c);
+      if (feeLine == null) {
+        feeLine = new Enrolment_Fee_Line__c(
           Id = line.Enrolment_Fee_Line__c,
           Invoiced__c = false
+        );
+        released.put(feeLine.Id, feeLine);
+      }
+      if (line.Period_Start__c != null) {
+        feeLine.Periods_Billed__c =
+          (feeLine.Periods_Billed__c == null
+            ? nvl(line.Enrolment_Fee_Line__r.Periods_Billed__c)
+            : feeLine.Periods_Billed__c) - 1;
+        feeLine.Next_Bill_Date__c = earliest(
+          feeLine.Next_Bill_Date__c,
+          line.Period_Start__c
+        );
+      }
+    }
+    for (Enrolment_Fee_Line__c feeLine : released.values()) {
+      if (feeLine.Periods_Billed__c != null && feeLine.Periods_Billed__c <= 0) {
+        feeLine.Periods_Billed__c = 0;
+        feeLine.Next_Bill_Date__c = null;
+      }
+    }
+    updates.addAll(released.values());
+    Writer writer = new Writer();
+    writer.deleteRecords(
+      [
+        SELECT Id
+        FROM Instalment__c
+        WHERE Student_Invoice__c = :invoiceId
+        WITH SYSTEM_MODE
+      ]
+    );
+    writer.updateRecords(updates);
+    refreshEnrolments(new Set<Id>{ invoice.Enrolment__c });
+  }
+
+  // ----------------------------------------------------------- instalments
+
+  public class PlanRequest {
+    @AuraEnabled
+    public Id invoiceId { get; set; }
+    @AuraEnabled
+    public Integer count { get; set; }
+    @AuraEnabled
+    public Date firstDueDate { get; set; }
+    @AuraEnabled
+    public Integer intervalMonths { get; set; }
+  }
+
+  public class PlannedInstalment {
+    @AuraEnabled
+    public Integer sequence;
+    @AuraEnabled
+    public Date dueDate;
+    @AuraEnabled
+    public Decimal amount;
+  }
+
+  /** The schedule a plan would create, without saving it. */
+  public static List<PlannedInstalment> previewPlan(PlanRequest request) {
+    Student_Invoice__c invoice = loadPlanInvoice(request);
+    return splitPlan(
+      invoice.Total__c,
+      request.count,
+      request.firstDueDate,
+      request.intervalMonths == null ? 1 : request.intervalMonths
+    );
+  }
+
+  /**
+   * Splits an issued invoice into 2-12 instalments. Payments keep allocating to
+   * the invoice as a whole; they settle instalments in order and the invoice's
+   * due date follows the first unpaid instalment, so overdue tracking and
+   * reminders work per instalment.
+   */
+  public static void createPlan(PlanRequest request) {
+    RecordAccess.assertPermission(MANAGE_PERMISSION);
+    Student_Invoice__c invoice = loadPlanInvoice(request);
+    if (nvl(invoice.Instalment_Count__c) > 0) {
+      throw new AppException('This invoice already has an instalment plan.');
+    }
+    List<Instalment__c> rows = new List<Instalment__c>();
+    for (
+      PlannedInstalment planned : splitPlan(
+        invoice.Total__c,
+        request.count,
+        request.firstDueDate,
+        request.intervalMonths == null ? 1 : request.intervalMonths
+      )
+    ) {
+      rows.add(
+        new Instalment__c(
+          Student_Invoice__c = invoice.Id,
+          Sequence__c = planned.sequence,
+          Due_Date__c = planned.dueDate,
+          Amount__c = planned.amount,
+          Amount_Paid__c = 0,
+          Status__c = 'Due'
         )
       );
     }
-    new Writer().updateRecords(updates);
-    refreshEnrolments(new Set<Id>{ invoice.Enrolment__c });
+    Writer writer = new Writer();
+    writer.insertRecords(rows);
+    writer.updateRecords(
+      new List<SObject>{
+        new Student_Invoice__c(
+          Id = invoice.Id,
+          Original_Due_Date__c = invoice.Due_Date__c
+        )
+      }
+    );
+    refreshInvoices(new Set<Id>{ invoice.Id });
+  }
+
+  /** Removes an instalment plan and restores the invoice's original due date. */
+  public static void removePlan(Id invoiceId) {
+    RecordAccess.assertPermission(MANAGE_PERMISSION);
+    Student_Invoice__c invoice = loadInvoice(invoiceId);
+    List<Instalment__c> rows = [
+      SELECT Id
+      FROM Instalment__c
+      WHERE Student_Invoice__c = :invoiceId
+      WITH SYSTEM_MODE
+    ];
+    if (rows.isEmpty()) {
+      throw new AppException('This invoice has no instalment plan.');
+    }
+    Writer writer = new Writer();
+    writer.deleteRecords(rows);
+    Student_Invoice__c change = new Student_Invoice__c(
+      Id = invoiceId,
+      Original_Due_Date__c = null
+    );
+    if (invoice.Original_Due_Date__c != null) {
+      change.Due_Date__c = invoice.Original_Due_Date__c;
+    }
+    writer.updateRecords(new List<SObject>{ change });
+  }
+
+  @TestVisible
+  private static List<PlannedInstalment> splitPlan(
+    Decimal total,
+    Integer count,
+    Date firstDueDate,
+    Integer intervalMonths
+  ) {
+    if (count == null || count < 2 || count > 12) {
+      throw new AppException('Choose between 2 and 12 instalments.');
+    }
+    if (intervalMonths == null || intervalMonths < 1 || intervalMonths > 6) {
+      throw new AppException('Instalments can be 1 to 6 months apart.');
+    }
+    if (firstDueDate == null) {
+      throw new AppException('Choose the first instalment due date.');
+    }
+    Decimal each = (nvl(total) / count).setScale(2, System.RoundingMode.DOWN);
+    List<PlannedInstalment> plan = new List<PlannedInstalment>();
+    for (Integer i = 1; i <= count; i++) {
+      PlannedInstalment planned = new PlannedInstalment();
+      planned.sequence = i;
+      planned.dueDate = firstDueDate.addMonths((i - 1) * intervalMonths);
+      // The rounding remainder goes on the last instalment.
+      planned.amount = i < count ? each : nvl(total) - each * (count - 1);
+      plan.add(planned);
+    }
+    return plan;
+  }
+
+  private static Student_Invoice__c loadPlanInvoice(PlanRequest request) {
+    if (request == null || request.invoiceId == null) {
+      throw new AppException('Choose the invoice.');
+    }
+    Student_Invoice__c invoice = loadInvoice(request.invoiceId);
+    if (!OPEN_STATUSES.contains(invoice.Status__c)) {
+      throw new AppException(
+        'Only issued invoices with a balance can be paid in instalments.'
+      );
+    }
+    if (
+      request.firstDueDate != null &&
+      invoice.Issue_Date__c != null &&
+      request.firstDueDate < invoice.Issue_Date__c
+    ) {
+      throw new AppException(
+        'The first instalment cannot be due before the invoice date.'
+      );
+    }
+    return invoice;
+  }
+
+  /** Settles instalments in order from the invoice's paid amount; due date follows the first unpaid one. */
+  private static void refreshInstalments(
+    Map<Id, Student_Invoice__c> invoices,
+    Map<Id, Student_Invoice__c> changes,
+    List<SObject> updates
+  ) {
+    Map<Id, Decimal> remaining = new Map<Id, Decimal>();
+    Set<Id> withPlan = new Set<Id>();
+    for (Student_Invoice__c invoice : invoices.values()) {
+      if (nvl(invoice.Instalment_Count__c) > 0) {
+        withPlan.add(invoice.Id);
+        remaining.put(invoice.Id, nvl(invoice.Amount_Paid__c));
+      }
+    }
+    if (withPlan.isEmpty()) {
+      return;
+    }
+    Map<Id, Date> nextDue = new Map<Id, Date>();
+    for (Instalment__c row : [
+      SELECT
+        Id,
+        Student_Invoice__c,
+        Amount__c,
+        Amount_Paid__c,
+        Status__c,
+        Due_Date__c
+      FROM Instalment__c
+      WHERE Student_Invoice__c IN :withPlan
+      WITH SYSTEM_MODE
+      ORDER BY Student_Invoice__c, Sequence__c
+    ]) {
+      Decimal available = remaining.get(row.Student_Invoice__c);
+      Decimal covered = Math.min(available, nvl(row.Amount__c));
+      remaining.put(row.Student_Invoice__c, available - covered);
+      String status = covered >= nvl(row.Amount__c)
+        ? 'Paid'
+        : covered > 0 ? 'Partially Paid' : 'Due';
+      if (covered != nvl(row.Amount_Paid__c) || status != row.Status__c) {
+        updates.add(
+          new Instalment__c(
+            Id = row.Id,
+            Amount_Paid__c = covered,
+            Status__c = status
+          )
+        );
+      }
+      if (status != 'Paid' && !nextDue.containsKey(row.Student_Invoice__c)) {
+        nextDue.put(row.Student_Invoice__c, row.Due_Date__c);
+      }
+    }
+    for (Id invoiceId : nextDue.keySet()) {
+      if (nextDue.get(invoiceId) != invoices.get(invoiceId).Due_Date__c) {
+        changeFor(changes, invoiceId).Due_Date__c = nextDue.get(invoiceId);
+      }
+    }
+  }
+
+  private static Student_Invoice__c changeFor(
+    Map<Id, Student_Invoice__c> changes,
+    Id invoiceId
+  ) {
+    if (!changes.containsKey(invoiceId)) {
+      changes.put(invoiceId, new Student_Invoice__c(Id = invoiceId));
+    }
+    return changes.get(invoiceId);
   }
 
   // ------------------------------------------------------------- payments
@@ -493,6 +892,8 @@ public with sharing class BillingService {
         Amount_Paid__c,
         Balance_Due__c,
         Overdue__c,
+        Original_Due_Date__c,
+        Billing_Period__c,
         Cancellation_Reason__c,
         Notes__c,
         Bill_To__c,
@@ -521,7 +922,9 @@ public with sharing class BillingService {
         Unit_Amount__c,
         Discount_Amount__c,
         Tax_Amount__c,
-        Line_Total__c
+        Line_Total__c,
+        Period_Start__c,
+        Period_End__c
       FROM Invoice_Line__c
       WHERE Student_Invoice__c = :invoiceId
       WITH SYSTEM_MODE
@@ -549,6 +952,21 @@ public with sharing class BillingService {
       WHERE Student_Invoice__c = :invoiceId AND Status__c = 'Pending'
       WITH SYSTEM_MODE
       ORDER BY Name
+    ];
+    view.instalments = [
+      SELECT
+        Id,
+        Name,
+        Sequence__c,
+        Due_Date__c,
+        Amount__c,
+        Amount_Paid__c,
+        Status__c,
+        Overdue__c
+      FROM Instalment__c
+      WHERE Student_Invoice__c = :invoiceId
+      WITH SYSTEM_MODE
+      ORDER BY Sequence__c
     ];
     view.canManage = FeatureManagement.checkPermission(MANAGE_PERMISSION);
     return view;
@@ -660,16 +1078,28 @@ public with sharing class BillingService {
 
   // --------------------------------------------------------------- helpers
 
-  /** Sets invoice status from its paid amount and keeps enrolment billing status in step. */
+  /**
+   * Sets invoice status from its paid amount, settles instalments, and keeps
+   * enrolment billing status in step.
+   */
   @TestVisible
   private static void refreshInvoices(Set<Id> invoiceIds) {
     if (invoiceIds.isEmpty()) {
       return;
     }
-    List<SObject> updates = new List<SObject>();
+    Map<Id, Student_Invoice__c> changes = new Map<Id, Student_Invoice__c>();
+    List<SObject> instalmentUpdates = new List<SObject>();
     Set<Id> enrolmentIds = new Set<Id>();
+    Map<Id, Student_Invoice__c> open = new Map<Id, Student_Invoice__c>();
     for (Student_Invoice__c invoice : [
-      SELECT Id, Status__c, Total__c, Amount_Paid__c, Enrolment__c
+      SELECT
+        Id,
+        Status__c,
+        Total__c,
+        Amount_Paid__c,
+        Enrolment__c,
+        Due_Date__c,
+        Instalment_Count__c
       FROM Student_Invoice__c
       WHERE Id IN :invoiceIds
       WITH SYSTEM_MODE
@@ -681,17 +1111,19 @@ public with sharing class BillingService {
       ) {
         continue;
       }
+      open.put(invoice.Id, invoice);
       Decimal paid = nvl(invoice.Amount_Paid__c);
       String status = paid >= nvl(invoice.Total__c)
         ? 'Paid'
         : paid > 0 ? 'Partially Paid' : 'Issued';
       if (status != invoice.Status__c) {
-        updates.add(
-          new Student_Invoice__c(Id = invoice.Id, Status__c = status)
-        );
+        changeFor(changes, invoice.Id).Status__c = status;
       }
     }
-    new Writer().updateRecords(updates);
+    refreshInstalments(open, changes, instalmentUpdates);
+    Writer writer = new Writer();
+    writer.updateRecords(changes.values());
+    writer.updateRecords(instalmentUpdates);
     refreshEnrolments(enrolmentIds);
   }
 
@@ -813,11 +1245,16 @@ public with sharing class BillingService {
       SELECT
         Id,
         Status__c,
+        Total__c,
         Amount_Paid__c,
         Bill_To__c,
         Learner__c,
         Branch__c,
-        Enrolment__c
+        Enrolment__c,
+        Issue_Date__c,
+        Due_Date__c,
+        Original_Due_Date__c,
+        Instalment_Count__c
       FROM Student_Invoice__c
       WHERE Id = :invoiceId
       WITH SYSTEM_MODE
@@ -828,19 +1265,17 @@ public with sharing class BillingService {
     return rows[0];
   }
 
-  private static CourseOfferingParticipant loadEnrolment(Id enrolmentId) {
-    List<CourseOfferingParticipant> rows = [
-      SELECT
-        Id,
-        ParticipantContactId,
-        ParticipantContact.AccountId,
-        ParticipationStatus,
-        Branch__c,
-        Discount_Approval_Status__c
-      FROM CourseOfferingParticipant
-      WHERE Id = :enrolmentId
-      WITH USER_MODE
-    ];
+  private static CourseOfferingParticipant loadEnrolment(
+    Id enrolmentId,
+    Boolean userMode
+  ) {
+    List<CourseOfferingParticipant> rows = Database.queryWithBinds(
+      'SELECT Id, ParticipantContactId, ParticipantContact.AccountId, ' +
+        'ParticipationStatus, Branch__c, Discount_Approval_Status__c, StartDate, EndDate ' +
+        'FROM CourseOfferingParticipant WHERE Id = :enrolmentId',
+      new Map<String, Object>{ 'enrolmentId' => enrolmentId },
+      userMode ? AccessLevel.USER_MODE : AccessLevel.SYSTEM_MODE
+    );
     if (rows.isEmpty()) {
       throw new AppException('Enrolment not found or not accessible.');
     }
@@ -904,6 +1339,12 @@ public with sharing class BillingService {
     void updateRecords(List<SObject> records) {
       if (!records.isEmpty()) {
         Database.update(records, AccessLevel.SYSTEM_MODE);
+      }
+    }
+
+    void deleteRecords(List<SObject> records) {
+      if (!records.isEmpty()) {
+        Database.delete(records, AccessLevel.SYSTEM_MODE);
       }
     }
   }

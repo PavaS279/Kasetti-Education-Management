@@ -96,4 +96,33 @@ public with sharing class BillingController {
       throw AppException.toAura(e);
     }
   }
+
+  @AuraEnabled
+  public static List<BillingService.PlannedInstalment> previewInstalmentPlan(
+    BillingService.PlanRequest request
+  ) {
+    try {
+      return BillingService.previewPlan(request);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static void createInstalmentPlan(BillingService.PlanRequest request) {
+    try {
+      BillingService.createPlan(request);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static void removeInstalmentPlan(Id invoiceId) {
+    try {
+      BillingService.removePlan(invoiceId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
 }

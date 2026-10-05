@@ -4,6 +4,9 @@ import getInvoice from "@salesforce/apex/BillingController.getInvoice";
 import issueInvoice from "@salesforce/apex/BillingController.issueInvoice";
 import confirmPayment from "@salesforce/apex/BillingController.confirmPayment";
 import PaymentModal from "c/kemPaymentModal";
+import InstalmentModal from "c/kemInstalmentModal";
+import removeInstalmentPlan from "@salesforce/apex/BillingController.removeInstalmentPlan";
+import LightningConfirm from "lightning/confirm";
 
 jest.mock(
   "@salesforce/apex/BillingController.getInvoice",
@@ -28,6 +31,16 @@ jest.mock(
 jest.mock(
   "@salesforce/apex/BillingController.failPayment",
   () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/BillingController.removeInstalmentPlan",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "c/kemInstalmentModal",
+  () => ({ __esModule: true, default: { open: jest.fn() } }),
   { virtual: true }
 );
 jest.mock(
@@ -172,5 +185,61 @@ describe("c-kem-invoice", () => {
     const element = await mount();
     expect(button(element, "Record payment")).toBeUndefined();
     expect(button(element, "Confirm")).toBeUndefined();
+  });
+
+  it("offers an instalment plan on an open invoice", async () => {
+    getInvoice.mockResolvedValue(view());
+    InstalmentModal.open.mockResolvedValue(false);
+    const element = await mount();
+    button(element, "Pay in instalments").click();
+    await flush();
+    expect(InstalmentModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ invoiceId: "a0I000000000001", total: 7080 })
+    );
+  });
+
+  it("shows instalments, periods and removes the plan", async () => {
+    const withPlan = view({
+      Billing_Period__c: "Oct 2026",
+      Original_Due_Date__c: "2026-10-15"
+    });
+    withPlan.lines[0].Period_Start__c = "2026-10-01";
+    withPlan.lines[0].Period_End__c = "2026-10-31";
+    withPlan.instalments = [
+      {
+        Id: "a0X1",
+        Sequence__c: 1,
+        Due_Date__c: "2026-10-15",
+        Amount__c: 3540,
+        Amount_Paid__c: 3000,
+        Status__c: "Partially Paid",
+        Overdue__c: true
+      },
+      {
+        Id: "a0X2",
+        Sequence__c: 2,
+        Due_Date__c: "2026-11-15",
+        Amount__c: 3540,
+        Amount_Paid__c: 0,
+        Status__c: "Due",
+        Overdue__c: false
+      }
+    ];
+    getInvoice.mockResolvedValue(withPlan);
+    LightningConfirm.open = jest.fn().mockResolvedValue(true);
+    removeInstalmentPlan.mockResolvedValue(undefined);
+    const element = await mount();
+    const text = element.shadowRoot.textContent;
+    expect(text).toContain("Period Oct 2026");
+    expect(text).toContain("0 of 2 paid");
+    expect(text).toContain("Overdue");
+    expect(element.shadowRoot.querySelectorAll(".inst")).toHaveLength(2);
+    expect(button(element, "Pay in instalments")).toBeUndefined();
+    button(element, "Remove plan").click();
+    await flush();
+    await flush();
+    expect(removeInstalmentPlan).toHaveBeenCalledWith({
+      invoiceId: "a0I000000000001"
+    });
   });
 });

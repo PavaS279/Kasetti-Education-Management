@@ -1,0 +1,83 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <p class="intro">
+      Payments still go against the invoice as a whole. They settle the
+      instalments in order, and the invoice is due on the first unpaid one.
+    </p>
+    <div class="form-grid">
+      <lightning-combobox
+        label="Instalments"
+        value={count}
+        options={countOptions}
+        onchange={handleCount}
+      ></lightning-combobox>
+      <lightning-input
+        type="date"
+        label="First due"
+        value={firstDueDate}
+        onchange={handleDate}
+        required
+      ></lightning-input>
+      <lightning-combobox
+        label="Frequency"
+        value={interval}
+        options={intervalOptions}
+        onchange={handleInterval}
+      ></lightning-combobox>
+    </div>
+    <template lwc:if={hasPlan}>
+      <table class="table" aria-label="Instalment schedule">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Due</th>
+            <th class="num">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template for:each={rows} for:item="r">
+            <tr key={r.key}>
+              <td>{r.sequence}</td>
+              <td>{r.dueLabel}</td>
+              <td class="num">
+                <lightning-formatted-number
+                  value={r.amount}
+                  format-style="currency"
+                  currency-code={currencyCode}
+                ></lightning-formatted-number>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2">Invoice total</td>
+            <td class="num">
+              <lightning-formatted-number
+                value={total}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Create plan"
+      onclick={handleSave}
+      disabled={cannotSave}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

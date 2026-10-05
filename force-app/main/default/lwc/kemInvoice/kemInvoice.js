@@ -7,6 +7,9 @@ import issueInvoice from "@salesforce/apex/BillingController.issueInvoice";
 import cancelInvoice from "@salesforce/apex/BillingController.cancelInvoice";
 import confirmPayment from "@salesforce/apex/BillingController.confirmPayment";
 import failPayment from "@salesforce/apex/BillingController.failPayment";
+import removeInstalmentPlan from "@salesforce/apex/BillingController.removeInstalmentPlan";
+import LightningConfirm from "lightning/confirm";
+import InstalmentModal from "c/kemInstalmentModal";
 import PaymentModal from "c/kemPaymentModal";
 import ReasonModal from "c/kemReasonModal";
 import { reduceErrors, toast, toastError } from "c/kemUtils";
@@ -17,6 +20,12 @@ const STATUS_CLASS = {
   "Partially Paid": "kem-badge kem-badge_warning",
   Paid: "kem-badge kem-badge_success",
   Cancelled: "kem-badge kem-badge_danger"
+};
+
+const INSTALMENT_CLASS = {
+  Due: "kem-badge kem-badge_info",
+  "Partially Paid": "kem-badge kem-badge_warning",
+  Paid: "kem-badge kem-badge_success"
 };
 
 function formatDate(value) {
@@ -116,7 +125,7 @@ export default class KemInvoice extends NavigationMixin(LightningElement) {
     );
   }
   get hasActions() {
-    return this.canIssue || this.canPay || this.canCancel;
+    return this.canIssue || this.canPay || this.canCancel || this.canPlan;
   }
   get isCancelled() {
     return this.status === "Cancelled";
@@ -125,8 +134,48 @@ export default class KemInvoice extends NavigationMixin(LightningElement) {
     return this.view.lines.map((l) => ({
       ...l,
       label: l.Description__c || l.Fee_Type__c,
-      hasDiscount: l.Discount_Amount__c > 0
+      hasDiscount: l.Discount_Amount__c > 0,
+      periodLabel: l.Period_Start__c
+        ? `${formatDate(l.Period_Start__c)} – ${formatDate(l.Period_End__c)}`
+        : ""
     }));
+  }
+  get billingPeriod() {
+    return this.invoice.Billing_Period__c;
+  }
+  get instalments() {
+    return (this.view.instalments || []).map((i) => {
+      const amount = i.Amount__c || 0;
+      const paid = i.Amount_Paid__c || 0;
+      const overdue = i.Overdue__c;
+      return {
+        ...i,
+        dueLabel: formatDate(i.Due_Date__c),
+        statusLabel: overdue ? "Overdue" : i.Status__c,
+        statusClass: overdue
+          ? "kem-badge kem-badge_danger"
+          : INSTALMENT_CLASS[i.Status__c] || "kem-badge",
+        barStyle: `width:${amount ? Math.min(100, Math.round((paid / amount) * 100)) : 0}%`,
+        rowClass: `inst${i.Status__c === "Paid" ? " inst_paid" : ""}${overdue ? " inst_overdue" : ""}`
+      };
+    });
+  }
+  get hasInstalments() {
+    return this.instalments.length > 0;
+  }
+  get instalmentSummary() {
+    const rows = this.instalments;
+    const paid = rows.filter((r) => r.Status__c === "Paid").length;
+    return `${paid} of ${rows.length} paid`;
+  }
+  get originalDueLabel() {
+    return formatDate(this.invoice.Original_Due_Date__c);
+  }
+  get canPlan() {
+    return this.canPay && !this.hasInstalments;
+  }
+  get canRemovePlan() {
+    return this.view.canManage && this.hasInstalments && this.status !== "Paid";
   }
   get payments() {
     return this.view.allocations.map((a) => ({
@@ -203,6 +252,41 @@ export default class KemInvoice extends NavigationMixin(LightningElement) {
       result.reconciliationStatus === "Exception" ? "warning" : "success"
     );
     await this.refresh();
+  }
+
+  async handlePlan() {
+    const created = await InstalmentModal.open({
+      size: "small",
+      invoiceId: this.recordId,
+      invoiceNumber: this.invoice.Name,
+      total: this.total,
+      dueDate: this.invoice.Due_Date__c
+    });
+    if (!created) {
+      return;
+    }
+    toast(
+      this,
+      "Instalment plan created",
+      "The invoice is now due on the first unpaid instalment."
+    );
+    await this.refresh();
+  }
+
+  async handleRemovePlan() {
+    const confirmed = await LightningConfirm.open({
+      label: "Remove instalment plan",
+      message: `The invoice goes back to a single due date (${this.originalDueLabel}). Payments already made stay allocated.`,
+      theme: "warning"
+    });
+    if (!confirmed) {
+      return;
+    }
+    this.run(
+      () => removeInstalmentPlan({ invoiceId: this.recordId }),
+      "Instalment plan removed",
+      "The original due date is restored."
+    );
   }
 
   async handleCancel() {
