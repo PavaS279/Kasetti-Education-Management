@@ -1,6 +1,6 @@
 # Progress Tracker
 
-> **Status 2026-10-03:** Phase 0 and Phase 1 are complete — every feature built, deployed, unit-tested and checked end to end, and one learner has completed the full journey with financial reconciliation (automated and live). Phase 2 (operational depth) is in progress — table below.
+> **Status 2026-10-05:** Phases 0, 1 and 2 are complete — every feature built, deployed, unit-tested and checked end to end. Phase 1: one learner completes the full journey with financial reconciliation. Phase 2: exceptions and recurring operations (waitlists, transfers, recurring billing, instalments, credit and refunds, messaging, cover, grading, portal, operations console) work reliably.
 
 Legend: ✅ done · 🟡 in progress · ⬜ not started
 
@@ -41,7 +41,7 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 
 ## Phase 2 — Operational depth
 
-**Completion condition — exceptions and recurring operations work reliably.**
+**Completion condition — exceptions and recurring operations work reliably:** ✅ (`Phase2JourneyTest`, the live checks of F2.1–F2.9 and the operations console reporting healthy)
 
 | #   | Feature                                                            | Built | Deployed | Tests | E2E check | Notes                                                                                   |
 | --- | ------------------------------------------------------------------ | ----- | -------- | ----- | --------- | --------------------------------------------------------------------------------------- |
@@ -53,4 +53,4 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 | 2.6 | Resource substitution (teacher cover, room swaps)                  | ✅    | ✅       | ✅    | ✅        | [F2.6-resource-substitution.md](features/F2.6-resource-substitution.md)                 |
 | 2.7 | Advanced grading (weighted course grades, report cards)            | ✅    | ✅       | ✅    | ✅        | [F2.7-advanced-grading.md](features/F2.7-advanced-grading.md)                           |
 | 2.8 | Richer portal (documents, waitlist, instalments, messages, grades) | ✅    | ✅       | ✅    | ✅        | [F2.8-richer-portal.md](features/F2.8-richer-portal.md)                                 |
-| 2.9 | Operations console and Phase 2 journey                             | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                         |
+| 2.9 | Operations console and Phase 2 journey                             | ✅    | ✅       | ✅    | ✅        | [F2.9-operations-console.md](features/F2.9-operations-console.md)                       |
