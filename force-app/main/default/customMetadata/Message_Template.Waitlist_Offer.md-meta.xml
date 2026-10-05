@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Waitlist Offer</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Body__c</field>
+        <value xsi:type="xsd:string">Dear {{RecipientFirstName}},
+
+Good news: a seat has opened up for {{LearnerName}} in {{ClassName}}. We are holding it until {{OfferExpires}}.
+
+Please contact us before then to confirm the enrolment.
+
+{{BranchName}}</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Sent when a waitlisted learner is offered a seat. Tokens: {{ClassName}}, {{OfferExpires}}.</value>
+    </values>
+    <values>
+        <field>Send_Email__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Send_Portal__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Subject__c</field>
+        <value
+      xsi:type="xsd:string"
+    >A seat is available for {{LearnerName}} in {{ClassName}}</value>
+    </values>
+</CustomMetadata>

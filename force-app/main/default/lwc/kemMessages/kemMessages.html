@@ -1,0 +1,122 @@
+<template>
+  <article class="kem-card panel">
+    <header class="head">
+      <div>
+        <div class="kem-section-title">Messages</div>
+        <div class="kem-muted small">
+          Notifications and messages to the family
+        </div>
+      </div>
+      <template lwc:if={timeline}>
+        <lightning-button
+          label="New message"
+          icon-name="utility:send"
+          onclick={handleNew}
+        ></lightning-button>
+      </template>
+    </header>
+
+    <template lwc:if={timeline}>
+      <template lwc:if={deliveryOff}>
+        <div class="banner">
+          Email delivery is switched off: emails are logged as Not Sent. Portal
+          messages are delivered.
+        </div>
+      </template>
+
+      <ul class="people" aria-label="Recipients and email consent">
+        <template for:each={people} for:item="p">
+          <li key={p.contactId} class={p.chipClass}>
+            <div class="person-main">
+              <span class="strong">{p.name}</span>
+              <span class="kem-muted small"
+                >{p.role}<template lwc:if={p.feePayer}> · fee payer</template> ·
+                {p.consentLabel}</span
+              >
+            </div>
+            <template lwc:if={p.canToggle}>
+              <lightning-button
+                variant="base"
+                label={p.toggleLabel}
+                data-id={p.contactId}
+                onclick={handleConsent}
+                disabled={isBusy}
+              ></lightning-button>
+            </template>
+          </li>
+        </template>
+      </ul>
+
+      <div class="pills" role="group" aria-label="Filter messages">
+        <template for:each={filters} for:item="f">
+          <button
+            key={f.value}
+            type="button"
+            class={f.className}
+            aria-pressed={f.pressed}
+            data-value={f.value}
+            onclick={handleFilter}
+          >
+            {f.label}
+          </button>
+        </template>
+      </div>
+
+      <ol class="timeline">
+        <template for:each={messages} for:item="m">
+          <li key={m.Id} class="item">
+            <span class="dot" aria-hidden="true"
+              ><lightning-icon
+                icon-name={m.icon}
+                size="x-small"
+              ></lightning-icon
+            ></span>
+            <div class="item-main">
+              <button
+                type="button"
+                class="item-head"
+                data-id={m.Id}
+                aria-expanded={m.expandedLabel}
+                onclick={handleToggle}
+              >
+                <span class="strong subject">{m.Subject__c}</span>
+                <span class={m.statusClass}>{m.Status__c}</span>
+              </button>
+              <div class="kem-muted small meta">
+                <lightning-icon
+                  icon-name={m.channelIcon}
+                  size="xx-small"
+                  alternative-text={m.Channel__c}
+                ></lightning-icon>
+                {m.Channel__c} to {m.recipient} · {m.when}
+                <template lwc:if={m.sender}> · by {m.sender}</template>
+              </div>
+              <template lwc:if={m.Status_Detail__c}>
+                <div class="detail">{m.Status_Detail__c}</div>
+              </template>
+              <template lwc:if={m.expanded}>
+                <div class="body">{m.Body__c}</div>
+              </template>
+            </div>
+          </li>
+        </template>
+      </ol>
+      <template lwc:if={isEmpty}>
+        <div class="kem-empty">No messages yet.</div>
+      </template>
+    </template>
+    <template lwc:elseif={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <template lwc:else>
+      <div class="loading">
+        <lightning-spinner
+          alternative-text="Loading messages"
+          size="small"
+        ></lightning-spinner>
+      </div>
+    </template>
+  </article>
+</template>

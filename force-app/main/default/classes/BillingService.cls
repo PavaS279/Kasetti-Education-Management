@@ -251,6 +251,7 @@ public with sharing class BillingService {
     refreshInvoices(new Set<Id>{ invoice.Id });
     if (issueNow == true) {
       CreditService.autoApply(new Set<Id>{ invoice.Id });
+      MessageService.invoicesIssued(new Set<Id>{ invoice.Id });
       queueInvoiceDocuments(new Set<Id>{ invoice.Id });
     }
     return invoice.Id;
@@ -339,6 +340,7 @@ public with sharing class BillingService {
     new Writer().updateRecords(new List<SObject>{ change });
     refreshInvoices(new Set<Id>{ invoiceId });
     CreditService.autoApply(new Set<Id>{ invoiceId });
+    MessageService.invoicesIssued(new Set<Id>{ invoiceId });
     DocumentService.enqueue(new Set<Id>{ invoiceId }, DocumentService.INVOICE);
   }
 
@@ -744,6 +746,7 @@ public with sharing class BillingService {
         }
       );
     allocate(paymentId);
+    MessageService.paymentsReceived(new Set<Id>{ paymentId });
     DocumentService.enqueue(new Set<Id>{ paymentId }, DocumentService.RECEIPT);
     return result(paymentId);
   }

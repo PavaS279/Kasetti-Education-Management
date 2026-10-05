@@ -11,7 +11,9 @@ public with sharing class KemJobs {
   private static final Map<String, String> CRON = new Map<String, String>{
     'KEM Offer Expiry' => '0 30 1 * * ?',
     'KEM Waitlist Offers' => '0 5 * * * ?',
-    'KEM Recurring Billing' => '0 10 2 * * ?'
+    'KEM Recurring Billing' => '0 10 2 * * ?',
+    'KEM Payment Reminders' => '0 5 9 * * ?',
+    'KEM Message Dispatch' => '0 20 * * * ?'
   };
 
   public static Integer scheduleAll() {
@@ -44,6 +46,12 @@ public with sharing class KemJobs {
       }
       when 'KEM Recurring Billing' {
         return new RecurringBillingJob();
+      }
+      when 'KEM Payment Reminders' {
+        return new MessageJob(true);
+      }
+      when 'KEM Message Dispatch' {
+        return new MessageJob(false);
       }
       when else {
         throw new AppException('Unknown job: ' + name);

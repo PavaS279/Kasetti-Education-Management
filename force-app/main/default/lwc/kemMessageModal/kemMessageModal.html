@@ -1,0 +1,53 @@
+<template>
+  <lightning-modal-header label="New message"></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <div class="form-grid">
+      <lightning-combobox
+        label="To"
+        value={recipientId}
+        options={recipientOptions}
+        onchange={handleRecipient}
+        required
+      ></lightning-combobox>
+      <lightning-combobox
+        label="Send by"
+        value={channel}
+        options={channelOptions}
+        onchange={handleChannel}
+      ></lightning-combobox>
+    </div>
+    <template lwc:if={emailWarning}>
+      <div class="warning">{emailWarning}</div>
+    </template>
+    <lightning-input
+      label="Subject"
+      value={subject}
+      max-length="255"
+      onchange={handleSubject}
+      required
+    ></lightning-input>
+    <lightning-textarea
+      class="body"
+      label="Message"
+      value={body}
+      onchange={handleBody}
+      required
+    ></lightning-textarea>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Send"
+      icon-name="utility:send"
+      onclick={handleSend}
+      disabled={cannotSend}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

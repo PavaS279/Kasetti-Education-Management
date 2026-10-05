@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Payment Received</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Body__c</field>
+        <value xsi:type="xsd:string">Dear {{RecipientFirstName}},
+
+Thank you. We have received your payment of {{Amount}} by {{Method}} on {{PaymentDate}} towards {{InvoiceNumber}} for {{LearnerName}}.
+
+Receipt number: {{ReceiptNumber}}
+
+The receipt is available in the family portal: {{PortalLink}}
+
+{{BranchName}}</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Sent to the payer when a payment is confirmed. Tokens: {{ReceiptNumber}}, {{Amount}}, {{Method}}, {{PaymentDate}}, {{InvoiceNumber}}.</value>
+    </values>
+    <values>
+        <field>Send_Email__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Send_Portal__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Subject__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Payment received - receipt {{ReceiptNumber}}</value>
+    </values>
+</CustomMetadata>

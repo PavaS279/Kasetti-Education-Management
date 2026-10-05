@@ -259,6 +259,9 @@ public with sharing class WaitlistService {
       writer.updateRecords(offers);
       writer.insertRecords(reminders);
       SeatService.recalculate(queues.keySet());
+      MessageService.waitlistOffers(
+        new Map<Id, Waitlist_Entry__c>(offers).keySet()
+      );
     } finally {
       offering = false;
     }

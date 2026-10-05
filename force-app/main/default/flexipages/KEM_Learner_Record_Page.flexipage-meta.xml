@@ -29,6 +29,12 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>kemMessages</componentName>
+                <identifier>c_kemMessages</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>force:relatedListContainer</componentName>
                 <identifier>force_relatedListContainer</identifier>
             </componentInstance>

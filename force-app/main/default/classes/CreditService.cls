@@ -626,6 +626,7 @@ public with sharing class CreditService {
           )
         }
       );
+    MessageService.refundsPaid(new Set<Id>{ refund.Id });
   }
 
   // ----------------------------------------------------------------- reads

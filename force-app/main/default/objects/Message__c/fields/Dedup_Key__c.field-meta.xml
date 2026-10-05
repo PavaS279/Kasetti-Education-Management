@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Dedup_Key__c</fullName>
+    <externalId>true</externalId>
+    <inlineHelpText
+  >Event, channel, recipient and record: the same notification is never sent twice.</inlineHelpText>
+    <label>Dedup Key</label>
+    <required>false</required>
+    <length>150</length>
+    <caseSensitive>false</caseSensitive>
+    <unique>true</unique>
+    <type>Text</type>
+</CustomField>

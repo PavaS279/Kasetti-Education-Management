@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Email Delivery</label>
+    <protected>false</protected>
+    <values>
+        <field>Description__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Live sends notification emails. Off records them in the message log without sending (use while testing or before go-live).</value>
+    </values>
+    <values>
+        <field>Value__c</field>
+        <value xsi:type="xsd:string">Off</value>
+    </values>
+</CustomMetadata>

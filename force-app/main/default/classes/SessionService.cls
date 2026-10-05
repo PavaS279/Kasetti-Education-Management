@@ -391,6 +391,7 @@ public with sharing class SessionService {
       ),
       null
     );
+    MessageService.sessionCancelled(sessionId);
   }
 
   public static Id addSession(

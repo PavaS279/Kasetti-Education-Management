@@ -25,6 +25,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>MessageController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>TimetableController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
