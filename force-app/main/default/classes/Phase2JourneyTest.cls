@@ -180,11 +180,16 @@ private class Phase2JourneyTest {
       joinRequest.offeringId = classA.Id;
       Id entryId = WaitlistService.join(joinRequest);
 
-      // A second seat opens: the class grows.
-      Database.update(
-        new CourseOffering(Id = classA.Id, EnrollmentCapacity = 2),
-        AccessLevel.SYSTEM_MODE
-      );
+      // A second seat opens: the class owner adds a seat.
+      Id classOwner = [
+        SELECT CreatedById
+        FROM CourseOffering
+        WHERE Id = :classA.Id
+      ]
+      .CreatedById;
+      System.runAs(new User(Id = classOwner)) {
+        update new CourseOffering(Id = classA.Id, EnrollmentCapacity = 2);
+      }
       Waitlist_Entry__c offered = [
         SELECT Status__c, Offer_Expires__c
         FROM Waitlist_Entry__c
