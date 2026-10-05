@@ -81,6 +81,9 @@ public with sharing class MessageService {
   // ----------------------------------------------------------- event hooks
 
   public static void invoicesIssued(Set<Id> invoiceIds) {
+    if (disabled) {
+      return;
+    }
     try {
       send('Invoice_Issued', invoiceNotices(invoiceIds, null, null));
     } catch (Exception e) {
@@ -89,6 +92,9 @@ public with sharing class MessageService {
   }
 
   public static void paymentsReceived(Set<Id> paymentIds) {
+    if (disabled) {
+      return;
+    }
     try {
       List<Notice> notices = new List<Notice>();
       for (Student_Payment__c payment : [
@@ -133,6 +139,9 @@ public with sharing class MessageService {
   }
 
   public static void waitlistOffers(Set<Id> entryIds) {
+    if (disabled) {
+      return;
+    }
     try {
       List<Waitlist_Entry__c> entries = [
         SELECT
@@ -179,6 +188,9 @@ public with sharing class MessageService {
   }
 
   public static void refundsPaid(Set<Id> refundIds) {
+    if (disabled) {
+      return;
+    }
     try {
       List<Notice> notices = new List<Notice>();
       for (Refund__c refund : [
@@ -221,6 +233,9 @@ public with sharing class MessageService {
 
   /** Tells each enrolled learner's fee payer that a session was cancelled. */
   public static void sessionCancelled(Id sessionId) {
+    if (disabled) {
+      return;
+    }
     try {
       Class_Session__c session = [
         SELECT
@@ -893,7 +908,8 @@ public with sharing class MessageService {
   private static Message_Template__mdt templateFor(String eventKey) {
     if (templates == null) {
       // Queried rather than getAll(): getAll() truncates long text fields to 255
-      // characters. Custom metadata queries do not count against SOQL limits.
+      // characters. System mode: users need no custom metadata type access.
+      // Custom metadata queries do not count against SOQL limits.
       templates = new Map<String, Message_Template__mdt>();
       for (Message_Template__mdt template : [
         SELECT
@@ -904,6 +920,7 @@ public with sharing class MessageService {
           Send_Email__c,
           Send_Portal__c
         FROM Message_Template__mdt
+        WITH SYSTEM_MODE
       ]) {
         templates.put(template.DeveloperName, template);
       }
