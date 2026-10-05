@@ -180,10 +180,10 @@ private class Phase2JourneyTest {
       joinRequest.offeringId = classA.Id;
       Id entryId = WaitlistService.join(joinRequest);
 
-      EnrolmentService.withdraw(
-        enrolmentOf('Lata', 'Journey A'),
-        'Moving to weekend batch',
-        null
+      // A second seat opens: the class grows.
+      Database.update(
+        new CourseOffering(Id = classA.Id, EnrollmentCapacity = 2),
+        AccessLevel.SYSTEM_MODE
       );
       Waitlist_Entry__c offered = [
         SELECT Status__c, Offer_Expires__c
@@ -197,7 +197,11 @@ private class Phase2JourneyTest {
       );
       Id enrolled = WaitlistService.accept(entryId);
       Assert.isNotNull(enrolled, 'Manu enrolled from the waitlist');
-      Assert.areEqual('Full', cls('Journey A').Class_Status__c, 'Full again');
+      Assert.areEqual(
+        'Full',
+        cls('Journey A').Class_Status__c,
+        'Full again with both children'
+      );
       Test.stopTest();
     }
   }

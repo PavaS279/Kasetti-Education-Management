@@ -96,6 +96,21 @@ private class OpsServiceTest {
           e.getMessage()
         );
       }
+      Integer refused = 0;
+      for (Integer i = 0; i < 3; i++) {
+        try {
+          if (i == 0) {
+            OpsController.getConsole();
+          } else if (i == 1) {
+            OpsController.ensureSchedules();
+          } else {
+            OpsController.runNow('KEM Recurring Billing');
+          }
+        } catch (AuraHandledException e) {
+          refused++;
+        }
+      }
+      Assert.areEqual(3, refused, 'Every console action is refused');
     }
   }
 }
