@@ -50,7 +50,7 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 | 2.3 | Recurring billing and instalment plans                           | ✅    | ✅       | ✅    | ✅        | [F2.3-recurring-billing-instalments.md](features/F2.3-recurring-billing-instalments.md) |
 | 2.4 | Refund automation and credit notes                               | ✅    | ✅       | ✅    | ✅        | [F2.4-credit-notes-refunds.md](features/F2.4-credit-notes-refunds.md)                   |
 | 2.5 | Messaging (templated notifications with consent)                 | ✅    | ✅       | ✅    | ✅        | [F2.5-messaging.md](features/F2.5-messaging.md)                                         |
-| 2.6 | Resource substitution (teacher cover, room swaps)                | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                         |
+| 2.6 | Resource substitution (teacher cover, room swaps)                | ✅    | ✅       | ✅    | ✅        | [F2.6-resource-substitution.md](features/F2.6-resource-substitution.md)                 |
 | 2.7 | Advanced grading (weighted course grades, report cards)          | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                         |
 | 2.8 | Richer portal (documents, waitlist, instalments, messages)       | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                         |
 | 2.9 | Operations console and Phase 2 journey                           | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                         |
