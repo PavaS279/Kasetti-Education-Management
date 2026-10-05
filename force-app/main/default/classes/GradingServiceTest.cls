@@ -178,10 +178,11 @@ private class GradingServiceTest {
   }
 
   @IsTest
-  static void weightsCommentsFinaliseAndReopen() {
+  static void teacherSetsWeightsAndComments() {
     CourseOffering cls = offering();
     Map<String, Course_Assessment__c> byName = assessments();
     System.runAs(new User(Id = cls.Teacher_User__c)) {
+      Test.startTest();
       GradingController.saveWeights(
         cls.Id,
         new List<GradingService.WeightRow>{
@@ -195,28 +196,18 @@ private class GradingServiceTest {
       );
       Assert.isFalse(grades.equalWeights, 'Weighted');
       Assert.areEqual(3, grades.columns.size(), 'Three assessments');
-      Assert.areEqual(60, grades.columns[0].share, 'Exam (oldest last): 60%');
+      Assert.areEqual(60, grades.columns[0].share, 'Exam (oldest first): 60%');
       Assert.isTrue(grades.canEdit, 'Class teacher edits grades');
       Assert.areEqual(3, grades.rows.size(), 'Three learners');
       Assert.areEqual('Open', grades.status, 'Open');
-      Assert.areEqual(
-        75,
-        enrolments().get('Asha').Course_Score__c,
-        '9 + 24 + 42'
-      );
-      Assert.areEqual(
-        'B',
-        enrolments().get('Asha').Course_Grade__c,
-        '75 is a B'
-      );
-      Assert.areEqual(
-        85,
-        enrolments().get('Chitra').Course_Score__c,
-        '(700 + 2700) / 40'
-      );
+      Assert.isNotNull(grades.classAverage, 'Class average');
+      Map<String, CourseOfferingParticipant> e = enrolments();
+      Assert.areEqual(75, e.get('Asha').Course_Score__c, '9 + 24 + 42');
+      Assert.areEqual('B', e.get('Asha').Course_Grade__c, '75 is a B');
+      Assert.areEqual(85, e.get('Chitra').Course_Score__c, '(700 + 2700) / 40');
 
       GradingService.CommentRow comment = new GradingService.CommentRow();
-      comment.enrolmentId = enrolments().get('Asha').Id;
+      comment.enrolmentId = e.get('Asha').Id;
       comment.comment = 'Consistent effort; revise organic reactions.';
       GradingController.saveComments(
         cls.Id,
@@ -227,7 +218,14 @@ private class GradingServiceTest {
         enrolments().get('Asha').Report_Comment__c,
         'Comment saved'
       );
+      Test.stopTest();
+    }
+  }
 
+  @IsTest
+  static void finalisingIssuesReportCards() {
+    CourseOffering cls = offering();
+    System.runAs(new User(Id = cls.Teacher_User__c)) {
       Test.startTest();
       Assert.areEqual(
         3,
@@ -237,18 +235,22 @@ private class GradingServiceTest {
       Test.stopTest();
     }
     System.runAs(TestDataFactory.admin()) {
-      Assert.areEqual('Final', offering().Grading_Status__c, 'Class final');
+      CourseOffering after = offering();
+      Assert.areEqual('Final', after.Grading_Status__c, 'Class final');
       Assert.areEqual(
         cls.Teacher_User__c,
-        offering().Grades_Finalised_By__c,
+        after.Grades_Finalised_By__c,
         'By the teacher'
       );
-      Map<String, CourseOfferingParticipant> e = enrolments();
-      Assert.areEqual('Final', e.get('Asha').Grade_Status__c, 'Final');
-      Id ashaId = e.get('Asha').Id;
+      Id ashaId = enrolments().get('Asha').Id;
+      Assert.areEqual(
+        'Final',
+        enrolments().get('Asha').Grade_Status__c,
+        'Final'
+      );
       Assert.isNotNull(
         DocumentService.existing(ashaId, DocumentService.REPORT_CARD),
-        'Report card filed'
+        'Report card filed by the background job'
       );
       Assert.areEqual(
         2,
@@ -267,7 +269,6 @@ private class GradingServiceTest {
       Assert.areEqual('Final', finalGrades.status, 'Final');
       Assert.isNotNull(finalGrades.rows[0].reportCardId, 'Report card linked');
       Assert.isTrue(finalGrades.canReopen, 'Administrator can reopen');
-
       try {
         GradingService.saveComments(
           cls.Id,
@@ -277,25 +278,39 @@ private class GradingServiceTest {
       } catch (AppException ex) {
         Assert.isTrue(ex.getMessage().contains('final'), ex.getMessage());
       }
+      Test.setCurrentPage(Page.KEM_Report_Card);
+      ApexPages.currentPage().getParameters().put('id', ashaId);
+      KemDocumentController pdf = new KemDocumentController();
+      Assert.areEqual('A', pdf.reportCard.grade, 'Equal weights: 80 is an A');
+      Assert.areEqual('Final', pdf.reportCard.status, 'Final');
+      Assert.areEqual(3, pdf.reportCard.lines.size(), 'Assessment lines');
+      Assert.areEqual(
+        '9 / 10',
+        pdf.reportCard.lines[2].result,
+        'Quiz is the newest'
+      );
+      Assert.isFalse(pdf.reportCard.bands.isEmpty(), 'Grade scale');
+    }
+  }
+
+  @IsTest
+  static void reopeningSupersedesReportCards() {
+    CourseOffering cls = offering();
+    System.runAs(TestDataFactory.admin()) {
+      DocumentService.suppressJobs = true;
+      GradingService.finalise(cls.Id);
+      Id ashaId = enrolments().get('Asha').Id;
+      Test.startTest();
+      Assert.isNotNull(
+        DocumentService.generate(ashaId, DocumentService.REPORT_CARD),
+        'Report card issued'
+      );
       try {
         GradingService.reopen(cls.Id, null);
         Assert.fail('Reason needed');
       } catch (AppException ex) {
         Assert.isTrue(ex.getMessage().contains('why'), ex.getMessage());
       }
-
-      Test.setCurrentPage(Page.KEM_Report_Card);
-      ApexPages.currentPage().getParameters().put('id', ashaId);
-      KemDocumentController pdf = new KemDocumentController();
-      Assert.areEqual('B', pdf.reportCard.grade, 'Grade on the report card');
-      Assert.areEqual(3, pdf.reportCard.lines.size(), 'Assessment lines');
-      Assert.areEqual(
-        '9 / 10',
-        pdf.reportCard.lines[2].result,
-        'Quiz line (newest first)'
-      );
-      Assert.isFalse(pdf.reportCard.bands.isEmpty(), 'Grade scale');
-
       GradingController.reopenGrades(cls.Id, 'Exam re-marked');
       Assert.areEqual('Open', offering().Grading_Status__c, 'Reopened');
       Assert.areEqual(
@@ -306,6 +321,18 @@ private class GradingServiceTest {
       Assert.isNull(
         DocumentService.existing(ashaId, DocumentService.REPORT_CARD),
         'Old report card superseded'
+      );
+      Assert.areEqual(
+        'Report Card (superseded): Exam re-marked',
+        DocumentService.documentsFor(ashaId)[0].kind,
+        'Kept for history'
+      );
+      Test.setCurrentPage(Page.KEM_Report_Card);
+      ApexPages.currentPage().getParameters().put('id', ashaId);
+      Assert.areEqual(
+        'Provisional',
+        new KemDocumentController().reportCard.status,
+        'Provisional preview'
       );
       try {
         GradingService.reopen(cls.Id, 'Again');
@@ -320,6 +347,7 @@ private class GradingServiceTest {
       } catch (AppException ex) {
         Assert.isTrue(ex.getMessage().contains('Retest'), ex.getMessage());
       }
+      Test.stopTest();
     }
   }
 
