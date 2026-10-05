@@ -15,7 +15,12 @@ public with sharing class MessageJob implements Schedulable {
     Integer created = reminders
       ? MessageService.sendReminders(Date.today())
       : 0;
-    System.enqueueJob(new MessageService.DispatchJob());
+    if (System.isQueueable()) {
+      // Started from the operations console ("Run now"): deliver here.
+      MessageService.dispatch(100);
+    } else {
+      System.enqueueJob(new MessageService.DispatchJob());
+    }
     if (reminders) {
       Logger.info(
         'MessageJob',

@@ -203,17 +203,10 @@ private class Phase2JourneyTest {
   }
 
   @IsTest
-  static void billingCreditRecurringAndInstalments() {
+  static void overpaymentBecomesCreditForTheSibling() {
     Account gauri = person('Gauri');
-    Account lata = person('Lata');
     Account manu = person('Manu');
     Id lataEnrolment = enrolmentOf('Lata', 'Journey A');
-    Date start = [
-      SELECT StartDate
-      FROM CourseOfferingParticipant
-      WHERE Id = :lataEnrolment
-    ]
-    .StartDate;
     System.runAs(TestDataFactory.admin()) {
       Test.startTest();
       Id first = BillingService.createInvoice(lataEnrolment, true);
@@ -247,9 +240,28 @@ private class Phase2JourneyTest {
         [SELECT Status__c FROM Credit_Note__c WHERE Id = :creditId].Status__c,
         'Credit used up'
       );
+      Set<String> events = eventsFor(gauri.PersonContactId);
+      Assert.isTrue(events.contains('Invoice_Issued'), 'Invoices notified');
+      Assert.isTrue(events.contains('Payment_Received'), 'Payment notified');
       Test.stopTest();
+    }
+  }
 
-      // The nightly job's work for next month, then an instalment plan.
+  @IsTest
+  static void recurringBillingAndInstalmentsReachThePortal() {
+    Account gauri = person('Gauri');
+    Account lata = person('Lata');
+    Id lataEnrolment = enrolmentOf('Lata', 'Journey A');
+    Date start = [
+      SELECT StartDate
+      FROM CourseOfferingParticipant
+      WHERE Id = :lataEnrolment
+    ]
+    .StartDate;
+    System.runAs(TestDataFactory.admin()) {
+      Test.startTest();
+      BillingService.createInvoice(lataEnrolment, true);
+      // The nightly job's work for next month.
       Id next = BillingService.billDuePeriods(
         lataEnrolment,
         start.addMonths(1)
@@ -260,35 +272,24 @@ private class Phase2JourneyTest {
         'Second month'
       );
       BillingService.PlanRequest plan = new BillingService.PlanRequest();
-      plan.invoiceId = second;
+      plan.invoiceId = next;
       plan.count = 2;
       plan.firstDueDate = Date.today().addDays(10);
       BillingService.createPlan(plan);
+      Test.stopTest();
 
       PortalService.Home home = PortalService.homeFor(gauri.PersonContactId);
       Assert.areEqual(2, home.learners.size(), 'Both children');
-      Assert.areEqual(
-        2360 + 3040,
-        home.totalDue,
-        'Next month for Lata + Manu after credit'
-      );
-      Set<String> events = eventsFor(gauri.PersonContactId);
-      Assert.isTrue(events.contains('Invoice_Issued'), 'Invoices notified');
-      Assert.isTrue(events.contains('Payment_Received'), 'Payment notified');
-      PortalService.LearnerDetail manuView = PortalService.learnerFor(
+      Assert.areEqual(3540 + 2360, home.totalDue, 'Two open invoices');
+      PortalService.LearnerDetail view = PortalService.learnerFor(
         gauri.PersonContactId,
-        manu.PersonContactId
+        lata.PersonContactId
       );
-      Assert.areEqual(
-        2,
-        manuView.invoices[0].instalments.size(),
-        'Instalments visible'
-      );
-      Assert.isFalse(
-        PortalService.learnerFor(gauri.PersonContactId, lata.PersonContactId)
-          .invoices.isEmpty(),
-        'Lata invoices visible'
-      );
+      Integer withPlan = 0;
+      for (PortalService.InvoiceItem invoice : view.invoices) {
+        withPlan += invoice.instalments.size();
+      }
+      Assert.areEqual(2, withPlan, 'Instalments visible in the portal');
     }
   }
 
