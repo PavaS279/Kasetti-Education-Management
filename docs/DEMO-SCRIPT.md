@@ -1,4 +1,4 @@
-# Demo & Test Script — Full Learner Journey (Phase 1)
+# Demo & Test Script — Phase 1 Learner Journey and Phase 2 Operations
 
 Use this to demonstrate or acceptance-test the complete Kasetti Education Management flow in the org: **enquiry → application → offer → enrolment → timetable → attendance → assessment → invoice → payment → reconciliation → documents → dashboards → portal**.
 
@@ -7,6 +7,7 @@ Use this to demonstrate or acceptance-test the complete Kasetti Education Manage
 - **Part C** — click-by-click demo in the app (about 30–40 minutes), with the expected result after every step.
 - **Part D** — negative tests (the guard rails).
 - **Part E** — portal, reporting and clean-up notes.
+- **Part F** — Phase 2 (operational depth): automated run and click-by-click demo of waitlists, transfers, recurring billing, instalments, credit and refunds, messaging, teacher cover, grading and report cards, the richer portal and the operations console.
 
 ---
 
@@ -25,10 +26,10 @@ Use this to demonstrate or acceptance-test the complete Kasetti Education Manage
 | Billing              | Invoice to the fee-paying guardian, branch numbering and due dates, payments (pending/confirmed/failed), oldest-due-first allocation, receipts, reconciliation exceptions, gateway API | Class roster, Invoice page, **Finance Desk**, `POST /kem/v1/payments` |
 | Documents            | Offer letter, invoice and receipt PDFs filed on the record automatically                                                                                                               | Documents panel on application/invoice/payment                        |
 | Reporting            | Role-aware Home cockpit, 6 reports, **KEM Operations** dashboard                                                                                                                       | Home, Reports → KEM Reports, Dashboards                               |
-| Portal               | Learner/guardian home (timetable, results, attendance, fees) with strict access                                                                                                        | Component ready; place on the site (see Part E)                       |
+| Portal               | Learner/guardian home (timetable, results, attendance, fees) with strict access                                                                                                        | Live on `TrialOrgPortal` → **My Learning** (see Part E)               |
 | Security             | 6 personas (permission set groups), branch sharing, system-managed fields, governed status transitions                                                                                 | Setup → Permission Set Groups                                         |
 
-**Quality:** 101 Apex tests (94% coverage), 40 Jest tests, and `FullJourneyTest` covering the whole journey; every feature was also checked live (see [TEST-LOG.md](TEST-LOG.md)).
+**Quality (2026-10-05):** 139 Apex tests (94% coverage), 87 Jest tests, `FullJourneyTest` (Phase 1) and `Phase2JourneyTest` (Phase 2); every feature was also checked live (see [TEST-LOG.md](TEST-LOG.md)). Phase 2 features are listed in Part F.
 
 ---
 
@@ -201,3 +202,75 @@ POST /services/apexrest/kem/v1/payments
 `201` created/confirmed · `200` duplicate · `400` invalid (unknown invoice, missing fields).
 
 **Clean-up.** All demo records carry `[KEM Demo]` in their name. Paid invoices and confirmed payments cannot be deleted by design; to retire a demo, leave the records or deactivate the demo portal users.
+
+---
+
+## Part F — Phase 2: operational depth
+
+### What is built
+
+| Area                     | What you can show                                                                                                                                         | Where                                                                                     |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Waitlists (F2.1)         | Priority queue, a freed seat held 48 h for the next learner, accept → enrolled, expiry passes the seat on                                                 | Class page → **Waitlist** panel                                                           |
+| Transfers (F2.2)         | Move an enrolment to another class with a price/billing preview; difference billed or issued as credit                                                    | Class page → roster ▾ → **Transfer to another class**                                     |
+| Recurring billing (F2.3) | Monthly fees billed period by period; nightly **KEM Recurring Billing** job; instalment plans settled in order                                            | Invoice page → **Pay in instalments**                                                     |
+| Credit & refunds (F2.4)  | Overpayment **held as credit**, credit applied to the next invoice automatically, withdrawal credit, refunds with auto-approval or second-person approval | Finance Desk (exceptions, **Refunds**), Invoice → **Issue credit note**, Credit Note page |
+| Messaging (F2.5)         | 8 templated notices (invoice, payment, due soon, overdue, waitlist offer, refund, session cancelled, report card), email consent, staff messages          | Learner page → **Messages** panel; Setup → Custom Metadata → Message Template             |
+| Teacher cover (F2.6)     | Report an absence, ranked cover suggestions, assign or cancel (families told), room swaps                                                                 | Home → **Cover Desk**; Session page → **Teacher and room**                                |
+| Grading (F2.7)           | Weighted course grades, comments, finalise → report card PDFs and family notices, reopen                                                                  | Class page → **Course grades**                                                            |
+| Portal (F2.8)            | Inbox, course grades with report card download, documents, instalments, credit, waitlist position                                                         | Portal → My Learning                                                                      |
+| Operations (F2.9)        | Health, exception queues, scheduled jobs with **Run now**, background runs, errors                                                                        | Home → **Operations** (administrators)                                                    |
+
+Email delivery is switched off in this org (Education Setting `Email_Delivery` = Off): emails are logged as **Not Sent**; portal messages are delivered.
+
+### Automated run (about 3 minutes, 31 checks)
+
+```bash
+scripts/demo/phase2-journey.sh            # or give a tag: scripts/demo/phase2-journey.sh P7
+```
+
+Each run creates its own guardian ("Guardian ‹tag› [KEM Demo] Phase2") with two children and two classes of the monthly Coding Club course, then:
+
+| Step | What happens                                                                 | Checked                                                                                                     |
+| ---- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| 0    | Elder child enrolled in one-seat class A                                     | Class A **Full**                                                                                            |
+| 1–2  | Younger child joins the waitlist; class A gets a second seat; offer accepted | **Offered**, guardian notified, **Enrolled**, Full again                                                    |
+| 3    | Younger child transferred to class B before invoicing                        | "Not invoiced yet", old enrolment **Withdrew**, seat released                                               |
+| 4    | Elder's first invoice (4,130) paid with 500 extra → held as credit           | **Exception** → credit **500**                                                                              |
+| 5    | Younger's first invoice                                                      | Credit **applied 500**, credit **Used**                                                                     |
+| 6    | Next month billed and split into two instalments                             | **2,950**, **2** instalments                                                                                |
+| 7    | Withdrawal credit 1,000 on the paid invoice; 600 refunded                    | **Auto-approved**, **Paid**, **400** credit left                                                            |
+| 8    | Class teacher absent tomorrow; first free suggestion assigned                | Absence **Covered**, session **Substituted**                                                                |
+| 9    | Quiz 18/20 published; grades finalised                                       | **A+**, **Final**                                                                                           |
+| 10   | Guardian's portal                                                            | 2 children, notices, A+ Final with report card, invoice/receipt/report card PDFs, 2 instalments, 400 credit |
+| 11   | Operations console                                                           | Every job scheduled, health reported                                                                        |
+
+Latest live run: tag `P2A` on 2026-10-05 — **all checks passed** (guardian "Guardian P2A [KEM Demo] Phase2", invoice BLR-000009).
+
+### Click-by-click demo (about 30 minutes)
+
+1. **Waitlist.** Open class _[KEM Demo] Waitlist Demo – Sunday_ → Waitlist panel: queue with positions, held seat and countdown. **Join waitlist** for a learner (priority, sibling discount code). Expected: added at the right position; the class shows Waiting count.
+2. **Accept or decline an offer** on an Offered entry. Expected: Accept enrols the learner with the code; Decline passes the seat to the next learner (new offer, new countdown).
+3. **Transfer.** Class roster ▾ → **Transfer to another class**. Pick a class: preview shows current vs new price, the difference and what happens to billing. Expected: old enrolment Withdrew "Transferred to …", new enrolment linked; a cheaper class after invoicing creates a credit note.
+4. **Recurring billing.** Open invoice BLR-000005 (Coding Club, Ishaan): line "Tuition (Sep 2026)" with period dates, **Instalments** panel (3 instalments, first paid, second part-paid). On a new issued invoice, **Pay in instalments** → choose 3, monthly → preview → **Create plan**. Expected: due date moves to the first unpaid instalment.
+5. **Credit and refunds.** Finance Desk → **Reconciliation exceptions** → **Hold as credit** on an overpaid payment. Then open a paid invoice → **Issue credit note** (Withdrawal) → the credit note page: **Request refund** of 800 (auto-approved, under 1,000) → **Mark paid** with a reference. Request 1,200 → "Waiting for an approver other than the requester". Expected: as a second user (branch manager), Finance Desk → **Refunds** → **Approve**. CN-000001 already has RFD-000001 (1,200) waiting.
+6. **Messaging.** Learner page (Ananya Sharma) → **Messages**: recipients with consent, the report card and staff notices, statuses (Delivered / Not Sent / Suppressed with reason). **New message** to Rohit by email and portal. Toggle **Opt out** for a guardian and send again: the email is Suppressed.
+7. **Teacher cover.** Home → **Cover Desk** → **Report absence** (a teacher, tomorrow, Training). Expected: their sessions appear under Needs cover with ranked teachers (free, has taught the course, load). **Assign** → session shows "covering for …", teacher attendance Substituted, a task for the cover teacher. On a session page, **Change room** lists free rooms large enough first.
+8. **Grading.** Class _[KEM Demo] Maths Foundation – Saturday AM_ → **Course grades**: weights 10/20 (33.3% / 66.7%), Ananya 92.67 A+, Arjun 69.00 C, Kavya 85.00 A, status **Final** with report card links. **Reopen** (reason) → Provisional, old report cards superseded; change a weight → **Save weights** → scores recalculate; **Finalise & issue report cards** → new PDFs and family notices.
+9. **Portal.** Log in as Rohit Sharma → My Learning: **Messages (n new)**; Ananya → Results starts with the course grade and **Report card** download; **Documents** tab; Fees shows instalments and credit; Timetable shows waitlist position when queued.
+10. **Operations.** Home → **Operations** (administrators): health banner, queues (e.g. 1 refund awaiting approval), the five scheduled jobs with next runs and **Run now**, background runs and recent errors.
+
+### Phase 2 negative tests
+
+| #   | Try                                                      | Expected                                                                      |
+| --- | -------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| 1   | Accept a waitlist offer after it expired                 | "The seat offer expired on …"                                                 |
+| 2   | Invoice a monthly enrolment again before the next period | "Nothing is due yet. The next monthly period is billed on …"                  |
+| 3   | Credit more than was paid on an invoice                  | "At most … can be credited on …"                                              |
+| 4   | Approve a refund you requested                           | "A refund must be decided by someone other than the person who requested it." |
+| 5   | Assign a cover teacher who is teaching at that time      | "The teacher is already teaching …"                                           |
+| 6   | Move a session to a room smaller than the class          | "The room holds … but … learners are enrolled."                               |
+| 7   | Finalise grades while an assessment is still draft       | "Publish or delete the draft assessment …"                                    |
+| 8   | Change weights or comments after grades are final        | "Grades are final. Reopen them before making changes."                        |
+| 9   | Download another family's report card through the portal | "Document not found or not available to you."                                 |
+| 10  | Open the Operations console as a non-administrator       | The card does not appear                                                      |

@@ -41,7 +41,7 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 
 ## Phase 2 — Operational depth
 
-**Completion condition — exceptions and recurring operations work reliably:** ✅ (`Phase2JourneyTest`, the live checks of F2.1–F2.9 and the operations console reporting healthy)
+**Completion condition — exceptions and recurring operations work reliably:** ✅ (`Phase2JourneyTest`, the live checks of F2.1–F2.9, `scripts/demo/phase2-journey.sh` passing 31 of 31 checks live, and the operations console reporting healthy)
 
 | #   | Feature                                                            | Built | Deployed | Tests | E2E check | Notes                                                                                   |
 | --- | ------------------------------------------------------------------ | ----- | -------- | ----- | --------- | --------------------------------------------------------------------------------------- |

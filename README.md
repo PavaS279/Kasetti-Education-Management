@@ -1,3 +1,20 @@
+# Kasetti Education Management — Salesforce Education Cloud
+
+Education management on Salesforce Education Cloud for Kasetti Technologies: enquiries, admissions, enrolment, scheduling, attendance, assessment, billing, documents, portal (Phase 1), and waitlists, transfers, recurring billing, instalments, credit and refunds, messaging, teacher cover, grading and report cards, a richer portal and an operations console (Phase 2).
+
+**Status (2026-10-05):** Phases 0, 1 and 2 complete — 139 Apex tests (94% coverage), 87 Jest tests, every feature checked live in the org.
+
+| Start here                                 |                                                 |
+| ------------------------------------------ | ----------------------------------------------- |
+| [docs/PROGRESS.md](docs/PROGRESS.md)       | What is built, deployed and tested              |
+| [docs/DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md) | Demo and acceptance tests (Phase 1 and Phase 2) |
+| [docs/NEXT-STEPS.md](docs/NEXT-STEPS.md)   | Hand-over: open actions, how to continue        |
+| [docs/README.md](docs/README.md)           | All documentation                               |
+
+Demo runners: `scripts/demo/full-journey.sh` (Phase 1) and `scripts/demo/phase2-journey.sh` (Phase 2). Deploy with `scripts/deploy.sh`.
+
+---
+
 # Salesforce DX Project
 
 Salesforce DX is a development approach that brings source-driven development, team collaboration, and continuous integration to the Salesforce Platform. Instead of working directly in an org through a web browser, you work with metadata as source files in a local DX project, track changes in version control, and deploy through automated processes.
@@ -11,7 +28,7 @@ Before you start, make sure you have:
 - **Salesforce CLI** - Download from [developer.salesforce.com/tools/salesforcecli](https://developer.salesforce.com/tools/salesforcecli). See [Install Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_install_cli.htm) for details.
 - **VS Code with Salesforce Extension Pack** - See [Installation Instructions](https://developer.salesforce.com/docs/platform/sfvscode-extensions/guide/install.html) for details. Includes the Agentforce Vibes extension.
 - **A development org** - Sign up for a free Developer Edition org [here](https://developer.salesforce.com/signup).
-- **Dev Hub enabled** (optional, required to create scratch orgs) - You can enable Dev Hub in your development org under Setup > Dev Hub.  See [Provide Developers Access to Salesforce DX Tools](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_setup_dx_tools.htm).
+- **Dev Hub enabled** (optional, required to create scratch orgs) - You can enable Dev Hub in your development org under Setup > Dev Hub. See [Provide Developers Access to Salesforce DX Tools](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_setup_dx_tools.htm).
 
 ## Project Structure
 
@@ -35,11 +52,11 @@ Org credentials are stored by the Salesforce CLI on **your machine** (in `~/.sf`
 1. Install the [Salesforce CLI](https://developer.salesforce.com/tools/salesforcecli) and check it with `sf --version`.
 2. From the repo root, log in. A browser window opens for the Salesforce login:
 
-   | Org type | Command |
-   | --- | --- |
-   | Production, Developer Edition, or Education Cloud trial | `npm run org:login` |
-   | Sandbox | `npm run org:login:sandbox` |
-   | Org with My Domain enforced | `sf org login web --alias edu-dev --set-default --instance-url https://<yourdomain>.my.salesforce.com` |
+   | Org type                                                | Command                                                                                                |
+   | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+   | Production, Developer Edition, or Education Cloud trial | `npm run org:login`                                                                                    |
+   | Sandbox                                                 | `npm run org:login:sandbox`                                                                            |
+   | Org with My Domain enforced                             | `sf org login web --alias edu-dev --set-default --instance-url https://<yourdomain>.my.salesforce.com` |
 
    `--set-default` makes the org the default target for this project, so `sf project deploy start` and `sf project retrieve start` use it without `--target-org`.
 
@@ -77,11 +94,11 @@ The workflow authorizes with the OAuth client credentials flow (`scripts/ci/sf-l
 3. On the **Settings** tab, select **Consumer Key and Secret** and copy both values.
 4. In **GitHub → Settings → Secrets and variables → Actions**, add these repository secrets:
 
-   | Secret | Value |
-   | --- | --- |
-   | `SF_INSTANCE_URL` | Your My Domain URL, for example `https://kasetti.my.salesforce.com` (from Setup → My Domain) |
-   | `SF_CLIENT_ID` | Consumer key |
-   | `SF_CLIENT_SECRET` | Consumer secret |
+   | Secret             | Value                                                                                        |
+   | ------------------ | -------------------------------------------------------------------------------------------- |
+   | `SF_INSTANCE_URL`  | Your My Domain URL, for example `https://kasetti.my.salesforce.com` (from Setup → My Domain) |
+   | `SF_CLIENT_ID`     | Consumer key                                                                                 |
+   | `SF_CLIENT_SECRET` | Consumer secret                                                                              |
 
 5. Run the workflow from the **Actions** tab to confirm that the login works.
 
@@ -114,4 +131,3 @@ Transform your ideas into custom Lightning apps that extend CRM workflows direct
 - [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/)
 - [Salesforce CLI Plugin Development Guide](https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/conceptual-overview.html)
 - [Salesforce VS Code Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-

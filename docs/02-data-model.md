@@ -122,3 +122,54 @@ Guardian link convention: `ContactId` = guardian's person contact, `RelatedConta
 | `Invoice_Line__c`                            | Controlled by parent  | `Student_Invoice__c` (MD), `Enrolment_Fee_Line__c`, `Fee_Type__c`, `Description__c`, `Unit_Amount__c`, `Discount_Amount__c`, `Tax_Amount__c`, `Line_Total__c`                                                                                                                                                                                                   |
 | `Student_Payment__c` (`PAY-`)                | Private               | `Payer__c`, `Learner__c`, `Student_Invoice__c`, `Branch__c`, `Amount__c`, `Method__c`, `Status__c`, `Payment_Date__c`, `Reference__c`, `Gateway_Transaction_Id__c` (unique), roll-up `Allocated_Amount__c`, `Unallocated_Amount__c`, `Reconciliation_Status__c`, `Reconciliation_Note__c`, `Reconciled_On__c`, `Reconciled_By__c`, `Receipt_Number__c` (unique) |
 | `Payment_Allocation__c` (junction)           | Controlled by parents | `Student_Invoice__c` (MD), `Student_Payment__c` (MD), `Amount__c`, `Allocated_On__c`                                                                                                                                                                                                                                                                            |
+
+## Phase 2 objects and fields (deployed)
+
+### F2.1 Waitlists and F2.2 Transfers
+
+| Object / field              | Sharing   | Key fields                                                                                                                                                                                                                                                                                                                                            |
+| --------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Waitlist_Entry__c` (`WL-`) | Read Only | `Course_Offering__c`, `Learner__c` (Account), `Learner_Contact__c`, `Application__c`, `Branch__c`, `Status__c` (Waiting/Offered/Enrolled/Declined/Expired/Cancelled), `Priority__c`, `Requested_On__c`, `Offered_On__c`, `Offer_Expires__c`, `Responded_On__c`, `Discount_Code__c`, `Enrolment__c`, `Offers_Made__c`, `Notes__c` — all system-managed |
+| `CourseOffering`            | —         | `Seats_Reserved__c` (held offers), `Waitlist_Count__c`; `Seats_Available__c` subtracts held seats                                                                                                                                                                                                                                                     |
+| `CourseOfferingParticipant` | —         | `Transferred_From__c`, `Transferred_To__c` (self lookups), `Transfer_Adjustment__c`, `Credit_Due__c`                                                                                                                                                                                                                                                  |
+
+### F2.3 Recurring billing and instalments
+
+| Object / field          | Sharing              | Key fields                                                                                                                                            |
+| ----------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Enrolment_Fee_Line__c` | —                    | `Next_Bill_Date__c`, `Periods_Billed__c` (monthly lines are invoiced period by period)                                                                |
+| `Invoice_Line__c`       | —                    | `Period_Start__c`, `Period_End__c`                                                                                                                    |
+| `Student_Invoice__c`    | —                    | `Billing_Period__c`, `Original_Due_Date__c`, roll-up `Instalment_Count__c`                                                                            |
+| `Instalment__c`         | Controlled by parent | `Student_Invoice__c` (MD), `Sequence__c`, `Due_Date__c`, `Amount__c`, `Amount_Paid__c`, `Status__c` (Due/Partially Paid/Paid), `Overdue__c` (formula) |
+
+### F2.4 Credit notes and refunds
+
+| Object / field           | Sharing | Key fields                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Credit_Note__c` (`CN-`) | Private | `Bill_To__c`, `Learner__c`, `Learner_Account__c`, `Enrolment__c`, `Source_Invoice__c`, `Source_Payment__c`, `Branch__c`, `Origin__c` (Overpayment/Transfer/Withdrawal/Goodwill/Other), `Reason__c`, `Issue_Date__c`, `Amount__c`, `Amount_Applied__c`, `Amount_Refunded__c`, `Balance__c` (formula), `Status__c` (Open/Partially Used/Used/Void), `Void_Reason__c` |
+| `Refund__c` (`RFD-`)     | Private | `Credit_Note__c`, `Payee__c`, `Branch__c`, `Amount__c`, `Method__c`, `Status__c` (Requested/Approved/Paid/Rejected), `Reason__c`, `Requested_By__c`, `Approved_By__c`, `Decided_On__c`, `Auto_Approved__c`, `Rejection_Reason__c`, `Paid_On__c`, `Reference__c`                                                                                                    |
+| `Student_Payment__c`     | —       | Method **Credit Note** and `Credit_Note__c`: applying credit is recorded as a payment, so allocations stay the single record of what an invoice received                                                                                                                                                                                                           |
+
+### F2.5 Messaging
+
+| Object / field          | Sharing | Key fields                                                                                                                                                                                                                                                                                                       |
+| ----------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Message__c` (`MSG-`)   | Private | `Recipient__c`, `Learner__c`, `Learner_Account__c`, `Branch__c`, `Channel__c` (Email/Portal), `Event__c`, `Subject__c`, `Body__c`, `Status__c` (Queued/Sent/Delivered/Suppressed/Not Sent/Failed), `Status_Detail__c`, `Related_Record_Id__c`, `Dedup_Key__c` (unique), `Sent_On__c`, `Read_On__c`, `Sent_By__c` |
+| `Message_Template__mdt` | —       | Record name = event; `Subject__c`, `Body__c` (`{{Token}}` merge fields), `Description__c`, `Active__c`, `Send_Email__c`, `Send_Portal__c`                                                                                                                                                                        |
+
+### F2.6 Resource substitution
+
+| Object / field              | Sharing   | Key fields                                                                                                                                                                                                  |
+| --------------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Staff_Absence__c` (`ABS-`) | Read Only | `Staff_User__c`, `Branch__c`, `Start__c`, `End__c`, `Reason__c`, `Notes__c`, `Status__c` (Needs Cover/Partially Covered/Covered/Withdrawn), `Sessions_Affected__c`, `Sessions_Handled__c`, `Reported_By__c` |
+| `Class_Session__c`          | —         | `Needs_Cover__c`, `Staff_Absence__c`, `Original_Teacher__c`, `Original_Room__c`, `Cover_Note__c`; activities enabled (cover-teacher tasks)                                                                  |
+
+### F2.7 Advanced grading
+
+| Object / field              | Key fields                                                                                                                                           |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CourseOfferingParticipant` | `Course_Score__c`, `Course_Grade__c`, `Grade_Status__c` (Provisional/Final), `Graded_Assessments__c`, `Grades_Calculated_On__c`, `Report_Comment__c` |
+| `CourseOffering`            | `Grading_Status__c` (Open/Final), `Grades_Finalised_On__c`, `Grades_Finalised_By__c`                                                                 |
+| Report card                 | PDF (`KEM_Report_Card`) filed on the enrolment as a Salesforce File                                                                                  |
+
+F2.8 (portal) and F2.9 (operations console) add no objects. All Phase 2 ledger, status and audit fields are system-managed.

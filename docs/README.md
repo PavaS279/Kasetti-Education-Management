@@ -1,6 +1,6 @@
 # Kasetti Education Management — Documentation
 
-> **Demo & test the full flow:** [DEMO-SCRIPT.md](DEMO-SCRIPT.md) (automated: `scripts/demo/full-journey.sh`)
+> **Demo & test:** [DEMO-SCRIPT.md](DEMO-SCRIPT.md) — Phase 1 journey (`scripts/demo/full-journey.sh`) and Phase 2 operations (`scripts/demo/phase2-journey.sh`). Hand-over: [NEXT-STEPS.md](NEXT-STEPS.md).
 
 Delivery documentation for the Salesforce Education Cloud implementation. Read in this order:
 
@@ -20,20 +20,27 @@ Target org: Kasetti Technologies Pvt Ltd (Enterprise Edition, Education Cloud), 
 
 ## Feature guides
 
-| Feature                   | Guide                                                                      |
-| ------------------------- | -------------------------------------------------------------------------- |
-| F1.1 Enquiries            | [features/F1.1-enquiries.md](features/F1.1-enquiries.md)                   |
-| F1.2 Learners & guardians | [features/F1.2-learners-guardians.md](features/F1.2-learners-guardians.md) |
-| F1.3 Applications         | [features/F1.3-applications.md](features/F1.3-applications.md)             |
-| F1.4 Pricing & discounts  | [features/F1.4-pricing-discounts.md](features/F1.4-pricing-discounts.md)   |
-| F1.5 Enrolment            | [features/F1.5-enrolment.md](features/F1.5-enrolment.md)                   |
-| F1.6 Scheduling           | [features/F1.6-scheduling.md](features/F1.6-scheduling.md)                 |
-| F1.7 Attendance           | [features/F1.7-attendance.md](features/F1.7-attendance.md)                 |
-| F1.8 Assessments          | [features/F1.8-assessments.md](features/F1.8-assessments.md)               |
-| F1.9 Billing              | [features/F1.9-billing.md](features/F1.9-billing.md)                       |
-| F1.10 Documents           | [features/F1.10-documents.md](features/F1.10-documents.md)                 |
-| F1.11 Portal              | [features/F1.11-portal.md](features/F1.11-portal.md)                       |
-| F1.12 Dashboards          | [features/F1.12-dashboards.md](features/F1.12-dashboards.md)               |
-| F1.13 Full journey        | [features/F1.13-full-journey.md](features/F1.13-full-journey.md)           |
-| F2.1 Waitlists            | [features/F2.1-waitlists.md](features/F2.1-waitlists.md)                   |
-| F2.2 Transfers            | [features/F2.2-transfers.md](features/F2.2-transfers.md)                   |
+| Feature                                   | Guide                                                                                            |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| F1.1 Enquiries                            | [features/F1.1-enquiries.md](features/F1.1-enquiries.md)                                         |
+| F1.2 Learners & guardians                 | [features/F1.2-learners-guardians.md](features/F1.2-learners-guardians.md)                       |
+| F1.3 Applications                         | [features/F1.3-applications.md](features/F1.3-applications.md)                                   |
+| F1.4 Pricing & discounts                  | [features/F1.4-pricing-discounts.md](features/F1.4-pricing-discounts.md)                         |
+| F1.5 Enrolment                            | [features/F1.5-enrolment.md](features/F1.5-enrolment.md)                                         |
+| F1.6 Scheduling                           | [features/F1.6-scheduling.md](features/F1.6-scheduling.md)                                       |
+| F1.7 Attendance                           | [features/F1.7-attendance.md](features/F1.7-attendance.md)                                       |
+| F1.8 Assessments                          | [features/F1.8-assessments.md](features/F1.8-assessments.md)                                     |
+| F1.9 Billing                              | [features/F1.9-billing.md](features/F1.9-billing.md)                                             |
+| F1.10 Documents                           | [features/F1.10-documents.md](features/F1.10-documents.md)                                       |
+| F1.11 Portal                              | [features/F1.11-portal.md](features/F1.11-portal.md)                                             |
+| F1.12 Dashboards                          | [features/F1.12-dashboards.md](features/F1.12-dashboards.md)                                     |
+| F1.13 Full journey                        | [features/F1.13-full-journey.md](features/F1.13-full-journey.md)                                 |
+| F2.1 Waitlists                            | [features/F2.1-waitlists.md](features/F2.1-waitlists.md)                                         |
+| F2.2 Transfers                            | [features/F2.2-transfers.md](features/F2.2-transfers.md)                                         |
+| F2.3 Recurring billing & instalments      | [features/F2.3-recurring-billing-instalments.md](features/F2.3-recurring-billing-instalments.md) |
+| F2.4 Credit notes & refunds               | [features/F2.4-credit-notes-refunds.md](features/F2.4-credit-notes-refunds.md)                   |
+| F2.5 Messaging                            | [features/F2.5-messaging.md](features/F2.5-messaging.md)                                         |
+| F2.6 Teacher cover & room swaps           | [features/F2.6-resource-substitution.md](features/F2.6-resource-substitution.md)                 |
+| F2.7 Grading & report cards               | [features/F2.7-advanced-grading.md](features/F2.7-advanced-grading.md)                           |
+| F2.8 Richer portal                        | [features/F2.8-richer-portal.md](features/F2.8-richer-portal.md)                                 |
+| F2.9 Operations console & Phase 2 journey | [features/F2.9-operations-console.md](features/F2.9-operations-console.md)                       |
