@@ -21,6 +21,12 @@
         <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemOpsConsole</componentName>
+                <identifier>c_kemOpsConsole</identifier>
+            </componentInstance>
+        </itemInstances>
         <name>bottomRight</name>
         <type>Region</type>
     </flexiPageRegions>

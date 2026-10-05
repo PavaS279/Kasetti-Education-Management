@@ -16,6 +16,13 @@ public with sharing class KemJobs {
     'KEM Message Dispatch' => '0 20 * * * ?'
   };
 
+  /** Names of all KEM scheduled jobs, sorted. */
+  public static List<String> jobNames() {
+    List<String> names = new List<String>(CRON.keySet());
+    names.sort();
+    return names;
+  }
+
   public static Integer scheduleAll() {
     Set<String> existing = new Set<String>();
     for (CronTrigger job : [

@@ -1,0 +1,134 @@
+<template>
+  <template lwc:if={visible}>
+    <article class="kem-card panel">
+      <header class="head">
+        <div>
+          <div class="kem-section-title">Operations</div>
+          <template lwc:if={data}>
+            <div class="kem-muted small">Updated {generated}</div>
+          </template>
+        </div>
+        <lightning-button-icon
+          icon-name="utility:refresh"
+          alternative-text="Refresh"
+          onclick={handleRefresh}
+        ></lightning-button-icon>
+      </header>
+
+      <template lwc:if={data}>
+        <div class={health.className} role="status">
+          <lightning-icon icon-name={health.icon} size="small"></lightning-icon>
+          <div>
+            <div class="strong">{health.label}</div>
+            <template lwc:if={hasIssues}>
+              <ul class="issues">
+                <template for:each={issues} for:item="i">
+                  <li key={i.key}>{i.text}</li>
+                </template>
+              </ul>
+            </template>
+          </div>
+        </div>
+
+        <div class="tiles">
+          <template for:each={queues} for:item="q">
+            <div key={q.key} class={q.className} title={q.hint}>
+              <span class="tile-count">{q.count}</span>
+              <span class="tile-label">{q.label}</span>
+            </div>
+          </template>
+        </div>
+
+        <div class="section-head">
+          <span class="group-title">Scheduled jobs</span>
+          <template lwc:if={anyMissing}>
+            <lightning-button
+              variant="brand"
+              label="Schedule missing jobs"
+              onclick={handleEnsure}
+              disabled={isBusy}
+            ></lightning-button>
+          </template>
+        </div>
+        <ul class="jobs">
+          <template for:each={schedules} for:item="s">
+            <li key={s.name} class="job">
+              <div class="job-main">
+                <span class="strong">{s.name}</span>
+                <span class="kem-muted small"
+                  >next {s.next} · last {s.last}</span
+                >
+              </div>
+              <span class={s.stateClass}>{s.state}</span>
+              <lightning-button-icon
+                icon-name="utility:play"
+                alternative-text={s.runLabel}
+                title={s.runLabel}
+                data-name={s.name}
+                onclick={handleRun}
+                disabled={isBusy}
+              ></lightning-button-icon>
+            </li>
+          </template>
+        </ul>
+
+        <div class="group-title">Background runs (7 days)</div>
+        <ul class="runs">
+          <template for:each={runs} for:item="r">
+            <li key={r.id} class={r.className}>
+              <span class="strong">{r.job}</span>
+              <span class="kem-muted small"
+                >{r.jobType} · {r.when} · {r.progress}</span
+              >
+              <span class="small">{r.status}</span>
+              <template lwc:if={r.detail}>
+                <span class="detail">{r.detail}</span>
+              </template>
+            </li>
+          </template>
+        </ul>
+        <template lwc:if={noRuns}>
+          <div class="kem-muted small">
+            No background runs in the last 7 days.
+          </div>
+        </template>
+
+        <template lwc:if={hasErrors}>
+          <lightning-button
+            class="toggle"
+            variant="base"
+            label={errorToggleLabel}
+            onclick={handleToggleErrors}
+          ></lightning-button>
+          <template lwc:if={showErrors}>
+            <ul class="errors">
+              <template for:each={errors} for:item="e">
+                <li key={e.Id} class="error">
+                  <span class="strong">{e.Source__c}</span>
+                  <span class="kem-muted small">{e.Name} · {e.when}</span>
+                  <span class="small">{e.message}</span>
+                </li>
+              </template>
+            </ul>
+          </template>
+        </template>
+      </template>
+      <template lwc:elseif={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+      <template lwc:else>
+        <div class="loading">
+          <lightning-spinner
+            alternative-text="Loading operations"
+            size="small"
+          ></lightning-spinner>
+        </div>
+      </template>
+    </article>
+  </template>
+</template>
