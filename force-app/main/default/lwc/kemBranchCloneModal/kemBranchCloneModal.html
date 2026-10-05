@@ -1,0 +1,156 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+
+    <template lwc:if={showForm}>
+      <template lwc:if={notAllowed}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_warning"
+          role="alert"
+        >
+          Only administrators can open new branches.
+        </div>
+      </template>
+      <p class="intro">
+        Copies {preview.name}'s policies (tax, due days, attendance threshold,
+        delivery modes) and the parts you choose. Classes are created as
+        Planned, without teachers, so you can review them before the branch
+        opens.
+      </p>
+      <div class="form-grid">
+        <lightning-input
+          label="Branch name"
+          data-field="name"
+          value={form.name}
+          onchange={handleField}
+          max-length="80"
+          required
+        ></lightning-input>
+        <lightning-input
+          label="Branch code"
+          data-field="code"
+          value={form.code}
+          onchange={handleField}
+          max-length="20"
+          placeholder="HYD-01"
+          required
+        ></lightning-input>
+        <lightning-input
+          label="Invoice prefix"
+          data-field="invoicePrefix"
+          value={form.invoicePrefix}
+          onchange={handleField}
+          max-length="10"
+          field-level-help="Invoice numbers of the new branch start with this prefix."
+          required
+        ></lightning-input>
+        <lightning-input
+          label="City"
+          data-field="city"
+          value={form.city}
+          onchange={handleField}
+          max-length="80"
+        ></lightning-input>
+        <lightning-input
+          label="Email"
+          data-field="email"
+          value={form.email}
+          onchange={handleField}
+        ></lightning-input>
+        <lightning-input
+          label="Phone"
+          data-field="phone"
+          value={form.phone}
+          onchange={handleField}
+        ></lightning-input>
+      </div>
+
+      <div class="group-title">Copy from {preview.name}</div>
+      <div class="parts">
+        <template for:each={parts} for:item="p">
+          <div key={p.key} class="part">
+            <lightning-input
+              type="checkbox"
+              label={p.label}
+              data-field={p.key}
+              checked={p.checked}
+              onchange={handleToggle}
+            ></lightning-input>
+            <span class="part-count">{p.count}</span>
+          </div>
+        </template>
+      </div>
+      <template lwc:if={showStartDate}>
+        <div class="group-title">Timetable</div>
+        <lightning-input
+          type="date"
+          label="Classes start on"
+          data-field="classStartDate"
+          value={form.classStartDate}
+          onchange={handleField}
+          field-level-help="The template's timetable is moved so its first class starts on this date."
+          required
+        ></lightning-input>
+      </template>
+    </template>
+
+    <template lwc:if={result}>
+      <div class="success" role="status">
+        <lightning-icon
+          icon-name="utility:success"
+          size="small"
+        ></lightning-icon>
+        {result.branchName} is ready.
+      </div>
+      <div class="summary">
+        <template for:each={summary} for:item="s">
+          <div key={s.key} class="stat">
+            <span class="stat-value">{s.value}</span>
+            <span class="stat-label">{s.label}</span>
+          </div>
+        </template>
+      </div>
+      <template lwc:if={hasNotes}>
+        <div class="group-title">Next steps</div>
+        <ul class="notes">
+          <template for:each={notes} for:item="n">
+            <li key={n.key}>{n.text}</li>
+          </template>
+        </ul>
+      </template>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <template lwc:if={result}>
+      <lightning-button
+        variant="brand"
+        label="Open new branch"
+        onclick={handleDone}
+      ></lightning-button>
+    </template>
+    <template lwc:else>
+      <lightning-button
+        label="Cancel"
+        onclick={handleCancel}
+      ></lightning-button>
+      <lightning-button
+        class="slds-m-left_x-small"
+        variant="brand"
+        label="Open branch"
+        onclick={handleSubmit}
+        disabled={cannotSubmit}
+      ></lightning-button>
+    </template>
+  </lightning-modal-footer>
+</template>

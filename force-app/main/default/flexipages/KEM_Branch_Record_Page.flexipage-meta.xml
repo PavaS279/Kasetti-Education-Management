@@ -3,31 +3,11 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
-                <componentName>kemInsights</componentName>
-                <identifier>c_kemInsights</identifier>
+                <componentName>force:highlightsPanel</componentName>
+                <identifier>force_highlightsPanel</identifier>
             </componentInstance>
         </itemInstances>
-        <name>top</name>
-        <type>Region</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentName>kemCoverDesk</componentName>
-                <identifier>c_kemCoverDesk</identifier>
-            </componentInstance>
-        </itemInstances>
-        <name>bottomLeft</name>
-        <type>Region</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentName>kemOpsConsole</componentName>
-                <identifier>c_kemOpsConsole</identifier>
-            </componentInstance>
-        </itemInstances>
-        <name>bottomRight</name>
+        <name>header</name>
         <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
@@ -37,12 +17,29 @@
                 <identifier>c_kemBranches</identifier>
             </componentInstance>
         </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>force:detailPanel</componentName>
+                <identifier>force_detailPanel</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>main</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>force:relatedListContainer</componentName>
+                <identifier>force_relatedListContainer</identifier>
+            </componentInstance>
+        </itemInstances>
         <name>sidebar</name>
         <type>Region</type>
     </flexiPageRegions>
-    <masterLabel>KEM Home Page</masterLabel>
+    <masterLabel>KEM Branch Record Page</masterLabel>
+    <sobjectType>Branch__c</sobjectType>
     <template>
-        <name>home:desktopTemplate</name>
+        <name>flexipage:recordHomeTemplateDesktop</name>
     </template>
-    <type>HomePage</type>
+    <type>RecordPage</type>
 </FlexiPage>
