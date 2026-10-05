@@ -7,6 +7,18 @@
             <div class="kem-hero__title">{greetingText}</div>
             <div class="kem-hero__subtitle">{subtitle}</div>
           </div>
+          <button
+            type="button"
+            class="inbox-button"
+            aria-expanded={showInbox}
+            onclick={handleInbox}
+          >
+            <lightning-icon
+              icon-name="utility:email"
+              size="x-small"
+            ></lightning-icon>
+            <span>{inboxLabel}</span>
+          </button>
           <template lwc:if={showSwitcher}>
             <div class="chips" role="group" aria-label="Choose a learner">
               <template for:each={learnerChips} for:item="l">
@@ -26,6 +38,34 @@
           </template>
         </div>
       </section>
+
+      <template lwc:if={showInbox}>
+        <section class="kem-card panel inbox kem-fade-in" aria-label="Messages">
+          <div class="kem-section-title">Messages</div>
+          <ul>
+            <template for:each={messages} for:item="m">
+              <li key={m.id} class={m.className}>
+                <button
+                  type="button"
+                  class="message-head"
+                  data-id={m.id}
+                  aria-expanded={m.expanded}
+                  onclick={handleOpenMessage}
+                >
+                  <span class="strong">{m.subject}</span>
+                  <span class="kem-muted small">{m.when}</span>
+                </button>
+                <template lwc:if={m.open}>
+                  <div class="message-body">{m.body}</div>
+                </template>
+              </li>
+            </template>
+          </ul>
+          <template lwc:if={noMessages}>
+            <div class="kem-empty">No messages yet.</div>
+          </template>
+        </section>
+      </template>
 
       <template lwc:if={hasLearners}>
         <template lwc:if={card}>
@@ -83,6 +123,22 @@
 
           <section class="kem-card panel kem-fade-in" role="tabpanel">
             <template lwc:if={showTimetable}>
+              <template lwc:if={hasWaitlist}>
+                <div class="waitlist">
+                  <template for:each={waitlist} for:item="w">
+                    <div key={w.id} class={w.className}>
+                      <lightning-icon
+                        icon-name="utility:clock"
+                        size="x-small"
+                      ></lightning-icon>
+                      <div>
+                        <div class="strong">{w.className}</div>
+                        <div class="small">{w.text}</div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </template>
               <template for:each={days} for:item="d">
                 <div key={d.key} class="day">
                   <div class="day-label">{d.label}</div>
@@ -119,6 +175,30 @@
             </template>
 
             <template lwc:if={showResults}>
+              <template lwc:if={hasGrades}>
+                <div class="grades">
+                  <template for:each={grades} for:item="g">
+                    <div key={g.enrolmentId} class="course">
+                      <span class={g.gradeClass}>{g.gradeLabel}</span>
+                      <div class="course-main">
+                        <div class="strong">{g.className}</div>
+                        <div class="kem-muted small">
+                          Course grade {g.scoreLabel} · {g.statusLabel}
+                        </div>
+                      </div>
+                      <template lwc:if={g.reportCardVersionId}>
+                        <lightning-button
+                          variant="base"
+                          label="Report card"
+                          icon-name="utility:download"
+                          data-id={g.reportCardVersionId}
+                          onclick={handleDownload}
+                        ></lightning-button>
+                      </template>
+                    </div>
+                  </template>
+                </div>
+              </template>
               <template for:each={results} for:item="r">
                 <div key={r.id} class="result">
                   <span class={r.gradeClass}>{r.gradeLabel}</span>
@@ -161,8 +241,24 @@
                   <div class="invoice-main">
                     <div class="strong">{i.invoiceNumber}</div>
                     <div class="kem-muted small">
-                      {i.className} · {i.dueLabel}
+                      {i.className}{i.period} · {i.dueLabel}
                     </div>
+                    <template lwc:if={i.hasPlan}>
+                      <ol class="plan" aria-label="Instalments">
+                        <template for:each={i.plan} for:item="p">
+                          <li key={p.key} class={p.className}>
+                            <span class="small">{p.dueLabel}</span>
+                            <lightning-formatted-number
+                              class="strong small"
+                              value={p.amount}
+                              format-style="currency"
+                              currency-code={currencyCode}
+                            ></lightning-formatted-number>
+                            <span class="small">{p.statusLabel}</span>
+                          </li>
+                        </template>
+                      </ol>
+                    </template>
                   </div>
                   <div class="invoice-side">
                     <lightning-formatted-number
@@ -177,6 +273,48 @@
               </template>
               <template lwc:if={noInvoices}>
                 <div class="kem-empty">No invoices.</div>
+              </template>
+              <template lwc:if={hasCredit}>
+                <div class="credit">
+                  You have
+                  <lightning-formatted-number
+                    class="strong"
+                    value={creditBalance}
+                    format-style="currency"
+                    currency-code={currencyCode}
+                  ></lightning-formatted-number>
+                  in credit. It is used on your next invoice automatically.
+                </div>
+              </template>
+            </template>
+
+            <template lwc:if={showDocuments}>
+              <ul>
+                <template for:each={documents} for:item="d">
+                  <li key={d.versionId} class="doc">
+                    <lightning-icon
+                      icon-name={d.icon}
+                      size="small"
+                    ></lightning-icon>
+                    <div class="doc-main">
+                      <div class="strong">{d.title}</div>
+                      <div class="kem-muted small">
+                        {d.kind} · {d.dateLabel}
+                      </div>
+                    </div>
+                    <lightning-button
+                      label="Download"
+                      icon-name="utility:download"
+                      title={d.downloadLabel}
+                      data-id={d.versionId}
+                      onclick={handleDownload}
+                      disabled={d.busy}
+                    ></lightning-button>
+                  </li>
+                </template>
+              </ul>
+              <template lwc:if={noDocuments}>
+                <div class="kem-empty">No documents yet.</div>
               </template>
             </template>
           </section>

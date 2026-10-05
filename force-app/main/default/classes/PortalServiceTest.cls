@@ -233,6 +233,94 @@ private class PortalServiceTest {
   }
 
   @IsTest
+  static void richerPortalShowsMessagesDocumentsAndPlans() {
+    System.runAs(TestDataFactory.admin()) {
+      Family fam = family();
+      Test.startTest();
+      BillingService.PlanRequest plan = new BillingService.PlanRequest();
+      plan.invoiceId = fam.invoiceId;
+      plan.count = 2;
+      plan.firstDueDate = Date.today().addDays(7);
+      BillingService.createPlan(plan);
+      CourseOfferingParticipant enrolment = [
+        SELECT Id, CourseOfferingId
+        FROM CourseOfferingParticipant
+        WHERE ParticipantContactId = :fam.learnerContactId
+      ];
+      Database.insert(
+        new List<SObject>{
+          new Waitlist_Entry__c(
+            Course_Offering__c = enrolment.CourseOfferingId,
+            Learner_Contact__c = fam.learnerContactId,
+            Status__c = 'Waiting',
+            Priority__c = 0,
+            Requested_On__c = System.now()
+          ),
+          new Credit_Note__c(
+            Learner__c = fam.learnerContactId,
+            Bill_To__c = fam.guardianContactId,
+            Amount__c = 100,
+            Amount_Applied__c = 0,
+            Amount_Refunded__c = 0,
+            Status__c = 'Open'
+          )
+        },
+        AccessLevel.SYSTEM_MODE
+      );
+      DocumentService.generate(fam.invoiceId, DocumentService.INVOICE);
+
+      PortalService.viewerOverride = fam.guardianContactId;
+      PortalService.Home home = PortalService.home();
+      Assert.isFalse(home.messages.isEmpty(), 'Invoice notice in the inbox');
+      Assert.areEqual(home.messages.size(), home.unreadMessages, 'All unread');
+      PortalController.markMessageRead(home.messages[0].id);
+      Assert.areEqual(
+        home.unreadMessages - 1,
+        PortalService.home().unreadMessages,
+        'Marked as read'
+      );
+
+      PortalService.LearnerDetail detail = PortalService.learner(
+        fam.learnerContactId
+      );
+      Assert.areEqual(
+        2,
+        detail.invoices[0].instalments.size(),
+        'Instalment plan'
+      );
+      Assert.areEqual(1, detail.waitlist.size(), 'Waitlist entry');
+      Assert.areEqual(1, detail.waitlist[0].position, 'First in line');
+      Assert.areEqual(100, detail.creditBalance, 'Open credit');
+      Assert.areEqual(1, detail.grades.size(), 'Course grade');
+      Assert.areEqual('A+', detail.grades[0].grade, '90% course grade');
+      Assert.areEqual('Provisional', detail.grades[0].status, 'Provisional');
+      Assert.areEqual(1, detail.documents.size(), 'Invoice PDF listed');
+      Assert.areEqual('Invoice', detail.documents[0].kind, 'Invoice');
+
+      PortalService.DocumentFile file = PortalController.downloadDocument(
+        detail.documents[0].versionId
+      );
+      Assert.isTrue(file.fileName.endsWith('.pdf'), file.fileName);
+      Assert.isTrue(String.isNotBlank(file.base64), 'File content');
+
+      PortalService.viewerOverride = fam.strangerContactId;
+      try {
+        PortalService.downloadDocument(detail.documents[0].versionId);
+        Assert.fail('Strangers cannot download');
+      } catch (AppException e) {
+        Assert.isTrue(e.getMessage().contains('not available'), e.getMessage());
+      }
+      try {
+        PortalService.markMessageRead(home.messages[0].id);
+        Assert.fail('Only the recipient');
+      } catch (AppException e) {
+        Assert.isTrue(e.getMessage().contains('not found'), e.getMessage());
+      }
+      Test.stopTest();
+    }
+  }
+
+  @IsTest
   static void internalUsersAreTurnedAway() {
     System.runAs(TestDataFactory.admin()) {
       try {

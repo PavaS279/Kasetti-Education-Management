@@ -47,6 +47,10 @@ public without sharing class PortalService {
     public List<LearnerCard> learners = new List<LearnerCard>();
     @AuraEnabled
     public Decimal totalDue = 0;
+    @AuraEnabled
+    public List<MessageItem> messages = new List<MessageItem>();
+    @AuraEnabled
+    public Integer unreadMessages = 0;
   }
 
   public class ClassItem {
@@ -121,7 +125,89 @@ public without sharing class PortalService {
     public String feedback;
   }
 
+  public class InstalmentItem {
+    @AuraEnabled
+    public Decimal sequence;
+    @AuraEnabled
+    public Date dueDate;
+    @AuraEnabled
+    public Decimal amount;
+    @AuraEnabled
+    public Decimal paid;
+    @AuraEnabled
+    public String status;
+    @AuraEnabled
+    public Boolean overdue;
+  }
+
+  public class GradeItem {
+    @AuraEnabled
+    public Id enrolmentId;
+    @AuraEnabled
+    public String className;
+    @AuraEnabled
+    public String course;
+    @AuraEnabled
+    public Decimal score;
+    @AuraEnabled
+    public String grade;
+    @AuraEnabled
+    public String status;
+    @AuraEnabled
+    public Id reportCardVersionId;
+  }
+
+  public class DocumentItem {
+    @AuraEnabled
+    public Id versionId;
+    @AuraEnabled
+    public String title;
+    @AuraEnabled
+    public String kind;
+    @AuraEnabled
+    public Datetime createdDate;
+  }
+
+  public class WaitlistItem {
+    @AuraEnabled
+    public Id id;
+    @AuraEnabled
+    public String className;
+    @AuraEnabled
+    public String status;
+    @AuraEnabled
+    public Integer position;
+    @AuraEnabled
+    public Datetime offerExpires;
+  }
+
+  public class MessageItem {
+    @AuraEnabled
+    public Id id;
+    @AuraEnabled
+    public String subject;
+    @AuraEnabled
+    public String body;
+    @AuraEnabled
+    public Datetime sentOn;
+    @AuraEnabled
+    public Boolean read;
+    @AuraEnabled
+    public String learnerName;
+  }
+
+  public class DocumentFile {
+    @AuraEnabled
+    public String fileName;
+    @AuraEnabled
+    public String base64;
+  }
+
   public class InvoiceItem {
+    @AuraEnabled
+    public List<InstalmentItem> instalments = new List<InstalmentItem>();
+    @AuraEnabled
+    public String billingPeriod;
     @AuraEnabled
     public Id id;
     @AuraEnabled
@@ -157,6 +243,14 @@ public without sharing class PortalService {
     public List<ResultItem> results = new List<ResultItem>();
     @AuraEnabled
     public List<InvoiceItem> invoices = new List<InvoiceItem>();
+    @AuraEnabled
+    public List<GradeItem> grades = new List<GradeItem>();
+    @AuraEnabled
+    public List<DocumentItem> documents = new List<DocumentItem>();
+    @AuraEnabled
+    public List<WaitlistItem> waitlist = new List<WaitlistItem>();
+    @AuraEnabled
+    public Decimal creditBalance = 0;
   }
 
   // ------------------------------------------------------------------ API
@@ -188,7 +282,90 @@ public without sharing class PortalService {
       result.learners.add(card);
       result.totalDue += card.balanceDue;
     }
+    for (Message__c m : [
+      SELECT
+        Id,
+        Subject__c,
+        Body__c,
+        Sent_On__c,
+        CreatedDate,
+        Read_On__c,
+        Learner__r.Name
+      FROM Message__c
+      WHERE Recipient__c = :viewerId AND Channel__c = :MessageService.PORTAL
+      WITH SYSTEM_MODE
+      ORDER BY CreatedDate DESC
+      LIMIT 30
+    ]) {
+      MessageItem item = new MessageItem();
+      item.id = m.Id;
+      item.subject = m.Subject__c;
+      item.body = m.Body__c;
+      item.sentOn = m.Sent_On__c == null ? m.CreatedDate : m.Sent_On__c;
+      item.read = m.Read_On__c != null;
+      item.learnerName = m.Learner__r?.Name;
+      if (!item.read) {
+        result.unreadMessages++;
+      }
+      result.messages.add(item);
+    }
     return result;
+  }
+
+  /** Marks one of the viewer's own portal messages as read. */
+  public static void markMessageRead(Id messageId) {
+    markMessageReadFor(viewerContactId(), messageId);
+  }
+
+  public static void markMessageReadFor(Id viewerId, Id messageId) {
+    List<Message__c> rows = [
+      SELECT Id, Read_On__c
+      FROM Message__c
+      WHERE Id = :messageId AND Recipient__c = :viewerId
+      WITH SYSTEM_MODE
+    ];
+    if (rows.isEmpty()) {
+      throw new AppException('Message not found.');
+    }
+    if (rows[0].Read_On__c == null) {
+      new Writer()
+        .updateRecords(
+          new List<SObject>{
+            new Message__c(Id = messageId, Read_On__c = System.now())
+          }
+        );
+    }
+  }
+
+  /**
+   * A document (invoice, receipt or report card) of a learner the viewer may
+   * see, as base64. Portal users cannot open files on staff records directly.
+   */
+  public static DocumentFile downloadDocument(Id versionId) {
+    return downloadDocumentFor(viewerContactId(), versionId);
+  }
+
+  public static DocumentFile downloadDocumentFor(Id viewerId, Id versionId) {
+    Set<Id> allowed = new Set<Id>();
+    for (DocumentItem item : documentsFor(authorisedLearners(viewerId))) {
+      allowed.add(item.versionId);
+    }
+    if (!allowed.contains(versionId)) {
+      throw new AppException('Document not found or not available to you.');
+    }
+    ContentVersion version = [
+      SELECT Title, FileExtension, VersionData
+      FROM ContentVersion
+      WHERE Id = :versionId
+      WITH SYSTEM_MODE
+    ];
+    DocumentFile file = new DocumentFile();
+    file.fileName =
+      version.Title.replaceAll('[^A-Za-z0-9 _-]', '').trim() +
+      '.' +
+      (String.isBlank(version.FileExtension) ? 'pdf' : version.FileExtension);
+    file.base64 = EncodingUtil.base64Encode(version.VersionData);
+    return file;
   }
 
   /** Learner detail as seen by the given contact, after the authorisation check. */
@@ -312,10 +489,163 @@ public without sharing class PortalService {
       item.balance = i.Balance_Due__c;
       item.status = i.Status__c;
       item.overdue = i.Overdue__c;
+      item.billingPeriod = i.Billing_Period__c;
+      for (Instalment__c inst : i.Instalments__r) {
+        InstalmentItem plan = new InstalmentItem();
+        plan.sequence = inst.Sequence__c;
+        plan.dueDate = inst.Due_Date__c;
+        plan.amount = inst.Amount__c;
+        plan.paid = inst.Amount_Paid__c;
+        plan.status = inst.Status__c;
+        plan.overdue = inst.Overdue__c;
+        item.instalments.add(plan);
+      }
       detail.invoices.add(item);
+    }
+    detail.documents.addAll(documentsFor(new Set<Id>{ learnerContactId }));
+    for (CourseOfferingParticipant enrolment : [
+      SELECT
+        Id,
+        CourseOffering.Name,
+        CourseOffering.LearningCourse.Name,
+        Course_Score__c,
+        Course_Grade__c,
+        Grade_Status__c
+      FROM CourseOfferingParticipant
+      WHERE ParticipantContactId = :learnerContactId AND Course_Grade__c != NULL
+      WITH SYSTEM_MODE
+      ORDER BY CreatedDate DESC
+    ]) {
+      GradeItem grade = new GradeItem();
+      grade.enrolmentId = enrolment.Id;
+      grade.className = enrolment.CourseOffering.Name;
+      grade.course = enrolment.CourseOffering.LearningCourse?.Name;
+      grade.score = enrolment.Course_Score__c;
+      grade.grade = enrolment.Course_Grade__c;
+      grade.status = enrolment.Grade_Status__c;
+      grade.reportCardVersionId = reportCardOf.get(enrolment.Id);
+      detail.grades.add(grade);
+    }
+    for (Waitlist_Entry__c entry : [
+      SELECT
+        Id,
+        Course_Offering__c,
+        Course_Offering__r.Name,
+        Status__c,
+        Priority__c,
+        Requested_On__c,
+        Offer_Expires__c
+      FROM Waitlist_Entry__c
+      WHERE
+        Learner_Contact__c = :learnerContactId
+        AND Status__c IN ('Waiting', 'Offered')
+      WITH SYSTEM_MODE
+    ]) {
+      WaitlistItem item = new WaitlistItem();
+      item.id = entry.Id;
+      item.className = entry.Course_Offering__r.Name;
+      item.status = entry.Status__c;
+      item.offerExpires = entry.Offer_Expires__c;
+      if (entry.Status__c == 'Waiting') {
+        item.position =
+          [
+            SELECT COUNT()
+            FROM Waitlist_Entry__c
+            WHERE
+              Course_Offering__c = :entry.Course_Offering__c
+              AND Status__c = 'Waiting'
+              AND (Priority__c > :entry.Priority__c
+              OR (Priority__c = :entry.Priority__c
+              AND Requested_On__c < :entry.Requested_On__c))
+            WITH SYSTEM_MODE
+          ] + 1;
+      }
+      detail.waitlist.add(item);
+    }
+    for (AggregateResult row : [
+      SELECT SUM(Balance__c) total
+      FROM Credit_Note__c
+      WHERE
+        Learner__c = :learnerContactId
+        AND Status__c IN :CreditService.USABLE
+      WITH SYSTEM_MODE
+    ]) {
+      detail.creditBalance = row.get('total') == null
+        ? 0
+        : (Decimal) row.get('total');
     }
     return detail;
   }
+
+  /** Current KEM documents (not superseded) of the learners' invoices, receipts and enrolments. */
+  private static List<DocumentItem> documentsFor(Set<Id> learnerIds) {
+    List<DocumentItem> result = new List<DocumentItem>();
+    reportCardOf = new Map<Id, Id>();
+    if (learnerIds.isEmpty()) {
+      return result;
+    }
+    Set<Id> recordIds = new Set<Id>();
+    for (Student_Invoice__c i : invoices(learnerIds)) {
+      recordIds.add(i.Id);
+    }
+    for (Student_Payment__c p : [
+      SELECT Id
+      FROM Student_Payment__c
+      WHERE
+        Learner__c IN :learnerIds
+        AND Status__c = 'Confirmed'
+        AND Method__c != :CreditService.CREDIT_METHOD
+      WITH SYSTEM_MODE
+      LIMIT 200
+    ]) {
+      recordIds.add(p.Id);
+    }
+    for (CourseOfferingParticipant e : [
+      SELECT Id
+      FROM CourseOfferingParticipant
+      WHERE ParticipantContactId IN :learnerIds
+      WITH SYSTEM_MODE
+    ]) {
+      recordIds.add(e.Id);
+    }
+    if (recordIds.isEmpty()) {
+      return result;
+    }
+    for (ContentDocumentLink link : [
+      SELECT
+        LinkedEntityId,
+        ContentDocument.Title,
+        ContentDocument.CreatedDate,
+        ContentDocument.LatestPublishedVersionId,
+        ContentDocument.LatestPublishedVersion.Description
+      FROM ContentDocumentLink
+      WHERE LinkedEntityId IN :recordIds
+      WITH SYSTEM_MODE
+      ORDER BY ContentDocument.CreatedDate DESC
+    ]) {
+      String description = link.ContentDocument.LatestPublishedVersion.Description;
+      if (
+        description == null ||
+        !description.startsWith('KEM ') ||
+        description.contains('(superseded)')
+      ) {
+        continue;
+      }
+      DocumentItem item = new DocumentItem();
+      item.versionId = link.ContentDocument.LatestPublishedVersionId;
+      item.title = link.ContentDocument.Title;
+      item.kind = description.removeStart('KEM ');
+      item.createdDate = link.ContentDocument.CreatedDate;
+      result.add(item);
+      if (item.kind == DocumentService.REPORT_CARD) {
+        reportCardOf.put(link.LinkedEntityId, item.versionId);
+      }
+    }
+    return result;
+  }
+
+  /** Report card version per enrolment, filled by documentsFor(). */
+  private static Map<Id, Id> reportCardOf = new Map<Id, Id>();
 
   /**
    * Learners the contact may see: themselves when they are a learner, plus
@@ -515,7 +845,19 @@ public without sharing class PortalService {
         Balance_Due__c,
         Status__c,
         Overdue__c,
-        Enrolment__r.CourseOffering.Name
+        Billing_Period__c,
+        Enrolment__r.CourseOffering.Name,
+        (
+          SELECT
+            Sequence__c,
+            Due_Date__c,
+            Amount__c,
+            Amount_Paid__c,
+            Status__c,
+            Overdue__c
+          FROM Instalments__r
+          ORDER BY Sequence__c
+        )
       FROM Student_Invoice__c
       WHERE
         Learner__c IN :learnerIds
@@ -524,5 +866,14 @@ public without sharing class PortalService {
       ORDER BY Issue_Date__c DESC
       LIMIT 100
     ];
+  }
+
+  /** Read receipts on the viewer's own messages (checked above). */
+  private without sharing class Writer {
+    void updateRecords(List<SObject> records) {
+      if (!records.isEmpty()) {
+        Database.update(records, AccessLevel.SYSTEM_MODE);
+      }
+    }
   }
 }

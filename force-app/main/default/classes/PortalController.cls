@@ -17,4 +17,22 @@ public with sharing class PortalController {
       throw AppException.toAura(e);
     }
   }
+
+  @AuraEnabled
+  public static void markMessageRead(Id messageId) {
+    try {
+      PortalService.markMessageRead(messageId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static PortalService.DocumentFile downloadDocument(Id versionId) {
+    try {
+      return PortalService.downloadDocument(versionId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
 }

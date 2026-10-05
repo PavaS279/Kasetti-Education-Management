@@ -351,3 +351,157 @@
     font-size: 0.8125rem;
   }
 }
+
+.inbox-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  --slds-c-icon-color-foreground-default: #ffffff;
+  transition: background 0.15s var(--kem-ease);
+}
+
+.inbox-button:hover,
+.inbox-button:focus-visible {
+  background: rgba(255, 255, 255, 0.24);
+  outline: none;
+}
+
+.inbox {
+  margin-bottom: 1rem;
+}
+
+.message {
+  border-bottom: 1px solid var(--kem-line);
+}
+
+.message:last-child {
+  border-bottom: none;
+}
+
+.message_unread .message-head .strong::before {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.4rem;
+  border-radius: 50%;
+  background: var(--kem-blue);
+  vertical-align: middle;
+}
+
+.message-head {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.message-head:focus-visible {
+  outline: 2px solid var(--kem-blue);
+}
+
+.message-body {
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-canvas);
+  white-space: pre-wrap;
+  font-size: 0.875rem;
+}
+
+.waitlist,
+.grades {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.wait {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  padding: 0.6rem 0.75rem;
+  border-left: 3px solid var(--kem-blue);
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-sky);
+}
+
+.wait_offer {
+  border-left-color: var(--kem-green);
+  background: #eef8f1;
+}
+
+.course {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+}
+
+.course-main,
+.doc-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.plan {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-surface);
+}
+
+.step_paid {
+  border-color: var(--kem-green);
+  background: #eef8f1;
+}
+
+.step_overdue {
+  border-color: var(--kem-red);
+  background: #fbe3e2;
+}
+
+.credit {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-left: 3px solid var(--kem-teal);
+  border-radius: 4px;
+  background: #e8f7f4;
+  font-size: 0.875rem;
+}
+
+.doc {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--kem-line);
+}
+
+.doc:last-child {
+  border-bottom: none;
+}

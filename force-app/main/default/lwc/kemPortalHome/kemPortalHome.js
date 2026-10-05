@@ -2,14 +2,24 @@ import { LightningElement } from "lwc";
 import CURRENCY from "@salesforce/i18n/currency";
 import getHome from "@salesforce/apex/PortalController.getHome";
 import getLearner from "@salesforce/apex/PortalController.getLearner";
+import markMessageRead from "@salesforce/apex/PortalController.markMessageRead";
+import downloadDocument from "@salesforce/apex/PortalController.downloadDocument";
 import { reduceErrors, initials, toneFor } from "c/kemUtils";
 
 const VIEWS = [
   { value: "timetable", label: "Timetable", icon: "utility:event" },
   { value: "results", label: "Results", icon: "utility:trophy" },
   { value: "attendance", label: "Attendance", icon: "utility:check" },
-  { value: "fees", label: "Fees", icon: "utility:moneybag" }
+  { value: "fees", label: "Fees", icon: "utility:moneybag" },
+  { value: "documents", label: "Documents", icon: "utility:file" }
 ];
+
+const DOC_ICON = {
+  Invoice: "doctype:pdf",
+  Receipt: "doctype:pdf",
+  "Report Card": "doctype:pdf",
+  "Offer Letter": "doctype:pdf"
+};
 
 const ATTENDANCE_CLASS = {
   Present: "dot dot_present",
@@ -79,6 +89,9 @@ export default class KemPortalHome extends LightningElement {
   errorMessage;
   detailError;
   isLoadingDetail = false;
+  showInbox = false;
+  openMessageId;
+  downloadingId;
 
   connectedCallback() {
     this.load();
@@ -199,6 +212,79 @@ export default class KemPortalHome extends LightningElement {
   get showFees() {
     return this.view === "fees";
   }
+  get showDocuments() {
+    return this.view === "documents";
+  }
+
+  // ------------------------------------------------------------ inbox
+  get unread() {
+    return this.home?.unreadMessages || 0;
+  }
+  get inboxLabel() {
+    return this.unread ? `Messages (${this.unread} new)` : "Messages";
+  }
+  get messages() {
+    return (this.home?.messages || []).map((m) => ({
+      ...m,
+      when: `${formatDay(m.sentOn)} · ${formatTime(m.sentOn)}`,
+      className: `message${m.read ? "" : " message_unread"}`,
+      open: m.id === this.openMessageId,
+      expanded: m.id === this.openMessageId ? "true" : "false"
+    }));
+  }
+  get noMessages() {
+    return this.messages.length === 0;
+  }
+
+  // -------------------------------------------------- grades, documents
+  get grades() {
+    return (this.detail?.grades || []).map((g) => {
+      const grade = g.grade || "—";
+      return {
+        ...g,
+        gradeLabel: grade,
+        gradeClass: `grade grade_${grade.replace("+", "plus").toLowerCase()}`,
+        scoreLabel: g.score == null ? "" : `${Number(g.score).toFixed(1)}%`,
+        isFinal: g.status === "Final",
+        statusLabel: g.status === "Final" ? "Final" : "Provisional — may change"
+      };
+    });
+  }
+  get hasGrades() {
+    return this.grades.length > 0;
+  }
+  get documents() {
+    return (this.detail?.documents || []).map((d) => ({
+      ...d,
+      icon: DOC_ICON[d.kind] || "doctype:attachment",
+      dateLabel: formatDate(d.createdDate),
+      busy: d.versionId === this.downloadingId,
+      downloadLabel: `Download ${d.title}`
+    }));
+  }
+  get noDocuments() {
+    return this.documents.length === 0;
+  }
+  get waitlist() {
+    return (this.detail?.waitlist || []).map((w) => ({
+      ...w,
+      offered: w.status === "Offered",
+      text:
+        w.status === "Offered"
+          ? `A seat is held for you until ${formatDay(w.offerExpires)} ${formatTime(w.offerExpires)}. Please contact us to confirm.`
+          : `Number ${w.position} on the waiting list.`,
+      className: `wait${w.status === "Offered" ? " wait_offer" : ""}`
+    }));
+  }
+  get hasWaitlist() {
+    return this.waitlist.length > 0;
+  }
+  get creditBalance() {
+    return this.detail?.creditBalance || 0;
+  }
+  get hasCredit() {
+    return this.creditBalance > 0;
+  }
 
   get days() {
     const groups = [];
@@ -262,7 +348,16 @@ export default class KemPortalHome extends LightningElement {
       ...i,
       statusClass: INVOICE_CLASS[i.status] || "kem-badge",
       dueLabel: `Due ${formatDate(i.dueDate)}`,
-      className: `invoice${i.overdue ? " invoice_overdue" : ""}`
+      className: `invoice${i.overdue ? " invoice_overdue" : ""}`,
+      period: i.billingPeriod ? ` · ${i.billingPeriod}` : "",
+      hasPlan: (i.instalments || []).length > 0,
+      plan: (i.instalments || []).map((p) => ({
+        ...p,
+        key: `${i.id}-${p.sequence}`,
+        dueLabel: formatDate(p.dueDate),
+        className: `step${p.status === "Paid" ? " step_paid" : ""}${p.overdue ? " step_overdue" : ""}`,
+        statusLabel: p.overdue ? "Overdue" : p.status
+      }))
     }));
   }
   get noInvoices() {
@@ -274,5 +369,45 @@ export default class KemPortalHome extends LightningElement {
   }
   handleView(event) {
     this.view = event.currentTarget.dataset.value;
+  }
+
+  handleInbox() {
+    this.showInbox = !this.showInbox;
+  }
+
+  async handleOpenMessage(event) {
+    const id = event.currentTarget.dataset.id;
+    this.openMessageId = this.openMessageId === id ? undefined : id;
+    const message = this.home.messages.find((m) => m.id === id);
+    if (message && !message.read) {
+      try {
+        await markMessageRead({ messageId: id });
+        this.home = {
+          ...this.home,
+          unreadMessages: Math.max(0, this.home.unreadMessages - 1),
+          messages: this.home.messages.map((m) =>
+            m.id === id ? { ...m, read: true } : m
+          )
+        };
+      } catch {
+        // Reading still works; the unread marker stays until the next visit.
+      }
+    }
+  }
+
+  async handleDownload(event) {
+    const versionId = event.currentTarget.dataset.id;
+    this.downloadingId = versionId;
+    try {
+      const file = await downloadDocument({ versionId });
+      const link = document.createElement("a");
+      link.href = `data:application/pdf;base64,${file.base64}`;
+      link.download = file.fileName;
+      link.click();
+    } catch (error) {
+      this.detailError = reduceErrors(error).join(" ");
+    } finally {
+      this.downloadingId = undefined;
+    }
   }
 }
