@@ -45,7 +45,7 @@
     <deploymentStatus>Deployed</deploymentStatus>
     <description
   >One scheduled teaching session of a class, generated from its weekly pattern or added ad hoc.</description>
-    <enableActivities>false</enableActivities>
+    <enableActivities>true</enableActivities>
     <enableBulkApi>true</enableBulkApi>
     <enableFeeds>false</enableFeeds>
     <enableHistory>true</enableHistory>

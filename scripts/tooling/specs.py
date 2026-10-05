@@ -221,7 +221,7 @@ OBJECTS = [
         ],
     },
     {
-        "name": "Class_Session__c", "label": "Class Session", "plural": "Class Sessions", "sharing": "Read", "externalSharing": "Read", "history": True,
+        "name": "Class_Session__c", "label": "Class Session", "plural": "Class Sessions", "sharing": "Read", "externalSharing": "Read", "history": True, "activities": True,
         "description": "One scheduled teaching session of a class, generated from its weekly pattern or added ad hoc.",
         "fields": [
             {"name": "Course_Offering__c", "label": "Class", "type": "Lookup", "ref": "CourseOffering", "relName": "Sessions", "relLabel": "Sessions"},
