@@ -1,6 +1,6 @@
 /**
- * Data for the PDF templates KEM_Offer_Letter, KEM_Invoice_Pdf and
- * KEM_Receipt_Pdf. The record comes from the "id" page parameter and is read in
+ * Data for the PDF templates KEM_Offer_Letter, KEM_Invoice_Pdf,
+ * KEM_Receipt_Pdf and KEM_Report_Card. The record comes from the "id" page parameter and is read in
  * user mode, so a user can only render documents for records they can see.
  */
 public with sharing class KemDocumentController {
@@ -8,6 +8,7 @@ public with sharing class KemDocumentController {
   public Student_Invoice__c invoice { get; private set; }
   public List<Invoice_Line__c> lines { get; private set; }
   public Student_Payment__c payment { get; private set; }
+  public GradingService.ReportCard reportCard { get; private set; }
   public List<Payment_Allocation__c> allocations { get; private set; }
   public Branch__c branch { get; private set; }
   public List<FeeRow> fees { get; private set; }
@@ -41,6 +42,9 @@ public with sharing class KemDocumentController {
       loadInvoice(recordId);
     } else if (type == Student_Payment__c.SObjectType) {
       loadPayment(recordId);
+    } else if (type == CourseOfferingParticipant.SObjectType) {
+      reportCard = GradingService.reportCard(recordId);
+      loadBranch(reportCard.branchId);
     }
   }
 

@@ -1,0 +1,163 @@
+<template>
+  <article class="kem-card panel">
+    <header class="head">
+      <div>
+        <div class="kem-section-title">Course grades</div>
+        <template lwc:if={data}>
+          <div class="kem-muted small">
+            Scale {data.scale} · class average {averageLabel}
+            <template lwc:if={finalisedText}> · {finalisedText}</template>
+          </div>
+        </template>
+      </div>
+      <template lwc:if={data}>
+        <div class="tools">
+          <span class={statusClass}>{statusLabel}</span>
+          <template lwc:if={canFinalise}>
+            <lightning-button
+              variant="brand"
+              label="Finalise &amp; issue report cards"
+              icon-name="utility:lock"
+              onclick={handleFinalise}
+              disabled={isBusy}
+            ></lightning-button>
+          </template>
+          <template lwc:if={canReopen}>
+            <lightning-button
+              label="Reopen"
+              icon-name="utility:unlock"
+              onclick={handleReopen}
+              disabled={isBusy}
+            ></lightning-button>
+          </template>
+        </div>
+      </template>
+    </header>
+
+    <template lwc:if={data}>
+      <template lwc:if={draftWarning}>
+        <div class="warning">{draftWarning}</div>
+      </template>
+      <template lwc:if={hasColumns}>
+        <div class="table-wrap">
+          <table class="grid" aria-label="Course grades">
+            <thead>
+              <tr>
+                <th class="sticky">Learner</th>
+                <template for:each={columns} for:item="c">
+                  <th key={c.assessmentId} class={c.headClass}>
+                    <div class="col-name">{c.name}</div>
+                    <div class="kem-muted tiny">
+                      {c.assessmentType} · {c.dateLabel}
+                    </div>
+                    <template lwc:if={editable}>
+                      <lightning-input
+                        class="weight"
+                        type="number"
+                        label="Weight"
+                        variant="label-hidden"
+                        placeholder="Weight"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={c.weightValue}
+                        data-id={c.assessmentId}
+                        onchange={handleWeight}
+                      ></lightning-input>
+                    </template>
+                    <div class="kem-muted tiny">{c.shareLabel}</div>
+                  </th>
+                </template>
+                <th class="num">Score</th>
+                <th class="num">Grade</th>
+                <th class="num">Attendance</th>
+                <th>Report card comment</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={rows} for:item="r">
+                <tr key={r.enrolmentId}>
+                  <td class="sticky strong">
+                    {r.learnerName}
+                    <template lwc:if={r.hasReportCard}>
+                      <a
+                        href="#"
+                        class="report"
+                        data-id={r.reportCardId}
+                        onclick={handleReportCard}
+                        >Report card</a
+                      >
+                    </template>
+                  </td>
+                  <template for:each={r.cells} for:item="c">
+                    <td key={c.key} class={c.cellClass}>
+                      <span>{c.label}</span>
+                      <template lwc:if={c.grade}>
+                        <span class="kem-muted tiny"> {c.grade}</span>
+                      </template>
+                    </td>
+                  </template>
+                  <td class="num strong">{r.scoreLabel}</td>
+                  <td class="num">
+                    <span class={r.gradeClass}>{r.gradeLabel}</span>
+                  </td>
+                  <td class="num">{r.attendanceLabel}</td>
+                  <td class="comment">
+                    <template lwc:if={editable}>
+                      <lightning-textarea
+                        label="Comment"
+                        variant="label-hidden"
+                        max-length="2000"
+                        value={r.commentValue}
+                        data-id={r.enrolmentId}
+                        onchange={handleComment}
+                      ></lightning-textarea>
+                    </template>
+                    <template lwc:else>
+                      <span class="small">{r.commentValue}</span>
+                    </template>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        <div class="foot">
+          <span class="kem-muted small">{weightNote}</span>
+          <template lwc:if={editable}>
+            <div class="tools">
+              <lightning-button
+                label="Save weights"
+                onclick={handleSaveWeights}
+                disabled={isBusy}
+              ></lightning-button>
+              <lightning-button
+                label="Save comments"
+                onclick={handleSaveComments}
+                disabled={isBusy}
+              ></lightning-button>
+            </div>
+          </template>
+        </div>
+      </template>
+      <template lwc:else>
+        <div class="kem-empty">
+          No assessments yet. Add and publish assessments to see course grades.
+        </div>
+      </template>
+    </template>
+    <template lwc:elseif={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <template lwc:else>
+      <div class="loading">
+        <lightning-spinner
+          alternative-text="Loading grades"
+          size="small"
+        ></lightning-spinner>
+      </div>
+    </template>
+  </article>
+</template>

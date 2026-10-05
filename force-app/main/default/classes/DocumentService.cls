@@ -1,5 +1,5 @@
 /**
- * Generates PDF documents (offer letter, invoice, receipt) from Visualforce
+ * Generates PDF documents (offer letter, invoice, receipt, report card) from Visualforce
  * templates and files them on the record as Salesforce Files.
  *
  * A document is generated once and then reused, so the version that was sent
@@ -11,6 +11,8 @@ public with sharing class DocumentService {
   public static final String OFFER_LETTER = 'Offer Letter';
   public static final String INVOICE = 'Invoice';
   public static final String RECEIPT = 'Receipt';
+  public static final String REPORT_CARD = 'Report Card';
+  private static final String SUPERSEDED = ' (superseded)';
   private static final String MARKER = 'KEM ';
 
   @TestVisible
@@ -101,7 +103,52 @@ public with sharing class DocumentService {
     if (type == Student_Payment__c.SObjectType) {
       return RECEIPT;
     }
+    if (type == CourseOfferingParticipant.SObjectType) {
+      return REPORT_CARD;
+    }
     throw new AppException('Documents are not available for this record.');
+  }
+
+  /**
+   * Marks issued documents of this kind as superseded (they stay on the record
+   * for history) so that the next generation issues a new version.
+   */
+  public static void supersede(Set<Id> recordIds, String kind, String reason) {
+    recordIds.remove(null);
+    if (recordIds.isEmpty()) {
+      return;
+    }
+    Set<Id> documentIds = new Set<Id>();
+    for (ContentDocumentLink link : [
+      SELECT
+        ContentDocumentId,
+        ContentDocument.LatestPublishedVersion.Description
+      FROM ContentDocumentLink
+      WHERE LinkedEntityId IN :recordIds
+      WITH SYSTEM_MODE
+    ]) {
+      if (
+        link.ContentDocument.LatestPublishedVersion.Description == MARKER + kind
+      ) {
+        documentIds.add(link.ContentDocumentId);
+      }
+    }
+    List<ContentVersion> versions = new List<ContentVersion>();
+    for (ContentVersion version : [
+      SELECT Id
+      FROM ContentVersion
+      WHERE ContentDocumentId IN :documentIds AND IsLatest = TRUE
+      WITH SYSTEM_MODE
+    ]) {
+      version.Description = (MARKER +
+        kind +
+        SUPERSEDED +
+        ': ' +
+        reason)
+        .left(1000);
+      versions.add(version);
+    }
+    new Writer().updateVersions(versions);
   }
 
   // --------------------------------------------------------------- helpers
@@ -131,6 +178,9 @@ public with sharing class DocumentService {
     }
     if (kind == RECEIPT) {
       return Page.KEM_Receipt_Pdf;
+    }
+    if (kind == REPORT_CARD) {
+      return Page.KEM_Report_Card;
     }
     throw new AppException('Unknown document type: ' + kind);
   }
@@ -169,6 +219,23 @@ public with sharing class DocumentService {
         throw new AppException('Only issued invoices have a PDF.');
       }
       return 'Invoice ' + invoice.Name;
+    }
+    if (kind == REPORT_CARD) {
+      CourseOfferingParticipant enrolment = [
+        SELECT Grade_Status__c, ParticipantContact.Name, CourseOffering.Name
+        FROM CourseOfferingParticipant
+        WHERE Id = :recordId
+        WITH SYSTEM_MODE
+      ];
+      if (enrolment.Grade_Status__c != 'Final') {
+        throw new AppException(
+          'A report card is issued once the class grades are final.'
+        );
+      }
+      return 'Report Card ' +
+        enrolment.ParticipantContact.Name +
+        ' - ' +
+        enrolment.CourseOffering.Name;
     }
     Student_Payment__c payment = [
       SELECT Receipt_Number__c, Status__c
@@ -237,6 +304,12 @@ public with sharing class DocumentService {
 
   /** Files are written after the caller's read access to the record was checked. */
   private without sharing class Writer {
+    void updateVersions(List<ContentVersion> versions) {
+      if (!versions.isEmpty()) {
+        Database.update(versions, AccessLevel.SYSTEM_MODE);
+      }
+    }
+
     void insertVersions(List<ContentVersion> versions) {
       if (!versions.isEmpty()) {
         Database.insert(versions, AccessLevel.SYSTEM_MODE);

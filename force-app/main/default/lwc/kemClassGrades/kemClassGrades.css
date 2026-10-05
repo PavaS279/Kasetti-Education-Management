@@ -1,0 +1,169 @@
+@import "c/kemStyles";
+
+.panel {
+  padding: 1rem;
+}
+
+.head,
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.head {
+  margin-bottom: 0.75rem;
+}
+
+.foot {
+  margin-top: 0.75rem;
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.tiny {
+  font-size: 0.6875rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.warning {
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--kem-amber);
+  border-radius: 4px;
+  background: #fdf5e8;
+  font-size: 0.8125rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+}
+
+.grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.grid th {
+  padding: 0.5rem;
+  background: var(--kem-canvas);
+  border-bottom: 1px solid var(--kem-line);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--kem-navy);
+  text-align: left;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+.grid td {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--kem-line);
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.grid tbody tr:hover td {
+  background: #fafcff;
+}
+
+.sticky {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--kem-surface);
+}
+
+.grid th.sticky {
+  background: var(--kem-canvas);
+}
+
+.col-name {
+  font-size: 0.75rem;
+  text-transform: none;
+}
+
+.col_draft {
+  opacity: 0.6;
+}
+
+.weight {
+  width: 5.5rem;
+  margin: 0.25rem 0;
+}
+
+.num {
+  text-align: right;
+}
+
+.cell_absent {
+  color: var(--kem-amber);
+}
+
+.report {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 400;
+}
+
+.comment {
+  min-width: 16rem;
+  white-space: normal;
+}
+
+.grade {
+  display: inline-block;
+  min-width: 2rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: var(--kem-canvas);
+  font-weight: 700;
+  text-align: center;
+}
+
+.grade_top {
+  background: #e3f5ea;
+  color: var(--kem-green);
+}
+
+.grade_good {
+  background: var(--kem-sky);
+  color: var(--kem-blue);
+}
+
+.grade_mid {
+  background: #fdf5e8;
+  color: var(--kem-amber);
+}
+
+.grade_low,
+.grade_fail {
+  background: #fbe3e2;
+  color: var(--kem-red);
+}
+
+.loading {
+  position: relative;
+  min-height: 5rem;
+}

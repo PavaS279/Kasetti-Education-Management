@@ -231,6 +231,67 @@ public with sharing class MessageService {
     }
   }
 
+  /** Tells each learner's fee payer that their report card is ready. */
+  public static void reportCardsReady(Set<Id> enrolmentIds) {
+    if (disabled) {
+      return;
+    }
+    try {
+      List<CourseOfferingParticipant> enrolments = [
+        SELECT
+          Id,
+          ParticipantContactId,
+          ParticipantContact.Name,
+          ParticipantAccountId,
+          Branch__c,
+          CourseOffering.Name,
+          Course_Grade__c,
+          Course_Score__c,
+          Attendance_Rate__c
+        FROM CourseOfferingParticipant
+        WHERE Id IN :enrolmentIds AND Grade_Status__c = 'Final'
+        WITH SYSTEM_MODE
+      ];
+      Set<Id> learners = new Set<Id>();
+      for (CourseOfferingParticipant e : enrolments) {
+        learners.add(e.ParticipantContactId);
+      }
+      Map<Id, Id> payers = feePayers(learners);
+      List<Notice> notices = new List<Notice>();
+      for (CourseOfferingParticipant e : enrolments) {
+        Notice notice = new Notice();
+        notice.recipientId = payers.get(e.ParticipantContactId);
+        notice.learnerContactId = e.ParticipantContactId;
+        notice.learnerAccountId = e.ParticipantAccountId;
+        notice.branchId = e.Branch__c;
+        notice.relatedId = e.Id;
+        notice.dedupSuffix = String.valueOf(System.now().getTime());
+        notice.values.put('LearnerName', e.ParticipantContact?.Name);
+        notice.values.put('ClassName', e.CourseOffering?.Name);
+        notice.values.put(
+          'Grade',
+          String.isBlank(e.Course_Grade__c) ? 'not graded' : e.Course_Grade__c
+        );
+        notice.values.put(
+          'Score',
+          e.Course_Score__c == null
+            ? 'no score'
+            : e.Course_Score__c.setScale(1) + '%'
+        );
+        notice.values.put(
+          'Attendance',
+          e.Attendance_Rate__c == null
+            ? 'not recorded'
+            : e.Attendance_Rate__c.setScale(1) + '%'
+        );
+        notices.add(notice);
+      }
+      send('Report_Card_Ready', notices);
+    } catch (Exception e) {
+      Logger.error('MessageService.reportCardsReady', e, null);
+    }
+  }
+
   /** Tells each enrolled learner's fee payer that a session was cancelled. */
   public static void sessionCancelled(Id sessionId) {
     if (disabled) {

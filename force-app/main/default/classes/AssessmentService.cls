@@ -181,6 +181,8 @@ public with sharing class AssessmentService {
         )
       }
     );
+    // Provisional course grades follow every publication.
+    GradingService.calculate(new Set<Id>{ assessment.Course_Offering__c });
   }
 
   public static String gradeFor(Decimal percent, List<Band> scale) {

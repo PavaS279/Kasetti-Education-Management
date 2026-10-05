@@ -158,6 +158,10 @@ OBJECTS = [
             {"name": "Class_Status__c", "label": "Class Status", "type": "Picklist", "values": ["Planned", "Open", "Full", "In Progress", "Completed", "Cancelled"],
              "default": "Planned"},
             {"name": "Seats_Taken__c", "label": "Seats Taken", "type": "Number", "precision": 5, "scale": 0, "systemManaged": True},
+            {"name": "Grading_Status__c", "label": "Grading Status", "type": "Picklist", "values": ["Open", "Final"], "default": "Open", "systemManaged": True,
+             "help": "Final once course grades are finalised and report cards issued."},
+            {"name": "Grades_Finalised_On__c", "label": "Grades Finalised On", "type": "DateTime", "systemManaged": True},
+            {"name": "Grades_Finalised_By__c", "label": "Grades Finalised By", "type": "Lookup", "ref": "User", "relName": "Finalised_Classes", "relLabel": "Finalised Classes", "systemManaged": True},
             {"name": "Seats_Reserved__c", "label": "Seats Reserved", "type": "Number", "precision": 5, "scale": 0, "systemManaged": True,
              "help": "Seats held for waitlist offers that have not been answered yet."},
             {"name": "Seats_Available__c", "label": "Seats Available", "type": "Formula", "returnType": "Number", "scale": 0,
@@ -186,6 +190,14 @@ OBJECTS = [
             {"name": "Sessions_Attended__c", "label": "Sessions Attended", "type": "Number", "precision": 5, "scale": 0, "systemManaged": True},
             {"name": "Sessions_Missed__c", "label": "Sessions Missed", "type": "Number", "precision": 5, "scale": 0, "systemManaged": True},
             {"name": "Attendance_Rate__c", "label": "Attendance Rate", "type": "Percent", "precision": 5, "scale": 2, "systemManaged": True},
+            {"name": "Course_Score__c", "label": "Course Score", "type": "Percent", "precision": 5, "scale": 2, "systemManaged": True,
+             "help": "Weighted average of the published assessments of the class."},
+            {"name": "Course_Grade__c", "label": "Course Grade", "type": "Text", "length": 10, "systemManaged": True},
+            {"name": "Grade_Status__c", "label": "Grade Status", "type": "Picklist", "values": ["Provisional", "Final"], "systemManaged": True,
+             "help": "Final once the class's grades are finalised and the report card is issued."},
+            {"name": "Graded_Assessments__c", "label": "Graded Assessments", "type": "Number", "precision": 3, "scale": 0, "systemManaged": True},
+            {"name": "Grades_Calculated_On__c", "label": "Grades Calculated On", "type": "DateTime", "systemManaged": True},
+            {"name": "Report_Comment__c", "label": "Report Card Comment", "type": "LongTextArea", "length": 2000, "lines": 4, "systemManaged": True},
             {"name": "Below_Attendance_Threshold__c", "label": "Below Attendance Threshold", "type": "Checkbox", "default": False, "systemManaged": True},
             {"name": "Transferred_From__c", "label": "Transferred From", "type": "Lookup", "ref": "CourseOfferingParticipant", "relName": "Transfers_In", "relLabel": "Transfers In", "systemManaged": True},
             {"name": "Transferred_To__c", "label": "Transferred To", "type": "Lookup", "ref": "CourseOfferingParticipant", "relName": "Transfers_Out", "relLabel": "Transfers Out", "systemManaged": True},
@@ -708,10 +720,10 @@ ENQUIRY_CLASSES = ["EnquiryController", "ApplicationController"]
 LEARNER_CLASSES = ["Learner360Controller", "MessageController"]
 PRICING_CLASSES = ["PricingController"]
 ENROLMENT_CLASSES = ["EnrolmentController", "WaitlistController", "TransferController"]
-SCHEDULE_CLASSES = ["TimetableController", "AttendanceController", "AssessmentController", "CoverController"]
+SCHEDULE_CLASSES = ["TimetableController", "AttendanceController", "AssessmentController", "CoverController", "GradingController"]
 BILLING_CLASSES = ["BillingController", "CreditController"]
 DOCUMENT_CLASSES = ["DocumentController", "KemDocumentController"]
-DOCUMENT_PAGES = ["KEM_Offer_Letter", "KEM_Invoice_Pdf", "KEM_Receipt_Pdf"]
+DOCUMENT_PAGES = ["KEM_Offer_Letter", "KEM_Invoice_Pdf", "KEM_Receipt_Pdf", "KEM_Report_Card"]
 
 # Education Cloud objects are only granted through permission sets tied to these licences.
 STAFF_LICENSE = "EducationCloudAccessPsl"
@@ -745,10 +757,10 @@ PERMISSION_SETS = [
     {"name": "KEM_Academic_Coordinator", "label": "KEM Academic Coordinator",
      "description": "Academic coordinator: maintains curriculum, timetable, enrolments, and academic oversight.",
      "license": STAFF_LICENSE, "objects": {"Staff_Absence__c": "CEV", "Message__c": "", "Waitlist_Entry__c": "CEV", "Course_Assessment__c": "CEDM", "Assessment_Result__c": "CEDV", "Session_Attendance__c": "CEDV", "Class_Session__c": "CEDM", "Calendar_Closure__c": "CEDM", "Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "CE", "LearningCourse": "CE", "LearningProgram": "CE", "LearnerProfile": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "CE", "Branch__c": "", "Room__c": "CE", "Lead": "", "Account": "E", "Contact": "E", "IndividualApplication": "",
-                 "ContactContactRelation": ""}, "classes": LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+                 "ContactContactRelation": ""}, "classes": LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES + DOCUMENT_CLASSES, "pages": DOCUMENT_PAGES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Teacher", "label": "KEM Teacher",
      "description": "Teacher: views assigned classes, marks attendance, and enters assessment results.",
-     "license": STAFF_LICENSE, "objects": {"Staff_Absence__c": "C", "Waitlist_Entry__c": "", "Course_Assessment__c": "CE", "Assessment_Result__c": "", "Session_Attendance__c": "", "Class_Session__c": "", "Calendar_Closure__c": "", "Fee_Price__c": "", "Discount__c": "", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": ""}, "classes": LEARNER_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
+     "license": STAFF_LICENSE, "objects": {"Staff_Absence__c": "C", "Waitlist_Entry__c": "", "Course_Assessment__c": "CE", "Assessment_Result__c": "", "Session_Attendance__c": "", "Class_Session__c": "", "Calendar_Closure__c": "", "Fee_Price__c": "", "Discount__c": "", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": ""}, "classes": LEARNER_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES + DOCUMENT_CLASSES, "pages": DOCUMENT_PAGES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Finance", "label": "KEM Finance",
      "description": "Finance user: manages fees, invoices, payments, allocations, and reconciliation.",
      "license": STAFF_LICENSE, "objects": {"Message__c": "V", "Credit_Note__c": "CEDM", "Refund__c": "CEDM", "Instalment__c": "CEDM", "Waitlist_Entry__c": "", "Student_Invoice__c": "CEDM", "Invoice_Line__c": "CEDM", "Student_Payment__c": "CEDM", "Payment_Allocation__c": "CEDM", "Course_Assessment__c": "", "Assessment_Result__c": "", "Session_Attendance__c": "", "Class_Session__c": "", "Calendar_Closure__c": "", "Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "CEDV", "Discount__c": "CEDV", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": "", "ContactContactRelation": ""}, "classes": LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES + BILLING_CLASSES + DOCUMENT_CLASSES, "pages": DOCUMENT_PAGES, "custom": ["KEM_Approve_Discounts", "KEM_Manage_Billing"], "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Finance_Desk"]},
