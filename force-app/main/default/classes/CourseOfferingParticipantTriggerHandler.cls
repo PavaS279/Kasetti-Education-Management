@@ -1,6 +1,7 @@
 /**
  * Class enrolment rules: governed participation status transitions and seat
- * recount whenever a seat may have been taken or released.
+ * recount whenever a seat may have been taken or released; freed seats are
+ * offered to the class waitlist.
  */
 public with sharing class CourseOfferingParticipantTriggerHandler extends TriggerHandler {
   protected override void beforeUpdate(
@@ -37,10 +38,14 @@ public with sharing class CourseOfferingParticipantTriggerHandler extends Trigge
       );
     }
     SeatService.recalculate(ids);
+    // A freed seat goes to the next learner on the waitlist.
+    WaitlistService.offerNext(ids);
   }
 
   protected override void afterDelete(List<SObject> oldRecords) {
-    SeatService.recalculate(offeringIds(oldRecords));
+    Set<Id> ids = offeringIds(oldRecords);
+    SeatService.recalculate(ids);
+    WaitlistService.offerNext(ids);
   }
 
   private static Set<Id> offeringIds(List<SObject> records) {

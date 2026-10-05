@@ -9,7 +9,8 @@ public with sharing class KemJobs {
 
   @TestVisible
   private static final Map<String, String> CRON = new Map<String, String>{
-    'KEM Offer Expiry' => '0 30 1 * * ?'
+    'KEM Offer Expiry' => '0 30 1 * * ?',
+    'KEM Waitlist Offers' => '0 5 * * * ?'
   };
 
   public static Integer scheduleAll() {
@@ -36,6 +37,9 @@ public with sharing class KemJobs {
     switch on name {
       when 'KEM Offer Expiry' {
         return new OfferExpiryJob();
+      }
+      when 'KEM Waitlist Offers' {
+        return new WaitlistOfferJob();
       }
       when else {
         throw new AppException('Unknown job: ' + name);

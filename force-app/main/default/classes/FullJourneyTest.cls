@@ -7,14 +7,13 @@
  */
 @IsTest
 private class FullJourneyTest {
-  @IsTest
-  static void learnerCompletesTheJourneyWithReconciledPayment() {
-    ChecklistItemGateway.simulateStatusUpdates = true;
+  /** Branch, course with prices, a class with a teacher and a weekly pattern. */
+  @TestSetup
+  static void setup() {
     TestDataFactory.createReferenceData();
     User teacher = TestDataFactory.createUserWithLicense(
       TestDataFactory.persona('KEM_Teacher')
     );
-
     System.runAs(TestDataFactory.admin()) {
       // ---------------------------------------------------- set-up
       Branch__c branch = TestDataFactory.createBranch();
@@ -67,7 +66,23 @@ private class FullJourneyTest {
           Time.newInstance(18, 0, 0, 0)
         )
       );
+    }
+  }
 
+  @IsTest
+  static void learnerCompletesTheJourneyWithReconciledPayment() {
+    ChecklistItemGateway.simulateStatusUpdates = true;
+    CourseOffering offering = [
+      SELECT Id, Branch__c, LearningCourseId, Teacher_User__c
+      FROM CourseOffering
+      WHERE LearningCourse.Name = 'Physics Foundation'
+      LIMIT 1
+    ];
+    User teacher = new User(Id = offering.Teacher_User__c);
+    Branch__c branch = new Branch__c(Id = offering.Branch__c);
+    LearningCourse course = new LearningCourse(Id = offering.LearningCourseId);
+
+    System.runAs(TestDataFactory.admin()) {
       // ---------------------------------------------------- 1. enquiry
       Lead enquiry = TestDataFactory.buildEnquiry(branch.Id);
       enquiry.Interested_Course__c = course.Id;
@@ -229,8 +244,6 @@ private class FullJourneyTest {
         'Gateway retry is idempotent'
       );
 
-      Test.stopTest();
-
       // ---------------------------------------------------- outcome
       invoice = [
         SELECT Status__c, Balance_Due__c, Enrolment__r.Billing_Status__c
@@ -263,6 +276,9 @@ private class FullJourneyTest {
       );
       Assert.areEqual(1, detail.results.size(), 'Published result visible');
       Assert.areEqual(1, detail.attendance.size(), 'Attendance visible');
+
+      // Queued document jobs run here.
+      Test.stopTest();
 
       // The offer letter job was queued before the test boundary, so file it here.
       Assert.isNotNull(

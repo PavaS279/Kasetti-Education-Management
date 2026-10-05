@@ -164,6 +164,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>CourseOffering.Seats_Reserved__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>CourseOffering.Seats_Taken__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -190,6 +195,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>CourseOffering.WaitlistStatus</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CourseOffering.Waitlist_Count__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Seats_Reserved__c</fullName>
+    <inlineHelpText
+  >Seats held for waitlist offers that have not been answered yet.</inlineHelpText>
+    <label>Seats Reserved</label>
+    <required>false</required>
+    <precision>5</precision>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>

@@ -1,6 +1,6 @@
 # Progress Tracker
 
-> **Status 2026-10-03:** Phase 0 and Phase 1 are complete — every feature built, deployed, unit-tested and checked end to end, and one learner has completed the full journey with financial reconciliation (automated and live). See [NEXT-STEPS.md](NEXT-STEPS.md) for the one manual step and suggested next phases.
+> **Status 2026-10-03:** Phase 0 and Phase 1 are complete — every feature built, deployed, unit-tested and checked end to end, and one learner has completed the full journey with financial reconciliation (automated and live). Phase 2 (operational depth) is in progress — table below.
 
 Legend: ✅ done · 🟡 in progress · ⬜ not started
 
@@ -38,3 +38,19 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 | 1.13 | Full learner journey with financial reconciliation    | ✅    | ✅       | ✅    | ✅        | [F1.13-full-journey.md](features/F1.13-full-journey.md)                               |
 
 **Phase 1 completion condition — one learner can complete the full journey with financial reconciliation:** ✅ (`FullJourneyTest` and the live run in [F1.13](features/F1.13-full-journey.md))
+
+## Phase 2 — Operational depth
+
+**Completion condition — exceptions and recurring operations work reliably.**
+
+| #   | Feature                                                          | Built | Deployed | Tests | E2E check | Notes |
+| --- | ---------------------------------------------------------------- | ----- | -------- | ----- | --------- | ----- |
+| 2.1 | Waitlists: queue, held seats, offers with expiry, accept → enrol | 🟡    | ⬜       | ⬜    | ⬜        |       |
+| 2.2 | Transfers between classes with price difference                  | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 2.3 | Recurring billing and instalment plans                           | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 2.4 | Refund automation and credit notes                               | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 2.5 | Messaging (templated notifications with consent)                 | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 2.6 | Resource substitution (teacher cover, room swaps)                | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 2.7 | Advanced grading (weighted course grades, report cards)          | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 2.8 | Richer portal (documents, waitlist, instalments, messages)       | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 2.9 | Operations console and Phase 2 journey                           | ⬜    | ⬜       | ⬜    | ⬜        |       |

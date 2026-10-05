@@ -1,6 +1,13 @@
 import { LightningElement, api, wire } from "lwc";
 import { refreshApex } from "@salesforce/apex";
 import { NavigationMixin } from "lightning/navigation";
+import {
+  MessageContext,
+  publish,
+  subscribe,
+  unsubscribe
+} from "lightning/messageService";
+import CLASS_CHANGED from "@salesforce/messageChannel/KEM_Class_Changed__c";
 import CURRENCY from "@salesforce/i18n/currency";
 import getRoster from "@salesforce/apex/EnrolmentController.getRoster";
 import withdraw from "@salesforce/apex/EnrolmentController.withdraw";
@@ -39,6 +46,30 @@ export default class KemClassRoster extends NavigationMixin(LightningElement) {
   roster;
   errorMessage;
   wiredResult;
+
+  @wire(MessageContext) messageContext;
+
+  connectedCallback() {
+    // The waitlist on the same page enrols learners; refresh when it does.
+    this.subscription = subscribe(
+      this.messageContext,
+      CLASS_CHANGED,
+      (message) => {
+        if (message.offeringId === this.recordId && this.wiredResult) {
+          refreshApex(this.wiredResult);
+        }
+      }
+    );
+  }
+
+  disconnectedCallback() {
+    unsubscribe(this.subscription);
+  }
+
+  /** Tells the waitlist that seats may have changed. */
+  announceChange() {
+    publish(this.messageContext, CLASS_CHANGED, { offeringId: this.recordId });
+  }
 
   @wire(getRoster, { offeringId: "$recordId" })
   wiredRoster(result) {
@@ -153,6 +184,7 @@ export default class KemClassRoster extends NavigationMixin(LightningElement) {
           : "The enrolment and agreed price were saved."
       );
       await refreshApex(this.wiredResult);
+      this.announceChange();
     }
   }
 
@@ -225,6 +257,8 @@ export default class KemClassRoster extends NavigationMixin(LightningElement) {
         );
         this.navigate(invoiceId);
         await refreshApex(this.wiredResult);
+        this.announceChange();
+        this.announceChange();
         return;
       }
       if (action === "withdraw") {
@@ -252,6 +286,7 @@ export default class KemClassRoster extends NavigationMixin(LightningElement) {
         );
       }
       await refreshApex(this.wiredResult);
+      this.announceChange();
     } catch (error) {
       toastError(this, error, "Action failed");
     }

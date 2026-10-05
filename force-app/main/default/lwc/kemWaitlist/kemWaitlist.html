@@ -1,0 +1,119 @@
+<template>
+  <section class="kem-card panel kem-fade-in">
+    <div class="panel-head">
+      <div class="kem-section-title">Waitlist</div>
+      <template lwc:if={view}>
+        <template lwc:if={view.canManage}>
+          <lightning-button
+            label="Add to waitlist"
+            icon-name="utility:add"
+            onclick={handleJoin}
+            disabled={isBusy}
+          ></lightning-button>
+        </template>
+      </template>
+    </div>
+
+    <template lwc:if={view}>
+      <div class="seats" role="list" aria-label="Seats">
+        <template for:each={seats} for:item="s">
+          <div key={s.key} class="seat" role="listitem">
+            <span class="seat-value">{s.value}</span>
+            <span class="seat-label">{s.label}</span>
+          </div>
+        </template>
+      </div>
+
+      <ul class="rows">
+        <template for:each={active} for:item="r">
+          <li key={r.id} class="row">
+            <span class="position">{r.positionLabel}</span>
+            <span class={r.avatarClass}>{r.initials}</span>
+            <div class="main">
+              <a
+                href="#"
+                data-id={r.learnerAccountId}
+                onclick={handleNavigate}
+                class="strong"
+                >{r.learnerName}</a
+              >
+              <div class={r.metaClass}>{r.meta}</div>
+            </div>
+            <template lwc:if={r.priorityLabel}>
+              <span class="kem-badge kem-badge_info">{r.priorityLabel}</span>
+            </template>
+            <span class={r.statusClass}>{r.status}</span>
+            <div class="actions">
+              <template lwc:if={r.canAccept}>
+                <lightning-button
+                  variant="brand"
+                  label="Accept seat"
+                  data-id={r.id}
+                  onclick={handleAccept}
+                  disabled={isBusy}
+                ></lightning-button>
+                <lightning-button
+                  label="Declined"
+                  data-id={r.id}
+                  onclick={handleDecline}
+                  disabled={isBusy}
+                ></lightning-button>
+              </template>
+              <template lwc:if={r.canRemove}>
+                <lightning-button-icon
+                  icon-name="utility:close"
+                  alternative-text="Remove from waitlist"
+                  title="Remove from waitlist"
+                  data-id={r.id}
+                  onclick={handleRemove}
+                  disabled={isBusy}
+                ></lightning-button-icon>
+              </template>
+            </div>
+          </li>
+        </template>
+      </ul>
+      <template lwc:if={noActive}>
+        <div class="kem-empty">Nobody is waiting for this class.</div>
+      </template>
+
+      <template lwc:if={hasClosed}>
+        <button type="button" class="toggle" onclick={handleToggleClosed}>
+          {closedToggleLabel}
+        </button>
+        <template lwc:if={showClosed}>
+          <ul class="rows rows_closed">
+            <template for:each={closed} for:item="r">
+              <li key={r.id} class="row">
+                <span class={r.avatarClass}>{r.initials}</span>
+                <div class="main">
+                  <span class="strong">{r.learnerName}</span>
+                  <div class="meta">{r.notes}</div>
+                </div>
+                <span class={r.statusClass}>{r.status}</span>
+                <div class="actions">
+                  <template lwc:if={r.isEnrolled}>
+                    <a href="#" data-id={r.enrolmentId} onclick={handleNavigate}
+                      >Enrolment</a
+                    >
+                  </template>
+                  <template lwc:if={r.canRequeue}>
+                    <lightning-button
+                      label="Back in queue"
+                      data-id={r.id}
+                      onclick={handleRequeue}
+                      disabled={isBusy}
+                    ></lightning-button>
+                  </template>
+                </div>
+              </li>
+            </template>
+          </ul>
+        </template>
+      </template>
+    </template>
+    <template lwc:elseif={errorMessage}>
+      <div class="slds-text-color_error small">{errorMessage}</div>
+    </template>
+  </section>
+</template>

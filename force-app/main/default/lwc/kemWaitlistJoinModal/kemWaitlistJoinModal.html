@@ -1,0 +1,71 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <lightning-input
+      type="search"
+      label="Find a learner"
+      placeholder="Name, email or phone"
+      value={searchTerm}
+      onchange={handleSearch}
+    ></lightning-input>
+    <ul class="options" role="listbox" aria-label="Learners">
+      <template for:each={learnerOptions} for:item="l">
+        <li key={l.Id}>
+          <button
+            type="button"
+            role="option"
+            class={l.className}
+            aria-selected={l.selected}
+            data-id={l.Id}
+            data-name={l.Name}
+            onclick={handlePick}
+          >
+            <span class={l.avatarClass}>{l.initials}</span>
+            <span class="option-main">
+              <span class="strong">{l.Name}</span>
+              <span class="kem-muted small">{l.detail}</span>
+            </span>
+          </button>
+        </li>
+      </template>
+    </ul>
+    <template lwc:if={noMatches}>
+      <div class="kem-muted small">No learners match.</div>
+    </template>
+    <div class="form-grid">
+      <lightning-combobox
+        label="Priority"
+        options={priorityOptions}
+        value={priority}
+        onchange={handlePriority}
+      ></lightning-combobox>
+      <lightning-input
+        label="Discount code (applied at enrolment)"
+        value={discountCode}
+        onchange={handleCode}
+        max-length="40"
+      ></lightning-input>
+      <lightning-textarea
+        class="span-all"
+        label="Notes"
+        value={notes}
+        onchange={handleNotes}
+      ></lightning-textarea>
+    </div>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Add to waitlist"
+      onclick={handleSave}
+      disabled={cannotSave}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

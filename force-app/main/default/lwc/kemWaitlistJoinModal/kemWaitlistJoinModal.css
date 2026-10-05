@@ -1,0 +1,63 @@
+@import "c/kemStyles";
+
+.options {
+  max-height: 14rem;
+  margin: 0.5rem 0 0.75rem;
+  overflow-y: auto;
+}
+
+.option {
+  display: flex;
+  width: 100%;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.45rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--kem-radius-sm);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s var(--kem-ease);
+}
+
+.option:hover {
+  background: var(--kem-canvas);
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--kem-blue);
+}
+
+.option_selected {
+  border-color: var(--kem-blue);
+  background: var(--kem-sky);
+}
+
+.option-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.span-all {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 30em) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

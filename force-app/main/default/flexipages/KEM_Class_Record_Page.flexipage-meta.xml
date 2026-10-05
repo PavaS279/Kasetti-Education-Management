@@ -29,6 +29,12 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>kemWaitlist</componentName>
+                <identifier>c_kemWaitlist</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>kemClassAssessments</componentName>
                 <identifier>c_kemClassAssessments</identifier>
             </componentInstance>

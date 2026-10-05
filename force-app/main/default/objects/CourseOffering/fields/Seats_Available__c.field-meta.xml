@@ -3,7 +3,7 @@
     <fullName>Seats_Available__c</fullName>
     <label>Seats Available</label>
     <formula
-  >IF(ISBLANK(EnrollmentCapacity), 0, EnrollmentCapacity - BLANKVALUE(Seats_Taken__c, 0))</formula>
+  >IF(ISBLANK(EnrollmentCapacity), 0, EnrollmentCapacity - BLANKVALUE(Seats_Taken__c, 0) - BLANKVALUE(Seats_Reserved__c, 0))</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <precision>18</precision>
     <scale>0</scale>

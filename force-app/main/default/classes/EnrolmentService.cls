@@ -22,6 +22,8 @@ public with sharing class EnrolmentService {
     public Id applicationId { get; set; }
     @AuraEnabled
     public String discountCode { get; set; }
+    /** Set when a waitlist offer is accepted: the seat held for that offer may be used. */
+    public Id waitlistEntryId { get; set; }
   }
 
   public class EnrolmentResult {
@@ -53,6 +55,11 @@ public with sharing class EnrolmentService {
     result.seatsRemaining = seatsRemaining(
       result.offering,
       SeatService.countTaken(new Set<Id>{ result.offering.Id })
+        .get(result.offering.Id) +
+      SeatService.countReserved(
+          new Set<Id>{ result.offering.Id },
+          request.waitlistEntryId
+        )
         .get(result.offering.Id)
     );
     result.blockers.addAll(
@@ -78,9 +85,16 @@ public with sharing class EnrolmentService {
     try {
       // Lock the class row so concurrent enrolments cannot oversell the last seat.
       CourseOffering offering = loadOffering(request.offeringId, true);
+      // Seats held for unanswered waitlist offers are not available, except the
+      // one held for this learner when they accept their own offer.
       Integer remaining = seatsRemaining(
         offering,
-        SeatService.countTaken(new Set<Id>{ offering.Id }).get(offering.Id)
+        SeatService.countTaken(new Set<Id>{ offering.Id }).get(offering.Id) +
+        SeatService.countReserved(
+            new Set<Id>{ offering.Id },
+            request.waitlistEntryId
+          )
+          .get(offering.Id)
       );
       List<String> problems = blockers(offering, remaining, request);
       if (!problems.isEmpty()) {
@@ -262,7 +276,13 @@ public with sharing class EnrolmentService {
     EnrolmentRequest request
   ) {
     List<String> problems = new List<String>();
-    if (!ENROLLABLE_CLASS_STATUSES.contains(offering.Class_Status__c)) {
+    // A full class still admits the learner whose waitlist offer holds a seat.
+    Boolean heldSeat =
+      offering.Class_Status__c == 'Full' &&
+      request.waitlistEntryId != null;
+    if (
+      !ENROLLABLE_CLASS_STATUSES.contains(offering.Class_Status__c) && !heldSeat
+    ) {
       problems.add(
         'The class is ' +
           (offering.Class_Status__c == null
