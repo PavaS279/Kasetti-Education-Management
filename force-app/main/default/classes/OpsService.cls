@@ -228,7 +228,9 @@ public with sharing class OpsService {
       WHERE
         CreatedDate >= :since
         AND ApexClass.Name IN :KEM_CLASSES
-        AND JobType IN ('BatchApex', 'Queueable', 'ScheduledApex')
+        // Scheduled-job rows are covered by the schedules section; unscheduling
+        // them before each deployment records them as Aborted.
+        AND JobType IN ('BatchApex', 'Queueable')
       ORDER BY CreatedDate DESC
       LIMIT 50
     ]) {
