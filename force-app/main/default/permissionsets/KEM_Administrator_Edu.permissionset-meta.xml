@@ -1227,7 +1227,7 @@
         <allowDelete>true</allowDelete>
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
-        <modifyAllRecords>false</modifyAllRecords>
+        <modifyAllRecords>true</modifyAllRecords>
         <object>CourseOffering</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
@@ -1236,7 +1236,7 @@
         <allowDelete>true</allowDelete>
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
-        <modifyAllRecords>false</modifyAllRecords>
+        <modifyAllRecords>true</modifyAllRecords>
         <object>CourseOfferingParticipant</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>

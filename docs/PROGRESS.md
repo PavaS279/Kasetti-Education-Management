@@ -54,3 +54,21 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 | 2.7 | Advanced grading (weighted course grades, report cards)            | ✅    | ✅       | ✅    | ✅        | [F2.7-advanced-grading.md](features/F2.7-advanced-grading.md)                           |
 | 2.8 | Richer portal (documents, waitlist, instalments, messages, grades) | ✅    | ✅       | ✅    | ✅        | [F2.8-richer-portal.md](features/F2.8-richer-portal.md)                                 |
 | 2.9 | Operations console and Phase 2 journey                             | ✅    | ✅       | ✅    | ✅        | [F2.9-operations-console.md](features/F2.9-operations-console.md)                       |
+
+## Phase 3 — Scale and optimisation
+
+**Completion condition — additional centres and higher volumes supported:** ⬜
+
+Scope chosen by the institution (2026-10-05): a generic LMS API (no LMS yet), a generic ERP export/API, online payments in the portal, and a library/resources module. Administrators now have Modify All on classes and enrolments (deployed 2026-10-05).
+
+| #   | Feature                                                                                       | Built | Deployed | Tests | E2E check | Notes |
+| --- | --------------------------------------------------------------------------------------------- | ----- | -------- | ----- | --------- | ----- |
+| 3.1 | Multi-branch templates (clone a branch's set-up; branch KPIs)                                 | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 3.2 | Scale and performance (bulk-safe batches, selective queries, volume tests)                    | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 3.3 | Generic LMS integration API (outbound events, inbound REST for classes, rosters, grades)      | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 3.4 | Generic ERP finance export (journal of invoices, payments, credits, refunds; CSV/JSON + REST) | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 3.5 | Advanced analytics (branch comparison, revenue trends, cohorts)                               | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 3.6 | Retention workflows (at-risk scoring, follow-up tasks, re-enrolment campaigns)                | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 3.7 | Online payments in the portal (gateway-agnostic payment links, signed webhook)                | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 3.8 | Library and resources (catalogue, loans, due dates, fines)                                    | ⬜    | ⬜       | ⬜    | ⬜        |       |
+| 3.9 | Phase 3 journey, volume test and demo script                                                  | ⬜    | ⬜       | ⬜    | ⬜        |       |

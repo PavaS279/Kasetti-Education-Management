@@ -101,4 +101,4 @@ The matrix is extended per feature in `scripts/tooling/specs.py` (`PERMISSION_SE
 | Report card and document pages          | ✅            | ✅                   | ✅          | ✅                   | ✅           | ✅         |
 | Operations console (`OpsController`)    | ✅            | —                    | —           | —                    | —            | —          |
 
-**Open decision:** administrators have View All but not Modify All on classes (`CourseOffering`) and enrolments (`CourseOfferingParticipant`), so they cannot edit those records when another user owns them. Grading uses Modify All on assessments instead (F2.7).
+**Administrator edit access (Phase 3, 2026-10-05):** administrators have Modify All on classes (`CourseOffering`) and enrolments (`CourseOfferingParticipant`), so they can edit, re-schedule and close records other users own. Teachers, branch managers and coordinators keep their existing access.
