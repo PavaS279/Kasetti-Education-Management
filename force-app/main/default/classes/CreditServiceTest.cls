@@ -454,4 +454,59 @@ private class CreditServiceTest {
       Assert.areEqual('Used', CreditService.statusFor(100, 60, 40), 'Used');
     }
   }
+
+  @IsTest
+  static void ledgerRecordsAreProtected() {
+    System.runAs(TestDataFactory.admin()) {
+      Student_Invoice__c a = invoiceA();
+      List<Credit_Note__c> notes = new List<Credit_Note__c>{
+        new Credit_Note__c(
+          Bill_To__c = a.Bill_To__c,
+          Amount__c = 100,
+          Amount_Applied__c = 40,
+          Amount_Refunded__c = 0,
+          Status__c = 'Partially Used'
+        ),
+        new Credit_Note__c(
+          Bill_To__c = a.Bill_To__c,
+          Amount__c = 100,
+          Amount_Applied__c = 0,
+          Amount_Refunded__c = 0,
+          Status__c = 'Open'
+        )
+      };
+      Database.insert(notes, AccessLevel.SYSTEM_MODE);
+      Refund__c paid = new Refund__c(
+        Credit_Note__c = notes[0].Id,
+        Amount__c = 10,
+        Status__c = 'Paid'
+      );
+      Database.insert(paid, AccessLevel.SYSTEM_MODE);
+
+      List<Database.DeleteResult> results = Database.delete(
+        new List<Id>{ notes[0].Id, paid.Id },
+        false,
+        AccessLevel.SYSTEM_MODE
+      );
+      Assert.isFalse(results[0].isSuccess(), 'Used credit is kept');
+      Assert.isFalse(results[1].isSuccess(), 'Paid refund is kept');
+      Assert.isTrue(
+        Database.delete(notes[1].Id, false, AccessLevel.SYSTEM_MODE)
+          .isSuccess(),
+        'An unused credit note can be deleted'
+      );
+      Database.SaveResult jump = Database.update(
+        new Credit_Note__c(Id = notes[0].Id, Status__c = 'Void'),
+        false,
+        AccessLevel.SYSTEM_MODE
+      );
+      Assert.isFalse(jump.isSuccess(), 'Used credit cannot be voided');
+      Database.SaveResult back = Database.update(
+        new Refund__c(Id = paid.Id, Status__c = 'Requested'),
+        false,
+        AccessLevel.SYSTEM_MODE
+      );
+      Assert.isFalse(back.isSuccess(), 'A paid refund cannot be reopened');
+    }
+  }
 }
