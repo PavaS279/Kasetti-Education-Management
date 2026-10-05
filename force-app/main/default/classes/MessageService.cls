@@ -356,31 +356,73 @@ public with sharing class MessageService {
    * messages created (repeats are skipped by the dedup key).
    */
   public static Integer sendReminders(Date today) {
-    Integer created = 0;
-    Date dueSoon = today.addDays(AppSettings.getInteger('Due_Soon_Days', 3));
-    created += send(
+    return remindInvoices(dueInvoices(reminderDueDates(today)), today);
+  }
+
+  /** Due dates that get a reminder today: due soon, and each overdue reminder day. */
+  public static Set<Date> reminderDueDates(Date today) {
+    Set<Date> dates = new Set<Date>(overdueDays(today).keySet());
+    dates.add(dueSoonDate(today));
+    return dates;
+  }
+
+  /**
+   * Due-soon and overdue reminders for the given invoices (as of today).
+   * Bulk-safe: a few queries and one insert per call, used by ReminderJob
+   * for any number of invoices.
+   */
+  public static Integer remindInvoices(Set<Id> invoiceIds, Date today) {
+    if (invoiceIds.isEmpty()) {
+      return 0;
+    }
+    Date dueSoon = dueSoonDate(today);
+    Map<Date, Integer> overdue = overdueDays(today);
+    Set<Id> dueSoonIds = new Set<Id>();
+    Set<Id> overdueIds = new Set<Id>();
+    for (Student_Invoice__c invoice : [
+      SELECT Id, Due_Date__c
+      FROM Student_Invoice__c
+      WHERE Id IN :invoiceIds
+      WITH SYSTEM_MODE
+    ]) {
+      if (invoice.Due_Date__c == dueSoon) {
+        dueSoonIds.add(invoice.Id);
+      } else if (overdue.containsKey(invoice.Due_Date__c)) {
+        overdueIds.add(invoice.Id);
+      }
+    }
+    Integer created = send(
         'Invoice_Due_Soon',
-        invoiceNotices(dueInvoices(new Set<Date>{ dueSoon }), today, null)
+        invoiceNotices(dueSoonIds, today, null)
       )
       .size();
-    Map<Date, Integer> overdueDays = new Map<Date, Integer>();
+    if (!overdueIds.isEmpty()) {
+      created += send(
+          'Invoice_Overdue',
+          invoiceNotices(overdueIds, today, overdue)
+        )
+        .size();
+    }
+    return created;
+  }
+
+  private static Date dueSoonDate(Date today) {
+    return today.addDays(AppSettings.getInteger('Due_Soon_Days', 3));
+  }
+
+  /** Due date → days overdue, from Education Setting Overdue_Reminder_Days. */
+  private static Map<Date, Integer> overdueDays(Date today) {
+    Map<Date, Integer> days = new Map<Date, Integer>();
     for (
       String part : AppSettings.getString('Overdue_Reminder_Days', '1,7,14')
         .split(',')
     ) {
       if (part.trim().isNumeric()) {
-        Integer days = Integer.valueOf(part.trim());
-        overdueDays.put(today.addDays(-days), days);
+        Integer value = Integer.valueOf(part.trim());
+        days.put(today.addDays(-value), value);
       }
     }
-    if (!overdueDays.isEmpty()) {
-      created += send(
-          'Invoice_Overdue',
-          invoiceNotices(dueInvoices(overdueDays.keySet()), today, overdueDays)
-        )
-        .size();
-    }
-    return created;
+    return days;
   }
 
   // -------------------------------------------------------- staff messages
@@ -527,13 +569,27 @@ public with sharing class MessageService {
 
   /** Sends queued emails (oldest first). Returns how many were sent. */
   public static Integer dispatch(Integer maxMessages) {
+    Integer batchSize = maxMessages;
+    if (emailLive()) {
+      Integer capacity = emailCapacity();
+      if (capacity <= 0) {
+        // Daily email allowance used up: leave the email queued for tomorrow.
+        Logger.warn(
+          'MessageService.dispatch',
+          'Daily email limit reached; queued email will be sent when the allowance resets.',
+          null
+        );
+        return 0;
+      }
+      batchSize = Math.min(maxMessages, capacity);
+    }
     List<Message__c> queued = [
       SELECT Id, Recipient__c, Subject__c, Body__c, Branch__r.Name
       FROM Message__c
       WHERE Status__c = 'Queued' AND Channel__c = :EMAIL
       WITH SYSTEM_MODE
       ORDER BY CreatedDate
-      LIMIT :maxMessages
+      LIMIT :batchSize
     ];
     if (queued.isEmpty()) {
       return 0;
@@ -606,11 +662,63 @@ public with sharing class MessageService {
     System.enqueueJob(new DispatchJob());
   }
 
+  /**
+   * Delivers queued email in rounds of DISPATCH_BATCH. While a round fills up
+   * and email is still queued, it starts the next round, up to
+   * Education Setting Dispatch_Rounds rounds in a row.
+   */
   public class DispatchJob implements Queueable {
+    private final Integer round;
+
+    public DispatchJob() {
+      this(1);
+    }
+
+    public DispatchJob(Integer round) {
+      this.round = round;
+    }
+
     public void execute(QueueableContext context) {
-      dispatch(DISPATCH_BATCH);
+      Integer sent = dispatch(DISPATCH_BATCH);
+      if (
+        sent >= DISPATCH_BATCH &&
+        round < AppSettings.getInteger('Dispatch_Rounds', 20) &&
+        queuedEmail() > 0 &&
+        !Test.isRunningTest()
+      ) {
+        System.enqueueJob(new DispatchJob(round + 1));
+      }
       Logger.flush();
     }
+  }
+
+  /** Remaining single-email allowance for today (the batch size when unknown). */
+  @TestVisible
+  private static Integer emailCapacity() {
+    if (emailCapacityOverride != null) {
+      return emailCapacityOverride;
+    }
+    try {
+      System.OrgLimit single = OrgLimits.getMap().get('SingleEmail');
+      return single == null
+        ? DISPATCH_BATCH
+        : single.getLimit() - single.getValue();
+    } catch (Exception e) {
+      return DISPATCH_BATCH;
+    }
+  }
+
+  @TestVisible
+  private static Integer emailCapacityOverride;
+
+  private static Integer queuedEmail() {
+    return [
+      SELECT COUNT()
+      FROM Message__c
+      WHERE Status__c = 'Queued' AND Channel__c = :EMAIL
+      WITH SYSTEM_MODE
+      LIMIT 1
+    ];
   }
 
   // ------------------------------------------------------------- creation

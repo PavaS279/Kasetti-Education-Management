@@ -284,3 +284,9 @@ Latest live run: tag `P2A` on 2026-10-05 — **all checks passed** (guardian "Gu
 3. **Open branch** → counts and next steps (assign teachers, generate sessions, open classes). **Open new branch** → the new branch page; its classes are Planned with the copied rooms, each on the same weekday as in the template.
 4. Open a copied class → **Generate sessions** → sessions start on or after the chosen date.
 5. Negative: repeat with the same code or invoice prefix → "Branch code … is already used by …"; as a branch manager the template buttons do not appear.
+
+### G2. Scale and background jobs (3 minutes)
+
+1. Home → **Operations** → **Run now** on _KEM Payment Reminders_: a `ReminderJob` batch appears under background runs (Completed) with a log entry "Payment reminders for …: n messages", followed by a delivery job.
+2. **Run now** on _KEM Recurring Billing_: the batch runs in small batches of 5 enrolments; the log line reports invoices raised, failures and any enrolments left for an automatic follow-up run.
+3. Setup → Custom Metadata Types → Education Setting: `Recurring_Billing_Batch_Size` (5) and `Dispatch_Rounds` (20) tune throughput without code changes.

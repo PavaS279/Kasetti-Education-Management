@@ -16,6 +16,7 @@
 public with sharing class OpsService {
   private static final Set<String> KEM_CLASSES = new Set<String>{
     'RecurringBillingJob',
+    'ReminderJob',
     'OfferExpiryJob',
     'WaitlistOfferJob',
     'MessageJob',
@@ -136,7 +137,7 @@ public with sharing class OpsService {
     assertAdmin();
     switch on jobName {
       when 'KEM Recurring Billing' {
-        return Database.executeBatch(new RecurringBillingJob(), 20);
+        return RecurringBillingJob.run();
       }
       when 'KEM Offer Expiry' {
         return Database.executeBatch(new OfferExpiryJob(), 200);
@@ -145,7 +146,7 @@ public with sharing class OpsService {
         return System.enqueueJob(new RunSchedulable(new WaitlistOfferJob()));
       }
       when 'KEM Payment Reminders' {
-        return System.enqueueJob(new RunSchedulable(new MessageJob(true)));
+        return ReminderJob.run(Date.today());
       }
       when 'KEM Message Dispatch' {
         return System.enqueueJob(new MessageService.DispatchJob());

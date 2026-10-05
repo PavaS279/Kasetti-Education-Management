@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Recurring Billing Batch Size</label>
+    <protected>false</protected>
+    <values>
+        <field>Description__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Enrolments billed per recurring billing batch. Each enrolment uses about 20 queries; the job also pauses an enrolment and continues in a follow-up run when a batch runs short of limits.</value>
+    </values>
+    <values>
+        <field>Value__c</field>
+        <value xsi:type="xsd:string">5</value>
+    </values>
+</CustomMetadata>
