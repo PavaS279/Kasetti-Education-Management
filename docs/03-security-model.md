@@ -101,4 +101,15 @@ The matrix is extended per feature in `scripts/tooling/specs.py` (`PERMISSION_SE
 | Report card and document pages          | ✅            | ✅                   | ✅          | ✅                   | ✅           | ✅         |
 | Operations console (`OpsController`)    | ✅            | —                    | —           | —                    | —            | —          |
 
+## Phase 3 permissions
+
+| Permission / access                              | Administrator | Branch Manager | Admissions  | Academic    | Teacher | Finance |
+| ------------------------------------------------ | ------------- | -------------- | ----------- | ----------- | ------- | ------- |
+| Branch comparison (`BranchController`)           | ✅            | ✅             | —           | —           | —       | —       |
+| Open a branch from a template (create on Branch) | ✅            | —              | —           | —           | —       | —       |
+| Classes (`CourseOffering`)                       | Modify All    | Create/Edit    | Read        | Create/Edit | Read    | Read    |
+| Enrolments (`CourseOfferingParticipant`)         | Modify All    | Create/Edit    | Create/Edit | Create/Edit | Read    | Read    |
+
+`BranchTemplateService` runs entirely as the user (user-mode queries and inserts), so cloning needs create access on every copied object; comparison figures only include records the user can see.
+
 **Administrator edit access (Phase 3, 2026-10-05):** administrators have Modify All on classes (`CourseOffering`) and enrolments (`CourseOfferingParticipant`), so they can edit, re-schedule and close records other users own. Teachers, branch managers and coordinators keep their existing access.

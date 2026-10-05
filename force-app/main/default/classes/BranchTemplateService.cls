@@ -424,7 +424,7 @@ public with sharing class BranchTemplateService {
       return;
     }
     Date first = firstStart(sourceClasses);
-    Integer shift = first == null ? 0 : first.daysBetween(startDate);
+    Integer shift = weeksShift(first, startDate);
     List<CourseOffering> copies = new List<CourseOffering>();
     Boolean hadTeachers = false;
     Boolean missingRooms = false;
@@ -870,6 +870,19 @@ public with sharing class BranchTemplateService {
       }
     }
     return first;
+  }
+
+  /**
+   * Days to move the timetable, in whole weeks so every class keeps its
+   * weekday; the first class lands on or after the chosen start date.
+   */
+  @TestVisible
+  private static Integer weeksShift(Date first, Date startDate) {
+    if (first == null || startDate == null) {
+      return 0;
+    }
+    Integer days = first.daysBetween(startDate);
+    return days >= 0 ? ((days + 6) / 7) * 7 : (days / 7) * 7;
   }
 
   private static Datetime shifted(Datetime value, Integer days) {

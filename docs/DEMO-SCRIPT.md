@@ -274,3 +274,13 @@ Latest live run: tag `P2A` on 2026-10-05 — **all checks passed** (guardian "Gu
 | 8   | Change weights or comments after grades are final        | "Grades are final. Reopen them before making changes."                        |
 | 9   | Download another family's report card through the portal | "Document not found or not available to you."                                 |
 | 10  | Open the Operations console as a non-administrator       | The card does not appear                                                      |
+
+## Part G — Phase 3: scale and optimisation
+
+### G1. Open a new branch from a template (5 minutes)
+
+1. Open branch **[KEM Demo] Bengaluru Central** → the **Branch comparison** panel shows every branch with seats filled, classes, learners, 30-day attendance, waiting, enquiries, rooms and (administrators, finance) outstanding, overdue and collected fees. The current branch is highlighted; sort by fill rate or attendance.
+2. **New branch from this one** → the modal lists what will be copied (rooms, branch prices, branch discounts, upcoming closures, classes and weekly patterns, with counts). Enter a name, code (for example DEMO-03) and invoice prefix; untick parts if needed; choose when classes start.
+3. **Open branch** → counts and next steps (assign teachers, generate sessions, open classes). **Open new branch** → the new branch page; its classes are Planned with the copied rooms, each on the same weekday as in the template.
+4. Open a copied class → **Generate sessions** → sessions start on or after the chosen date.
+5. Negative: repeat with the same code or invoice prefix → "Branch code … is already used by …"; as a branch manager the template buttons do not appear.

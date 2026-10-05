@@ -205,7 +205,7 @@ private class BranchTemplateServiceTest {
       Assert.isNull(copy.Teacher_User__c, 'Teachers not copied');
       Assert.areEqual(15, copy.EnrollmentCapacity, 'Capacity');
       Assert.areEqual(
-        Date.today().addDays(30),
+        Date.today().addDays(35),
         copy.StartDate.date(),
         'Shifted to the new start date'
       );
@@ -215,7 +215,7 @@ private class BranchTemplateServiceTest {
         WHERE CourseOfferingId = :copy.Id
       ];
       Assert.areEqual(
-        Date.today().addDays(30),
+        Date.today().addDays(35),
         pattern.StartDate,
         'Pattern shifted'
       );
@@ -370,6 +370,27 @@ private class BranchTemplateServiceTest {
       Assert.areEqual(1, o.totals.openEnquiries, 'Totals enquiries');
       Assert.areEqual('All branches', o.totals.name, 'Totals label');
     }
+  }
+
+  @IsTest
+  static void timetableMovesInWholeWeeks() {
+    Date monday = Date.newInstance(2026, 9, 7);
+    Assert.areEqual(
+      56,
+      BranchTemplateService.weeksShift(monday, Date.newInstance(2026, 11, 1)),
+      'Sunday target: next Monday, eight weeks later'
+    );
+    Assert.areEqual(
+      7,
+      BranchTemplateService.weeksShift(monday, monday.addDays(7)),
+      'Exact week'
+    );
+    Assert.areEqual(
+      -7,
+      BranchTemplateService.weeksShift(monday, monday.addDays(-10)),
+      'Earlier start stays on or after the chosen date'
+    );
+    Assert.areEqual(0, BranchTemplateService.weeksShift(null, monday), 'None');
   }
 
   @IsTest
