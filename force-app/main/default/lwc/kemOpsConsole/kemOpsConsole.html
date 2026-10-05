@@ -32,7 +32,7 @@
 
         <div class="tiles">
           <template for:each={queues} for:item="q">
-            <div key={q.key} class={q.className} title={q.hint}>
+            <div key={q.key} class={q.className} title={q.guidance}>
               <span class="tile-count">{q.count}</span>
               <span class="tile-label">{q.label}</span>
             </div>

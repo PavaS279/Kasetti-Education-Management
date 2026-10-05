@@ -76,7 +76,7 @@ public with sharing class OpsService {
     @AuraEnabled
     public Integer count;
     @AuraEnabled
-    public String hint;
+    public String guidance;
     /** ok, warning or error, when count is above zero. */
     @AuraEnabled
     public String severity;
@@ -438,14 +438,14 @@ public with sharing class OpsService {
     String key,
     String label,
     Integer count,
-    String hint,
+    String guidance,
     String severity
   ) {
     Queue q = new Queue();
     q.key = key;
     q.label = label;
     q.count = count;
-    q.hint = hint;
+    q.guidance = guidance;
     q.severity = severity;
     return q;
   }

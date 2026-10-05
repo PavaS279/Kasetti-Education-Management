@@ -175,10 +175,10 @@ private class Phase2JourneyTest {
         classA.Class_Status__c,
         'One seat, taken by Lata'
       );
-      WaitlistService.JoinRequest join = new WaitlistService.JoinRequest();
-      join.learnerAccountId = manu.Id;
-      join.offeringId = classA.Id;
-      Id entryId = WaitlistService.join(join);
+      WaitlistService.JoinRequest joinRequest = new WaitlistService.JoinRequest();
+      joinRequest.learnerAccountId = manu.Id;
+      joinRequest.offeringId = classA.Id;
+      Id entryId = WaitlistService.joinRequest(joinRequest);
 
       EnrolmentService.withdraw(
         enrolmentOf('Lata', 'Journey A'),

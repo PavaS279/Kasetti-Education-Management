@@ -67,7 +67,7 @@ function consoleData(overrides = {}) {
         label: "Sessions needing cover",
         count: 1,
         severity: "error",
-        hint: "Cover Desk"
+        guidance: "Cover Desk"
       },
       {
         key: "refunds",
