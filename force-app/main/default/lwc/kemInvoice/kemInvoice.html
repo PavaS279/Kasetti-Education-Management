@@ -109,6 +109,14 @@
                   disabled={isBusy}
                 ></lightning-button>
               </template>
+              <template lwc:if={canCredit}>
+                <lightning-button
+                  label="Issue credit note"
+                  icon-name="utility:undo"
+                  onclick={handleCredit}
+                  disabled={isBusy}
+                ></lightning-button>
+              </template>
               <template lwc:if={canCancel}>
                 <lightning-button
                   variant="destructive-text"

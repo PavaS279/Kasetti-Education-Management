@@ -206,6 +206,18 @@ private class TransferServiceTest {
         newOne.Billing_Status__c,
         'Covered by the original invoice'
       );
+      Credit_Note__c credit = [
+        SELECT Origin__c, Amount__c, Status__c, Source_Invoice__c, Reason__c
+        FROM Credit_Note__c
+        WHERE Enrolment__c = :newId
+      ];
+      Assert.areEqual('Transfer', credit.Origin__c, 'Transfer credit note');
+      Assert.areEqual(472, credit.Amount__c, 'Issued for the difference');
+      Assert.areEqual('Open', credit.Status__c, 'Ready to use or refund');
+      Assert.isNotNull(
+        credit.Source_Invoice__c,
+        'Linked to the original invoice'
+      );
       Test.stopTest();
     }
   }

@@ -295,7 +295,10 @@ public with sharing class InsightsService {
       (Decimal) [
           SELECT SUM(Amount__c) total
           FROM Student_Payment__c
-          WHERE Status__c = 'Confirmed' AND Payment_Date__c >= :monthStart
+          WHERE
+            Status__c = 'Confirmed'
+            AND Method__c != :CreditService.CREDIT_METHOD
+            AND Payment_Date__c >= :monthStart
           WITH USER_MODE
         ][0]
         .get('total')

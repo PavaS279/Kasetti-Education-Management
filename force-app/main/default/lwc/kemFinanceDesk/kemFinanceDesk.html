@@ -124,12 +124,70 @@
                       disabled={isBusy}
                     ></lightning-button>
                     <lightning-button
+                      label="Hold as credit"
+                      data-id={p.Id}
+                      onclick={handleHoldCredit}
+                      disabled={isBusy}
+                    ></lightning-button>
+                    <lightning-button
                       label="Close"
                       data-id={p.Id}
                       onclick={handleClose}
                       disabled={isBusy}
                     ></lightning-button>
                   </lightning-button-group>
+                </template>
+              </li>
+            </template>
+          </template>
+
+          <template lwc:if={showRefunds}>
+            <template for:each={refundRows} for:item="r">
+              <li key={r.Id} class="row">
+                <div class="main">
+                  <a
+                    href="#"
+                    data-id={r.Credit_Note__c}
+                    onclick={handleNavigate}
+                    class="strong"
+                    >{r.Name} · {r.creditName}</a
+                  >
+                  <div class="kem-muted small">
+                    {r.payee} · {r.Method__c} · requested {r.dateLabel} by
+                    {r.requestedBy} · {r.Reason__c}
+                  </div>
+                </div>
+                <span class={r.statusClass}>{r.statusLabel}</span>
+                <lightning-formatted-number
+                  class="money"
+                  value={r.Amount__c}
+                  format-style="currency"
+                  currency-code={currencyCode}
+                ></lightning-formatted-number>
+                <template lwc:if={r.canDecide}>
+                  <lightning-button-group>
+                    <lightning-button
+                      label="Approve"
+                      data-id={r.Id}
+                      onclick={handleApproveRefund}
+                      disabled={isBusy}
+                    ></lightning-button>
+                    <lightning-button
+                      label="Reject"
+                      data-id={r.Id}
+                      onclick={handleRejectRefund}
+                      disabled={isBusy}
+                    ></lightning-button>
+                  </lightning-button-group>
+                </template>
+                <template lwc:if={r.canPay}>
+                  <lightning-button
+                    variant="brand"
+                    label="Mark paid"
+                    data-id={r.Id}
+                    onclick={handlePayRefund}
+                    disabled={isBusy}
+                  ></lightning-button>
                 </template>
               </li>
             </template>

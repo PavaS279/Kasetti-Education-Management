@@ -39,6 +39,11 @@
                 <default>false</default>
                 <label>Online Gateway</label>
             </value>
+            <value>
+                <fullName>Credit Note</fullName>
+                <default>false</default>
+                <label>Credit Note</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

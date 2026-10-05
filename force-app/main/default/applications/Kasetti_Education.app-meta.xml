@@ -20,6 +20,15 @@
     </actionOverrides>
     <actionOverrides>
         <actionName>View</actionName>
+        <comment>Kasetti credit note</comment>
+        <content>KEM_Credit_Note_Record_Page</content>
+        <formFactor>Large</formFactor>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Flexipage</type>
+        <pageOrSobjectType>Credit_Note__c</pageOrSobjectType>
+    </actionOverrides>
+    <actionOverrides>
+        <actionName>View</actionName>
         <comment>Kasetti invoice</comment>
         <content>KEM_Invoice_Record_Page</content>
         <formFactor>Large</formFactor>

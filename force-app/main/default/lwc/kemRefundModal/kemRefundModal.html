@@ -1,0 +1,57 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <div class="summary">
+      <span class="kem-muted small">Available to refund to {payerName}</span>
+      <lightning-formatted-number
+        class="available"
+        value={available}
+        format-style="currency"
+        currency-code={currencyCode}
+      ></lightning-formatted-number>
+    </div>
+    <div class="form-grid">
+      <lightning-input
+        type="number"
+        label="Amount"
+        value={amount}
+        formatter="currency"
+        step="0.01"
+        min="0.01"
+        max={available}
+        onchange={handleAmount}
+        required
+      ></lightning-input>
+      <lightning-combobox
+        label="Pay by"
+        value={method}
+        options={methodOptions}
+        onchange={handleMethod}
+        required
+      ></lightning-combobox>
+    </div>
+    <lightning-textarea
+      label="Reason"
+      value={reason}
+      onchange={handleReason}
+      max-length="255"
+      required
+    ></lightning-textarea>
+    <div class={approvalClass}>{approvalNote}</div>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Request refund"
+      onclick={handleSubmit}
+      disabled={cannotSubmit}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

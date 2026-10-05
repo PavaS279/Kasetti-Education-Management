@@ -10,6 +10,7 @@ import failPayment from "@salesforce/apex/BillingController.failPayment";
 import removeInstalmentPlan from "@salesforce/apex/BillingController.removeInstalmentPlan";
 import LightningConfirm from "lightning/confirm";
 import InstalmentModal from "c/kemInstalmentModal";
+import CreditModal from "c/kemCreditModal";
 import PaymentModal from "c/kemPaymentModal";
 import ReasonModal from "c/kemReasonModal";
 import { reduceErrors, toast, toastError } from "c/kemUtils";
@@ -124,8 +125,21 @@ export default class KemInvoice extends NavigationMixin(LightningElement) {
       this.paid === 0
     );
   }
+  get canCredit() {
+    return (
+      this.view.canManage &&
+      ["Paid", "Partially Paid"].includes(this.status) &&
+      this.paid > 0
+    );
+  }
   get hasActions() {
-    return this.canIssue || this.canPay || this.canCancel || this.canPlan;
+    return (
+      this.canIssue ||
+      this.canPay ||
+      this.canCancel ||
+      this.canPlan ||
+      this.canCredit
+    );
   }
   get isCancelled() {
     return this.status === "Cancelled";
@@ -181,7 +195,11 @@ export default class KemInvoice extends NavigationMixin(LightningElement) {
     return this.view.allocations.map((a) => ({
       ...a,
       paymentName: a.Student_Payment__r?.Name,
-      receipt: a.Student_Payment__r?.Receipt_Number__c,
+      receipt:
+        a.Student_Payment__r?.Method__c === "Credit Note"
+          ? `Credit ${a.Student_Payment__r?.Reference__c}`
+          : a.Student_Payment__r?.Receipt_Number__c,
+      isCredit: a.Student_Payment__r?.Method__c === "Credit Note",
       method: a.Student_Payment__r?.Method__c,
       reference: a.Student_Payment__r?.Reference__c,
       dateLabel: formatDate(a.Student_Payment__r?.Payment_Date__c)
@@ -271,6 +289,27 @@ export default class KemInvoice extends NavigationMixin(LightningElement) {
       "The invoice is now due on the first unpaid instalment."
     );
     await this.refresh();
+  }
+
+  async handleCredit() {
+    const creditNoteId = await CreditModal.open({
+      size: "small",
+      invoiceId: this.recordId,
+      invoiceNumber: this.invoice.Name,
+      paid: this.paid
+    });
+    if (!creditNoteId) {
+      return;
+    }
+    toast(
+      this,
+      "Credit note issued",
+      "It is used on the family's next invoice, or can be refunded from the credit note."
+    );
+    this[NavigationMixin.Navigate]({
+      type: "standard__recordPage",
+      attributes: { recordId: creditNoteId, actionName: "view" }
+    });
   }
 
   async handleRemovePlan() {

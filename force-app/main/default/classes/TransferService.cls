@@ -9,7 +9,8 @@
  * Money: if the original enrolment was never invoiced, its uninvoiced fee lines
  * are dropped and the new enrolment is billed normally. If it was invoiced, the
  * new enrolment is billed only for a price increase (one adjustment line); a
- * price decrease is recorded as Credit_Due__c for a credit note or refund.
+ * price decrease is recorded as Credit_Due__c and issued as a credit note
+ * (CreditService) to be used on a later invoice or refunded.
  */
 public with sharing class TransferService {
   public class TransferRequest {
@@ -134,6 +135,22 @@ public with sharing class TransferService {
         // Never invoiced: the old price simply lapses.
         writer.deleteRecords(feeLines(source.Id, true));
       }
+      if (invoiced && difference < 0) {
+        // Money already paid for the dearer class is held as a credit note,
+        // used on the next invoice or refunded.
+        CreditService.issueForTransfer(
+          targetId,
+          source.Id,
+          -difference,
+          ('Transfer from ' +
+            source.CourseOffering.Name +
+            ' to ' +
+            targetName +
+            ': ' +
+            request.reason)
+            .left(255)
+        );
+      }
       writer.updateRecords(
         new List<SObject>{
           target,
@@ -197,7 +214,7 @@ public with sharing class TransferService {
       return 'Already invoiced: only the difference is billed on the new enrolment.';
     }
     if (difference < 0) {
-      return 'Already invoiced: the difference is recorded as credit due to the family.';
+      return 'Already invoiced: the difference is issued to the family as a credit note.';
     }
     return 'Already invoiced: same price, nothing more to bill.';
   }

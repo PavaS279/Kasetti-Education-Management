@@ -5,6 +5,7 @@ import issueInvoice from "@salesforce/apex/BillingController.issueInvoice";
 import confirmPayment from "@salesforce/apex/BillingController.confirmPayment";
 import PaymentModal from "c/kemPaymentModal";
 import InstalmentModal from "c/kemInstalmentModal";
+import CreditModal from "c/kemCreditModal";
 import removeInstalmentPlan from "@salesforce/apex/BillingController.removeInstalmentPlan";
 import LightningConfirm from "lightning/confirm";
 
@@ -36,6 +37,11 @@ jest.mock(
 jest.mock(
   "@salesforce/apex/BillingController.removeInstalmentPlan",
   () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "c/kemCreditModal",
+  () => ({ __esModule: true, default: { open: jest.fn() } }),
   { virtual: true }
 );
 jest.mock(
@@ -241,5 +247,33 @@ describe("c-kem-invoice", () => {
     expect(removeInstalmentPlan).toHaveBeenCalledWith({
       invoiceId: "a0I000000000001"
     });
+  });
+
+  it("issues a credit note on a paid invoice and labels credit payments", async () => {
+    const paid = view({
+      Status__c: "Paid",
+      Amount_Paid__c: 7080,
+      Balance_Due__c: 0
+    });
+    paid.allocations.push({
+      Id: "a0A000000000002",
+      Amount__c: 1000,
+      Student_Payment__c: "a0P000000000009",
+      Student_Payment__r: {
+        Name: "PAY-000009",
+        Method__c: "Credit Note",
+        Reference__c: "CN-000001"
+      }
+    });
+    getInvoice.mockResolvedValue(paid);
+    CreditModal.open.mockResolvedValue(null);
+    const element = await mount();
+    expect(element.shadowRoot.textContent).toContain("Credit CN-000001");
+    expect(button(element, "Record payment")).toBeUndefined();
+    button(element, "Issue credit note").click();
+    await flush();
+    expect(CreditModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ invoiceId: "a0I000000000001", paid: 7080 })
+    );
   });
 });

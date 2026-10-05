@@ -250,6 +250,7 @@ public with sharing class BillingService {
     writer.updateRecords(updates);
     refreshInvoices(new Set<Id>{ invoice.Id });
     if (issueNow == true) {
+      CreditService.autoApply(new Set<Id>{ invoice.Id });
       queueInvoiceDocuments(new Set<Id>{ invoice.Id });
     }
     return invoice.Id;
@@ -337,6 +338,7 @@ public with sharing class BillingService {
     stampIssue(change, new BranchPolicy(loadBranch(invoice.Branch__c)));
     new Writer().updateRecords(new List<SObject>{ change });
     refreshInvoices(new Set<Id>{ invoiceId });
+    CreditService.autoApply(new Set<Id>{ invoiceId });
     DocumentService.enqueue(new Set<Id>{ invoiceId }, DocumentService.INVOICE);
   }
 
@@ -1016,7 +1018,10 @@ public with sharing class BillingService {
       (Decimal) [
           SELECT SUM(Amount__c) total
           FROM Student_Payment__c
-          WHERE Status__c = 'Confirmed' AND Payment_Date__c >= :monthStart
+          WHERE
+            Status__c = 'Confirmed'
+            AND Method__c != :CreditService.CREDIT_METHOD
+            AND Payment_Date__c >= :monthStart
           WITH USER_MODE
         ][0]
         .get('total')
@@ -1040,7 +1045,9 @@ public with sharing class BillingService {
     desk.exceptions = paymentList(
       'Status__c = \'Confirmed\' AND Reconciliation_Status__c = \'Exception\''
     );
-    desk.recent = paymentList('Status__c = \'Confirmed\'');
+    desk.recent = paymentList(
+      'Status__c = \'Confirmed\' AND Method__c != \'Credit Note\''
+    );
     desk.canManage = FeatureManagement.checkPermission(MANAGE_PERMISSION);
     return desk;
   }
@@ -1082,8 +1089,7 @@ public with sharing class BillingService {
    * Sets invoice status from its paid amount, settles instalments, and keeps
    * enrolment billing status in step.
    */
-  @TestVisible
-  private static void refreshInvoices(Set<Id> invoiceIds) {
+  public static void refreshInvoices(Set<Id> invoiceIds) {
     if (invoiceIds.isEmpty()) {
       return;
     }

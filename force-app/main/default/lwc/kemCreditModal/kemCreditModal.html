@@ -1,0 +1,56 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <p class="intro">
+      Credits part of what the family has paid. The credit is used on their next
+      invoice automatically, or can be refunded from the credit note. Paid on
+      this invoice:
+      <lightning-formatted-number
+        value={paid}
+        format-style="currency"
+        currency-code={currencyCode}
+      ></lightning-formatted-number>
+    </p>
+    <div class="form-grid">
+      <lightning-input
+        type="number"
+        label="Credit amount"
+        value={amount}
+        formatter="currency"
+        step="0.01"
+        min="0.01"
+        max={paid}
+        onchange={handleAmount}
+        required
+      ></lightning-input>
+      <lightning-combobox
+        label="Origin"
+        value={origin}
+        options={originOptions}
+        onchange={handleOrigin}
+      ></lightning-combobox>
+    </div>
+    <lightning-textarea
+      label="Reason"
+      value={reason}
+      onchange={handleReason}
+      max-length="255"
+      required
+    ></lightning-textarea>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Issue credit note"
+      onclick={handleSubmit}
+      disabled={cannotSubmit}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

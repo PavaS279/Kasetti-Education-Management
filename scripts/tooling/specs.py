@@ -428,7 +428,9 @@ OBJECTS = [
              "help": "The invoice the payer intended to pay. Allocation starts here."},
             {"name": "Branch__c", "label": "Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Payments", "relLabel": "Payments", "systemManaged": True},
             {"name": "Amount__c", "label": "Amount", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True, "track": True},
-            {"name": "Method__c", "label": "Method", "type": "Picklist", "values": ["Cash", "Card", "UPI", "Bank Transfer", "Cheque", "Online Gateway"], "systemManaged": True},
+            {"name": "Method__c", "label": "Method", "type": "Picklist", "values": ["Cash", "Card", "UPI", "Bank Transfer", "Cheque", "Online Gateway", "Credit Note"], "systemManaged": True},
+            {"name": "Credit_Note__c", "label": "Credit Note", "type": "Lookup", "ref": "Credit_Note__c", "relName": "Applications", "relLabel": "Applications", "systemManaged": True,
+             "help": "For method Credit Note: the credit note whose balance paid this invoice."},
             {"name": "Status__c", "label": "Status", "type": "Picklist", "values": ["Pending", "Confirmed", "Failed"], "default": "Pending", "systemManaged": True, "track": True},
             {"name": "Payment_Date__c", "label": "Payment Date", "type": "Date", "systemManaged": True},
             {"name": "Reference__c", "label": "Reference", "type": "Text", "length": 100, "systemManaged": True, "help": "Cheque number, bank reference, or card slip."},
@@ -453,6 +455,51 @@ OBJECTS = [
             {"name": "Student_Payment__c", "label": "Payment", "type": "MasterDetail", "ref": "Student_Payment__c", "relName": "Allocations", "relLabel": "Allocations", "order": 1},
             {"name": "Amount__c", "label": "Amount", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True},
             {"name": "Allocated_On__c", "label": "Allocated On", "type": "DateTime", "systemManaged": True},
+        ],
+    },
+    {
+        "name": "Credit_Note__c", "label": "Credit Note", "plural": "Credit Notes", "sharing": "Private", "externalSharing": "Private", "history": True,
+        "nameField": {"label": "Credit Note Number", "type": "AutoNumber", "format": "CN-{000000}"},
+        "description": "Money owed back to a payer: an overpayment, a cheaper class after a transfer, or a credit granted on a paid invoice. Used against later invoices or refunded.",
+        "fields": [
+            {"name": "Bill_To__c", "label": "Payer", "type": "Lookup", "ref": "Contact", "relName": "Credit_Notes", "relLabel": "Credit Notes", "systemManaged": True},
+            {"name": "Learner__c", "label": "Learner", "type": "Lookup", "ref": "Contact", "relName": "Learner_Credit_Notes", "relLabel": "Credit Notes (Learner)", "systemManaged": True},
+            {"name": "Learner_Account__c", "label": "Learner Account", "type": "Lookup", "ref": "Account", "relName": "Credit_Notes", "relLabel": "Credit Notes", "systemManaged": True},
+            {"name": "Enrolment__c", "label": "Enrolment", "type": "Lookup", "ref": "CourseOfferingParticipant", "relName": "Credit_Notes", "relLabel": "Credit Notes", "systemManaged": True},
+            {"name": "Source_Invoice__c", "label": "Source Invoice", "type": "Lookup", "ref": "Student_Invoice__c", "relName": "Credit_Notes", "relLabel": "Credit Notes", "systemManaged": True},
+            {"name": "Source_Payment__c", "label": "Source Payment", "type": "Lookup", "ref": "Student_Payment__c", "relName": "Credit_Notes", "relLabel": "Credit Notes", "systemManaged": True},
+            {"name": "Branch__c", "label": "Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Credit_Notes", "relLabel": "Credit Notes", "systemManaged": True},
+            {"name": "Origin__c", "label": "Origin", "type": "Picklist", "values": ["Overpayment", "Transfer", "Withdrawal", "Goodwill", "Other"], "systemManaged": True},
+            {"name": "Reason__c", "label": "Reason", "type": "Text", "length": 255, "systemManaged": True},
+            {"name": "Issue_Date__c", "label": "Issue Date", "type": "Date", "systemManaged": True},
+            {"name": "Amount__c", "label": "Amount", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True, "track": True},
+            {"name": "Amount_Applied__c", "label": "Applied to Invoices", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True},
+            {"name": "Amount_Refunded__c", "label": "Refunded", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True},
+            {"name": "Balance__c", "label": "Balance", "type": "Formula", "returnType": "Currency", "scale": 2,
+             "formula": "IF(ISPICKVAL(Status__c, 'Void'), 0, BLANKVALUE(Amount__c, 0) - BLANKVALUE(Amount_Applied__c, 0) - BLANKVALUE(Amount_Refunded__c, 0))"},
+            {"name": "Status__c", "label": "Status", "type": "Picklist", "values": ["Open", "Partially Used", "Used", "Void"], "default": "Open", "systemManaged": True, "track": True},
+            {"name": "Void_Reason__c", "label": "Void Reason", "type": "Text", "length": 255, "systemManaged": True},
+        ],
+    },
+    {
+        "name": "Refund__c", "label": "Refund", "plural": "Refunds", "sharing": "Private", "externalSharing": "Private", "history": True,
+        "nameField": {"label": "Refund Number", "type": "AutoNumber", "format": "RFD-{000000}"},
+        "description": "Payout of a credit note balance to the payer. Above the auto-approval limit it needs approval by someone other than the requester.",
+        "fields": [
+            {"name": "Credit_Note__c", "label": "Credit Note", "type": "Lookup", "ref": "Credit_Note__c", "relName": "Refunds", "relLabel": "Refunds", "systemManaged": True},
+            {"name": "Payee__c", "label": "Payee", "type": "Lookup", "ref": "Contact", "relName": "Refunds", "relLabel": "Refunds", "systemManaged": True},
+            {"name": "Branch__c", "label": "Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Refunds", "relLabel": "Refunds", "systemManaged": True},
+            {"name": "Amount__c", "label": "Amount", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True, "track": True},
+            {"name": "Method__c", "label": "Method", "type": "Picklist", "values": ["Bank Transfer", "UPI", "Cash", "Cheque", "Card Reversal", "Online Gateway"], "systemManaged": True},
+            {"name": "Status__c", "label": "Status", "type": "Picklist", "values": ["Requested", "Approved", "Paid", "Rejected"], "default": "Requested", "systemManaged": True, "track": True},
+            {"name": "Reason__c", "label": "Reason", "type": "Text", "length": 255, "systemManaged": True},
+            {"name": "Requested_By__c", "label": "Requested By", "type": "Lookup", "ref": "User", "relName": "Refunds_Requested", "relLabel": "Refunds Requested", "systemManaged": True},
+            {"name": "Approved_By__c", "label": "Decided By", "type": "Lookup", "ref": "User", "relName": "Refunds_Decided", "relLabel": "Refunds Decided", "systemManaged": True},
+            {"name": "Decided_On__c", "label": "Decided On", "type": "DateTime", "systemManaged": True},
+            {"name": "Auto_Approved__c", "label": "Auto-approved", "type": "Checkbox", "systemManaged": True, "help": "Within the refund auto-approval limit."},
+            {"name": "Rejection_Reason__c", "label": "Rejection Reason", "type": "Text", "length": 255, "systemManaged": True},
+            {"name": "Paid_On__c", "label": "Paid On", "type": "Date", "systemManaged": True},
+            {"name": "Reference__c", "label": "Payout Reference", "type": "Text", "length": 100, "systemManaged": True},
         ],
     },
     {
@@ -613,7 +660,7 @@ LEARNER_CLASSES = ["Learner360Controller"]
 PRICING_CLASSES = ["PricingController"]
 ENROLMENT_CLASSES = ["EnrolmentController", "WaitlistController", "TransferController"]
 SCHEDULE_CLASSES = ["TimetableController", "AttendanceController", "AssessmentController"]
-BILLING_CLASSES = ["BillingController"]
+BILLING_CLASSES = ["BillingController", "CreditController"]
 DOCUMENT_CLASSES = ["DocumentController", "KemDocumentController"]
 DOCUMENT_PAGES = ["KEM_Offer_Letter", "KEM_Invoice_Pdf", "KEM_Receipt_Pdf"]
 
@@ -635,13 +682,13 @@ STAFF_TABS = ["Branch__c", "Room__c", "Branch_Staff__c", "Fee_Price__c", "Discou
 PERMISSION_SETS = [
     {"name": "KEM_Administrator", "label": "KEM Administrator",
      "description": "Institution administrator: configures branches, policies, and has full access to Kasetti Education Management data.",
-     "license": STAFF_LICENSE, "objects": {"Instalment__c": "CEDM", "Waitlist_Entry__c": "CEDM", "Student_Invoice__c": "CEDM", "Invoice_Line__c": "CEDM", "Student_Payment__c": "CEDM", "Payment_Allocation__c": "CEDM", "Course_Assessment__c": "CEDM", "Assessment_Result__c": "CEDM", "Session_Attendance__c": "CEDM", "Class_Session__c": "CEDM", "Calendar_Closure__c": "CEDM", "Fee_Price__c": "CEDM", "Discount__c": "CEDM", "Enrolment_Fee_Line__c": "CEDM", "DocumentChecklistItem": "CEDV", "Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "LearnerProfile": "CEDV", "CourseOffering": "CEDV", "CourseOfferingParticipant": "CEDV", "CourseOfferingSchedule": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
+     "license": STAFF_LICENSE, "objects": {"Credit_Note__c": "CEDM", "Refund__c": "CEDM", "Instalment__c": "CEDM", "Waitlist_Entry__c": "CEDM", "Student_Invoice__c": "CEDM", "Invoice_Line__c": "CEDM", "Student_Payment__c": "CEDM", "Payment_Allocation__c": "CEDM", "Course_Assessment__c": "CEDM", "Assessment_Result__c": "CEDM", "Session_Attendance__c": "CEDM", "Class_Session__c": "CEDM", "Calendar_Closure__c": "CEDM", "Fee_Price__c": "CEDM", "Discount__c": "CEDM", "Enrolment_Fee_Line__c": "CEDM", "DocumentChecklistItem": "CEDV", "Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "LearnerProfile": "CEDV", "CourseOffering": "CEDV", "CourseOfferingParticipant": "CEDV", "CourseOfferingSchedule": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
                  "IndividualApplication": "CEDV", "ContactContactRelation": "CEDV"},
-     "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES + BILLING_CLASSES + DOCUMENT_CLASSES, "pages": DOCUMENT_PAGES, "custom": ["KEM_Approve_Discounts", "KEM_Manage_Billing"], "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications", "Error_Log__c", "KEM_Finance_Desk"]},
+     "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES + BILLING_CLASSES + DOCUMENT_CLASSES, "pages": DOCUMENT_PAGES, "custom": ["KEM_Approve_Refunds", "KEM_Approve_Discounts", "KEM_Manage_Billing"], "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications", "Error_Log__c", "KEM_Finance_Desk"]},
     {"name": "KEM_Branch_Manager", "label": "KEM Branch Manager",
      "description": "Branch manager: manages rooms, classes, staff allocation, and learners for their branch.",
-     "license": STAFF_LICENSE, "objects": {"Instalment__c": "V", "Waitlist_Entry__c": "CEV", "Student_Invoice__c": "CEV", "Invoice_Line__c": "V", "Student_Payment__c": "CEV", "Payment_Allocation__c": "V", "Course_Assessment__c": "CEDV", "Assessment_Result__c": "CEDV", "Session_Attendance__c": "CEDV", "Class_Session__c": "CEDM", "Calendar_Closure__c": "CED", "Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "CED", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "E", "Room__c": "CED", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
-                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES + BILLING_CLASSES + DOCUMENT_CLASSES, "pages": DOCUMENT_PAGES, "custom": ["KEM_Manage_Billing"], "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
+     "license": STAFF_LICENSE, "objects": {"Credit_Note__c": "V", "Refund__c": "V", "Instalment__c": "V", "Waitlist_Entry__c": "CEV", "Student_Invoice__c": "CEV", "Invoice_Line__c": "V", "Student_Payment__c": "CEV", "Payment_Allocation__c": "V", "Course_Assessment__c": "CEDV", "Assessment_Result__c": "CEDV", "Session_Attendance__c": "CEDV", "Class_Session__c": "CEDM", "Calendar_Closure__c": "CED", "Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "CE", "CourseOffering": "CE", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "CED", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "E", "Room__c": "CED", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
+                 "ContactContactRelation": "CE"}, "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES + BILLING_CLASSES + DOCUMENT_CLASSES, "pages": DOCUMENT_PAGES, "custom": ["KEM_Approve_Refunds", "KEM_Manage_Billing"], "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications"]},
     {"name": "KEM_Admissions_Counsellor", "label": "KEM Admissions Counsellor",
      "description": "Admissions counsellor: works enquiries, applications, offers, and follow-ups.",
      "license": STAFF_LICENSE, "objects": {"Instalment__c": "", "Waitlist_Entry__c": "CE", "Student_Invoice__c": "", "Invoice_Line__c": "", "Student_Payment__c": "", "Payment_Allocation__c": "", "Course_Assessment__c": "", "Assessment_Result__c": "", "Session_Attendance__c": "", "Class_Session__c": "", "Calendar_Closure__c": "", "Enrolment_Fee_Line__c": "CE", "Fee_Price__c": "", "Discount__c": "", "DocumentChecklistItem": "CED", "CourseOffering": "", "CourseOfferingParticipant": "CE", "CourseOfferingSchedule": "", "LearnerProfile": "CE", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Lead": "CE", "Account": "CE", "Contact": "CE", "IndividualApplication": "CE",
@@ -655,7 +702,7 @@ PERMISSION_SETS = [
      "license": STAFF_LICENSE, "objects": {"Waitlist_Entry__c": "", "Course_Assessment__c": "CE", "Assessment_Result__c": "", "Session_Attendance__c": "", "Class_Session__c": "", "Calendar_Closure__c": "", "Fee_Price__c": "", "Discount__c": "", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": ""}, "classes": LEARNER_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES, "apps": STAFF_APPS, "tabs": STAFF_TABS},
     {"name": "KEM_Finance", "label": "KEM Finance",
      "description": "Finance user: manages fees, invoices, payments, allocations, and reconciliation.",
-     "license": STAFF_LICENSE, "objects": {"Instalment__c": "CEDM", "Waitlist_Entry__c": "", "Student_Invoice__c": "CEDM", "Invoice_Line__c": "CEDM", "Student_Payment__c": "CEDM", "Payment_Allocation__c": "CEDM", "Course_Assessment__c": "", "Assessment_Result__c": "", "Session_Attendance__c": "", "Class_Session__c": "", "Calendar_Closure__c": "", "Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "CEDV", "Discount__c": "CEDV", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": "", "ContactContactRelation": ""}, "classes": LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES + BILLING_CLASSES + DOCUMENT_CLASSES, "pages": DOCUMENT_PAGES, "custom": ["KEM_Approve_Discounts", "KEM_Manage_Billing"], "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Finance_Desk"]},
+     "license": STAFF_LICENSE, "objects": {"Credit_Note__c": "CEDM", "Refund__c": "CEDM", "Instalment__c": "CEDM", "Waitlist_Entry__c": "", "Student_Invoice__c": "CEDM", "Invoice_Line__c": "CEDM", "Student_Payment__c": "CEDM", "Payment_Allocation__c": "CEDM", "Course_Assessment__c": "", "Assessment_Result__c": "", "Session_Attendance__c": "", "Class_Session__c": "", "Calendar_Closure__c": "", "Enrolment_Fee_Line__c": "CEV", "Fee_Price__c": "CEDV", "Discount__c": "CEDV", "CourseOffering": "", "CourseOfferingParticipant": "", "CourseOfferingSchedule": "", "LearnerProfile": "", "Log_Event__e": "C", "Branch_Staff__c": "", "Learning": "", "LearningCourse": "", "LearningProgram": "", "Branch__c": "", "Room__c": "", "Account": "", "Contact": "", "ContactContactRelation": ""}, "classes": LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES + BILLING_CLASSES + DOCUMENT_CLASSES, "pages": DOCUMENT_PAGES, "custom": ["KEM_Approve_Discounts", "KEM_Manage_Billing"], "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Finance_Desk"]},
     {"name": "KEM_Eligibility_Override", "label": "KEM Eligibility Override",
      "description": "Allows overriding a failed eligibility check on an application. Grant to administrators and branch managers.",
      "objects": {}, "custom": ["KEM_Override_Eligibility"]},
@@ -695,6 +742,13 @@ TRANSITIONS = {
     ],
     ("Student_Payment__c", "Status__c"): [
         ("Pending", "Confirmed"), ("Pending", "Failed"),
+    ],
+    ("Credit_Note__c", "Status__c"): [
+        ("Open", "Partially Used"), ("Open", "Used"), ("Partially Used", "Used"), ("Open", "Void"), ("Partially Used", "Open"),
+        ("Used", "Partially Used"), ("Used", "Open"),
+    ],
+    ("Refund__c", "Status__c"): [
+        ("Requested", "Approved"), ("Requested", "Rejected"), ("Approved", "Paid"), ("Approved", "Rejected"),
     ],
     ("Waitlist_Entry__c", "Status__c"): [
         ("Waiting", "Offered"), ("Waiting", "Cancelled"), ("Offered", "Enrolled"), ("Offered", "Declined"),

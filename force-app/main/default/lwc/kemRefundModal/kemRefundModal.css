@@ -1,0 +1,51 @@
+@import "c/kemStyles";
+
+.summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-canvas);
+}
+
+.available {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--kem-teal);
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.note {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+}
+
+.note_ok {
+  border-color: var(--kem-green);
+  background: #eef8f1;
+}
+
+.note_warn {
+  border-color: var(--kem-amber);
+  background: #fdf5e8;
+}
+
+@media (max-width: 30em) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

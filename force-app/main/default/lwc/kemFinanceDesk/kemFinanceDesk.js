@@ -5,12 +5,18 @@ import getFinanceDesk from "@salesforce/apex/BillingController.getFinanceDesk";
 import confirmPayment from "@salesforce/apex/BillingController.confirmPayment";
 import failPayment from "@salesforce/apex/BillingController.failPayment";
 import resolveException from "@salesforce/apex/BillingController.resolveException";
+import getRefundQueue from "@salesforce/apex/CreditController.getRefundQueue";
+import holdOverpayment from "@salesforce/apex/CreditController.holdOverpayment";
+import approveRefund from "@salesforce/apex/CreditController.approveRefund";
+import rejectRefund from "@salesforce/apex/CreditController.rejectRefund";
+import markRefundPaid from "@salesforce/apex/CreditController.markRefundPaid";
 import ReasonModal from "c/kemReasonModal";
 import { reduceErrors, toast, toastError } from "c/kemUtils";
 
 const TABS = [
   { value: "pending", label: "Awaiting confirmation" },
   { value: "exceptions", label: "Reconciliation exceptions" },
+  { value: "refunds", label: "Refunds" },
   { value: "overdue", label: "Overdue invoices" },
   { value: "recent", label: "Recent receipts" }
 ];
@@ -34,6 +40,7 @@ function daysOverdue(value) {
 export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
   currencyCode = CURRENCY;
   desk;
+  refunds;
   errorMessage;
   activeTab = "pending";
   isBusy = false;
@@ -44,7 +51,12 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
 
   async load() {
     try {
-      this.desk = await getFinanceDesk();
+      const [desk, refunds] = await Promise.all([
+        getFinanceDesk(),
+        getRefundQueue()
+      ]);
+      this.desk = desk;
+      this.refunds = refunds;
       this.errorMessage = undefined;
     } catch (error) {
       this.errorMessage = reduceErrors(error).join(" ");
@@ -70,6 +82,12 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
         label: "Collected this month",
         value: this.desk.collectedThisMonth,
         className: "kpi kem-card kpi_good"
+      },
+      {
+        key: "credit",
+        label: "Open credit",
+        value: this.refunds.openCreditTotal,
+        className: "kpi kem-card"
       }
     ];
   }
@@ -78,6 +96,7 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
     const counts = {
       pending: this.desk.pending.length,
       exceptions: this.desk.exceptions.length,
+      refunds: this.refundCount,
       overdue: this.desk.overdue.length,
       recent: this.desk.recent.length
     };
@@ -86,7 +105,10 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
       count: counts[t.value],
       selected: t.value === this.activeTab ? "true" : "false",
       className: `tab${t.value === this.activeTab ? " tab_on" : ""}${
-        t.value === "exceptions" && counts.exceptions ? " tab_alert" : ""
+        (t.value === "exceptions" && counts.exceptions) ||
+        (t.value === "refunds" && this.refunds.awaitingApproval.length)
+          ? " tab_alert"
+          : ""
       }`
     }));
   }
@@ -96,6 +118,38 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
   }
   get showExceptions() {
     return this.activeTab === "exceptions";
+  }
+  get showRefunds() {
+    return this.activeTab === "refunds";
+  }
+  get refundCount() {
+    return (
+      this.refunds.awaitingApproval.length + this.refunds.awaitingPayout.length
+    );
+  }
+  get refundRows() {
+    const me = this.refunds.currentUserId;
+    const rows = [
+      ...this.refunds.awaitingApproval,
+      ...this.refunds.awaitingPayout
+    ];
+    return rows.map((r) => {
+      const requested = r.Status__c === "Requested";
+      return {
+        ...r,
+        payee: r.Payee__r?.Name || "—",
+        creditName: r.Credit_Note__r?.Name,
+        requestedBy: r.Requested_By__r?.Name,
+        dateLabel: formatDate(r.CreatedDate),
+        statusLabel: requested ? "Awaiting approval" : "Ready to pay",
+        statusClass: requested
+          ? "kem-badge kem-badge_warning"
+          : "kem-badge kem-badge_info",
+        canDecide:
+          requested && this.refunds.canApprove && r.Requested_By__c !== me,
+        canPay: !requested && this.refunds.canManage
+      };
+    });
   }
   get showOverdue() {
     return this.activeTab === "overdue";
@@ -143,6 +197,7 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
     const list = {
       pending: this.desk.pending,
       exceptions: this.desk.exceptions,
+      refunds: this.refundRows,
       overdue: this.desk.overdue,
       recent: this.desk.recent
     }[this.activeTab];
@@ -152,6 +207,7 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
     return {
       pending: "No payments are waiting for confirmation.",
       exceptions: "Every confirmed payment is reconciled.",
+      refunds: "No refunds are waiting for approval or payout.",
       overdue: "No invoices are overdue.",
       recent: "No payments received yet."
     }[this.activeTab];
@@ -248,6 +304,60 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
         () => resolveException({ paymentId, note }),
         "Payment reconciled",
         "The exception was closed."
+      );
+    }
+  }
+
+  async handleHoldCredit(event) {
+    const paymentId = event.currentTarget.dataset.id;
+    this.run(
+      () => holdOverpayment({ paymentId }),
+      "Held as credit",
+      "A credit note was issued to the payer; it is used on their next invoice or can be refunded."
+    );
+  }
+
+  handleApproveRefund(event) {
+    const refundId = event.currentTarget.dataset.id;
+    this.run(
+      () => approveRefund({ refundId }),
+      "Refund approved",
+      "It is ready to pay out."
+    );
+  }
+
+  async handleRejectRefund(event) {
+    const refundId = event.currentTarget.dataset.id;
+    const reason = await ReasonModal.open({
+      size: "small",
+      label: "Reject refund",
+      message: "The amount goes back to the credit balance.",
+      confirmLabel: "Reject",
+      confirmVariant: "destructive"
+    });
+    if (reason) {
+      this.run(
+        () => rejectRefund({ refundId, reason }),
+        "Refund rejected",
+        "The credit is available again."
+      );
+    }
+  }
+
+  async handlePayRefund(event) {
+    const refundId = event.currentTarget.dataset.id;
+    const reference = await ReasonModal.open({
+      size: "small",
+      label: "Record payout",
+      message: "Enter the bank, UPI or cheque reference of the payout.",
+      reasonLabel: "Payout reference",
+      confirmLabel: "Mark as paid"
+    });
+    if (reference) {
+      this.run(
+        () => markRefundPaid({ refundId, reference, paidOn: null }),
+        "Refund paid",
+        "The credit balance was reduced."
       );
     }
   }
