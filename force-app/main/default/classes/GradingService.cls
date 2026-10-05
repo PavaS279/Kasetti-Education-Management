@@ -355,7 +355,7 @@ public with sharing class GradingService {
     CourseOffering offering = loadOffering(offeringId);
     if (!canReopen(offering)) {
       throw new AppException(
-        'Only users who can edit the class can reopen final grades.'
+        'Only coordinators and administrators can reopen final grades.'
       );
     }
     if (offering.Grading_Status__c != FINAL_STATUS) {
@@ -722,14 +722,32 @@ public with sharing class GradingService {
     return canReopen(offering);
   }
 
-  /** Reopening final grades needs edit access to the class itself. */
+  /**
+   * Reopening final grades: edit access to the class, or Modify All on
+   * assessments (administrators and academic coordinators).
+   */
   private static Boolean canReopen(CourseOffering offering) {
     List<UserRecordAccess> access = [
       SELECT RecordId, HasEditAccess
       FROM UserRecordAccess
       WHERE UserId = :UserInfo.getUserId() AND RecordId = :offering.Id
     ];
-    return !access.isEmpty() && access[0].HasEditAccess;
+    if (!access.isEmpty() && access[0].HasEditAccess) {
+      return true;
+    }
+    return [
+        SELECT COUNT()
+        FROM PermissionSetAssignment
+        WHERE
+          AssigneeId = :UserInfo.getUserId()
+          AND PermissionSetId IN (
+            SELECT ParentId
+            FROM ObjectPermissions
+            WHERE
+              SobjectType = 'Course_Assessment__c'
+              AND PermissionsModifyAllRecords = TRUE
+          )
+      ] > 0;
   }
 
   private static void assertOpenAndEditable(CourseOffering offering) {
