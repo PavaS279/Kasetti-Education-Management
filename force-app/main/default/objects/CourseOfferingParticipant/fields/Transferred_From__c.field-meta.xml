@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Transferred_From__c</fullName>
+    <label>Transferred From</label>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <referenceTo>CourseOfferingParticipant</referenceTo>
+    <relationshipLabel>Transfers In</relationshipLabel>
+    <relationshipName>Transfers_In</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

@@ -113,12 +113,16 @@
                       data-id={r.enrolmentId}
                       onselect={handleRowAction}
                     >
-                      <template lwc:if={r.isActive}
-                        ><lightning-menu-item
+                      <template lwc:if={r.isActive}>
+                        <lightning-menu-item
+                          value="transfer"
+                          label="Transfer to another class"
+                        ></lightning-menu-item>
+                        <lightning-menu-item
                           value="withdraw"
                           label="Withdraw"
-                        ></lightning-menu-item
-                      ></template>
+                        ></lightning-menu-item>
+                      </template>
                       <template lwc:if={r.canDecide}>
                         <lightning-menu-item
                           value="approve"

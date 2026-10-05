@@ -1,0 +1,99 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <div class="section-title">Move to</div>
+    <ul class="options" role="listbox" aria-label="Classes">
+      <template for:each={classOptions} for:item="c">
+        <li key={c.Id}>
+          <button
+            type="button"
+            role="option"
+            class={c.className}
+            aria-selected={c.selected}
+            data-id={c.Id}
+            onclick={handlePick}
+          >
+            <span class="option-main">
+              <span class="strong">{c.Name}</span>
+              <span class="kem-muted small">{c.course} · {c.meta}</span>
+            </span>
+            <span class="kem-badge">{c.seats}</span>
+          </button>
+        </li>
+      </template>
+    </ul>
+    <template lwc:if={noClasses}>
+      <div class="kem-empty">No other open classes.</div>
+    </template>
+
+    <div class="form-grid">
+      <lightning-input
+        type="date"
+        label="Transfer date"
+        value={effectiveDate}
+        onchange={handleDate}
+        required
+      ></lightning-input>
+      <lightning-input
+        label="Reason"
+        value={reason}
+        onchange={handleReason}
+        required
+        max-length="200"
+      ></lightning-input>
+    </div>
+
+    <template lwc:if={preview}>
+      <div class="summary">
+        <div class="price">
+          <span class="kem-muted small">Current</span>
+          <lightning-formatted-number
+            value={preview.currentTotal}
+            format-style="currency"
+            currency-code={currencyCode}
+          ></lightning-formatted-number>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="price">
+          <span class="kem-muted small">New class</span>
+          <lightning-formatted-number
+            value={preview.newTotal}
+            format-style="currency"
+            currency-code={currencyCode}
+          ></lightning-formatted-number>
+        </div>
+        <div class={differenceClass}>
+          <span class="kem-muted small">Difference</span>
+          <lightning-formatted-number
+            value={preview.difference}
+            format-style="currency"
+            currency-code={currencyCode}
+          ></lightning-formatted-number>
+        </div>
+      </div>
+      <div class="outcome">{preview.billingOutcome}</div>
+      <template lwc:if={hasBlockers}>
+        <ul class="blockers">
+          <template for:each={preview.blockers} for:item="b">
+            <li key={b}>{b}</li>
+          </template>
+        </ul>
+      </template>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Transfer"
+      onclick={handleTransfer}
+      disabled={cannotTransfer}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

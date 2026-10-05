@@ -17,6 +17,7 @@ import PatternModal from "c/kemPatternModal";
 import generateSessions from "@salesforce/apex/TimetableController.generateSessions";
 import createInvoice from "@salesforce/apex/BillingController.createInvoice";
 import ReasonModal from "c/kemReasonModal";
+import TransferModal from "c/kemTransferModal";
 import { reduceErrors, toast, toastError, initials, toneFor } from "c/kemUtils";
 
 const ACTIVE = ["Enrolled", "On Hold"];
@@ -259,6 +260,26 @@ export default class KemClassRoster extends NavigationMixin(LightningElement) {
         await refreshApex(this.wiredResult);
         this.announceChange();
         this.announceChange();
+        return;
+      }
+      if (action === "transfer") {
+        const row = this.roster.rows.find((r) => r.enrolmentId === enrolmentId);
+        const newId = await TransferModal.open({
+          size: "medium",
+          enrolmentId,
+          learnerName: row?.learnerName,
+          currentOfferingId: this.recordId,
+          branchId: this.offering.Branch__c
+        });
+        if (newId) {
+          toast(
+            this,
+            "Learner transferred",
+            "The seat here was released and the history kept."
+          );
+          await refreshApex(this.wiredResult);
+          this.announceChange();
+        }
         return;
       }
       if (action === "withdraw") {

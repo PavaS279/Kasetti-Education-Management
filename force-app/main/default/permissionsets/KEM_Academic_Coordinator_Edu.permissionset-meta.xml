@@ -294,6 +294,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>CourseOfferingParticipant.Credit_Due__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>CourseOfferingParticipant.Discount_Approval_Status__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -370,6 +375,21 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>CourseOfferingParticipant.Summary</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CourseOfferingParticipant.Transfer_Adjustment__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CourseOfferingParticipant.Transferred_From__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CourseOfferingParticipant.Transferred_To__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

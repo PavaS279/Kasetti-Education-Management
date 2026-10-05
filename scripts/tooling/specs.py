@@ -187,6 +187,12 @@ OBJECTS = [
             {"name": "Sessions_Missed__c", "label": "Sessions Missed", "type": "Number", "precision": 5, "scale": 0, "systemManaged": True},
             {"name": "Attendance_Rate__c", "label": "Attendance Rate", "type": "Percent", "precision": 5, "scale": 2, "systemManaged": True},
             {"name": "Below_Attendance_Threshold__c", "label": "Below Attendance Threshold", "type": "Checkbox", "default": False, "systemManaged": True},
+            {"name": "Transferred_From__c", "label": "Transferred From", "type": "Lookup", "ref": "CourseOfferingParticipant", "relName": "Transfers_In", "relLabel": "Transfers In", "systemManaged": True},
+            {"name": "Transferred_To__c", "label": "Transferred To", "type": "Lookup", "ref": "CourseOfferingParticipant", "relName": "Transfers_Out", "relLabel": "Transfers Out", "systemManaged": True},
+            {"name": "Transfer_Adjustment__c", "label": "Transfer Price Difference", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True,
+             "help": "New agreed total minus the previous class's agreed total at transfer."},
+            {"name": "Credit_Due__c", "label": "Credit Due", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True,
+             "help": "Amount owed back to the family (for example a transfer to a cheaper class after invoicing). Settled by a credit note or refund."},
         ],
     },
     {
@@ -579,7 +585,7 @@ COMMON_CLASSES = {
 ENQUIRY_CLASSES = ["EnquiryController", "ApplicationController"]
 LEARNER_CLASSES = ["Learner360Controller"]
 PRICING_CLASSES = ["PricingController"]
-ENROLMENT_CLASSES = ["EnrolmentController", "WaitlistController"]
+ENROLMENT_CLASSES = ["EnrolmentController", "WaitlistController", "TransferController"]
 SCHEDULE_CLASSES = ["TimetableController", "AttendanceController", "AssessmentController"]
 BILLING_CLASSES = ["BillingController"]
 DOCUMENT_CLASSES = ["DocumentController", "KemDocumentController"]
