@@ -43,14 +43,14 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 
 **Completion condition — exceptions and recurring operations work reliably.**
 
-| #   | Feature                                                          | Built | Deployed | Tests | E2E check | Notes                                                                                   |
-| --- | ---------------------------------------------------------------- | ----- | -------- | ----- | --------- | --------------------------------------------------------------------------------------- |
-| 2.1 | Waitlists: queue, held seats, offers with expiry, accept → enrol | ✅    | ✅       | ✅    | ✅        | [F2.1-waitlists.md](features/F2.1-waitlists.md)                                         |
-| 2.2 | Transfers between classes with price difference                  | ✅    | ✅       | ✅    | ✅        | [F2.2-transfers.md](features/F2.2-transfers.md)                                         |
-| 2.3 | Recurring billing and instalment plans                           | ✅    | ✅       | ✅    | ✅        | [F2.3-recurring-billing-instalments.md](features/F2.3-recurring-billing-instalments.md) |
-| 2.4 | Refund automation and credit notes                               | ✅    | ✅       | ✅    | ✅        | [F2.4-credit-notes-refunds.md](features/F2.4-credit-notes-refunds.md)                   |
-| 2.5 | Messaging (templated notifications with consent)                 | ✅    | ✅       | ✅    | ✅        | [F2.5-messaging.md](features/F2.5-messaging.md)                                         |
-| 2.6 | Resource substitution (teacher cover, room swaps)                | ✅    | ✅       | ✅    | ✅        | [F2.6-resource-substitution.md](features/F2.6-resource-substitution.md)                 |
-| 2.7 | Advanced grading (weighted course grades, report cards)          | ✅    | ✅       | ✅    | ✅        | [F2.7-advanced-grading.md](features/F2.7-advanced-grading.md)                           |
-| 2.8 | Richer portal (documents, waitlist, instalments, messages)       | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                         |
-| 2.9 | Operations console and Phase 2 journey                           | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                         |
+| #   | Feature                                                            | Built | Deployed | Tests | E2E check | Notes                                                                                   |
+| --- | ------------------------------------------------------------------ | ----- | -------- | ----- | --------- | --------------------------------------------------------------------------------------- |
+| 2.1 | Waitlists: queue, held seats, offers with expiry, accept → enrol   | ✅    | ✅       | ✅    | ✅        | [F2.1-waitlists.md](features/F2.1-waitlists.md)                                         |
+| 2.2 | Transfers between classes with price difference                    | ✅    | ✅       | ✅    | ✅        | [F2.2-transfers.md](features/F2.2-transfers.md)                                         |
+| 2.3 | Recurring billing and instalment plans                             | ✅    | ✅       | ✅    | ✅        | [F2.3-recurring-billing-instalments.md](features/F2.3-recurring-billing-instalments.md) |
+| 2.4 | Refund automation and credit notes                                 | ✅    | ✅       | ✅    | ✅        | [F2.4-credit-notes-refunds.md](features/F2.4-credit-notes-refunds.md)                   |
+| 2.5 | Messaging (templated notifications with consent)                   | ✅    | ✅       | ✅    | ✅        | [F2.5-messaging.md](features/F2.5-messaging.md)                                         |
+| 2.6 | Resource substitution (teacher cover, room swaps)                  | ✅    | ✅       | ✅    | ✅        | [F2.6-resource-substitution.md](features/F2.6-resource-substitution.md)                 |
+| 2.7 | Advanced grading (weighted course grades, report cards)            | ✅    | ✅       | ✅    | ✅        | [F2.7-advanced-grading.md](features/F2.7-advanced-grading.md)                           |
+| 2.8 | Richer portal (documents, waitlist, instalments, messages, grades) | ✅    | ✅       | ✅    | ✅        | [F2.8-richer-portal.md](features/F2.8-richer-portal.md)                                 |
+| 2.9 | Operations console and Phase 2 journey                             | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                         |
