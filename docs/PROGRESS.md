@@ -43,14 +43,14 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 
 **Completion condition — exceptions and recurring operations work reliably.**
 
-| #   | Feature                                                          | Built | Deployed | Tests | E2E check | Notes                                           |
-| --- | ---------------------------------------------------------------- | ----- | -------- | ----- | --------- | ----------------------------------------------- |
-| 2.1 | Waitlists: queue, held seats, offers with expiry, accept → enrol | ✅    | ✅       | ✅    | ✅        | [F2.1-waitlists.md](features/F2.1-waitlists.md) |
-| 2.2 | Transfers between classes with price difference                  | ✅    | ✅       | ✅    | ✅        | [F2.2-transfers.md](features/F2.2-transfers.md) |
-| 2.3 | Recurring billing and instalment plans                           | ⬜    | ⬜       | ⬜    | ⬜        |                                                 |
-| 2.4 | Refund automation and credit notes                               | ⬜    | ⬜       | ⬜    | ⬜        |                                                 |
-| 2.5 | Messaging (templated notifications with consent)                 | ⬜    | ⬜       | ⬜    | ⬜        |                                                 |
-| 2.6 | Resource substitution (teacher cover, room swaps)                | ⬜    | ⬜       | ⬜    | ⬜        |                                                 |
-| 2.7 | Advanced grading (weighted course grades, report cards)          | ⬜    | ⬜       | ⬜    | ⬜        |                                                 |
-| 2.8 | Richer portal (documents, waitlist, instalments, messages)       | ⬜    | ⬜       | ⬜    | ⬜        |                                                 |
-| 2.9 | Operations console and Phase 2 journey                           | ⬜    | ⬜       | ⬜    | ⬜        |                                                 |
+| #   | Feature                                                          | Built | Deployed | Tests | E2E check | Notes                                                                                   |
+| --- | ---------------------------------------------------------------- | ----- | -------- | ----- | --------- | --------------------------------------------------------------------------------------- |
+| 2.1 | Waitlists: queue, held seats, offers with expiry, accept → enrol | ✅    | ✅       | ✅    | ✅        | [F2.1-waitlists.md](features/F2.1-waitlists.md)                                         |
+| 2.2 | Transfers between classes with price difference                  | ✅    | ✅       | ✅    | ✅        | [F2.2-transfers.md](features/F2.2-transfers.md)                                         |
+| 2.3 | Recurring billing and instalment plans                           | ✅    | ✅       | ✅    | ✅        | [F2.3-recurring-billing-instalments.md](features/F2.3-recurring-billing-instalments.md) |
+| 2.4 | Refund automation and credit notes                               | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                         |
+| 2.5 | Messaging (templated notifications with consent)                 | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                         |
+| 2.6 | Resource substitution (teacher cover, room swaps)                | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                         |
+| 2.7 | Advanced grading (weighted course grades, report cards)          | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                         |
+| 2.8 | Richer portal (documents, waitlist, instalments, messages)       | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                         |
+| 2.9 | Operations console and Phase 2 journey                           | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                         |
