@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Original_Teacher__c</fullName>
+    <inlineHelpText
+  >The scheduled teacher when another teacher covers the session.</inlineHelpText>
+    <label>Original Teacher</label>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel>Covered Sessions</relationshipLabel>
+    <relationshipName>Covered_Sessions</relationshipName>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <type>Lookup</type>
+</CustomField>

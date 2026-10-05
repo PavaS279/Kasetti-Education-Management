@@ -29,6 +29,12 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>kemSessionCover</componentName>
+                <identifier>c_kemSessionCover</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>force:relatedListContainer</componentName>
                 <identifier>force_relatedListContainer</identifier>
             </componentInstance>

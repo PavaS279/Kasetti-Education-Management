@@ -1,0 +1,128 @@
+<template>
+  <article class="kem-card panel">
+    <header class="head">
+      <div>
+        <div class="kem-section-title">Cover desk</div>
+        <div class="kem-muted small">
+          Teacher absences and sessions needing cover
+        </div>
+      </div>
+      <template lwc:if={desk}>
+        <lightning-button
+          label="Report absence"
+          icon-name="utility:user_role"
+          onclick={handleReport}
+        ></lightning-button>
+      </template>
+    </header>
+
+    <template lwc:if={desk}>
+      <template lwc:if={allClear}>
+        <div class="clear">
+          <lightning-icon
+            icon-name="utility:success"
+            size="small"
+          ></lightning-icon>
+          <span>Every upcoming session has a teacher.</span>
+        </div>
+      </template>
+
+      <template lwc:if={hasSessions}>
+        <div class="group-title">Needs cover</div>
+        <ul class="sessions">
+          <template for:each={sessions} for:item="s">
+            <li key={s.id} class="session">
+              <div class="session-head">
+                <div>
+                  <a href="#" class="strong" data-id={s.id} onclick={handleOpen}
+                    >{s.className}</a
+                  >
+                  <div class="kem-muted small">
+                    {s.when} · {s.room} · {s.learners} learners · {s.teacher}
+                    absent
+                  </div>
+                </div>
+                <template lwc:if={desk.canArrange}>
+                  <lightning-button
+                    variant="destructive-text"
+                    label="Cancel"
+                    data-session={s.id}
+                    onclick={handleCancelSession}
+                    disabled={isBusy}
+                  ></lightning-button>
+                </template>
+              </div>
+              <template lwc:if={desk.canArrange}>
+                <ul class="candidates" aria-label="Suggested cover teachers">
+                  <template for:each={s.candidates} for:item="c">
+                    <li key={c.key} class={c.chipClass}>
+                      <div class="candidate-main">
+                        <span class="strong">{c.name}</span>
+                        <span class="kem-muted small">{c.detail}</span>
+                      </div>
+                      <lightning-button
+                        label="Assign"
+                        title={c.assignLabel}
+                        data-session={s.id}
+                        data-user={c.userId}
+                        data-name={c.name}
+                        onclick={handleAssign}
+                        disabled={c.disabled}
+                      ></lightning-button>
+                    </li>
+                  </template>
+                </ul>
+                <template lwc:if={s.noCandidates}>
+                  <div class="kem-muted small">
+                    No other teachers at this branch.
+                  </div>
+                </template>
+              </template>
+            </li>
+          </template>
+        </ul>
+      </template>
+
+      <template lwc:if={hasAbsences}>
+        <div class="group-title">Absences</div>
+        <ul class="absences">
+          <template for:each={absences} for:item="a">
+            <li key={a.Id} class="absence">
+              <div class="absence-main">
+                <div class="strong">{a.teacher} · {a.Reason__c}</div>
+                <div class="kem-muted small">{a.period}</div>
+                <div class="bar" aria-hidden="true">
+                  <span style={a.barStyle}></span>
+                </div>
+                <div class="kem-muted small">{a.progress}</div>
+              </div>
+              <span class={a.statusClass}>{a.Status__c}</span>
+              <template lwc:if={a.canWithdraw}>
+                <lightning-button
+                  variant="base"
+                  label="Withdraw"
+                  data-id={a.Id}
+                  onclick={handleWithdraw}
+                  disabled={isBusy}
+                ></lightning-button>
+              </template>
+            </li>
+          </template>
+        </ul>
+      </template>
+    </template>
+    <template lwc:elseif={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <template lwc:else>
+      <div class="loading">
+        <lightning-spinner
+          alternative-text="Loading cover desk"
+          size="small"
+        ></lightning-spinner>
+      </div>
+    </template>
+  </article>
+</template>

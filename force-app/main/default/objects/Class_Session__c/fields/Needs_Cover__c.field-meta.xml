@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Needs_Cover__c</fullName>
+    <inlineHelpText
+  >The scheduled teacher is absent and no cover teacher has been assigned yet.</inlineHelpText>
+    <label>Needs Cover</label>
+    <defaultValue>false</defaultValue>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

@@ -11,6 +11,12 @@
         <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemCoverDesk</componentName>
+                <identifier>c_kemCoverDesk</identifier>
+            </componentInstance>
+        </itemInstances>
         <name>bottomLeft</name>
         <type>Region</type>
     </flexiPageRegions>

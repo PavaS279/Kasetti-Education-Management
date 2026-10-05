@@ -1,0 +1,133 @@
+@import "c/kemStyles";
+
+.panel {
+  padding: 1rem;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.clear {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: var(--kem-radius-sm);
+  background: #eef8f1;
+  color: var(--kem-green);
+  --slds-c-icon-color-foreground-default: var(--kem-green);
+}
+
+.group-title {
+  margin: 0.75rem 0 0.4rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--kem-muted);
+}
+
+.sessions,
+.absences {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.session {
+  padding: 0.75rem;
+  border: 1px solid var(--kem-line);
+  border-left: 4px solid var(--kem-red);
+  border-radius: var(--kem-radius-sm);
+}
+
+.session-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.candidates {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.candidate {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-surface);
+  transition: border-color 0.15s var(--kem-ease);
+}
+
+.candidate:hover {
+  border-color: var(--kem-blue);
+}
+
+.candidate_busy {
+  background: var(--kem-canvas);
+  opacity: 0.75;
+}
+
+.candidate-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.absence {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--kem-line);
+}
+
+.absence:last-child {
+  border-bottom: none;
+}
+
+.absence-main {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.bar {
+  height: 6px;
+  margin: 0.35rem 0 0.2rem;
+  border-radius: 3px;
+  background: var(--kem-line);
+  overflow: hidden;
+}
+
+.bar span {
+  display: block;
+  height: 100%;
+  background: var(--kem-green);
+  transition: width 0.4s var(--kem-ease);
+}
+
+.loading {
+  position: relative;
+  min-height: 5rem;
+}

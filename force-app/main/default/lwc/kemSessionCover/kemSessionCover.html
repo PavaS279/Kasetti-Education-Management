@@ -1,0 +1,116 @@
+<template>
+  <article class="kem-card panel">
+    <div class="kem-section-title">Teacher and room</div>
+    <template lwc:if={record}>
+      <template lwc:if={needsCover}>
+        <div class="alert" role="status">
+          <lightning-icon
+            icon-name="utility:warning"
+            size="x-small"
+          ></lightning-icon>
+          The teacher is absent: this session needs cover.
+        </div>
+      </template>
+      <dl class="facts">
+        <div class="fact">
+          <dt class="kem-muted small">Teacher</dt>
+          <dd class="strong">{teacher}</dd>
+          <template lwc:if={originalTeacher}>
+            <dd class="kem-muted small">covering for {originalTeacher}</dd>
+          </template>
+        </div>
+        <div class="fact">
+          <dt class="kem-muted small">Room</dt>
+          <dd class="strong">{room}</dd>
+          <template lwc:if={originalRoom}>
+            <dd class="kem-muted small">moved from {originalRoom}</dd>
+          </template>
+        </div>
+      </dl>
+      <template lwc:if={coverNote}>
+        <div class="kem-muted small note">{coverNote}</div>
+      </template>
+      <template lwc:if={showActions}>
+        <div class="actions">
+          <lightning-button
+            label={coverLabel}
+            icon-name="utility:user"
+            onclick={handleTeacherPicker}
+            disabled={isBusy}
+          ></lightning-button>
+          <lightning-button
+            label="Change room"
+            icon-name="utility:home"
+            onclick={handleRoomPicker}
+            disabled={isBusy}
+          ></lightning-button>
+        </div>
+      </template>
+      <template lwc:if={mode}>
+        <div class="picker">
+          <div class="picker-head">
+            <span class="strong">{coverLabel}</span>
+            <lightning-button-icon
+              icon-name="utility:close"
+              variant="bare"
+              alternative-text="Close"
+              onclick={handleClose}
+            ></lightning-button-icon>
+          </div>
+          <lightning-input
+            label="Note (optional)"
+            value={note}
+            max-length="255"
+            onchange={handleNote}
+          ></lightning-input>
+          <template lwc:if={pickingTeacher}>
+            <ul class="options">
+              <template for:each={teacherOptions} for:item="c">
+                <li key={c.key} class={c.className}>
+                  <div class="option-main">
+                    <span class="strong">{c.name}</span>
+                    <span class="kem-muted small">{c.detail}</span>
+                  </div>
+                  <lightning-button
+                    label="Assign"
+                    data-id={c.userId}
+                    data-name={c.name}
+                    onclick={handleAssign}
+                    disabled={c.disabled}
+                  ></lightning-button>
+                </li>
+              </template>
+            </ul>
+          </template>
+          <template lwc:if={pickingRoom}>
+            <ul class="options">
+              <template for:each={roomOptions} for:item="r">
+                <li key={r.key} class={r.className}>
+                  <div class="option-main">
+                    <span class="strong">{r.name}</span>
+                    <span class="kem-muted small">{r.detail}</span>
+                  </div>
+                  <lightning-button
+                    label="Move"
+                    data-id={r.roomId}
+                    data-name={r.name}
+                    onclick={handleMove}
+                    disabled={r.disabled}
+                  ></lightning-button>
+                </li>
+              </template>
+            </ul>
+          </template>
+          <template lwc:if={noOptions}>
+            <div class="kem-empty">Nothing to choose from.</div>
+          </template>
+        </div>
+      </template>
+    </template>
+    <template lwc:elseif={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+  </article>
+</template>
