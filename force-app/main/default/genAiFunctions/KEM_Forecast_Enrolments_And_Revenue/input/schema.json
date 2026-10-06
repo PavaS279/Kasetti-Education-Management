@@ -1,0 +1,21 @@
+{
+  "required": [],
+  "unevaluatedProperties": false,
+  "properties": {
+    "branch": {
+      "title": "Branch",
+      "description": "Optional branch name, code or record Id. Leave empty for all branches.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": true
+    },
+    "months": {
+      "title": "Months",
+      "description": "How many months ahead, 1 to 6 (default 3).",
+      "lightning:type": "lightning__integerType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": true
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

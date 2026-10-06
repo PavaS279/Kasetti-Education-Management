@@ -13,6 +13,12 @@
                 <identifier>c_kemAnalytics</identifier>
             </componentInstance>
         </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemForecast</componentName>
+                <identifier>c_kemForecast</identifier>
+            </componentInstance>
+        </itemInstances>
         <name>top</name>
         <type>Region</type>
     </flexiPageRegions>

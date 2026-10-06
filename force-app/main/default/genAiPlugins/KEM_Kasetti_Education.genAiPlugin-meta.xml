@@ -31,9 +31,16 @@
         <masterLabel>at risk</masterLabel>
         <utterance>Which learners are at high risk of leaving?</utterance>
     </aiPluginUtterances>
+    <aiPluginUtterances>
+        <developerName>forecast</developerName>
+        <language>en_US</language>
+        <masterLabel>forecast</masterLabel>
+        <utterance
+    >How many new enrolments should we expect next quarter, and will we have enough seats?</utterance>
+    </aiPluginUtterances>
     <canEscalate>false</canEscalate>
     <description
-  >Helps Kasetti staff (counsellors, teachers, branch managers, finance and administrators) with institution policies, learner progress, enquiry replies, branch performance and learners at risk, using live Kasetti Education Management data.</description>
+  >Helps Kasetti staff (counsellors, teachers, branch managers, finance and administrators) with institution policies, learner progress, enquiry replies, branch performance, learners at risk and forecasts, using live Kasetti Education Management data.</description>
     <developerName>KEM_Kasetti_Education</developerName>
     <genAiFunctions>
         <functionName>KEM_Answer_Policy_Question</functionName>
@@ -49,6 +56,9 @@
     </genAiFunctions>
     <genAiFunctions>
         <functionName>KEM_List_Learners_At_Risk</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>KEM_Forecast_Enrolments_And_Revenue</functionName>
     </genAiFunctions>
     <genAiPluginInstructions>
         <description
@@ -82,9 +92,17 @@
         <masterLabel>grounding</masterLabel>
         <sortOrder>3</sortOrder>
     </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description
+    >For questions about expected enrolments, seats, invoicing, revenue or cash in the coming months, run Forecast KEM Enrolments and Revenue. Always mention the accuracy it reports and that forecasts are estimates with ranges.</description>
+        <developerName>forecasts</developerName>
+        <language>en_US</language>
+        <masterLabel>forecasts</masterLabel>
+        <sortOrder>4</sortOrder>
+    </genAiPluginInstructions>
     <language>en_US</language>
     <masterLabel>Kasetti Education</masterLabel>
     <pluginType>Topic</pluginType>
     <scope
-  >Your job is to help Kasetti Education staff answer policy questions from the institution&apos;s knowledge base, summarise a learner&apos;s progress, draft enquiry replies for review, brief them on a branch and list learners at risk. You only work with Kasetti Education Management data and never send messages or change records.</scope>
+  >Your job is to help Kasetti Education staff answer policy questions from the institution&apos;s knowledge base, summarise a learner&apos;s progress, draft enquiry replies for review, brief them on a branch, list learners at risk and forecast enrolments, seats, invoicing and cash. You only work with Kasetti Education Management data and never send messages or change records.</scope>
 </GenAiPlugin>

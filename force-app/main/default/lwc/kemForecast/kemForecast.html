@@ -1,0 +1,361 @@
+<template>
+  <template lwc:if={visible}>
+    <article class="kem-card panel">
+      <div class="head">
+        <span class="kem-section-title">Forecasts</span>
+        <div class="controls">
+          <template lwc:if={showBranchPicker}>
+            <lightning-combobox
+              class="branch"
+              label="Branch"
+              variant="label-hidden"
+              options={branchOptions}
+              value={branchId}
+              onchange={handleBranch}
+            ></lightning-combobox>
+          </template>
+          <lightning-radio-group
+            name="horizon"
+            label="Months ahead"
+            variant="label-hidden"
+            type="button"
+            options={horizonOptions}
+            value={horizon}
+            onchange={handleHorizon}
+          ></lightning-radio-group>
+          <lightning-button-icon
+            icon-name="utility:refresh"
+            alternative-text="Refresh"
+            title="Refresh"
+            onclick={handleRefresh}
+          ></lightning-button-icon>
+        </div>
+      </div>
+
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+      <template lwc:if={isLoading}>
+        <lightning-spinner
+          alternative-text="Forecasting"
+          size="small"
+        ></lightning-spinner>
+      </template>
+
+      <template lwc:if={data}>
+        <template lwc:if={hasNothing}>
+          <p class="muted small">
+            You do not have access to enrolment or finance figures.
+          </p>
+        </template>
+        <div class="tiles">
+          <template for:each={tiles} for:item="t">
+            <div key={t.key} class={t.className}>
+              <span class="tile-value">{t.value}</span>
+              <span class="tile-label">{t.label}</span>
+              <span class="tile-sub">{t.sub}</span>
+            </div>
+          </template>
+        </div>
+
+        <template lwc:if={data.showEnrolments}>
+          <section class="section">
+            <div class="section-head">
+              <span class="section-title">New enrolments</span>
+              <span class={enrolmentChart.accuracyClass}
+                >{enrolmentChart.accuracy}</span
+              >
+              <span class="muted small"
+                >{enrolmentChart.method} · {enrolmentChart.detail}</span
+              >
+            </div>
+            <svg
+              class="svg"
+              viewBox={viewBox}
+              role="img"
+              aria-label="New enrolments by month with forecast"
+            >
+              <template for:each={enrolmentChart.ticks} for:item="tick">
+                <g key={tick.key}>
+                  <line
+                    class="grid"
+                    x1={axisLeft}
+                    x2={axisRight}
+                    y1={tick.y}
+                    y2={tick.y}
+                  ></line>
+                  <text class="tick" x="44" y={tick.y} text-anchor="end">
+                    {tick.label}
+                  </text>
+                </g>
+              </template>
+              <template lwc:if={enrolmentChart.dividerX}>
+                <line
+                  class="divider"
+                  x1={enrolmentChart.dividerX}
+                  x2={enrolmentChart.dividerX}
+                  y1={dividerTop}
+                  y2={axisY}
+                ></line>
+              </template>
+              <template for:each={enrolmentChart.bars} for:item="b">
+                <g key={b.key}>
+                  <title>{b.title}</title>
+                  <path class={b.className} d={b.path}></path>
+                  <template lwc:if={b.hasRange}>
+                    <line
+                      class="range"
+                      x1={b.rangeX}
+                      x2={b.rangeX}
+                      y1={b.rangeTop}
+                      y2={b.rangeBottom}
+                    ></line>
+                    <line
+                      class="range"
+                      x1={b.capLeft}
+                      x2={b.capRight}
+                      y1={b.rangeTop}
+                      y2={b.rangeTop}
+                    ></line>
+                    <line
+                      class="range"
+                      x1={b.capLeft}
+                      x2={b.capRight}
+                      y1={b.rangeBottom}
+                      y2={b.rangeBottom}
+                    ></line>
+                  </template>
+                  <template lwc:if={b.showLabel}>
+                    <text
+                      class="tick"
+                      x={b.labelX}
+                      y={labelY}
+                      text-anchor="middle"
+                    >
+                      {b.label}
+                    </text>
+                  </template>
+                </g>
+              </template>
+            </svg>
+            <div class="two">
+              <div class="table-wrap">
+                <table class="data-table">
+                  <caption class="table-caption">
+                    Admissions pipeline now
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Stage</th>
+                      <th scope="col" class="num">Now</th>
+                      <th scope="col" class="num">Enrol rate</th>
+                      <th scope="col" class="num">Expected</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={pipelineRows} for:item="r">
+                      <tr key={r.stage}>
+                        <td>{r.stage}</td>
+                        <td class="num">{r.count}</td>
+                        <td class="num">{r.rateLabel}</td>
+                        <td class="num">{r.expected}</td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <caption class="table-caption">
+                    Seats in open and planned classes
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Course</th>
+                      <th scope="col" class="num">Free</th>
+                      <th scope="col" class="num">Expected</th>
+                      <th scope="col">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template lwc:if={hasSeats}>
+                      <template for:each={seatRows} for:item="s">
+                        <tr key={s.course}>
+                          <td>{s.course}</td>
+                          <td class="num">{s.freeSeats}</td>
+                          <td class="num">{s.demand}</td>
+                          <td><span class={s.statusClass}>{s.status}</span></td>
+                        </tr>
+                      </template>
+                    </template>
+                    <template lwc:else>
+                      <tr>
+                        <td colspan="4" class="muted">
+                          No open or planned classes.
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </template>
+
+        <template lwc:if={data.showFinance}>
+          <section class="section">
+            <div class="section-head">
+              <span class="section-title">Invoicing</span>
+              <span class={revenueChart.accuracyClass}
+                >{revenueChart.accuracy}</span
+              >
+              <span class="muted small"
+                >{revenueChart.method} · {revenueChart.detail}</span
+              >
+            </div>
+            <svg
+              class="svg"
+              viewBox={viewBox}
+              role="img"
+              aria-label="Invoiced by month with forecast"
+            >
+              <template for:each={revenueChart.ticks} for:item="tick">
+                <g key={tick.key}>
+                  <line
+                    class="grid"
+                    x1={axisLeft}
+                    x2={axisRight}
+                    y1={tick.y}
+                    y2={tick.y}
+                  ></line>
+                  <text class="tick" x="44" y={tick.y} text-anchor="end">
+                    {tick.label}
+                  </text>
+                </g>
+              </template>
+              <template lwc:if={revenueChart.dividerX}>
+                <line
+                  class="divider"
+                  x1={revenueChart.dividerX}
+                  x2={revenueChart.dividerX}
+                  y1={dividerTop}
+                  y2={axisY}
+                ></line>
+              </template>
+              <template for:each={revenueChart.bars} for:item="b">
+                <g key={b.key}>
+                  <title>{b.title}</title>
+                  <path class={b.className} d={b.path}></path>
+                  <template lwc:if={b.hasRange}>
+                    <line
+                      class="range"
+                      x1={b.rangeX}
+                      x2={b.rangeX}
+                      y1={b.rangeTop}
+                      y2={b.rangeBottom}
+                    ></line>
+                  </template>
+                  <template lwc:if={b.showLabel}>
+                    <text
+                      class="tick"
+                      x={b.labelX}
+                      y={labelY}
+                      text-anchor="middle"
+                    >
+                      {b.label}
+                    </text>
+                  </template>
+                </g>
+              </template>
+            </svg>
+            <div class="table-wrap">
+              <table class="data-table">
+                <caption class="table-caption">
+                  Expected cash
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Month</th>
+                    <th scope="col" class="num">Due on open invoices</th>
+                    <th scope="col" class="num">Monthly fees to bill</th>
+                    <th scope="col" class="num">Expected cash</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={cashRows} for:item="c">
+                    <tr key={c.key}>
+                      <td>{c.label}</td>
+                      <td class="num">{c.due}</td>
+                      <td class="num">{c.billing}</td>
+                      <td class="num strong">{c.expected}</td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </template>
+
+        <template lwc:if={hasNotes}>
+          <ul class="notes">
+            <template for:each={notes} for:item="n">
+              <li key={n.key}>{n.text}</li>
+            </template>
+          </ul>
+        </template>
+
+        <template lwc:if={aiAvailable}>
+          <section class="explain">
+            <template lwc:if={narrative}>
+              <div class="narrative">
+                <template for:each={narrativeParagraphs} for:item="p">
+                  <p key={p.key}>{p.text}</p>
+                </template>
+                <div class="meta">
+                  <span>Einstein · explains the figures above</span>
+                  <template lwc:if={reviewed}>
+                    <span>Thanks for the feedback</span>
+                  </template>
+                  <template lwc:else>
+                    <span>
+                      <lightning-button-icon
+                        icon-name="utility:like"
+                        alternative-text="Helpful"
+                        title="Helpful"
+                        data-helpful="true"
+                        onclick={handleFeedback}
+                        size="small"
+                      ></lightning-button-icon>
+                      <lightning-button-icon
+                        icon-name="utility:dislike"
+                        alternative-text="Not helpful"
+                        title="Not helpful"
+                        data-helpful="false"
+                        onclick={handleFeedback}
+                        size="small"
+                      ></lightning-button-icon>
+                    </span>
+                  </template>
+                </div>
+              </div>
+            </template>
+            <template lwc:if={narrativeError}>
+              <p class="error small">{narrativeError}</p>
+            </template>
+            <lightning-button
+              label="Explain with Einstein"
+              icon-name="utility:einstein"
+              onclick={handleExplain}
+              disabled={isExplaining}
+            ></lightning-button>
+          </section>
+        </template>
+      </template>
+    </article>
+  </template>
+</template>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Forecast Narrative</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Feature__c</field>
+        <value xsi:type="xsd:string">Forecast Narrative</value>
+    </values>
+    <values>
+        <field>Instructions__c</field>
+        <value
+      xsi:type="xsd:string"
+    >You are a planning analyst at Kasetti, a learning centre. Explain the forecast below to a branch manager in plain language.
+Rules:
+- Use only the figures given; do not calculate new totals or invent numbers, dates or causes.
+- Start with the outlook for new enrolments and seats, then invoicing and cash.
+- Say how reliable each forecast is (its accuracy label and history) and mention ranges where useful.
+- End with two or three concrete actions (for example open another class where seats are short, follow up offers awaiting a reply, chase overdue invoices).
+- Plain text, short paragraphs, no Markdown.</value>
+    </values>
+    <values>
+        <field>Max_Words__c</field>
+        <value xsi:type="xsd:double">170</value>
+    </values>
+    <values>
+        <field>Minutes_Saved__c</field>
+        <value xsi:type="xsd:double">10.0</value>
+    </values>
+    <values>
+        <field>Template__c</field>
+        <value xsi:type="xsd:string">Forecast facts:
+{{Facts}}</value>
+    </values>
+    <values>
+        <field>Version__c</field>
+        <value xsi:type="xsd:double">1</value>
+    </values>
+</CustomMetadata>

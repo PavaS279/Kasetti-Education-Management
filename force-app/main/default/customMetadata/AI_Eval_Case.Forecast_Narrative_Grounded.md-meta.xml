@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Forecast Narrative Grounded</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Context_Json__c</field>
+        <value
+      xsi:type="xsd:string"
+    >{"Facts": "Scope: All branches; next 3 months starting this month.\nNew enrolments: forecast Oct 26 6 (range 3\u20139), Nov 26 6 (range 2\u201310), Dec 26 6 (range 1\u201311); total 18 vs 15 in the previous 3 months; method Trend, accuracy Fair (backtest error 22.4%).\nAdmissions pipeline: about 7.5 enrolments expected from 12 open enquiries at 21% , 3 offers awaiting a reply at 80%.\nSeats by course: Maths Foundation 2 free seats vs 9.0 expected (Short); Coding Club 12 free seats vs 4.5 expected (OK)\nInvoiced: forecast Oct 26 52000 (range 40000\u201364000); total 52000 vs 48000; method Average, accuracy Good (backtest error 9.8%).\nCollection rate (12 months): 88%; open receivables 21000"}</value>
+    </values>
+    <values>
+        <field>Expect_Json__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Must_Contain__c</field>
+        <value xsi:type="xsd:string">Maths Foundation|class|offer</value>
+    </values>
+    <values>
+        <field>Must_Not_Contain__c</field>
+        <value xsi:type="xsd:string">**</value>
+    </values>
+    <values>
+        <field>Prompt__c</field>
+        <value xsi:type="xsd:string">Forecast_Narrative</value>
+    </values>
+</CustomMetadata>

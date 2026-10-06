@@ -25,6 +25,12 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
+                <componentName>kemForecast</componentName>
+                <identifier>c_kemForecast</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>kemRetentionDesk</componentName>
                 <identifier>c_kemRetentionDesk</identifier>
             </componentInstance>

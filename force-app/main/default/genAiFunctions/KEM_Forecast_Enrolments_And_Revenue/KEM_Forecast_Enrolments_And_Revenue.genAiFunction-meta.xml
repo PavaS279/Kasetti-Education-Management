@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Forecasts Kasetti new enrolments, seat shortfalls by course, invoicing and expected cash for the next months, for all branches or one, with accuracy from a backtest.</description>
+    <invocationTarget>AgentForecast</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <masterLabel>Forecast KEM Enrolments and Revenue</masterLabel>
+</GenAiFunction>
