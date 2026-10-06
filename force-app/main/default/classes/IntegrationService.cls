@@ -166,15 +166,15 @@ public with sharing class IntegrationService {
     }
     List<Integration_Event__c> events = new List<Integration_Event__c>();
     for (SObject row : records) {
+      Map<String, Object> fields = row.getPopulatedFieldsAsMap();
+      Id branchId = (Id) fields.get('Branch__c');
       Map<String, Object> payload = new Map<String, Object>{
         'id' => row.Id,
-        'documentNumber' => row.get('Name'),
+        'documentNumber' => fields.get('Name'),
         'amount' => amountOf(row),
-        'branchId' => row.get('Branch__c')
+        'branchId' => branchId
       };
-      events.add(
-        event(ERP, eventType, row.Id, (Id) row.get('Branch__c'), payload)
-      );
+      events.add(event(ERP, eventType, row.Id, branchId, payload));
     }
     record(events);
   }
@@ -201,19 +201,34 @@ public with sharing class IntegrationService {
       Payload__c = JSON.serialize(payload, true),
       Status__c = 'Pending',
       Attempts__c = 0,
-      // One event per record and type per transaction.
+      // Unique per event; repeats within a transaction are dropped in record().
       Dedup_Key__c = (target +
         '|' +
         eventType +
         '|' +
         recordId +
         '|' +
-        Request.getCurrent().getRequestId())
+        EncodingUtil.convertToHex(Crypto.generateAesKey(128)))
         .left(255)
     );
   }
 
-  private static void record(List<Integration_Event__c> events) {
+  /** Events already recorded in this transaction (target|type|record). */
+  private static Set<String> recorded = new Set<String>();
+
+  private static void record(List<Integration_Event__c> candidates) {
+    List<Integration_Event__c> events = new List<Integration_Event__c>();
+    for (Integration_Event__c candidate : candidates) {
+      String key =
+        candidate.Target__c +
+        '|' +
+        candidate.Event_Type__c +
+        '|' +
+        candidate.Record_Id__c;
+      if (recorded.add(key)) {
+        events.add(candidate);
+      }
+    }
     if (events.isEmpty()) {
       return;
     }
@@ -349,6 +364,7 @@ public with sharing class IntegrationService {
           push(target);
         }
       }
+      PaymentLinkService.expireLinks();
       purge();
       Logger.flush();
     }

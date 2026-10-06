@@ -35,4 +35,13 @@ public with sharing class PortalController {
       throw AppException.toAura(e);
     }
   }
+
+  @AuraEnabled
+  public static PaymentLinkService.LinkView startPayment(Id invoiceId) {
+    try {
+      return PaymentLinkService.createForPortal(invoiceId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
 }

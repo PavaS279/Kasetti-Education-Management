@@ -1,0 +1,91 @@
+<template>
+  <template lwc:if={visible}>
+    <article class="kem-card panel">
+      <div class="head">
+        <div class="kem-section-title">Online payment</div>
+        <template lwc:if={panel}>
+          <span class="kem-muted small">{modeLabel}</span>
+        </template>
+      </div>
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+      <template lwc:if={panel}>
+        <template lwc:if={isOff}>
+          <p class="kem-muted small">
+            Families pay at the branch. Set Education Setting
+            Payment_Gateway_Mode to Test or Live to offer Pay online in the
+            portal.
+          </p>
+        </template>
+        <template lwc:else>
+          <template lwc:if={webhookWarning}>
+            <div
+              class="slds-notify slds-notify_alert slds-alert_warning"
+              role="alert"
+            >
+              Live mode without a webhook secret: payments cannot be confirmed.
+              Set it in Setup → Custom Settings → KEM Gateway.
+            </div>
+          </template>
+          <template lwc:if={isTest}>
+            <p class="kem-muted small">
+              Test mode: no money is taken. Simulate the gateway to record a
+              payment.
+            </p>
+          </template>
+          <template lwc:if={hasLinks}>
+            <ul class="links">
+              <template for:each={links} for:item="l">
+                <li key={l.Id} class="link">
+                  <div class="link-main">
+                    <span class="strong">{l.Name}</span>
+                    <lightning-formatted-number
+                      class="small"
+                      value={l.Amount__c}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                    <span class="kem-muted small">{l.Created_Via__c}</span>
+                  </div>
+                  <span class={l.statusClass}>{l.Status__c}</span>
+                  <template lwc:if={l.canSimulate}>
+                    <lightning-button
+                      variant="base"
+                      label="Simulate payment"
+                      data-id={l.Id}
+                      onclick={handleSimulate}
+                      disabled={isBusy}
+                    ></lightning-button>
+                  </template>
+                </li>
+              </template>
+            </ul>
+          </template>
+          <template lwc:else>
+            <p class="kem-muted small">No payment links yet.</p>
+          </template>
+          <template lwc:if={checkoutUrl}>
+            <lightning-input
+              class="checkout"
+              label="Checkout address to share"
+              value={checkoutUrl}
+              readonly
+            ></lightning-input>
+          </template>
+          <lightning-button
+            class="create"
+            label="Create payment link"
+            onclick={handleCreate}
+            disabled={isBusy}
+          ></lightning-button>
+        </template>
+      </template>
+    </article>
+  </template>
+</template>

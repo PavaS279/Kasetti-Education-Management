@@ -292,6 +292,19 @@ public with sharing class MessageService {
     }
   }
 
+  /** Sends a template to prepared notices (retention, library and payment features). Returns messages created. */
+  public static Integer notify(String eventKey, List<Notice> notices) {
+    if (disabled) {
+      return 0;
+    }
+    return send(eventKey, notices).size();
+  }
+
+  /** Fee payer contact of each learner contact (the learner when no fee-paying guardian is set). */
+  public static Map<Id, Id> feePayersOf(Set<Id> learnerContactIds) {
+    return feePayers(learnerContactIds);
+  }
+
   /** Tells each enrolled learner's fee payer that a session was cancelled. */
   public static void sessionCancelled(Id sessionId) {
     if (disabled) {
@@ -1119,7 +1132,7 @@ public with sharing class MessageService {
 
   /** ₹ with grouping in the user's locale and always two decimals. */
   @TestVisible
-  private static String money(Decimal amount) {
+  public static String money(Decimal amount) {
     if (amount == null) {
       return '';
     }

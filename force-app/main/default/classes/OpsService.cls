@@ -19,6 +19,8 @@ public with sharing class OpsService {
     'IntegrationService',
     'IntegrationSyncJob',
     'FinanceExportJob',
+    'RetentionJob',
+    'LibraryJob',
     'ReminderJob',
     'OfferExpiryJob',
     'WaitlistOfferJob',
@@ -167,8 +169,14 @@ public with sharing class OpsService {
       when 'KEM Payment Reminders' {
         return ReminderJob.run(Date.today());
       }
+      when 'KEM Library' {
+        return System.enqueueJob(new RunSchedulable(new LibraryJob()));
+      }
+      when 'KEM Retention' {
+        return RetentionJob.run();
+      }
       when 'KEM Finance Export' {
-        return System.enqueueJob(new FinanceExportJob());
+        return System.enqueueJob(new FinanceExportJob.Run());
       }
       when 'KEM Integration Sync' {
         return System.enqueueJob(new IntegrationService.SyncJob());

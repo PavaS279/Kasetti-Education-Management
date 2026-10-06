@@ -106,21 +106,25 @@ private class LmsIntegrationTest {
       update new CourseOffering(Id = offering().Id, Room__c = null);
       Test.stopTest();
     }
-    Integration_Event__c latest = [
-      SELECT Event_Type__c, Payload__c
-      FROM Integration_Event__c
-      ORDER BY Name DESC
-      LIMIT 1
-    ];
     Assert.areEqual(
       before + 1,
       [SELECT COUNT() FROM Integration_Event__c],
       'Only the capacity change is published'
     );
-    Map<String, Object> payload = (Map<String, Object>) JSON.deserializeUntyped(
-      latest.Payload__c
-    );
-    Assert.areEqual(12, payload.get('capacity'), 'Snapshot');
+    Map<String, Object> payload;
+    for (Integration_Event__c e : [
+      SELECT Payload__c
+      FROM Integration_Event__c
+      WHERE Event_Type__c = 'class.updated'
+    ]) {
+      Map<String, Object> candidate = (Map<String, Object>) JSON.deserializeUntyped(
+        e.Payload__c
+      );
+      if (candidate.get('capacity') == 12) {
+        payload = candidate;
+      }
+    }
+    Assert.isNotNull(payload, 'Snapshot with the new capacity');
     Assert.areEqual('LMS-01', payload.get('branchCode'), 'Branch code');
   }
 

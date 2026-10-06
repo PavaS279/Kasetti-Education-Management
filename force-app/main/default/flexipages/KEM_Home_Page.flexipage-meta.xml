@@ -7,6 +7,12 @@
                 <identifier>c_kemInsights</identifier>
             </componentInstance>
         </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemAnalytics</componentName>
+                <identifier>c_kemAnalytics</identifier>
+            </componentInstance>
+        </itemInstances>
         <name>top</name>
         <type>Region</type>
     </flexiPageRegions>
@@ -15,6 +21,12 @@
             <componentInstance>
                 <componentName>kemCoverDesk</componentName>
                 <identifier>c_kemCoverDesk</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemRetentionDesk</componentName>
+                <identifier>c_kemRetentionDesk</identifier>
             </componentInstance>
         </itemInstances>
         <name>bottomLeft</name>

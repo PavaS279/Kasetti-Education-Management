@@ -505,3 +505,35 @@
 .doc:last-child {
   border-bottom: none;
 }
+
+.payment-notice {
+  margin-bottom: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-sky);
+  font-size: 0.8125rem;
+}
+
+.pay {
+  margin-top: 0.35rem;
+}
+
+.loan {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--kem-line);
+}
+
+.loan_overdue .strong {
+  color: var(--kem-red);
+}
+
+.loan-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}

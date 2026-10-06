@@ -1,0 +1,321 @@
+@import "c/kemStyles";
+
+/* Validated categorical slots 1-2 (blue, orange) and a single-hue sequential ramp. */
+.viz-root {
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --seq-1: #dbe8f8;
+  --seq-2: #a9c8ee;
+  --seq-3: #5e9be2;
+  --seq-4: #2a78d6;
+  --chart-grid: #e3e8ef;
+  --chart-axis: #b8c2cf;
+}
+
+.panel {
+  position: relative;
+  padding: 1rem;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.filter {
+  min-width: 10rem;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-sky);
+}
+
+.tile-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--kem-ink);
+}
+
+.tile-label {
+  font-size: 0.75rem;
+  color: var(--kem-muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 0.75rem;
+}
+
+.chart {
+  position: relative;
+  margin: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-surface);
+}
+
+.chart-title {
+  font-weight: 700;
+  color: var(--kem-ink);
+  margin-bottom: 0.25rem;
+}
+
+.legend {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--kem-muted);
+  margin-bottom: 0.25rem;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.swatch {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 3px;
+}
+
+.s1 {
+  background: var(--series-1);
+}
+
+.s2 {
+  background: var(--series-2);
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.s1-fill {
+  fill: var(--series-1);
+}
+
+.s2-fill {
+  fill: var(--series-2);
+}
+
+.s1-stroke {
+  stroke: var(--series-1);
+}
+
+.line {
+  fill: none;
+  stroke-width: 2;
+}
+
+.dot {
+  stroke: var(--kem-surface);
+  stroke-width: 2;
+}
+
+.grid-line {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+
+.axis {
+  stroke: var(--chart-axis);
+  stroke-width: 1;
+}
+
+.tick {
+  font-size: 11px;
+  fill: var(--kem-muted);
+}
+
+.hit {
+  fill: transparent;
+  cursor: crosshair;
+}
+
+.hit:hover {
+  fill: rgba(27, 58, 107, 0.05);
+}
+
+.tooltip {
+  position: absolute;
+  top: 3.25rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-ink);
+  color: #ffffff;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  box-shadow: var(--kem-shadow);
+  z-index: 1;
+}
+
+.tooltip-title {
+  font-weight: 700;
+  margin-bottom: 0.15rem;
+}
+
+.tooltip-line {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.cohorts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.cohort {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.cohort-label {
+  font-size: 0.75rem;
+  color: var(--kem-muted);
+}
+
+.cohort-cell {
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--kem-ink);
+  background: var(--kem-canvas);
+}
+
+.seq-1 {
+  background: var(--seq-1);
+}
+
+.seq-2 {
+  background: var(--seq-2);
+}
+
+.seq-3 {
+  background: var(--seq-3);
+  color: #ffffff;
+}
+
+.seq-4 {
+  background: var(--seq-4);
+  color: #ffffff;
+}
+
+.ageing {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+}
+
+.ageing-row {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr auto auto;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.8125rem;
+}
+
+.ageing-track,
+.fill-track {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--kem-line);
+  overflow: hidden;
+}
+
+.ageing-bar,
+.fill-bar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--series-1);
+}
+
+.ageing-value {
+  font-weight: 700;
+  text-align: right;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--kem-line);
+  text-align: left;
+}
+
+.data-table th {
+  color: var(--kem-muted);
+  font-weight: 600;
+}
+
+.data-table .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.fill-cell {
+  display: grid;
+  grid-template-columns: minmax(3rem, 1fr) auto;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+@media (max-width: 30em) {
+  .ageing-row {
+    grid-template-columns: 5.5rem 1fr auto;
+  }
+
+  .ageing-count {
+    display: none;
+  }
+}

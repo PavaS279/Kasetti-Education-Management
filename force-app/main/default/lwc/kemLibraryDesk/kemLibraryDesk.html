@@ -1,0 +1,289 @@
+<template>
+  <template lwc:if={visible}>
+    <article class="kem-card panel">
+      <header class="head">
+        <div class="kem-section-title">Library</div>
+        <lightning-button-icon
+          icon-name="utility:refresh"
+          alternative-text="Refresh"
+          onclick={handleRefresh}
+        ></lightning-button-icon>
+      </header>
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+      <template lwc:if={data}>
+        <div class="counts">
+          <template for:each={counts} for:item="c">
+            <div key={c.key} class={c.className}>
+              <span class="count-value">{c.value}</span>
+              <span class="count-label">{c.label}</span>
+            </div>
+          </template>
+        </div>
+        <div class="tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            class={loansTabClass}
+            data-tab="loans"
+            onclick={handleTab}
+          >
+            On loan
+          </button>
+          <button
+            type="button"
+            role="tab"
+            class={catalogueTabClass}
+            data-tab="catalogue"
+            onclick={handleTab}
+          >
+            Catalogue
+          </button>
+          <button
+            type="button"
+            role="tab"
+            class={finesTabClass}
+            data-tab="fines"
+            onclick={handleTab}
+          >
+            Fines
+          </button>
+        </div>
+
+        <template lwc:if={isLoans}>
+          <template lwc:if={hasLoans}>
+            <ul class="rows">
+              <template for:each={loans} for:item="l">
+                <li key={l.id} class="row">
+                  <div class="row-main">
+                    <span class="strong">{l.title}</span>
+                    <span class="kem-muted small"
+                      >{l.borrower} · {l.itemCode} · {l.loanNumber}</span
+                    >
+                    <span class={l.dueClass}>{l.dueLabel}</span>
+                  </div>
+                  <template lwc:if={data.canLend}>
+                    <div class="row-actions">
+                      <template lwc:if={l.canRenew}>
+                        <lightning-button
+                          variant="base"
+                          label="Renew"
+                          data-id={l.id}
+                          onclick={handleRenew}
+                          disabled={isBusy}
+                        ></lightning-button>
+                      </template>
+                      <lightning-button
+                        variant="base"
+                        label="Return"
+                        data-id={l.id}
+                        data-condition="Good"
+                        onclick={handleReturn}
+                        disabled={isBusy}
+                      ></lightning-button>
+                      <lightning-button
+                        variant="base"
+                        label="Return damaged"
+                        data-id={l.id}
+                        data-condition="Damaged"
+                        onclick={handleReturn}
+                        disabled={isBusy}
+                      ></lightning-button>
+                      <lightning-button
+                        variant="base"
+                        label="Lost"
+                        data-id={l.id}
+                        onclick={handleLost}
+                        disabled={isBusy}
+                      ></lightning-button>
+                    </div>
+                  </template>
+                </li>
+              </template>
+            </ul>
+          </template>
+          <template lwc:else>
+            <div class="kem-empty">Nothing on loan.</div>
+          </template>
+        </template>
+
+        <template lwc:if={isCatalogue}>
+          <div class="toolbar">
+            <lightning-input
+              type="search"
+              label="Search title, code, author or subject"
+              variant="label-hidden"
+              placeholder="Search title, code, author or subject"
+              value={search}
+              onchange={handleSearch}
+            ></lightning-input>
+            <template lwc:if={data.canManageItems}>
+              <lightning-button
+                label="Add item"
+                icon-name="utility:add"
+                onclick={handleToggleAdd}
+              ></lightning-button>
+            </template>
+          </div>
+          <template lwc:if={showAdd}>
+            <div class="add-form">
+              <lightning-input
+                label="Title"
+                data-field="title"
+                value={newItem.title}
+                onchange={handleNewItem}
+                required
+              ></lightning-input>
+              <lightning-input
+                label="Item code"
+                data-field="code"
+                value={newItem.code}
+                onchange={handleNewItem}
+                required
+              ></lightning-input>
+              <lightning-combobox
+                label="Type"
+                data-field="type"
+                value={newItem.type}
+                options={typeOptions}
+                onchange={handleNewItem}
+              ></lightning-combobox>
+              <lightning-input
+                label="Author / maker"
+                data-field="author"
+                value={newItem.author}
+                onchange={handleNewItem}
+              ></lightning-input>
+              <lightning-input
+                type="number"
+                label="Copies"
+                data-field="copies"
+                value={newItem.copies}
+                min="1"
+                onchange={handleNewItem}
+              ></lightning-input>
+              <div class="form-actions">
+                <lightning-button
+                  label="Cancel"
+                  onclick={handleToggleAdd}
+                ></lightning-button>
+                <lightning-button
+                  variant="brand"
+                  label="Save item"
+                  onclick={handleAdd}
+                  disabled={cannotAdd}
+                ></lightning-button>
+              </div>
+            </div>
+          </template>
+          <template lwc:if={hasItems}>
+            <ul class="rows">
+              <template for:each={items} for:item="i">
+                <li key={i.id} class="row">
+                  <div class="row-main">
+                    <span class="strong">{i.title}</span>
+                    <span class="kem-muted small"
+                      >{i.itemType} · {i.code} · {i.availability}</span
+                    >
+                  </div>
+                  <template lwc:if={i.canIssue}>
+                    <lightning-button
+                      variant="base"
+                      label="Issue"
+                      data-id={i.id}
+                      onclick={handleStartIssue}
+                    ></lightning-button>
+                  </template>
+                  <template lwc:if={i.issuing}>
+                    <div class="issue-form">
+                      <lightning-input
+                        type="search"
+                        label="Learner"
+                        placeholder="Type a learner's name"
+                        value={learnerSearch}
+                        onchange={handleLearnerSearch}
+                      ></lightning-input>
+                      <lightning-combobox
+                        label="Choose learner"
+                        value={learnerId}
+                        options={learnerOptions}
+                        onchange={handleLearner}
+                      ></lightning-combobox>
+                      <div class="form-actions">
+                        <lightning-button
+                          label="Cancel"
+                          onclick={handleCancelIssue}
+                        ></lightning-button>
+                        <lightning-button
+                          variant="brand"
+                          label="Issue item"
+                          onclick={handleIssue}
+                          disabled={cannotIssue}
+                        ></lightning-button>
+                      </div>
+                    </div>
+                  </template>
+                </li>
+              </template>
+            </ul>
+          </template>
+          <template lwc:else>
+            <div class="kem-empty">No items found.</div>
+          </template>
+        </template>
+
+        <template lwc:if={isFines}>
+          <template lwc:if={hasFines}>
+            <ul class="rows">
+              <template for:each={fines} for:item="f">
+                <li key={f.id} class="row">
+                  <div class="row-main">
+                    <span class="strong">{f.borrower}</span>
+                    <span class="kem-muted small"
+                      >{f.title} · {f.status} · {f.loanNumber}</span
+                    >
+                  </div>
+                  <lightning-formatted-number
+                    class="strong"
+                    value={f.fine}
+                    format-style="currency"
+                    currency-code={currencyCode}
+                  ></lightning-formatted-number>
+                  <template lwc:if={data.canLend}>
+                    <div class="row-actions">
+                      <lightning-button
+                        variant="base"
+                        label="Paid"
+                        data-id={f.id}
+                        data-outcome="Paid"
+                        onclick={handleSettle}
+                        disabled={isBusy}
+                      ></lightning-button>
+                      <lightning-button
+                        variant="base"
+                        label="Waive"
+                        data-id={f.id}
+                        data-outcome="Waived"
+                        onclick={handleSettle}
+                        disabled={isBusy}
+                      ></lightning-button>
+                    </div>
+                  </template>
+                </li>
+              </template>
+            </ul>
+          </template>
+          <template lwc:else>
+            <div class="kem-empty">No fines due.</div>
+          </template>
+        </template>
+      </template>
+    </article>
+  </template>
+</template>

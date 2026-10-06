@@ -35,6 +35,12 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
+                <componentName>kemPaymentLinks</componentName>
+                <identifier>c_kemPaymentLinks</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>force:relatedListContainer</componentName>
                 <identifier>force_relatedListContainer</identifier>
             </componentInstance>

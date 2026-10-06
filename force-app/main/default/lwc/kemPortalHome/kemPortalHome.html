@@ -236,6 +236,9 @@
             </template>
 
             <template lwc:if={showFees}>
+              <template lwc:if={paymentNotice}>
+                <div class="payment-notice" role="status">{paymentNotice}</div>
+              </template>
               <template for:each={invoices} for:item="i">
                 <div key={i.id} class={i.className}>
                   <div class="invoice-main">
@@ -268,6 +271,16 @@
                       currency-code={currencyCode}
                     ></lightning-formatted-number>
                     <span class={i.statusClass}>{i.status}</span>
+                    <template lwc:if={i.canPay}>
+                      <lightning-button
+                        class="pay"
+                        variant="brand"
+                        label="Pay online"
+                        data-id={i.id}
+                        onclick={handlePay}
+                        disabled={payingId}
+                      ></lightning-button>
+                    </template>
                   </div>
                 </div>
               </template>
@@ -285,6 +298,38 @@
                   ></lightning-formatted-number>
                   in credit. It is used on your next invoice automatically.
                 </div>
+              </template>
+            </template>
+
+            <template lwc:if={showLibrary}>
+              <template for:each={loans} for:item="l">
+                <div key={l.id} class={l.className}>
+                  <div>
+                    <div class="strong">{l.title}</div>
+                    <div class="kem-muted small">{l.dueLabel}</div>
+                  </div>
+                  <div class="loan-side">
+                    <template lwc:if={l.overdueLabel}>
+                      <span class="kem-badge kem-badge_danger"
+                        >{l.overdueLabel}</span
+                      >
+                    </template>
+                    <template lwc:if={l.hasFine}>
+                      <span class="small">
+                        Late fee
+                        <lightning-formatted-number
+                          class="strong"
+                          value={l.fine}
+                          format-style="currency"
+                          currency-code={currencyCode}
+                        ></lightning-formatted-number>
+                      </span>
+                    </template>
+                  </div>
+                </div>
+              </template>
+              <template lwc:if={noLoans}>
+                <div class="kem-empty">No library loans.</div>
               </template>
             </template>
 

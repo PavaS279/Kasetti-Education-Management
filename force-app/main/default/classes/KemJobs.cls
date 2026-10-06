@@ -15,7 +15,9 @@ public with sharing class KemJobs {
     'KEM Payment Reminders' => '0 5 9 * * ?',
     'KEM Message Dispatch' => '0 20 * * * ?',
     'KEM Integration Sync' => '0 40 * * * ?',
-    'KEM Finance Export' => '0 15 3 * * ?'
+    'KEM Finance Export' => '0 15 3 * * ?',
+    'KEM Retention' => '0 5 4 * * ?',
+    'KEM Library' => '0 15 7 * * ?'
   };
 
   /** Names of all KEM scheduled jobs, sorted. */
@@ -67,6 +69,12 @@ public with sharing class KemJobs {
       }
       when 'KEM Finance Export' {
         return new FinanceExportJob();
+      }
+      when 'KEM Retention' {
+        return new RetentionJob();
+      }
+      when 'KEM Library' {
+        return new LibraryJob();
       }
       when else {
         throw new AppException('Unknown job: ' + name);

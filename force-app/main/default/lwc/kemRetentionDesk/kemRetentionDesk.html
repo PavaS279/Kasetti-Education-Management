@@ -1,0 +1,191 @@
+<template>
+  <template lwc:if={visible}>
+    <article class="kem-card panel">
+      <header class="head">
+        <div>
+          <div class="kem-section-title">Retention</div>
+          <template lwc:if={data}>
+            <div class="kem-muted small">{assessedLabel}</div>
+          </template>
+        </div>
+        <div class="actions">
+          <template lwc:if={data}>
+            <template lwc:if={data.canRecalculate}>
+              <lightning-button
+                label="Recalculate"
+                onclick={handleRecalculate}
+                disabled={isBusy}
+              ></lightning-button>
+            </template>
+          </template>
+          <lightning-button-icon
+            icon-name="utility:refresh"
+            alternative-text="Refresh"
+            onclick={handleRefresh}
+          ></lightning-button-icon>
+        </div>
+      </header>
+
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+
+      <template lwc:if={data}>
+        <div class="counts">
+          <template for:each={counts} for:item="c">
+            <div key={c.key} class={c.className}>
+              <span class="count-value">{c.value}</span>
+              <span class="count-label">{c.label}</span>
+            </div>
+          </template>
+        </div>
+
+        <div class="tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            class={riskTabClass}
+            data-tab="risk"
+            onclick={handleTab}
+            aria-selected={isRisk}
+          >
+            At risk
+          </button>
+          <button
+            type="button"
+            role="tab"
+            class={inviteTabClass}
+            data-tab="invite"
+            onclick={handleTab}
+            aria-selected={isInvite}
+          >
+            Re-enrolment
+          </button>
+        </div>
+
+        <template lwc:if={isRisk}>
+          <lightning-combobox
+            class="level"
+            label="Risk level"
+            variant="label-inline"
+            value={level}
+            options={levelOptions}
+            onchange={handleLevel}
+          ></lightning-combobox>
+          <template lwc:if={hasRows}>
+            <ul class="rows">
+              <template for:each={rows} for:item="r">
+                <li key={r.enrolmentId} class="row">
+                  <div class="row-head">
+                    <div class="who">
+                      <a
+                        href="#"
+                        data-id={r.learnerAccountId}
+                        onclick={handleOpen}
+                        >{r.learner}</a
+                      >
+                      <span class="kem-muted small"
+                        >{r.className} · {r.branch}</span
+                      >
+                    </div>
+                    <span class={r.badgeClass}>{r.level} · {r.score}</span>
+                  </div>
+                  <div class="reasons">{r.reasons}</div>
+                  <div class="row-foot">
+                    <span class="kem-muted small">{r.statusLabel}</span>
+                    <template lwc:if={r.editing}>
+                      <span></span>
+                    </template>
+                    <template lwc:else>
+                      <lightning-button
+                        variant="base"
+                        label="Log follow-up"
+                        data-id={r.enrolmentId}
+                        onclick={handleEdit}
+                      ></lightning-button>
+                    </template>
+                  </div>
+                  <template lwc:if={r.note}>
+                    <div class="note">{r.note}</div>
+                  </template>
+                  <template lwc:if={r.editing}>
+                    <div class="editor">
+                      <lightning-combobox
+                        label="Outcome"
+                        value={outcome}
+                        options={outcomeOptions}
+                        onchange={handleOutcome}
+                      ></lightning-combobox>
+                      <lightning-textarea
+                        label="Note"
+                        value={note}
+                        max-length="1000"
+                        onchange={handleNote}
+                      ></lightning-textarea>
+                      <div class="editor-actions">
+                        <lightning-button
+                          label="Cancel"
+                          onclick={handleCancelEdit}
+                        ></lightning-button>
+                        <lightning-button
+                          variant="brand"
+                          label="Save follow-up"
+                          onclick={handleSave}
+                          disabled={cannotSave}
+                        ></lightning-button>
+                      </div>
+                    </div>
+                  </template>
+                </li>
+              </template>
+            </ul>
+          </template>
+          <template lwc:else>
+            <div class="kem-empty">No learners at risk.</div>
+          </template>
+        </template>
+
+        <template lwc:if={isInvite}>
+          <p class="kem-muted small intro">
+            Learners whose class ends within 30 days (or ended in the last 14)
+            and who are not enrolled in a later class.
+          </p>
+          <template lwc:if={hasCandidates}>
+            <ul class="rows">
+              <template for:each={candidates} for:item="c">
+                <li key={c.enrolmentId} class="row candidate">
+                  <lightning-input
+                    type="checkbox"
+                    label={c.learner}
+                    data-id={c.enrolmentId}
+                    checked={c.checked}
+                    onchange={handleSelect}
+                  ></lightning-input>
+                  <span class="kem-muted small"
+                    >{c.className} · ends {c.endDate} · {c.invitedLabel}</span
+                  >
+                </li>
+              </template>
+            </ul>
+            <div class="invite-bar">
+              <lightning-button
+                variant="brand"
+                label={inviteLabel}
+                onclick={handleInvite}
+                disabled={cannotInvite}
+              ></lightning-button>
+            </div>
+          </template>
+          <template lwc:else>
+            <div class="kem-empty">No classes ending soon.</div>
+          </template>
+        </template>
+      </template>
+    </article>
+  </template>
+</template>

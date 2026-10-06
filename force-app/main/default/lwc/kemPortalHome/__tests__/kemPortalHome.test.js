@@ -4,6 +4,7 @@ import getHome from "@salesforce/apex/PortalController.getHome";
 import getLearner from "@salesforce/apex/PortalController.getLearner";
 import markMessageRead from "@salesforce/apex/PortalController.markMessageRead";
 import downloadDocument from "@salesforce/apex/PortalController.downloadDocument";
+import startPayment from "@salesforce/apex/PortalController.startPayment";
 
 jest.mock(
   "@salesforce/apex/PortalController.getHome",
@@ -23,6 +24,12 @@ jest.mock(
 );
 jest.mock(
   "@salesforce/apex/PortalController.downloadDocument",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+
+jest.mock(
+  "@salesforce/apex/PortalController.startPayment",
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -283,5 +290,102 @@ describe("c-kem-portal-home", () => {
       .click();
     await flush();
     expect(downloadDocument).toHaveBeenCalledWith({ versionId: "068A" });
+  });
+
+  it("starts an online payment in test and live mode", async () => {
+    getHome.mockResolvedValue(HOME);
+    getLearner.mockImplementation(({ learnerContactId }) =>
+      Promise.resolve({
+        ...detail(learnerContactId, "Ananya Sharma"),
+        payOnline: true,
+        paymentMode: "Test"
+      })
+    );
+    startPayment
+      .mockResolvedValueOnce({
+        mode: "Test",
+        linkNumber: "PL-000001",
+        invoiceNumber: "BLR-000001"
+      })
+      .mockResolvedValueOnce({
+        mode: "Live",
+        checkoutUrl: "https://pay.example.com/checkout?ref=abc",
+        invoiceNumber: "BLR-000001"
+      })
+      .mockRejectedValueOnce({
+        body: { message: "Online payments are not available yet." }
+      });
+    const opened = jest.spyOn(window, "open").mockImplementation(() => null);
+    const element = createElement("c-kem-portal-home", { is: KemPortalHome });
+    document.body.appendChild(element);
+    await flush();
+    await flush();
+    const root = element.shadowRoot;
+    root.querySelector('button[data-value="fees"]').click();
+    await flush();
+    const pay = () =>
+      [...root.querySelectorAll("lightning-button")].find(
+        (b) => b.label === "Pay online"
+      );
+    pay().click();
+    await flush();
+    expect(startPayment).toHaveBeenCalledWith({ invoiceId: "a0I1" });
+    expect(root.querySelector(".payment-notice").textContent).toContain(
+      "Test mode"
+    );
+    pay().click();
+    await flush();
+    expect(opened).toHaveBeenCalledWith(
+      "https://pay.example.com/checkout?ref=abc",
+      "_blank",
+      "noopener"
+    );
+    expect(root.querySelector(".payment-notice").textContent).toContain(
+      "payment window"
+    );
+    pay().click();
+    await flush();
+    expect(root.querySelector(".payment-notice").textContent).toContain(
+      "not available"
+    );
+    opened.mockRestore();
+  });
+
+  it("shows library loans with overdue days and fees", async () => {
+    getHome.mockResolvedValue(HOME);
+    getLearner.mockImplementation(({ learnerContactId }) =>
+      Promise.resolve({
+        ...detail(learnerContactId, "Ananya Sharma"),
+        loans: [
+          {
+            id: "L1",
+            title: "Wings of Fire",
+            status: "Overdue",
+            dueOn: "2026-10-01",
+            daysOverdue: 5
+          },
+          {
+            id: "L2",
+            title: "Atlas",
+            status: "Returned",
+            returnedOn: "2026-09-20",
+            fine: 30,
+            fineStatus: "Due"
+          }
+        ]
+      })
+    );
+    const element = createElement("c-kem-portal-home", { is: KemPortalHome });
+    document.body.appendChild(element);
+    await flush();
+    await flush();
+    const root = element.shadowRoot;
+    root.querySelector('button[data-value="library"]').click();
+    await flush();
+    expect(root.querySelectorAll(".loan")).toHaveLength(2);
+    expect(root.querySelector(".loan_overdue").textContent).toContain(
+      "5 day(s) overdue"
+    );
+    expect(root.textContent).toContain("Late fee");
   });
 });

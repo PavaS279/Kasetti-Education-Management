@@ -49,7 +49,7 @@ private class FinanceExportTest {
 
   private static Student_Invoice__c invoice() {
     return [
-      SELECT Id, Name, Total__c, Tax_Total__c
+      SELECT Id, Name, Total__c, Tax_Total__c, Branch__c
       FROM Student_Invoice__c
       WHERE Branch__r.Branch_Code__c = 'ERP-01'
     ];
@@ -244,6 +244,23 @@ private class FinanceExportTest {
         }
       }
       Assert.areEqual(3, messages.size(), String.join(messages, ' | '));
+      Integer handled = 0;
+      for (Integer i = 0; i < 2; i++) {
+        try {
+          if (i == 0) {
+            FinanceExportController.preview(null, null, null);
+          } else {
+            FinanceExportController.runExport(
+              Date.today(),
+              Date.today().addDays(-1),
+              null
+            );
+          }
+        } catch (AuraHandledException e) {
+          handled++;
+        }
+      }
+      Assert.areEqual(2, handled, 'Controller reports errors');
       Assert.isTrue(messages[2].contains('92'), messages[2]);
     }
     User teacher = TestDataFactory.createUserWithLicense(
@@ -255,6 +272,12 @@ private class FinanceExportTest {
         Assert.fail('Teachers cannot export');
       } catch (AppException e) {
         Assert.isTrue(e.getMessage().contains('permission'), e.getMessage());
+      }
+      try {
+        FinanceExportController.getRecent();
+        Assert.fail('Teachers cannot list exports');
+      } catch (AuraHandledException e) {
+        Assert.isNotNull(e.getMessage(), 'Refused');
       }
     }
   }
@@ -278,7 +301,7 @@ private class FinanceExportTest {
   static void dailyJobExportsYesterday() {
     System.runAs(TestDataFactory.admin()) {
       Test.startTest();
-      new FinanceExportJob().execute((SchedulableContext) null);
+      new FinanceExportJob().execute(null);
       Test.stopTest();
       Finance_Export__c record = [
         SELECT Run_Type__c, From_Date__c, To_Date__c, Status__c

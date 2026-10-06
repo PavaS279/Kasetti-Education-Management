@@ -251,6 +251,13 @@ public without sharing class PortalService {
     public List<WaitlistItem> waitlist = new List<WaitlistItem>();
     @AuraEnabled
     public Decimal creditBalance = 0;
+    /** Online payments are available (Education Setting Payment_Gateway_Mode is Test or Live). */
+    @AuraEnabled
+    public Boolean payOnline = false;
+    @AuraEnabled
+    public String paymentMode;
+    @AuraEnabled
+    public List<LibraryService.LoanRow> loans = new List<LibraryService.LoanRow>();
   }
 
   // ------------------------------------------------------------------ API
@@ -376,6 +383,8 @@ public without sharing class PortalService {
     LearnerDetail detail = new LearnerDetail();
     detail.learner = cards(new Set<Id>{ learnerContactId }, viewerId)
       .get(learnerContactId);
+    detail.paymentMode = PaymentLinkService.mode();
+    detail.payOnline = detail.paymentMode != PaymentLinkService.MODE_OFF;
 
     Set<Id> offeringIds = new Set<Id>();
     for (CourseOfferingParticipant enrolment : enrolments(learnerContactId)) {
@@ -503,6 +512,7 @@ public without sharing class PortalService {
       detail.invoices.add(item);
     }
     detail.documents.addAll(documentsFor(new Set<Id>{ learnerContactId }));
+    detail.loans = LibraryService.learnerLoans(learnerContactId);
     for (CourseOfferingParticipant enrolment : [
       SELECT
         Id,
@@ -697,7 +707,8 @@ public without sharing class PortalService {
   }
 
   @TestVisible
-  private static Id viewerContactId() {
+  /** Contact of the signed-in portal user. */
+  public static Id viewerContactId() {
     if (Test.isRunningTest() && viewerOverride != null) {
       return viewerOverride;
     }

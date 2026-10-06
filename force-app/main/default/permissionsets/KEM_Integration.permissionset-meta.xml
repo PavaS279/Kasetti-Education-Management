@@ -12,9 +12,17 @@
         <apexClass>LmsApi</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <classAccesses>
+        <apexClass>PaymentWebhookApi</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <customPermissions>
         <enabled>true</enabled>
         <name>KEM_Integration</name>
+    </customPermissions>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>KEM_Manage_Billing</name>
     </customPermissions>
     <description
   >API user for external systems (LMS, ERP, payment gateway middleware): reads classes, rosters and the finance journal, writes grades, polls and acknowledges integration events.</description>

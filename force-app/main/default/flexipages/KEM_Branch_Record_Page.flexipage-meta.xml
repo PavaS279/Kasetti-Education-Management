@@ -19,6 +19,24 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
+                <componentName>kemAnalytics</componentName>
+                <identifier>c_kemAnalytics</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemRetentionDesk</componentName>
+                <identifier>c_kemRetentionDesk</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemLibraryDesk</componentName>
+                <identifier>c_kemLibraryDesk</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>force:detailPanel</componentName>
                 <identifier>force_detailPanel</identifier>
             </componentInstance>

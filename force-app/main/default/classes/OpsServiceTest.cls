@@ -128,20 +128,21 @@ private class OpsServiceTest {
         OpsService.console().administratorsNotInGroup >= 1,
         'Console reports it'
       );
-      AdminGroupService.SyncResult result = OpsController.syncAdministrators();
-      Assert.isTrue(result.added >= 1, 'Added');
-      Assert.areEqual(0, AdminGroupService.missing(), 'Nobody missing');
-      Assert.areEqual(
-        1,
-        [
-          SELECT COUNT()
-          FROM GroupMember
-          WHERE
-            GroupId = :AdminGroupService.groupId()
-            AND UserOrGroupId = :newAdmin.Id
-        ],
-        'In the group'
-      );
     }
+    // Group membership changes need user-management rights (system administrators, the deployment).
+    AdminGroupService.SyncResult result = OpsController.syncAdministrators();
+    Assert.isTrue(result.added >= 1, 'Added');
+    Assert.areEqual(0, AdminGroupService.missing(), 'Nobody missing');
+    Assert.areEqual(
+      1,
+      [
+        SELECT COUNT()
+        FROM GroupMember
+        WHERE
+          GroupId = :AdminGroupService.groupId()
+          AND UserOrGroupId = :newAdmin.Id
+      ],
+      'In the group'
+    );
   }
 }

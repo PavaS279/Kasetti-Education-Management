@@ -4,6 +4,7 @@ import getHome from "@salesforce/apex/PortalController.getHome";
 import getLearner from "@salesforce/apex/PortalController.getLearner";
 import markMessageRead from "@salesforce/apex/PortalController.markMessageRead";
 import downloadDocument from "@salesforce/apex/PortalController.downloadDocument";
+import startPayment from "@salesforce/apex/PortalController.startPayment";
 import { reduceErrors, initials, toneFor } from "c/kemUtils";
 
 const VIEWS = [
@@ -11,7 +12,8 @@ const VIEWS = [
   { value: "results", label: "Results", icon: "utility:trophy" },
   { value: "attendance", label: "Attendance", icon: "utility:check" },
   { value: "fees", label: "Fees", icon: "utility:moneybag" },
-  { value: "documents", label: "Documents", icon: "utility:file" }
+  { value: "documents", label: "Documents", icon: "utility:file" },
+  { value: "library", label: "Library", icon: "utility:knowledge_base" }
 ];
 
 const DOC_ICON = {
@@ -92,6 +94,8 @@ export default class KemPortalHome extends LightningElement {
   showInbox = false;
   openMessageId;
   downloadingId;
+  payingId;
+  paymentNotice;
 
   connectedCallback() {
     this.load();
@@ -211,6 +215,24 @@ export default class KemPortalHome extends LightningElement {
   }
   get showFees() {
     return this.view === "fees";
+  }
+  get showLibrary() {
+    return this.view === "library";
+  }
+  get loans() {
+    return (this.detail?.loans || []).map((l) => ({
+      ...l,
+      dueLabel:
+        l.status === "Returned" || l.status === "Lost"
+          ? `${l.status} ${formatDate(l.returnedOn)}`
+          : `Due ${formatDate(l.dueOn)}`,
+      className: `loan${l.daysOverdue > 0 ? " loan_overdue" : ""}`,
+      overdueLabel: l.daysOverdue > 0 ? `${l.daysOverdue} day(s) overdue` : "",
+      hasFine: l.fineStatus === "Due"
+    }));
+  }
+  get noLoans() {
+    return this.loans.length === 0;
   }
   get showDocuments() {
     return this.view === "documents";
@@ -350,6 +372,10 @@ export default class KemPortalHome extends LightningElement {
       dueLabel: `Due ${formatDate(i.dueDate)}`,
       className: `invoice${i.overdue ? " invoice_overdue" : ""}`,
       period: i.billingPeriod ? ` · ${i.billingPeriod}` : "",
+      canPay:
+        this.detail?.payOnline === true &&
+        i.balance > 0 &&
+        (i.status === "Issued" || i.status === "Partially Paid"),
       hasPlan: (i.instalments || []).length > 0,
       plan: (i.instalments || []).map((p) => ({
         ...p,
@@ -385,13 +411,32 @@ export default class KemPortalHome extends LightningElement {
         this.home = {
           ...this.home,
           unreadMessages: Math.max(0, this.home.unreadMessages - 1),
-          messages: this.home.messages.map((m) =>
-            m.id === id ? { ...m, read: true } : m
-          )
+          messages: this.home.messages.map((m) => {
+            return m.id === id ? { ...m, read: true } : m;
+          })
         };
       } catch {
         // Reading still works; the unread marker stays until the next visit.
       }
+    }
+  }
+
+  async handlePay(event) {
+    const invoiceId = event.currentTarget.dataset.id;
+    this.paymentNotice = undefined;
+    this.payingId = invoiceId;
+    try {
+      const link = await startPayment({ invoiceId });
+      if (link.mode === "Live" && link.checkoutUrl) {
+        window.open(link.checkoutUrl, "_blank", "noopener");
+        this.paymentNotice = `Complete the payment of ${link.invoiceNumber} in the payment window. Your receipt appears here once the payment is confirmed.`;
+      } else {
+        this.paymentNotice = `Test mode: payment request ${link.linkNumber} for ${link.invoiceNumber} was created. No money is taken.`;
+      }
+    } catch (error) {
+      this.paymentNotice = reduceErrors(error).join(" ");
+    } finally {
+      this.payingId = undefined;
     }
   }
 
