@@ -53,8 +53,11 @@ export default class KemOpsConsole extends LightningElement {
       this.errorMessage = undefined;
     } catch (error) {
       const message = reduceErrors(error).join(" ");
-      // Not an administrator: the console simply does not show.
-      this.hidden = message.includes("administrators");
+      // Not an administrator (refused by the service, or no access to its
+      // Apex class at all): the console simply does not show.
+      this.hidden =
+        message.includes("administrators") ||
+        message.includes("do not have access");
       this.errorMessage = message;
     }
   }

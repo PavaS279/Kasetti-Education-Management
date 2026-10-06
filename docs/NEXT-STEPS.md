@@ -80,6 +80,8 @@ See [PROGRESS.md](PROGRESS.md), [TEST-LOG.md](TEST-LOG.md) and [DEMO-SCRIPT.md](
 - The Education Cloud licence silently drops View All / Modify All on `CourseOffering` and `CourseOfferingParticipant` (the deploy succeeds; check `ObjectPermissions`). Use sharing rules to a group instead.
 - Production orgs reject Protected custom settings; one class cannot be both Queueable and Schedulable; `Database.queryWithBinds` returns `List<SObject>` (cast to `List<AggregateResult>` for aggregates).
 - In tests, `Request.getCurrent().getRequestId()` is the same for setup and test methods — do not use it for uniqueness.
+- Report and dashboard folders need explicit `folderShares` (enhanced folder sharing ignores `accessType` Public); custom object tabs need an "All" list view with `filterScope` Everything, or users only see Recently Viewed.
+- A component that hides when access is refused must also match the platform's "You do not have access to the Apex class…" message.
 - LightningModal sets `label`, `size` and `description` on open: never define them as getters in a modal (use `heading` for the header text). Jest stubs do not catch every platform behaviour — check new screens in the browser.
 - Einstein calls are callouts: no DML before them in the same transaction (`AiService.deferLogs`), and tests use `AiService.testProvider`.
 - Agentforce: deploy the Apex before the GenAiFunction, then the plugin and agent; activate the agent version through the Connect API (`/connect/bot-versions/<id>/activation`).

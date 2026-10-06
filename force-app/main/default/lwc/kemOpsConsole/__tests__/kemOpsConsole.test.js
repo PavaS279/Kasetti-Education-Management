@@ -183,4 +183,15 @@ describe("c-kem-ops-console", () => {
     const el = await mount();
     expect(el.shadowRoot.querySelector("article")).toBeNull();
   });
+
+  it("stays hidden for users without access to its Apex class", async () => {
+    getConsole.mockRejectedValue({
+      body: {
+        message:
+          "You do not have access to the Apex class named 'OpsController'."
+      }
+    });
+    const el = await mount();
+    expect(el.shadowRoot.querySelector("article")).toBeNull();
+  });
 });
