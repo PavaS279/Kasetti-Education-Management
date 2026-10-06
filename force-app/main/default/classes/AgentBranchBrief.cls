@@ -41,6 +41,7 @@ public with sharing class AgentBranchBrief {
       }
       responses.add(response);
     }
+    AgentSupport.finish();
     return responses;
   }
 

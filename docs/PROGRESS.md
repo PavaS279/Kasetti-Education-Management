@@ -79,17 +79,19 @@ Scope chosen by the institution (2026-10-05): a generic LMS API (no LMS yet), a 
 
 Choices (2026-10-06): Salesforce Einstein (Models API, Trust Layer) and Agentforce; assistants for enquiry replies, document extraction, learner progress summaries, staff policy Q&A and record summaries; forecasting of enrolments/seats and revenue/collections; transport, exams and hall tickets, alumni and referrals. Analysis: [ai/AI-OPPORTUNITIES.md](ai/AI-OPPORTUNITIES.md).
 
-| #    | Feature                                                                                               | Built | Deployed | Tests | E2E check | Notes |
-| ---- | ----------------------------------------------------------------------------------------------------- | ----- | -------- | ----- | --------- | ----- |
-| 4.1  | AI foundation: Einstein service, prompt catalogue, access control, review log, evaluation, AI console | ⬜    | ⬜       | ⬜    | ⬜        |       |
-| 4.2  | Enquiry reply drafts                                                                                  | ⬜    | ⬜       | ⬜    | ⬜        |       |
-| 4.3  | Learner progress summaries and report-card comment drafts                                             | ⬜    | ⬜       | ⬜    | ⬜        |       |
-| 4.4  | Record summaries (enquiry, application, class, branch brief, finance brief)                           | ⬜    | ⬜       | ⬜    | ⬜        |       |
-| 4.5  | Staff policy Q&A with sources                                                                         | ⬜    | ⬜       | ⬜    | ⬜        |       |
-| 4.6  | Agentforce staff assistant topic and actions                                                          | ⬜    | ⬜       | ⬜    | ⬜        |       |
-| 4.7  | Document extraction support for applications                                                          | ⬜    | ⬜       | ⬜    | ⬜        |       |
-| 4.8  | Forecasting: enrolments and seats, revenue and collections                                            | ⬜    | ⬜       | ⬜    | ⬜        |       |
-| 4.9  | Transport: routes, stops, assignments, transport fees                                                 | ⬜    | ⬜       | ⬜    | ⬜        |       |
-| 4.10 | Exams and hall tickets                                                                                | ⬜    | ⬜       | ⬜    | ⬜        |       |
-| 4.11 | Alumni and referrals                                                                                  | ⬜    | ⬜       | ⬜    | ⬜        |       |
-| 4.12 | Phase 4 journey, evaluation report and demo                                                           | ⬜    | ⬜       | ⬜    | ⬜        |       |
+F4.1–F4.7 live (2026-10-06): Einstein assistants on the enquiry, application, learner, class, branch and Home pages, the **KEM Staff Assistant** Agentforce agent (active), the AI document reader, and the AI console; live evaluation 10 of 10. Staff need the **KEM AI User** permission set (assigned to Kasetti Tech).
+
+| #    | Feature                                                                                               | Built | Deployed | Tests | E2E check | Notes                                                                             |
+| ---- | ----------------------------------------------------------------------------------------------------- | ----- | -------- | ----- | --------- | --------------------------------------------------------------------------------- |
+| 4.1  | AI foundation: Einstein service, prompt catalogue, access control, review log, evaluation, AI console | ✅    | ✅       | ✅    | ✅        | [F4.1-ai-foundation.md](features/F4.1-ai-foundation.md)                           |
+| 4.2  | Enquiry reply drafts                                                                                  | ✅    | ✅       | ✅    | ✅        | [F4.2-F4.5-ai-assistants.md](features/F4.2-F4.5-ai-assistants.md)                 |
+| 4.3  | Learner progress summaries and report-card comment drafts                                             | ✅    | ✅       | ✅    | ✅        | [F4.2-F4.5-ai-assistants.md](features/F4.2-F4.5-ai-assistants.md)                 |
+| 4.4  | Record summaries (enquiry, application, class, branch daily brief, learner)                           | ✅    | ✅       | ✅    | ✅        | [F4.2-F4.5-ai-assistants.md](features/F4.2-F4.5-ai-assistants.md)                 |
+| 4.5  | Staff policy Q&A with sources                                                                         | ✅    | ✅       | ✅    | ✅        | [F4.2-F4.5-ai-assistants.md](features/F4.2-F4.5-ai-assistants.md)                 |
+| 4.6  | Agentforce staff assistant topic and actions                                                          | ✅    | ✅       | ✅    | ✅        | [F4.6-agentforce-staff-assistant.md](features/F4.6-agentforce-staff-assistant.md) |
+| 4.7  | Document extraction support for applications                                                          | ✅    | ✅       | ✅    | ✅        | [F4.7-document-extraction.md](features/F4.7-document-extraction.md)               |
+| 4.8  | Forecasting: enrolments and seats, revenue and collections                                            | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                   |
+| 4.9  | Transport: routes, stops, assignments, transport fees                                                 | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                   |
+| 4.10 | Exams and hall tickets                                                                                | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                   |
+| 4.11 | Alumni and referrals                                                                                  | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                   |
+| 4.12 | Phase 4 journey, evaluation report and demo                                                           | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                   |

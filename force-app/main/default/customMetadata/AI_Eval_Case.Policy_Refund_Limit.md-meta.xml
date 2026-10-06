@@ -22,7 +22,9 @@
     </values>
     <values>
         <field>Must_Contain__c</field>
-        <value xsi:type="xsd:string">someone other|"sources"</value>
+        <value
+      xsi:type="xsd:string"
+    >1000|approv|Refunds and credit notes</value>
     </values>
     <values>
         <field>Must_Not_Contain__c</field>

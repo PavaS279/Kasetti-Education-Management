@@ -41,7 +41,11 @@ export async function readPdfText(component, source) {
   const lib = await library(component);
   const pdf = await lib.getDocument({
     data: toBytes(source),
-    isEvalSupported: false
+    // Text only: no script evaluation, no font loading or extra fetches.
+    isEvalSupported: false,
+    disableFontFace: true,
+    useSystemFonts: false,
+    useWorkerFetch: false
   }).promise;
   const pages = Math.min(pdf.numPages, MAX_PAGES);
   const parts = [];

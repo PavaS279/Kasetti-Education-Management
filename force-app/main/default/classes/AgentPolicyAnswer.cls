@@ -50,6 +50,7 @@ public with sharing class AgentPolicyAnswer {
       }
       responses.add(response);
     }
+    AgentSupport.finish();
     return responses;
   }
 }

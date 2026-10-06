@@ -271,6 +271,17 @@ public with sharing class AiExtractionService {
     result.documentType = value(data, 'documentType');
     Current current = currentValues(app);
     result.hasGuardian = current.guardianAccountId != null;
+    // A document naming another parent must not update the linked guardian.
+    Boolean otherPerson =
+      result.hasGuardian &&
+      (differentValue(
+        current.values.get('guardianFirstName'),
+        value(data, 'guardianFirstName')
+      ) ||
+      differentValue(
+        current.values.get('guardianRelationship'),
+        relationship(value(data, 'guardianRelationship'))
+      ));
     for (Def d : DEFS) {
       Proposal p = new Proposal();
       p.key = d.key;
@@ -285,8 +296,13 @@ public with sharing class AiExtractionService {
       p.differs = !same(p.current, p.proposed);
       if (d.section == 'Guardian' && current.guardianAccountId != null) {
         // Existing guardians keep their names; contact details can be updated.
-        p.selectable = d.key == 'guardianPhone' || d.key == 'guardianEmail';
-        if (!p.selectable && p.differs) {
+        p.selectable =
+          !otherPerson &&
+          (d.key == 'guardianPhone' ||
+          d.key == 'guardianEmail');
+        if (otherPerson && p.differs) {
+          p.note = 'The document names a different parent or guardian: add them from the learner record if needed.';
+        } else if (!p.selectable && p.differs) {
           p.note = 'Different from the linked guardian: check the guardian record.';
         }
       }
@@ -433,19 +449,12 @@ public with sharing class AiExtractionService {
       throw e;
     }
     if (interactionId != null) {
-      List<Proposal> applied = new List<Proposal>();
-      for (Def d : DEFS) {
-        if (values.containsKey(d.key)) {
-          Proposal p = new Proposal();
-          p.label = d.label;
-          p.proposed = values.get(d.key);
-          applied.add(p);
-        }
-      }
+      // Only corrections count as edits: proposals left unticked are staff
+      // decisions about conflicts, not mistakes by the reader.
       AiService.review(
         interactionId,
         'Accepted',
-        describe(applied),
+        corrected(interactionId, values),
         null,
         null
       );
@@ -605,6 +614,13 @@ public with sharing class AiExtractionService {
     return v;
   }
 
+  /** Both values present and different (ignoring case and spaces). */
+  private static Boolean differentValue(String current, String proposed) {
+    return String.isNotBlank(current) &&
+      String.isNotBlank(proposed) &&
+      !same(current, proposed);
+  }
+
   private static Boolean isDate(String value) {
     return Pattern.matches('^\\d{4}-\\d{2}-\\d{2}$', value);
   }
@@ -671,6 +687,44 @@ public with sharing class AiExtractionService {
       return 'Guardian';
     }
     return 'Other';
+  }
+
+  /**
+   * The proposals as stored at extraction ("Label: value" lines) with the
+   * applied values put in; values staff typed for fields the reader did
+   * not propose are added at the end.
+   */
+  private static String corrected(
+    Id interactionId,
+    Map<String, String> values
+  ) {
+    List<AI_Interaction__c> rows = [
+      SELECT Response__c
+      FROM AI_Interaction__c
+      WHERE Id = :interactionId
+      WITH SYSTEM_MODE
+    ];
+    List<String> lines = rows.isEmpty() || rows[0].Response__c == null
+      ? new List<String>()
+      : rows[0].Response__c.split('\n');
+    for (Def d : DEFS) {
+      if (!values.containsKey(d.key)) {
+        continue;
+      }
+      String line = d.label + ': ' + values.get(d.key);
+      Boolean found = false;
+      for (Integer i = 0; i < lines.size(); i++) {
+        if (lines[i].startsWith(d.label + ': ')) {
+          lines[i] = line;
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        lines.add(line);
+      }
+    }
+    return String.join(lines, '\n');
   }
 
   /** One "Label: value" line per proposal: the comparable form of a result. */

@@ -89,3 +89,13 @@ Phase 3 statuses (set by Apex only): integration event Pending → Delivered / F
 | KEM Message Dispatch  | Hourly at :20 | Sends email queued where a job could not be started                  |
 
 `scripts/deploy.sh` pauses these jobs during a deployment and schedules them again afterwards; the operations console shows their state and can schedule any that are missing.
+
+Phase 4 settings (`Education_Setting__mdt`):
+
+| Setting                | Default                    | Meaning                                                                                  |
+| ---------------------- | -------------------------- | ---------------------------------------------------------------------------------------- |
+| `AI_Enabled`           | On                         | Off hides every AI panel and refuses AI calls and Agentforce actions                     |
+| `AI_Model`             | `sfdc_ai__DefaultGPT4Omni` | Einstein model used unless a prompt names its own                                        |
+| `AI_Disabled_Features` | (empty)                    | Comma-separated features to switch off, for example `Enquiry Reply, Document Extraction` |
+
+Phase 4 statuses (set by Apex only): AI interaction Succeeded / Failed / Blocked, outcome Pending Review → Accepted / Edited / Rejected (Not Applicable for failed, Agentforce and evaluation calls).

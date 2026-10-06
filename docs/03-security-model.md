@@ -126,3 +126,20 @@ The matrix is extended per feature in `scripts/tooling/specs.py` (`PERMISSION_SE
 `BranchTemplateService` runs entirely as the user (user-mode queries and inserts), so cloning needs create access on every copied object; comparison figures only include records the user can see.
 
 **Administrator edit access (Phase 3):** see _Administrator edit access to classes and enrolments_ under Phase 3 permissions — granted through the KEM Administrators group, not Modify All.
+
+## Phase 4 permissions (AI)
+
+| Permission / access                                      | Administrator                      | Other staff with **KEM AI User**          | Staff without it |
+| -------------------------------------------------------- | ---------------------------------- | ----------------------------------------- | ---------------- |
+| AI panels and Agentforce actions                         | ✅ (needs KEM AI User too)         | ✅                                        | Hidden / refused |
+| Facts sent to the model                                  | What the user can see              | What the user can see (user-mode queries) | —                |
+| AI interactions (`AI_Interaction__c`)                    | All (Modify All)                   | Own (read)                                | —                |
+| AI console                                               | Everyone's figures, run evaluation | Own figures                               | —                |
+| Evaluation results (`AI_Evaluation__c`)                  | ✅                                 | —                                         | —                |
+| Saving AI output (reply task, comment, message, details) | Normal object permissions apply    | Normal object permissions apply           | —                |
+
+**KEM AI User** (permission set `KEM_AI_User`): custom permission `KEM_Use_AI`, read on `AI_Interaction__c`, access to `AiController` and the `Agent*` action classes. It is assigned person by person, on top of the persona; it is not in any persona group. Opening the Agentforce agent also needs the user's Agentforce licence or permission set licence.
+
+**Data protection:** model calls go through the Einstein Trust Layer (masking of personal data, zero retention by the model provider, audit). Prompts contain only the facts the feature needs; the document reader excludes health, religion, caste, income and identity numbers, and documents chosen from the computer are read in the browser and not stored. Switches: `AI_Enabled` (all AI) and `AI_Disabled_Features`. Interaction logs are private to their owner and administrators.
+
+**System-mode operations (Phase 4):** AI interaction and evaluation logs are written by the system (`AiService.Writer`, `AiEvaluationService.Writer`) after the access check; the document reader writes `Document_Details__c` in system mode (system-managed field) after reading the application as the user; the prompt catalogue and evaluation cases are read in system mode (configuration).

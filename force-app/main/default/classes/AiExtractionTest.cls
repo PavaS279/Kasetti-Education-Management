@@ -28,6 +28,10 @@ private class AiExtractionTest {
         new List<String>{ 'KEM_AI_User' }
       );
     }
+    // Applications are private: hand the test application to this user.
+    IndividualApplication app = application();
+    update new IndividualApplication(Id = app.Id, OwnerId = u.Id);
+    update new Account(Id = app.AccountId, OwnerId = u.Id);
     return u;
   }
 
@@ -165,7 +169,11 @@ private class AiExtractionTest {
       Assert.areEqual(3, result.learnerFields, 'Learner fields');
       Assert.isTrue(result.guardianAdded, 'Guardian added');
       Assert.isTrue(result.detailsNoted, 'School noted');
-      Assert.areEqual('Edited', result.outcome, 'Subset applied = edited');
+      Assert.areEqual(
+        'Accepted',
+        result.outcome,
+        'Values applied as read; unticked conflicts are not edits'
+      );
     }
     Account learner = [
       SELECT
@@ -225,20 +233,38 @@ private class AiExtractionTest {
       Map<String, AiExtractionService.Proposal> p = byKey(e);
       Assert.isFalse(p.get('guardianFirstName').selectable, 'Name locked');
       Assert.isTrue(
-        p.get('guardianFirstName').note.contains('check the guardian'),
+        p.get('guardianFirstName').note.contains('different parent'),
         'Explained'
       );
-      Assert.isTrue(p.get('guardianPhone').selectable, 'Phone can update');
+      Assert.isFalse(
+        p.get('guardianPhone').selectable,
+        'Document names Suresh (father), linked guardian is Lakshmi (mother)'
+      );
+      Assert.isTrue(
+        p.get('guardianPhone').note.contains('different parent'),
+        p.get('guardianPhone').note
+      );
+      // A document naming the linked guardian may update their contact details.
+      AiService.testProvider = new StubProvider(
+        BIRTH_CERTIFICATE.replace('"Suresh"', '"Lakshmi"')
+          .replace('"father"', '"Mother"')
+      );
+      p = byKey(
+        AiExtractionService.extract(app.Id, 'Letter.pdf', DOCUMENT_TEXT)
+      );
+      Assert.isTrue(p.get('guardianPhone').selectable, 'Same person');
+      Assert.isFalse(p.get('guardianFirstName').differs, 'Same first name');
       AiExtractionService.ApplyResult result = AiExtractionService.apply(
         app.Id,
         e.interactionId,
         'Birth certificate.pdf',
         new List<AiExtractionService.Change>{
           change('guardianPhone', '+919845022222'),
-          change('guardianEmail', 'suresh.d@example.com')
+          change('guardianEmail', 'suresh.rao@example.com')
         }
       );
       Assert.isFalse(result.guardianAdded, 'No new guardian');
+      Assert.areEqual('Edited', result.outcome, 'Corrected email = edited');
       Assert.areEqual(2, result.guardianFields, 'Guardian updated');
     }
     Assert.areEqual(

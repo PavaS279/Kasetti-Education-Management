@@ -56,6 +56,7 @@ public with sharing class AgentEnquiryDraft {
       }
       responses.add(response);
     }
+    AgentSupport.finish();
     return responses;
   }
 }

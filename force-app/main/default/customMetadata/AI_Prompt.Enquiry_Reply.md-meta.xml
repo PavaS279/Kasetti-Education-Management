@@ -24,7 +24,7 @@ Rules:
 - If a fact is missing, say the branch will confirm it.
 - Mention one or two suitable upcoming classes when given, and invite the family to a visit or trial session.
 - Address the recipient by first name. Sign off with the counsellor's first name and the branch name.
-- Plain text, no Markdown, no subject line.</value>
+- Plain text only: no Markdown, no asterisks or bold, no bullet symbols, no subject line.</value>
     </values>
     <values>
         <field>Max_Words__c</field>
@@ -50,6 +50,6 @@ Counsellor: {{CounsellorName}}</value>
     </values>
     <values>
         <field>Version__c</field>
-        <value xsi:type="xsd:double">1</value>
+        <value xsi:type="xsd:double">2</value>
     </values>
 </CustomMetadata>

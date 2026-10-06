@@ -494,16 +494,46 @@ private class AiServiceTest {
         [SELECT COUNT() FROM AI_Interaction__c],
         'Calls logged after the callouts'
       );
-      AI_Interaction__c one = [SELECT Id FROM AI_Interaction__c LIMIT 1];
-      AiService.review(one.Id, 'Rejected', null, 2, 'Not useful');
+      Assert.areEqual(
+        run.cases,
+        [SELECT COUNT() FROM AI_Interaction__c WHERE Channel__c = 'Evaluation'],
+        'Logged on the evaluation channel'
+      );
       AiConsoleService.Console c = AiController.getConsole(30);
+      Assert.areEqual(0, c.totals.calls, 'Evaluation runs not counted as use');
+      // Two in-app calls and one Agentforce call.
+      for (Integer i = 0; i < 2; i++) {
+        AiService.generate(
+          'Record_Summary',
+          new Map<String, String>{ 'Record' => 'Class ' + i },
+          null,
+          null
+        );
+      }
+      AiService.channel = AiService.CHANNEL_AGENT;
+      AiService.generate(
+        'Record_Summary',
+        new Map<String, String>{ 'Record' => 'Agent' },
+        null,
+        null
+      );
+      AiService.channel = AiService.CHANNEL_IN_APP;
+      AI_Interaction__c one = [
+        SELECT Id
+        FROM AI_Interaction__c
+        WHERE Channel__c = 'In-app'
+        LIMIT 1
+      ];
+      AiService.review(one.Id, 'Rejected', null, 2, 'Not useful');
+      c = AiController.getConsole(30);
       Assert.isTrue(c.enabled && c.isAdmin && c.canUse, 'Admin with AI');
-      Assert.areEqual(run.cases, c.totals.calls, 'Calls counted');
+      Assert.areEqual(3, c.totals.calls, 'Calls counted');
+      Assert.areEqual(1, c.agentCalls, 'Agentforce calls');
       Assert.areEqual(1, c.totals.rejected, 'Rejection counted');
       Assert.areEqual(0, c.totals.acceptanceRate, 'None used');
       Assert.areEqual(1, c.users, 'One user');
       Assert.isNotNull(c.evaluation, 'Latest evaluation');
-      Assert.isTrue(c.features.size() >= 4, 'Per feature');
+      Assert.areEqual(1, c.features.size(), 'Per feature');
     }
     User teacher = TestDataFactory.createUserWithLicense(
       TestDataFactory.persona('KEM_Teacher')
@@ -519,6 +549,23 @@ private class AiServiceTest {
         );
       }
     }
+  }
+
+  @IsTest
+  static void markdownRemovedFromDrafts() {
+    Assert.areEqual(
+      'Class Journey D2 starts Monday.\nSee you soon',
+      AiService.plainText(
+        '## Class *Journey D2* starts **Monday**.\nSee you soon  '
+      ),
+      'Emphasis and headings removed'
+    );
+    Assert.areEqual(
+      '- Seats 8 * 2\n- Branch__c kept',
+      AiService.plainText('- Seats 8 * 2\n- Branch__c kept'),
+      'Bullets, arithmetic and underscores kept'
+    );
+    Assert.areEqual('', AiService.plainText(null), 'Null');
   }
 
   @IsTest

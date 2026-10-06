@@ -11,9 +11,22 @@ public with sharing class AgentSupport {
   public class ResolveException extends Exception {
   }
 
-  /** Runs AI calls for an action on the Agentforce channel. */
+  /**
+   * Runs AI calls for an action on the Agentforce channel. Logs are held
+   * until finish(), so an agent can send several requests in one call
+   * (a callout cannot follow a write in the same transaction).
+   */
   public static void begin() {
     AiService.channel = AiService.CHANNEL_AGENT;
+    AiService.deferLogs = true;
+  }
+
+  /** Writes the held AI interaction logs. */
+  public static void finish() {
+    AiService.deferLogs = false;
+    AiService.channel = AiService.CHANNEL_IN_APP;
+    AiService.flushLogs();
+    Logger.flush();
   }
 
   /**
@@ -109,7 +122,12 @@ public with sharing class AgentSupport {
     if (e instanceof QueryException || e instanceof NoAccessException) {
       return 'You do not have access to that information.';
     }
-    Logger.error('AgentSupport', e, null);
+    // Buffered (written in finish()) so later callouts in the call still work.
+    Logger.warn(
+      'AgentSupport',
+      e.getTypeName() + ': ' + e.getMessage() + '\n' + e.getStackTraceString(),
+      null
+    );
     return 'Something went wrong: ' + e.getMessage().left(150);
   }
 }

@@ -55,6 +55,7 @@ public with sharing class AgentLearnerSummary {
       }
       responses.add(response);
     }
+    AgentSupport.finish();
     return responses;
   }
 }

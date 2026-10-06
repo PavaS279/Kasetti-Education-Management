@@ -122,7 +122,7 @@ public with sharing class AiService {
     Long started = System.currentTimeMillis();
     try {
       result.text = provider().complete(result.model, instructions, message);
-      result.text = result.text == null ? '' : result.text.trim();
+      result.text = plainText(result.text);
       result.ok = String.isNotBlank(result.text);
       if (!result.ok) {
         result.error = 'The model returned no text.';
@@ -158,6 +158,21 @@ public with sharing class AiService {
       );
     }
     return result;
+  }
+
+  /** Removes Markdown emphasis and headings: drafts are used as plain text. */
+  @TestVisible
+  private static String plainText(String text) {
+    if (text == null) {
+      return '';
+    }
+    return text.replaceAll('\\*\\*(.+?)\\*\\*', '$1')
+      .replaceAll(
+        '(?<![\\w*])\\*(?![\\s*])([^*\\n]+?)(?<!\\s)\\*(?![\\w*])',
+        '$1'
+      )
+      .replaceAll('(?m)^#{1,6}\\s+', '')
+      .trim();
   }
 
   @TestVisible
@@ -395,10 +410,10 @@ public with sharing class AiService {
    * Where requests come from: In-app (assistant panels, reviewed by staff),
    * Agentforce (actions in an agent conversation) or Evaluation.
    */
-  public static String channel = CHANNEL_IN_APP;
   public static final String CHANNEL_IN_APP = 'In-app';
   public static final String CHANNEL_AGENT = 'Agentforce';
   public static final String CHANNEL_EVALUATION = 'Evaluation';
+  public static String channel = CHANNEL_IN_APP;
   private static List<AI_Interaction__c> pendingLogs = new List<AI_Interaction__c>();
 
   /** Writes interactions held while deferLogs was on; returns how many. */

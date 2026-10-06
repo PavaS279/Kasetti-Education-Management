@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlannerBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Agentforce assistant for Kasetti staff: policy answers with sources, learner progress summaries, enquiry reply drafts, branch briefings and learners at risk.</description>
+    <genAiPlugins>
+        <genAiPluginName>KEM_Kasetti_Education</genAiPluginName>
+    </genAiPlugins>
+    <masterLabel>KEM Staff Assistant</masterLabel>
+    <plannerType>AiCopilot__ReAct</plannerType>
+</GenAiPlannerBundle>

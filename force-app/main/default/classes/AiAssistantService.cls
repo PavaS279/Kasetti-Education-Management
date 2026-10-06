@@ -809,15 +809,16 @@ public with sharing class AiAssistantService {
       Map<String, Object> parsed = AiJson.parseObject(generated.text);
       result.answer = (String) parsed.get('answer');
       result.confident = parsed.get('confident') == true;
-      Set<String> known = new Set<String>();
+      Map<String, String> known = new Map<String, String>();
       for (AI_Knowledge__mdt a : articles) {
-        known.add(a.MasterLabel);
+        known.put(a.MasterLabel.toLowerCase(), a.MasterLabel);
       }
       if (parsed.get('sources') instanceof List<Object>) {
         for (Object s : (List<Object>) parsed.get('sources')) {
           // Only cite articles that were actually given to the model.
-          if (known.contains(String.valueOf(s))) {
-            result.sources.add(String.valueOf(s));
+          String label = known.get(String.valueOf(s).trim().toLowerCase());
+          if (label != null && !result.sources.contains(label)) {
+            result.sources.add(label);
           }
         }
       }

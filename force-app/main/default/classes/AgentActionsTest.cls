@@ -32,6 +32,14 @@ private class AgentActionsTest {
       branch.Branch_Code__c = 'AGT-01';
       insert branch;
       LearningCourse course = TestDataFactory.createCourse('Agent Maths');
+      insert new Fee_Price__c(
+        Learning_Course__c = course.Id,
+        Branch__c = branch.Id,
+        Fee_Type__c = 'Tuition',
+        Billing_Frequency__c = 'Monthly',
+        Amount__c = 2500,
+        Effective_From__c = Date.today().addDays(-30)
+      );
       CourseOffering offering = TestDataFactory.createOffering(
         course.Id,
         branch.Id,
@@ -75,22 +83,40 @@ private class AgentActionsTest {
   @IsTest
   static void policyAnswerWithSources() {
     AiService.testProvider = new StubProvider(
-      '{"answer": "Refunds follow the refund policy.", "sources": ["Refunds and Credit"], "confident": true}'
+      '{"answer": "Refunds follow the refund policy.", "sources": ["refunds and credit notes", "Made-up article"], "confident": true}'
     );
     AgentPolicyAnswer.Request r = new AgentPolicyAnswer.Request();
     r.question = 'How do refunds and credit notes work?';
     System.runAs(aiUser()) {
-      AgentPolicyAnswer.Response response = AgentPolicyAnswer.answer(
-        new List<AgentPolicyAnswer.Request>{ r }
-      )[0];
+      // Two requests in one call: logs are held until all answers are in.
+      List<AgentPolicyAnswer.Response> responses = AgentPolicyAnswer.answer(
+        new List<AgentPolicyAnswer.Request>{ r, r }
+      );
+      Assert.areEqual(2, responses.size(), 'One answer per request');
+      AgentPolicyAnswer.Response response = responses[0];
+      Assert.isFalse(AiService.deferLogs, 'Logging restored');
+      Assert.areEqual(
+        AiService.CHANNEL_IN_APP,
+        AiService.channel,
+        'Channel reset'
+      );
       Assert.areEqual(
         'Refunds follow the refund policy.',
         response.answer,
         'Answer'
       );
       Assert.isTrue(response.confident, 'Confident');
-      Assert.isTrue(response.sources.contains('Refund'), response.sources);
+      Assert.areEqual(
+        'Refunds and credit notes',
+        response.sources,
+        'Only given articles cited, with their own title'
+      );
     }
+    Assert.areEqual(
+      2,
+      [SELECT COUNT() FROM AI_Interaction__c],
+      'Both calls logged'
+    );
     AI_Interaction__c row = [
       SELECT Channel__c, Outcome__c
       FROM AI_Interaction__c
@@ -147,7 +173,11 @@ private class AgentActionsTest {
     }
     Assert.areEqual(
       0,
-      [SELECT COUNT() FROM Task WHERE WhoId = :enquiry.Id],
+      [
+        SELECT COUNT()
+        FROM Task
+        WHERE WhoId = :enquiry.Id AND Subject LIKE 'Email reply%'
+      ],
       'Nothing sent or logged as sent'
     );
   }
