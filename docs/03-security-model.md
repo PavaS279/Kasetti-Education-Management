@@ -125,4 +125,4 @@ The matrix is extended per feature in `scripts/tooling/specs.py` (`PERMISSION_SE
 
 `BranchTemplateService` runs entirely as the user (user-mode queries and inserts), so cloning needs create access on every copied object; comparison figures only include records the user can see.
 
-**Administrator edit access (Phase 3, 2026-10-05):** administrators have Modify All on classes (`CourseOffering`) and enrolments (`CourseOfferingParticipant`), so they can edit, re-schedule and close records other users own. Teachers, branch managers and coordinators keep their existing access.
+**Administrator edit access (Phase 3):** see _Administrator edit access to classes and enrolments_ under Phase 3 permissions — granted through the KEM Administrators group, not Modify All.

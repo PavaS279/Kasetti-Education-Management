@@ -59,7 +59,7 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 
 **Completion condition — additional centres and higher volumes supported:** ✅ (`Phase3JourneyTest`, `VolumeTest`, the live checks of F3.1–F3.9 and `scripts/demo/phase3-journey.sh` passing 26 of 26 checks live)
 
-Scope chosen by the institution (2026-10-05): a generic LMS API (no LMS yet), a generic ERP export/API, online payments in the portal, and a library/resources module. Administrators now have Modify All on classes and enrolments (deployed 2026-10-05).
+Scope chosen by the institution (2026-10-05): a generic LMS API (no LMS yet), a generic ERP export/API, online payments in the portal, and a library/resources module. Administrators have edit access to every class and enrolment through the **KEM Administrators** group (owner sharing rules; the Education Cloud licence does not allow Modify All on these objects) (2026-10-06; the Modify All permission deployed on 2026-10-05 is not stored by the licence).
 
 | #   | Feature                                                                                       | Built | Deployed | Tests | E2E check | Notes                                                                     |
 | --- | --------------------------------------------------------------------------------------------- | ----- | -------- | ----- | --------- | ------------------------------------------------------------------------- |
