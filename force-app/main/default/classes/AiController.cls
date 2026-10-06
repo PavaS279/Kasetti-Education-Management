@@ -131,6 +131,64 @@ public with sharing class AiController {
     }
   }
 
+  // ---------------------------------------------------------------- document reader
+
+  @AuraEnabled
+  public static List<AiExtractionService.Document> applicationDocuments(
+    Id applicationId
+  ) {
+    try {
+      AiService.assertAllowed('Document Extraction');
+      return AiExtractionService.documents(applicationId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static AiExtractionService.FileContent documentContent(
+    Id contentVersionId
+  ) {
+    try {
+      AiService.assertAllowed('Document Extraction');
+      return AiExtractionService.fileContent(contentVersionId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static AiExtractionService.Extraction extractDocument(
+    Id applicationId,
+    String documentName,
+    String text
+  ) {
+    try {
+      return AiExtractionService.extract(applicationId, documentName, text);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static AiExtractionService.ApplyResult applyExtraction(
+    Id applicationId,
+    Id interactionId,
+    String documentName,
+    List<AiExtractionService.Change> changes
+  ) {
+    try {
+      return AiExtractionService.apply(
+        applicationId,
+        interactionId,
+        documentName,
+        changes
+      );
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
   /** Whether the AI panels should show for this user (switch and permission). */
   @AuraEnabled(cacheable=true)
   public static Boolean isAvailable(String feature) {

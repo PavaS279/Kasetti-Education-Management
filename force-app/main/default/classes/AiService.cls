@@ -321,6 +321,20 @@ public with sharing class AiService {
       );
   }
 
+  /**
+   * Replaces the stored response with a comparable form (for example
+   * extracted fields as "Label: value" lines) before staff review it.
+   */
+  public static void replaceResponse(Id interactionId, String text) {
+    new Writer()
+      .updateInteraction(
+        new AI_Interaction__c(
+          Id = interactionId,
+          Response__c = text == null ? null : text.left(32000)
+        )
+      );
+  }
+
   /** Share of words changed between the draft and the text used (0-100). */
   @TestVisible
   private static Decimal editRatio(String draft, String finalText) {
@@ -376,6 +390,15 @@ public with sharing class AiService {
    * callouts can run in one transaction (a callout cannot follow a write).
    */
   public static Boolean deferLogs = false;
+
+  /**
+   * Where requests come from: In-app (assistant panels, reviewed by staff),
+   * Agentforce (actions in an agent conversation) or Evaluation.
+   */
+  public static String channel = CHANNEL_IN_APP;
+  public static final String CHANNEL_IN_APP = 'In-app';
+  public static final String CHANNEL_AGENT = 'Agentforce';
+  public static final String CHANNEL_EVALUATION = 'Evaluation';
   private static List<AI_Interaction__c> pendingLogs = new List<AI_Interaction__c>();
 
   /** Writes interactions held while deferLogs was on; returns how many. */
@@ -408,7 +431,11 @@ public with sharing class AiService {
       Output_Chars__c = result.text == null ? 0 : result.text.length(),
       Response__c = result.text == null ? null : result.text.left(32000),
       Error__c = result.error == null ? null : result.error.left(255),
-      Outcome__c = result.ok ? 'Pending Review' : 'Not Applicable'
+      Channel__c = channel,
+      // Only in-app drafts come back for a staff review.
+      Outcome__c = result.ok && channel == CHANNEL_IN_APP
+        ? 'Pending Review'
+        : 'Not Applicable'
     );
     if (deferLogs) {
       pendingLogs.add(row);

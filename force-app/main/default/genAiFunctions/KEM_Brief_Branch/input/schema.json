@@ -1,0 +1,14 @@
+{
+  "required": ["branch"],
+  "unevaluatedProperties": false,
+  "properties": {
+    "branch": {
+      "title": "Branch",
+      "description": "The branch (centre or campus) name, code or record Id from the conversation.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": true
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

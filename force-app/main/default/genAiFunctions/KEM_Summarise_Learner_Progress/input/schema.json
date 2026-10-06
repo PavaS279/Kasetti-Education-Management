@@ -1,0 +1,14 @@
+{
+  "required": ["learner"],
+  "unevaluatedProperties": false,
+  "properties": {
+    "learner": {
+      "title": "Learner",
+      "description": "The learner's full name (or record Id) from the conversation. If no name was given, ask the user for it.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": true
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

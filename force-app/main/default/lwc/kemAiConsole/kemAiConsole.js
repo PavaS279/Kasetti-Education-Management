@@ -56,6 +56,11 @@ export default class KemAiConsole extends LightningElement {
       { key: "calls", label: "AI requests", value: String(t.calls) },
       { key: "users", label: "Staff using AI", value: String(this.data.users) },
       {
+        key: "agent",
+        label: "Agentforce actions",
+        value: String(this.data.agentCalls || 0)
+      },
+      {
         key: "accept",
         label: "Used (as is or edited)",
         value: percent(t.acceptanceRate)

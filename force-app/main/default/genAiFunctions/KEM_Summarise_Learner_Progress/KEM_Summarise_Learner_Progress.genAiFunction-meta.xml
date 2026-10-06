@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Summarises a Kasetti learner&apos;s progress (classes, attendance, recent results and next steps) for staff. Use it when staff ask how a learner or student is doing.</description>
+    <invocationTarget>AgentLearnerSummary</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <masterLabel>Summarise a KEM Learner&apos;s Progress</masterLabel>
+</GenAiFunction>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
+    <cacheControl>Private</cacheControl>
+    <contentType>application/zip</contentType>
+    <description>pdf.js 3.11.174 (Apache-2.0, Mozilla) legacy build: reads the text of PDF documents in the browser for the AI document reader.</description>
+</StaticResource>

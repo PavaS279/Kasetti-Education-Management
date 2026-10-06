@@ -19,6 +19,12 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
+                <componentName>kemAiDocumentReader</componentName>
+                <identifier>c_kemAiDocumentReader</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>force:detailPanel</componentName>
                 <identifier>force_detailPanel</identifier>
             </componentInstance>

@@ -1,0 +1,21 @@
+{
+  "required": [],
+  "unevaluatedProperties": false,
+  "properties": {
+    "branch": {
+      "title": "Branch",
+      "description": "Optional branch name, code or record Id. Leave empty for all branches.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": true
+    },
+    "level": {
+      "title": "Risk level",
+      "description": "High, Medium or All (default All).",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": true
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}

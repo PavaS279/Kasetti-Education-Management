@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata">
+    <aiPluginUtterances>
+        <developerName>policy_question</developerName>
+        <language>en_US</language>
+        <masterLabel>policy question</masterLabel>
+        <utterance>How many days do families have to pay an invoice?</utterance>
+    </aiPluginUtterances>
+    <aiPluginUtterances>
+        <developerName>learner_progress</developerName>
+        <language>en_US</language>
+        <masterLabel>learner progress</masterLabel>
+        <utterance>How is Ananya Rao doing in her classes?</utterance>
+    </aiPluginUtterances>
+    <aiPluginUtterances>
+        <developerName>enquiry_reply</developerName>
+        <language>en_US</language>
+        <masterLabel>enquiry reply</masterLabel>
+        <utterance
+    >Draft a reply to the enquiry from Kavya Sharma and offer a trial class.</utterance>
+    </aiPluginUtterances>
+    <aiPluginUtterances>
+        <developerName>branch_brief</developerName>
+        <language>en_US</language>
+        <masterLabel>branch brief</masterLabel>
+        <utterance>How is the Whitefield branch doing?</utterance>
+    </aiPluginUtterances>
+    <aiPluginUtterances>
+        <developerName>at_risk</developerName>
+        <language>en_US</language>
+        <masterLabel>at risk</masterLabel>
+        <utterance>Which learners are at high risk of leaving?</utterance>
+    </aiPluginUtterances>
+    <canEscalate>false</canEscalate>
+    <description
+  >Helps Kasetti staff (counsellors, teachers, branch managers, finance and administrators) with institution policies, learner progress, enquiry replies, branch performance and learners at risk, using live Kasetti Education Management data.</description>
+    <developerName>KEM_Kasetti_Education</developerName>
+    <genAiFunctions>
+        <functionName>KEM_Answer_Policy_Question</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>KEM_Summarise_Learner_Progress</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>KEM_Draft_Enquiry_Reply</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>KEM_Brief_Branch</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>KEM_List_Learners_At_Risk</functionName>
+    </genAiFunctions>
+    <genAiPluginInstructions>
+        <description
+    >For any question about the institution&apos;s fees, invoices, payments, refunds, credit, attendance, admissions, offers, waitlists, transfers, grading, report cards, library or messaging rules, always run Answer a KEM Policy Question. Never answer such questions from general knowledge. Show the sources after the answer. If Confident is false, say the policies do not clearly cover it and suggest checking with an administrator.</description>
+        <developerName>policy_answers</developerName>
+        <language>en_US</language>
+        <masterLabel>policy answers</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description
+    >Pass the learner, enquiry or branch name exactly as the user wrote it. If an action replies that several records match, show the choices and ask the user which one, then run the action again with the full name chosen. If it replies that nothing was found, say so and ask the user to check the name.</description>
+        <developerName>names</developerName>
+        <language>en_US</language>
+        <masterLabel>names</masterLabel>
+        <sortOrder>1</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description
+    >Learner summaries and enquiry replies are drafts. Always tell the user that nothing has been sent and that they should check the text before sharing it; enquiry replies are reviewed and sent from the AI reply panel on the enquiry page.</description>
+        <developerName>drafts</developerName>
+        <language>en_US</language>
+        <masterLabel>drafts</masterLabel>
+        <sortOrder>2</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description
+    >Show the action&apos;s text as returned without adding figures, fees, dates or names that are not in it. If an action returns a message saying the user has no access, or that the assistant is switched off, relay that message as is.</description>
+        <developerName>grounding</developerName>
+        <language>en_US</language>
+        <masterLabel>grounding</masterLabel>
+        <sortOrder>3</sortOrder>
+    </genAiPluginInstructions>
+    <language>en_US</language>
+    <masterLabel>Kasetti Education</masterLabel>
+    <pluginType>Topic</pluginType>
+    <scope
+  >Your job is to help Kasetti Education staff answer policy questions from the institution&apos;s knowledge base, summarise a learner&apos;s progress, draft enquiry replies for review, brief them on a branch and list learners at risk. You only work with Kasetti Education Management data and never send messages or change records.</scope>
+</GenAiPlugin>

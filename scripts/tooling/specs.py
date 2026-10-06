@@ -669,6 +669,8 @@ OBJECTS = [
             {"name": "Eligibility_Status__c", "label": "Eligibility", "type": "Picklist", "values": ["Not Checked", "Eligible", "Not Eligible", "Overridden"],
              "default": "Not Checked", "systemManaged": True},
             {"name": "Eligibility_Notes__c", "label": "Eligibility Notes", "type": "TextArea", "systemManaged": True},
+            {"name": "Document_Details__c", "label": "Document Details", "type": "LongTextArea", "length": 4000, "lines": 5, "systemManaged": True,
+             "help": "Details taken from the applicant's documents (for example previous school and grade), confirmed by staff with the AI document reader."},
             {"name": "Checklist_Complete__c", "label": "Checklist Complete", "type": "Checkbox", "default": False, "systemManaged": True,
              "help": "All required checklist items are accepted or waived."},
             {"name": "Decision__c", "label": "Decision", "type": "Picklist", "values": ["Admit", "Waitlist", "Reject"], "systemManaged": True},
@@ -823,6 +825,7 @@ OBJECTS = [
             {"name": "Response__c", "label": "Response", "type": "LongTextArea", "length": 32768, "lines": 8, "systemManaged": True},
             {"name": "Error__c", "label": "Error", "type": "Text", "length": 255, "systemManaged": True},
             {"name": "Outcome__c", "label": "Outcome", "type": "Picklist", "values": ["Pending Review", "Accepted", "Edited", "Rejected", "Not Applicable"], "default": "Pending Review", "systemManaged": True},
+            {"name": "Channel__c", "label": "Channel", "type": "Picklist", "values": ["In-app", "Agentforce", "Evaluation"], "default": "In-app", "systemManaged": True, "description": "Where the request came from: an in-app assistant, an Agentforce action or an evaluation run."},
             {"name": "Edit_Ratio__c", "label": "Share Edited", "type": "Percent", "precision": 5, "scale": 1, "systemManaged": True},
             {"name": "Rating__c", "label": "Rating", "type": "Number", "precision": 1, "scale": 0, "systemManaged": True, "help": "1 (poor) to 5 (excellent), given by the reviewer."},
             {"name": "Feedback__c", "label": "Feedback", "type": "TextArea", "systemManaged": True},
@@ -882,7 +885,7 @@ ENROLMENT_CLASSES = ["EnrolmentController", "WaitlistController", "TransferContr
 SCHEDULE_CLASSES = ["TimetableController", "AttendanceController", "AssessmentController", "CoverController", "GradingController"]
 BILLING_CLASSES = ["BillingController", "CreditController", "PaymentLinkController"]
 DOCUMENT_CLASSES = ["DocumentController", "KemDocumentController"]
-AI_CLASSES = ["AiController"]  # extended per Phase 4 feature
+AI_CLASSES = ["AiController", "AgentPolicyAnswer", "AgentLearnerSummary", "AgentEnquiryDraft", "AgentBranchBrief", "AgentAtRiskLearners"]  # extended per Phase 4 feature
 INTEGRATION_CLASSES = ["LmsApi", "ErpApi", "PaymentWebhookApi"]  # extended as the APIs are added (F3.4, F3.7)
 DOCUMENT_PAGES = ["KEM_Offer_Letter", "KEM_Invoice_Pdf", "KEM_Receipt_Pdf", "KEM_Report_Card"]
 

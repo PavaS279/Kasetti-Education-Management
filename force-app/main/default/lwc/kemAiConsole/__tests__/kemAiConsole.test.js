@@ -23,6 +23,7 @@ function data(overrides = {}) {
     canUse: true,
     isAdmin: true,
     users: 3,
+    agentCalls: 2,
     totals: {
       calls: 20,
       failed: 1,
@@ -79,9 +80,10 @@ describe("c-kem-ai-console", () => {
     runEvaluation.mockResolvedValue({ cases: 7, passed: 6 });
     const el = await mount();
     const tiles = el.shadowRoot.querySelectorAll(".tile");
-    expect(tiles).toHaveLength(6);
-    expect(tiles[2].textContent).toContain("86.7%");
-    expect(tiles[3].textContent).toContain("42.5");
+    expect(tiles).toHaveLength(7);
+    expect(tiles[2].textContent).toContain("2");
+    expect(tiles[3].textContent).toContain("86.7%");
+    expect(tiles[4].textContent).toContain("42.5");
     expect(el.shadowRoot.querySelector(".tile_warn")).not.toBeNull();
     const cells = el.shadowRoot.querySelectorAll("tbody td");
     expect(cells[0].textContent).toBe("Enquiry Reply");

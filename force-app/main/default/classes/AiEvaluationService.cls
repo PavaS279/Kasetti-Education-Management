@@ -41,6 +41,7 @@ public with sharing class AiEvaluationService {
     List<AI_Evaluation__c> rows = new List<AI_Evaluation__c>();
     // All callouts first, then every write (a callout cannot follow a write).
     AiService.deferLogs = true;
+    AiService.channel = AiService.CHANNEL_EVALUATION;
     try {
       for (AI_Eval_Case__mdt c : cases) {
         if (String.isNotBlank(promptName) && c.Prompt__c != promptName) {
@@ -50,6 +51,7 @@ public with sharing class AiEvaluationService {
       }
     } finally {
       AiService.deferLogs = false;
+      AiService.channel = AiService.CHANNEL_IN_APP;
     }
     AiService.flushLogs();
     new Writer().insertRows(rows);

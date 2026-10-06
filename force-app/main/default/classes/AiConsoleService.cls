@@ -56,6 +56,9 @@ public with sharing class AiConsoleService {
     public FeatureStats totals = new FeatureStats();
     @AuraEnabled
     public Integer users = 0;
+    /** Calls made through Agentforce actions (included in the totals). */
+    @AuraEnabled
+    public Integer agentCalls = 0;
     @AuraEnabled
     public AiEvaluationService.RunSummary evaluation;
   }
@@ -71,7 +74,10 @@ public with sharing class AiConsoleService {
     c.isAdmin = OpsService.isAdmin();
     Datetime since = System.now().addDays(-span);
     Id me = UserInfo.getUserId();
-    String scope = c.isAdmin ? '' : ' AND OwnerId = :me';
+    // Evaluation runs are measured separately (AI_Evaluation__c).
+    String scope =
+      ' AND Channel__c != \'Evaluation\'' +
+      (c.isAdmin ? '' : ' AND OwnerId = :me');
     Map<String, Object> binds = new Map<String, Object>{
       'since' => since,
       'me' => me
@@ -112,6 +118,12 @@ public with sharing class AiConsoleService {
       ))[0]
       .get('users');
     c.users = users == null ? 0 : (Integer) users;
+    c.agentCalls = Database.countQueryWithBinds(
+      'SELECT COUNT() FROM AI_Interaction__c WHERE CreatedDate >= :since AND Channel__c = \'Agentforce\'' +
+      (c.isAdmin ? '' : ' AND OwnerId = :me'),
+      binds,
+      AccessLevel.SYSTEM_MODE
+    );
     if (c.isAdmin) {
       c.evaluation = AiEvaluationService.latest();
     }

@@ -175,6 +175,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>AI_Interaction__c.Channel__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>AI_Interaction__c.Edit_Ratio__c</field>
         <readable>true</readable>
     </fieldPermissions>

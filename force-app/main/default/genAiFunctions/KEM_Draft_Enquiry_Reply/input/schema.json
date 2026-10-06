@@ -1,0 +1,21 @@
+{
+  "required": ["enquiry"],
+  "unevaluatedProperties": false,
+  "properties": {
+    "enquiry": {
+      "title": "Enquiry",
+      "description": "The enquirer's name (or enquiry record Id) from the conversation.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": true
+    },
+    "note": {
+      "title": "Counsellor note",
+      "description": "Optional points the counsellor wants in the reply, for example a trial class offer.",
+      "lightning:type": "lightning__textType",
+      "lightning:isPII": false,
+      "copilotAction:isUserInput": true
+    }
+  },
+  "lightning:type": "lightning__objectType"
+}
