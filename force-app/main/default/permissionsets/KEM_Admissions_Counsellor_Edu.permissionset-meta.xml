@@ -4,6 +4,21 @@
   >Education Cloud object access for the KEM Admissions Counsellor persona. Requires the Education Cloud licence.</description>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Account.Alumni_Contact_Ok__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Account.Alumni_Since__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Account.Alumni__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Account.Branch__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -40,6 +55,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Account.Phone</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Account.Referral_Code__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

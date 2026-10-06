@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Attendant_Name__c</fullName>
+    <label>Attendant Name</label>
+    <required>false</required>
+    <length>80</length>
+    <unique>false</unique>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+</CustomField>

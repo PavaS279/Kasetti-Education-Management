@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Referral_Code__c</fullName>
+    <inlineHelpText
+  >Code of the family or alumnus who referred this enquiry (F4.11).</inlineHelpText>
+    <label>Referral Code</label>
+    <required>false</required>
+    <length>20</length>
+    <unique>false</unique>
+    <type>Text</type>
+</CustomField>

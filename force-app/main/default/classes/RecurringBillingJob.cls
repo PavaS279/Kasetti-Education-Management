@@ -65,7 +65,9 @@ public with sharing class RecurringBillingJob implements Database.Batchable<SObj
             WHERE
               Billing_Frequency__c = :BillingService.MONTHLY
               AND Invoiced__c = FALSE
-              AND Periods_Billed__c > 0
+              // Transport lines start on their own date (F4.9); others after the first invoice.
+              AND (Periods_Billed__c > 0
+              OR Fee_Type__c = 'Transport')
               AND Next_Bill_Date__c <= :asOf
           )
       ]

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Assessment__c</fullName>
+    <label>Gradebook Assessment</label>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <referenceTo>Course_Assessment__c</referenceTo>
+    <relationshipLabel>Exam Papers</relationshipLabel>
+    <relationshipName>Exam_Papers</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

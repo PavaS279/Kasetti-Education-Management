@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Bill_Until__c</fullName>
+    <inlineHelpText
+  >Last day a monthly fee is billed, for example when transport ends; empty bills until the class ends.</inlineHelpText>
+    <label>Bill Until</label>
+    <required>false</required>
+    <type>Date</type>
+</CustomField>

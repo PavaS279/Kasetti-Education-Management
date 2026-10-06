@@ -149,7 +149,8 @@ public with sharing class BillingService {
         Tax_Amount__c,
         Line_Total__c,
         Next_Bill_Date__c,
-        Periods_Billed__c
+        Periods_Billed__c,
+        Bill_Until__c
       FROM Enrolment_Fee_Line__c
       WHERE Enrolment__c = :enrolment.Id AND Invoiced__c = FALSE
       WITH SYSTEM_MODE
@@ -197,8 +198,7 @@ public with sharing class BillingService {
           Id = feeLine.Id,
           Next_Bill_Date__c = following,
           Periods_Billed__c = nvl(feeLine.Periods_Billed__c) + periods.size(),
-          Invoiced__c = enrolment.EndDate != null &&
-            following > enrolment.EndDate
+          Invoiced__c = following > lastBillable(feeLine, enrolment)
         )
       );
     }
@@ -272,16 +272,27 @@ public with sharing class BillingService {
       periods.add(next);
       next = next.addMonths(1);
     }
-    while (
-      next <= asOf &&
-      (enrolment.EndDate == null ||
-      next <= enrolment.EndDate) &&
-      periods.size() < 12
-    ) {
+    Date last = lastBillable(feeLine, enrolment);
+    while (next <= asOf && next <= last && periods.size() < 12) {
       periods.add(next);
       next = next.addMonths(1);
     }
     return periods;
+  }
+
+  /** Last day a monthly line is billed: the class end or the line's own end (Bill Until). */
+  @TestVisible
+  private static Date lastBillable(
+    Enrolment_Fee_Line__c feeLine,
+    CourseOfferingParticipant enrolment
+  ) {
+    Date last = enrolment.EndDate == null
+      ? Date.newInstance(4000, 12, 31)
+      : enrolment.EndDate;
+    if (feeLine.Bill_Until__c != null && feeLine.Bill_Until__c < last) {
+      last = feeLine.Bill_Until__c;
+    }
+    return last;
   }
 
   private static Invoice_Line__c invoiceLine(

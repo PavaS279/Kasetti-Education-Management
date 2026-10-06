@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Block_Overdue_Fees__c</fullName>
+    <inlineHelpText
+  >Withhold hall tickets of candidates with overdue invoices.</inlineHelpText>
+    <label>Withhold for Overdue Fees</label>
+    <defaultValue>false</defaultValue>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>
