@@ -258,6 +258,8 @@ public without sharing class PortalService {
     public String paymentMode;
     @AuraEnabled
     public List<LibraryService.LoanRow> loans = new List<LibraryService.LoanRow>();
+    @AuraEnabled
+    public List<TransportService.TransportItem> transport = new List<TransportService.TransportItem>();
   }
 
   // ------------------------------------------------------------------ API
@@ -513,6 +515,16 @@ public without sharing class PortalService {
     }
     detail.documents.addAll(documentsFor(new Set<Id>{ learnerContactId }));
     detail.loans = LibraryService.learnerLoans(learnerContactId);
+    Set<Id> learnerAccounts = new Set<Id>();
+    for (Contact c : [
+      SELECT AccountId
+      FROM Contact
+      WHERE Id = :learnerContactId
+      WITH SYSTEM_MODE
+    ]) {
+      learnerAccounts.add(c.AccountId);
+    }
+    detail.transport = TransportService.forLearners(learnerAccounts);
     for (CourseOfferingParticipant enrolment : [
       SELECT
         Id,
@@ -617,6 +629,18 @@ public without sharing class PortalService {
       WITH SYSTEM_MODE
     ]) {
       recordIds.add(e.Id);
+    }
+    // Hall tickets (F4.10) are filed on the exam candidate.
+    for (Exam_Candidate__c c : [
+      SELECT Id
+      FROM Exam_Candidate__c
+      WHERE
+        Learner_Account__r.PersonContactId IN :learnerIds
+        AND Status__c = 'Ticket Issued'
+      WITH SYSTEM_MODE
+      LIMIT 100
+    ]) {
+      recordIds.add(c.Id);
     }
     if (recordIds.isEmpty()) {
       return result;

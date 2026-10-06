@@ -14,6 +14,8 @@ public with sharing class KemDocumentController {
   public List<FeeRow> fees { get; private set; }
   public Decimal feeTotal { get; private set; }
   public String institutionName { get; private set; }
+  public Exam_Candidate__c candidate { get; private set; }
+  public List<Exam_Paper__c> papers { get; private set; }
   public Date today { get; private set; }
   public String currencyCode { get; private set; }
 
@@ -45,6 +47,8 @@ public with sharing class KemDocumentController {
     } else if (type == CourseOfferingParticipant.SObjectType) {
       reportCard = GradingService.reportCard(recordId);
       loadBranch(reportCard.branchId);
+    } else if (type == Exam_Candidate__c.SObjectType) {
+      loadHallTicket(recordId);
     }
   }
 
@@ -90,6 +94,50 @@ public with sharing class KemDocumentController {
       }
       return String.join(parts, ' · ');
     }
+  }
+
+  /** Hall ticket: candidate, seat and the papers of the candidate's classes (F4.10). */
+  private void loadHallTicket(Id recordId) {
+    candidate = [
+      SELECT
+        Name,
+        Seat_Number__c,
+        Room__r.Name,
+        Learner_Account__c,
+        Learner_Account__r.Name,
+        Learner_Account__r.PersonBirthdate,
+        Exam__c,
+        Exam__r.Name,
+        Exam__r.Exam_Code__c,
+        Exam__r.Instructions__c,
+        Exam__r.Branch__c
+      FROM Exam_Candidate__c
+      WHERE Id = :recordId
+      WITH USER_MODE
+    ];
+    Set<Id> classes = new Set<Id>();
+    for (CourseOfferingParticipant e : [
+      SELECT CourseOfferingId
+      FROM CourseOfferingParticipant
+      WHERE ParticipantAccountId = :candidate.Learner_Account__c
+      WITH USER_MODE
+    ]) {
+      classes.add(e.CourseOfferingId);
+    }
+    papers = [
+      SELECT
+        Name,
+        Paper_Date__c,
+        Start_Time__c,
+        Duration_Minutes__c,
+        Max_Marks__c,
+        Course_Offering__r.Name
+      FROM Exam_Paper__c
+      WHERE Exam__c = :candidate.Exam__c AND Course_Offering__c IN :classes
+      WITH USER_MODE
+      ORDER BY Paper_Date__c, Start_Time__c
+    ];
+    loadBranch(candidate.Exam__r.Branch__c);
   }
 
   private void loadApplication(Id recordId) {

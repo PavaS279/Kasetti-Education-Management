@@ -13,7 +13,8 @@ const VIEWS = [
   { value: "attendance", label: "Attendance", icon: "utility:check" },
   { value: "fees", label: "Fees", icon: "utility:moneybag" },
   { value: "documents", label: "Documents", icon: "utility:file" },
-  { value: "library", label: "Library", icon: "utility:knowledge_base" }
+  { value: "library", label: "Library", icon: "utility:knowledge_base" },
+  { value: "transport", label: "Transport", icon: "utility:travel_and_places" }
 ];
 
 const DOC_ICON = {
@@ -233,6 +234,26 @@ export default class KemPortalHome extends LightningElement {
   }
   get noLoans() {
     return this.loans.length === 0;
+  }
+  get showTransport() {
+    return this.view === "transport";
+  }
+  get transport() {
+    return (this.detail?.transport || []).map((t, i) => ({
+      ...t,
+      key: String(i),
+      times: [
+        t.pickupTime ? `Pick-up ${t.pickupTime}` : null,
+        t.dropTime ? `Drop ${t.dropTime}` : null
+      ]
+        .filter((x) => x)
+        .join(" · "),
+      driverLine: [t.driver, t.driverPhone].filter((x) => x).join(" · "),
+      since: `Since ${formatDate(t.startDate)}`
+    }));
+  }
+  get noTransport() {
+    return this.transport.length === 0;
   }
   get showDocuments() {
     return this.view === "documents";

@@ -333,6 +333,26 @@
               </template>
             </template>
 
+            <template lwc:if={showTransport}>
+              <template for:each={transport} for:item="t">
+                <div key={t.key} class="transport">
+                  <div>
+                    <div class="strong">{t.route}</div>
+                    <div>{t.stop} · {t.direction}</div>
+                    <div class="kem-muted small">{t.times}</div>
+                  </div>
+                  <div class="kem-muted small">
+                    <div>{t.vehicle}</div>
+                    <div>Driver {t.driverLine}</div>
+                    <div>{t.since}</div>
+                  </div>
+                </div>
+              </template>
+              <template lwc:if={noTransport}>
+                <div class="kem-empty">No school transport.</div>
+              </template>
+            </template>
+
             <template lwc:if={showDocuments}>
               <ul>
                 <template for:each={documents} for:item="d">

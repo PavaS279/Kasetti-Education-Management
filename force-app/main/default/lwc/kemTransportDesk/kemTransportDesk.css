@@ -1,0 +1,178 @@
+@import "c/kemStyles";
+
+.panel {
+  position: relative;
+  padding: 1rem;
+}
+
+.head,
+.title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.head {
+  margin-bottom: 0.75rem;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.muted {
+  color: var(--kem-muted);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(12rem, 18rem) 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 48em) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.routes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.route {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-surface, #fff);
+  text-align: left;
+  cursor: pointer;
+}
+
+.route_selected {
+  border-color: var(--kem-navy, #1b3a6b);
+  box-shadow: 0 0 0 1px var(--kem-navy, #1b3a6b);
+}
+
+.route_inactive {
+  opacity: 0.6;
+}
+
+.route-name,
+.route-title,
+.stop-name {
+  font-weight: 700;
+  color: var(--kem-ink);
+}
+
+.bar {
+  display: block;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: var(--kem-sky);
+  overflow: hidden;
+}
+
+.bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--kem-navy, #1b3a6b);
+}
+
+.bar-fill_full {
+  background: #c2410c;
+}
+
+.detail-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.actions,
+.form-actions,
+.rider-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  border-radius: var(--kem-radius-sm);
+  background: #f7f9fe;
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+}
+
+.stops {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.stop {
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--kem-navy, #1b3a6b);
+  background: var(--kem-surface, #fff);
+}
+
+.stop-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.riders {
+  margin-top: 0.3rem;
+}
+
+.rider {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0;
+  border-top: 1px solid var(--kem-line);
+  font-size: 0.8125rem;
+}
+
+.rider-name {
+  display: flex;
+  flex-direction: column;
+}
+
+.stop-pick {
+  min-width: 10rem;
+}
+
+@media print {
+  .routes,
+  .actions,
+  .rider-actions,
+  .form {
+    display: none;
+  }
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

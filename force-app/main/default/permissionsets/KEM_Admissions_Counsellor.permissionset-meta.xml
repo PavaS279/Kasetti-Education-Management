@@ -1955,6 +1955,10 @@
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
     <pageAccesses>
+        <apexPage>KEM_Hall_Ticket</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+    <pageAccesses>
         <apexPage>KEM_Invoice_Pdf</apexPage>
         <enabled>true</enabled>
     </pageAccesses>

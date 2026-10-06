@@ -1,0 +1,227 @@
+<template>
+  <template lwc:if={visible}>
+    <article class="kem-card panel">
+      <div class="head">
+        <span class="title"
+          ><lightning-icon
+            icon-name="utility:travel_and_places"
+            size="x-small"
+          ></lightning-icon
+          ><span class="kem-section-title">Transport</span></span
+        >
+      </div>
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+      <template lwc:if={isLoading}>
+        <lightning-spinner
+          alternative-text="Loading routes"
+          size="small"
+        ></lightning-spinner>
+      </template>
+      <template lwc:if={routes}>
+        <template lwc:if={hasRoutes}>
+          <div class="layout">
+            <ul class="routes" aria-label="Routes">
+              <template for:each={routeCards} for:item="r">
+                <li key={r.routeId}>
+                  <button
+                    type="button"
+                    class={r.className}
+                    data-id={r.routeId}
+                    onclick={handleRoute}
+                  >
+                    <span class="route-name">{r.name}</span>
+                    <span class="small muted">{r.meta}</span>
+                    <span class="bar"
+                      ><span class={r.barClass} style={r.barStyle}></span
+                    ></span>
+                    <span class="small">{r.seats} · {r.fee}</span>
+                  </button>
+                </li>
+              </template>
+            </ul>
+            <template lwc:if={route}>
+              <section class="detail">
+                <div class="detail-head">
+                  <div>
+                    <div class="route-title">{route.name}</div>
+                    <div class="small muted">
+                      {route.vehicle} · driver {route.driver}
+                      {route.driverPhone} · morning {route.morningStart} ·
+                      afternoon {route.afternoonStart}
+                    </div>
+                  </div>
+                  <div class="actions">
+                    <template lwc:if={canManage}>
+                      <lightning-button
+                        label="Add learner"
+                        icon-name="utility:add"
+                        onclick={toggleAssign}
+                      ></lightning-button>
+                      <lightning-button
+                        label="Message families"
+                        icon-name="utility:email"
+                        onclick={toggleNotice}
+                      ></lightning-button>
+                    </template>
+                    <lightning-button-icon
+                      icon-name="utility:print"
+                      alternative-text="Print manifest"
+                      title="Print manifest"
+                      onclick={handlePrint}
+                    ></lightning-button-icon>
+                  </div>
+                </div>
+
+                <template lwc:if={showAssign}>
+                  <div class="form">
+                    <lightning-input
+                      type="search"
+                      label="Learner (enrolled at this branch)"
+                      value={searchTerm}
+                      onchange={handleSearch}
+                      placeholder="Type at least two letters"
+                    ></lightning-input>
+                    <template lwc:if={hasLearnerOptions}>
+                      <lightning-combobox
+                        label="Choose learner"
+                        options={learnerOptions}
+                        value={learnerId}
+                        data-field="learnerId"
+                        onchange={handleField}
+                      ></lightning-combobox>
+                    </template>
+                    <lightning-combobox
+                      label="Stop"
+                      options={stopOptions}
+                      value={stopId}
+                      data-field="stopId"
+                      onchange={handleField}
+                    ></lightning-combobox>
+                    <lightning-combobox
+                      label="Direction"
+                      options={directions}
+                      value={direction}
+                      data-field="direction"
+                      onchange={handleField}
+                    ></lightning-combobox>
+                    <lightning-input
+                      type="date"
+                      label="Start date"
+                      value={startDate}
+                      data-field="startDate"
+                      onchange={handleField}
+                    ></lightning-input>
+                    <lightning-input
+                      type="checkbox"
+                      label="Charge the monthly transport fee (billed with the learner's class)"
+                      checked={chargeFee}
+                      data-field="chargeFee"
+                      onchange={handleField}
+                    ></lightning-input>
+                    <div class="form-actions">
+                      <lightning-button
+                        label="Cancel"
+                        onclick={toggleAssign}
+                      ></lightning-button>
+                      <lightning-button
+                        variant="brand"
+                        label="Add to route"
+                        onclick={handleAssign}
+                        disabled={assignDisabled}
+                      ></lightning-button>
+                    </div>
+                  </div>
+                </template>
+
+                <template lwc:if={showNotice}>
+                  <div class="form">
+                    <lightning-textarea
+                      label="Message to every family on this route"
+                      value={notice}
+                      onchange={handleNoticeText}
+                      max-length="1000"
+                      placeholder="For example: The bus is running 20 minutes late this morning."
+                    ></lightning-textarea>
+                    <div class="form-actions">
+                      <lightning-button
+                        label="Cancel"
+                        onclick={toggleNotice}
+                      ></lightning-button>
+                      <lightning-button
+                        variant="brand"
+                        label="Send"
+                        onclick={handleSendNotice}
+                        disabled={noticeDisabled}
+                      ></lightning-button>
+                    </div>
+                  </div>
+                </template>
+
+                <p class="small muted">{riderCount} learner(s) on this route</p>
+                <ol class="stops">
+                  <template for:each={stops} for:item="s">
+                    <li key={s.stopId} class="stop">
+                      <div class="stop-head">
+                        <span class="stop-name">{s.sequence}. {s.name}</span>
+                        <span class="small muted">{s.times}</span>
+                      </div>
+                      <template lwc:if={s.landmark}>
+                        <div class="small muted">{s.landmark}</div>
+                      </template>
+                      <template lwc:if={s.hasRiders}>
+                        <ul class="riders">
+                          <template for:each={s.riders} for:item="r">
+                            <li key={r.assignmentId} class="rider">
+                              <span class="rider-name">
+                                <span>{r.learner}</span>
+                                <span class="small muted"
+                                  >{r.direction} · {r.contact}</span
+                                >
+                              </span>
+                              <template lwc:if={canManage}>
+                                <span class="rider-actions">
+                                  <lightning-combobox
+                                    class="stop-pick"
+                                    label="Stop"
+                                    variant="label-hidden"
+                                    options={r.stopOptions}
+                                    value={r.stopId}
+                                    data-id={r.assignmentId}
+                                    onchange={handleChangeStop}
+                                  ></lightning-combobox>
+                                  <lightning-button-icon
+                                    icon-name="utility:close"
+                                    alternative-text="End transport"
+                                    title="End transport"
+                                    data-id={r.assignmentId}
+                                    onclick={handleEnd}
+                                  ></lightning-button-icon>
+                                </span>
+                              </template>
+                            </li>
+                          </template>
+                        </ul>
+                      </template>
+                    </li>
+                  </template>
+                </ol>
+              </section>
+            </template>
+          </div>
+        </template>
+        <template lwc:else>
+          <p class="small muted">
+            No routes yet. Create a Transport Route with its stops to start.
+          </p>
+        </template>
+      </template>
+    </article>
+  </template>
+</template>

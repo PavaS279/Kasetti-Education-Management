@@ -1,0 +1,315 @@
+<apex:page
+  controller="KemDocumentController"
+  renderAs="pdf"
+  applyHtmlTag="false"
+  applyBodyTag="false"
+  showHeader="false"
+  sidebar="false"
+  standardStylesheets="false"
+>
+  <html>
+    <head>
+      <style type="text/css">
+        @page {
+          size: A4;
+          margin: 18mm 16mm 20mm 16mm;
+          @bottom-center {
+            content: "Page " counter(page) " of " counter(pages);
+            font-family: sans-serif;
+            font-size: 8pt;
+            color: #8a94a3;
+          }
+        }
+        body {
+          font-family:
+            Arial Unicode MS,
+            sans-serif;
+          font-size: 10pt;
+          color: #16243a;
+        }
+        .band {
+          background-color: #1b3a6b;
+          color: #ffffff;
+          padding: 14px 18px;
+        }
+        .band-table {
+          width: 100%;
+        }
+        .brand {
+          font-size: 18pt;
+          font-weight: bold;
+        }
+        .brand-sub {
+          font-size: 9pt;
+          color: #c9d8f2;
+        }
+        .doc-title {
+          font-size: 16pt;
+          font-weight: bold;
+          text-align: right;
+          letter-spacing: 1px;
+        }
+        .doc-number {
+          font-size: 10pt;
+          text-align: right;
+          color: #c9d8f2;
+        }
+        .section {
+          margin-top: 18px;
+        }
+        .label {
+          font-size: 8pt;
+          color: #5f6b7a;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        .value {
+          font-size: 10.5pt;
+          font-weight: bold;
+        }
+        .muted {
+          color: #5f6b7a;
+          font-size: 9pt;
+        }
+        .grid {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        .grid td {
+          vertical-align: top;
+          padding: 0 10px 0 0;
+        }
+        table.lines {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 8px;
+        }
+        table.lines th {
+          background-color: #e8f0fd;
+          color: #1b3a6b;
+          font-size: 8pt;
+          text-transform: uppercase;
+          text-align: left;
+          padding: 7px 8px;
+        }
+        table.lines td {
+          padding: 7px 8px;
+          border-bottom: 1px solid #e3e8ef;
+        }
+        .num {
+          text-align: right;
+        }
+        .totals {
+          width: 45%;
+          margin-left: 55%;
+          border-collapse: collapse;
+          margin-top: 10px;
+        }
+        .totals td {
+          padding: 5px 8px;
+        }
+        .totals .grand td {
+          border-top: 2px solid #1b3a6b;
+          font-size: 12pt;
+          font-weight: bold;
+        }
+        .stamp {
+          display: inline-block;
+          padding: 4px 10px;
+          border: 2px solid #2e844a;
+          color: #2e844a;
+          font-weight: bold;
+          font-size: 11pt;
+          letter-spacing: 1px;
+        }
+        .grade-box {
+          text-align: center;
+          padding: 12px;
+          border: 2px solid #1b3a6b;
+        }
+        .grade-big {
+          font-size: 28pt;
+          font-weight: bold;
+          color: #1b3a6b;
+        }
+        .provisional {
+          color: #c77700;
+          font-weight: bold;
+        }
+        .bands td {
+          padding: 3px 8px;
+          font-size: 8.5pt;
+          border-bottom: 1px solid #e3e8ef;
+        }
+        .feedback {
+          font-size: 8.5pt;
+          color: #5f6b7a;
+          font-style: italic;
+        }
+        .stamp-due {
+          border-color: #c77700;
+          color: #c77700;
+        }
+        .note {
+          margin-top: 20px;
+          padding: 10px 12px;
+          background-color: #f4f7fb;
+          border-left: 3px solid #2e6fd8;
+          font-size: 9pt;
+        }
+        .footer {
+          margin-top: 30px;
+          font-size: 8pt;
+          color: #8a94a3;
+          border-top: 1px solid #e3e8ef;
+          padding-top: 8px;
+        }
+        .signature {
+          margin-top: 40px;
+        }
+        .signature-line {
+          width: 200px;
+          border-top: 1px solid #16243a;
+          padding-top: 4px;
+          font-size: 9pt;
+        }
+        .table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 8px;
+        }
+        .table th {
+          background-color: #eef2f8;
+          text-align: left;
+          font-size: 8.5pt;
+          padding: 6px;
+        }
+        .table td {
+          border-bottom: 1px solid #dde3ec;
+          padding: 6px;
+        }
+        .ticket {
+          border: 2px solid #1b3a6b;
+          padding: 12px 14px;
+          margin-top: 16px;
+        }
+        .ticket-number {
+          font-size: 18pt;
+          font-weight: bold;
+          letter-spacing: 1px;
+        }
+        .seat {
+          font-size: 14pt;
+          font-weight: bold;
+        }
+        .instructions {
+          white-space: pre-wrap;
+          font-size: 9pt;
+        }
+      </style>
+    </head>
+    <body>
+      <c:KEM_Document_Header
+        institution="{!institutionName}"
+        branchName="{!branchName}"
+        branchAddress="{!branchAddress}"
+        branchContact="{!branchContact}"
+        title="HALL TICKET"
+        number="{!candidate.Exam__r.Name}"
+      />
+
+      <div class="ticket">
+        <table class="grid">
+          <tr>
+            <td style="width: 50%">
+              <div class="label">Hall ticket number</div>
+              <div class="ticket-number">{!candidate.Name}</div>
+              <div class="label" style="margin-top: 8px">Candidate</div>
+              <div class="value">{!candidate.Learner_Account__r.Name}</div>
+              <apex:outputPanel
+                rendered="{!NOT(ISBLANK(candidate.Learner_Account__r.PersonBirthdate))}"
+              >
+                <div class="muted">
+                  Date of birth
+                  <apex:outputText value="{0,date,dd/MM/yyyy}">
+                    <apex:param
+                      value="{!candidate.Learner_Account__r.PersonBirthdate}"
+                    />
+                  </apex:outputText>
+                </div>
+              </apex:outputPanel>
+            </td>
+            <td style="width: 50%">
+              <div class="label">Room and seat</div>
+              <div class="seat">{!candidate.Seat_Number__c}</div>
+              <div class="muted">{!candidate.Room__r.Name}</div>
+              <div class="label" style="margin-top: 8px">Exam</div>
+              <div class="value">{!candidate.Exam__r.Name}</div>
+              <div class="muted">{!candidate.Exam__r.Exam_Code__c}</div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="label">Papers</div>
+        <table class="table">
+          <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Paper</th>
+            <th>Class</th>
+            <th>Duration</th>
+            <th>Marks</th>
+          </tr>
+          <apex:repeat value="{!papers}" var="p">
+            <tr>
+              <td>
+                <apex:outputText value="{0,date,EEE dd/MM/yyyy}">
+                  <apex:param value="{!p.Paper_Date__c}" />
+                </apex:outputText>
+              </td>
+              <td>{!p.Start_Time__c}</td>
+              <td>{!p.Name}</td>
+              <td>{!p.Course_Offering__r.Name}</td>
+              <td>
+                <apex:outputText
+                  value="{!IF(ISBLANK(p.Duration_Minutes__c), '', TEXT(p.Duration_Minutes__c) + ' min')}"
+                />
+              </td>
+              <td>{!p.Max_Marks__c}</td>
+            </tr>
+          </apex:repeat>
+        </table>
+      </div>
+
+      <apex:outputPanel
+        rendered="{!NOT(ISBLANK(candidate.Exam__r.Instructions__c))}"
+      >
+        <div class="section">
+          <div class="label">Instructions</div>
+          <div class="instructions">{!candidate.Exam__r.Instructions__c}</div>
+        </div>
+      </apex:outputPanel>
+
+      <div class="section">
+        <table class="grid">
+          <tr>
+            <td style="width: 50%">
+              <div class="signature-line">Candidate's signature</div>
+            </td>
+            <td style="width: 50%">
+              <div class="signature-line">Controller of examinations</div>
+            </td>
+          </tr>
+        </table>
+        <p class="muted">
+          Bring this hall ticket to every paper. Issued by {!institutionName} on
+          <apex:outputText value="{0,date,dd/MM/yyyy}">
+            <apex:param value="{!today}" /> </apex:outputText
+          >.
+        </p>
+      </div>
+    </body>
+  </html>
+</apex:page>

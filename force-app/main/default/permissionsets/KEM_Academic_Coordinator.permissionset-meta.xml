@@ -29,6 +29,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>ExamController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>ForecastController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -1659,6 +1663,10 @@
         <object>Waitlist_Entry__c</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
+    <pageAccesses>
+        <apexPage>KEM_Hall_Ticket</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
     <pageAccesses>
         <apexPage>KEM_Invoice_Pdf</apexPage>
         <enabled>true</enabled>

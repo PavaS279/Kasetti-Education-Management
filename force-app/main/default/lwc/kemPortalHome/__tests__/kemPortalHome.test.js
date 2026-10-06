@@ -388,4 +388,36 @@ describe("c-kem-portal-home", () => {
     );
     expect(root.textContent).toContain("Late fee");
   });
+
+  it("shows the learner's transport", async () => {
+    getHome.mockResolvedValue(HOME);
+    getLearner.mockImplementation(({ learnerContactId }) =>
+      Promise.resolve({
+        ...detail(learnerContactId, "Ananya Sharma"),
+        transport: [
+          {
+            route: "Route 1",
+            stop: "Lake View",
+            direction: "Both ways",
+            pickupTime: "07:20",
+            dropTime: "15:40",
+            vehicle: "KA01",
+            driver: "Ravi",
+            driverPhone: "+91 98",
+            startDate: "2026-10-06"
+          }
+        ]
+      })
+    );
+    const element = createElement("c-kem-portal-home", { is: KemPortalHome });
+    document.body.appendChild(element);
+    await flush();
+    await flush();
+    const root = element.shadowRoot;
+    root.querySelector('button[data-value="transport"]').click();
+    await flush();
+    expect(root.querySelectorAll(".transport")).toHaveLength(1);
+    expect(root.textContent).toContain("Pick-up 07:20 · Drop 15:40");
+    expect(root.textContent).toContain("Driver Ravi · +91 98");
+  });
 });

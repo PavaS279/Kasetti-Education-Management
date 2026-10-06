@@ -12,6 +12,7 @@ public with sharing class DocumentService {
   public static final String INVOICE = 'Invoice';
   public static final String RECEIPT = 'Receipt';
   public static final String REPORT_CARD = 'Report Card';
+  public static final String HALL_TICKET = 'Hall Ticket';
   private static final String SUPERSEDED = ' (superseded)';
   private static final String MARKER = 'KEM ';
 
@@ -106,6 +107,9 @@ public with sharing class DocumentService {
     if (type == CourseOfferingParticipant.SObjectType) {
       return REPORT_CARD;
     }
+    if (type == Exam_Candidate__c.SObjectType) {
+      return HALL_TICKET;
+    }
     throw new AppException('Documents are not available for this record.');
   }
 
@@ -182,6 +186,9 @@ public with sharing class DocumentService {
     if (kind == REPORT_CARD) {
       return Page.KEM_Report_Card;
     }
+    if (kind == HALL_TICKET) {
+      return Page.KEM_Hall_Ticket;
+    }
     throw new AppException('Unknown document type: ' + kind);
   }
 
@@ -236,6 +243,21 @@ public with sharing class DocumentService {
         enrolment.ParticipantContact.Name +
         ' - ' +
         enrolment.CourseOffering.Name;
+    }
+    if (kind == HALL_TICKET) {
+      Exam_Candidate__c candidate = [
+        SELECT Name, Status__c, Learner_Account__r.Name, Exam__r.Name
+        FROM Exam_Candidate__c
+        WHERE Id = :recordId
+        WITH SYSTEM_MODE
+      ];
+      if (candidate.Status__c != 'Ticket Issued') {
+        throw new AppException('A hall ticket is available once it is issued.');
+      }
+      return 'Hall Ticket ' +
+        candidate.Name +
+        ' - ' +
+        candidate.Learner_Account__r.Name;
     }
     Student_Payment__c payment = [
       SELECT Receipt_Number__c, Status__c

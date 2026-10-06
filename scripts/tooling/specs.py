@@ -1049,7 +1049,7 @@ BILLING_CLASSES = ["BillingController", "CreditController", "PaymentLinkControll
 DOCUMENT_CLASSES = ["DocumentController", "KemDocumentController"]
 AI_CLASSES = ["AiController", "AgentPolicyAnswer", "AgentLearnerSummary", "AgentEnquiryDraft", "AgentBranchBrief", "AgentAtRiskLearners", "AgentForecast"]  # extended per Phase 4 feature
 INTEGRATION_CLASSES = ["LmsApi", "ErpApi", "PaymentWebhookApi"]  # extended as the APIs are added (F3.4, F3.7)
-DOCUMENT_PAGES = ["KEM_Offer_Letter", "KEM_Invoice_Pdf", "KEM_Receipt_Pdf", "KEM_Report_Card"]
+DOCUMENT_PAGES = ["KEM_Offer_Letter", "KEM_Invoice_Pdf", "KEM_Receipt_Pdf", "KEM_Report_Card", "KEM_Hall_Ticket"]
 
 # Education Cloud objects are only granted through permission sets tied to these licences.
 STAFF_LICENSE = "EducationCloudAccessPsl"
