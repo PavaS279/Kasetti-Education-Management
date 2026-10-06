@@ -12,6 +12,21 @@ import DecisionModal from "c/kemDecisionModal";
 import EnrolModal from "c/kemEnrolModal";
 import { reduceErrors, toast, toastError, formatDateTime } from "c/kemUtils";
 
+/** Doctype icon for a file extension. */
+function fileIcon(extension) {
+  const ext = (extension || "").toLowerCase();
+  if (ext === "pdf") {
+    return "doctype:pdf";
+  }
+  if (["png", "jpg", "jpeg", "gif", "heic"].includes(ext)) {
+    return "doctype:image";
+  }
+  if (["doc", "docx"].includes(ext)) {
+    return "doctype:word";
+  }
+  return "doctype:attachment";
+}
+
 const STAGES = [
   "Processing",
   "In Review",
@@ -145,7 +160,19 @@ export default class KemApplicationWorkbench extends NavigationMixin(
         statusClass: BADGE[status] || "kem-badge",
         fileLabel: item.fileCount
           ? `${item.fileCount} file${item.fileCount === 1 ? "" : "s"}`
-          : "Upload"
+          : "Upload",
+        hasFiles: (item.files || []).length > 0,
+        fileRows: (item.files || []).map((f) => ({
+          ...f,
+          icon: fileIcon(f.extension),
+          extensionLabel: (f.extension || "file").toUpperCase(),
+          meta: [
+            f.uploadedBy,
+            f.uploadedOn ? formatDateTime(f.uploadedOn) : null
+          ]
+            .filter((x) => x)
+            .join(" · ")
+        }))
       };
     });
   }
@@ -387,6 +414,15 @@ export default class KemApplicationWorkbench extends NavigationMixin(
         `${name} was added to the checklist.`
       );
     }
+  }
+
+  /** Opens the file in the standard Salesforce file preview. */
+  handleViewFile(event) {
+    this[NavigationMixin.Navigate]({
+      type: "standard__namedPage",
+      attributes: { pageName: "filePreview" },
+      state: { selectedRecordId: event.currentTarget.dataset.id }
+    });
   }
 
   async handleUploadFinished() {

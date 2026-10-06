@@ -6,6 +6,7 @@ import getLearner from "@salesforce/apex/PortalController.getLearner";
 import markMessageRead from "@salesforce/apex/PortalController.markMessageRead";
 import downloadDocument from "@salesforce/apex/PortalController.downloadDocument";
 import startPayment from "@salesforce/apex/PortalController.startPayment";
+import uploadAdmissionDocument from "@salesforce/apex/PortalController.uploadAdmissionDocument";
 
 jest.mock(
   "@salesforce/apex/PortalController.getReferral",
@@ -36,6 +37,12 @@ jest.mock(
 
 jest.mock(
   "@salesforce/apex/PortalController.startPayment",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+
+jest.mock(
+  "@salesforce/apex/PortalController.uploadAdmissionDocument",
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -453,5 +460,94 @@ describe("c-kem-portal-home", () => {
     await flush();
     expect(getReferral).toHaveBeenLastCalledWith({ create: true });
     expect(root.querySelector(".refer-code").textContent).toBe("SHA-7Q2X");
+  });
+
+  it("lets the family upload admission documents but not review them", async () => {
+    const admissions = [
+      {
+        applicationId: "0iT1",
+        name: "IA-0000000045",
+        learnerName: "Kavin Ravichandran",
+        course: "Drawing and Painting",
+        branch: "KT Edutech Koramangala",
+        status: "In Review",
+        stillNeeded: 1,
+        items: [
+          {
+            itemId: "0kD1",
+            name: "Birth Certificate",
+            required: true,
+            status: "New",
+            files: [],
+            canUpload: true
+          },
+          {
+            itemId: "0kD2",
+            name: "Address Proof",
+            required: true,
+            status: "Accepted",
+            files: ["Address Proof – bill"],
+            canUpload: false
+          },
+          {
+            itemId: "0kD3",
+            name: "Photo",
+            required: false,
+            status: "Rejected",
+            rejectReason: "Blurred",
+            files: ["Photo – old"],
+            canUpload: true
+          }
+        ]
+      }
+    ];
+    getHome.mockResolvedValue({ ...HOME, learners: [], admissions });
+    uploadAdmissionDocument.mockResolvedValue("068X");
+    const element = createElement("c-kem-portal-home", { is: KemPortalHome });
+    document.body.appendChild(element);
+    await flush();
+    await flush();
+    const root = element.shadowRoot;
+    const card = root.querySelector(".admissions");
+    expect(card).not.toBeNull();
+    expect(card.textContent).toContain("1 required document to go");
+    expect(card.textContent).toContain("Please upload again: Blurred");
+    // Upload only: one file input per open item, no review controls.
+    const inputs = [...card.querySelectorAll("lightning-input")];
+    expect(inputs.map((i) => i.dataset.id)).toEqual(["0kD1", "0kD3"]);
+    expect(
+      card.querySelectorAll("lightning-button, lightning-button-icon").length
+    ).toBe(0);
+    expect(card.textContent).not.toMatch(/Accept\b|Reject\b|Waive/);
+
+    class FakeReader {
+      readAsDataURL() {
+        this.result = "data:application/pdf;base64,QUJD";
+        this.onload();
+      }
+    }
+    global.FileReader = FakeReader;
+    const file = { name: "birth.pdf", size: 2048 };
+    Object.defineProperty(inputs[0], "files", { value: [file] });
+    inputs[0].dispatchEvent(new CustomEvent("change"));
+    await flush();
+    await flush();
+    expect(uploadAdmissionDocument).toHaveBeenCalledWith({
+      itemId: "0kD1",
+      fileName: "birth.pdf",
+      base64: "QUJD"
+    });
+    expect(root.querySelector(".admissions").textContent).toContain(
+      "Birth Certificate was sent"
+    );
+
+    const big = { name: "scan.pdf", size: 5 * 1024 * 1024 };
+    Object.defineProperty(inputs[1], "files", { value: [big] });
+    inputs[1].dispatchEvent(new CustomEvent("change"));
+    await flush();
+    expect(uploadAdmissionDocument).toHaveBeenCalledTimes(1);
+    expect(root.querySelector(".admissions").textContent).toContain(
+      "larger than 3 MB"
+    );
   });
 });

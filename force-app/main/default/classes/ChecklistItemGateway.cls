@@ -15,20 +15,37 @@ public inherited sharing class ChecklistItemGateway {
 
   public static void updateStatus(DocumentChecklistItem change) {
     if (simulateStatusUpdates && Test.isRunningTest()) {
-      simulate(change);
+      simulate(change, AccessLevel.USER_MODE);
       return;
     }
     Database.update(change, AccessLevel.USER_MODE);
   }
 
-  private static void simulate(DocumentChecklistItem change) {
+  /**
+   * System-context status change for automated steps that run without a staff
+   * user (the Admission_Document__e trigger runs as the Automated Process user).
+   * Same test seam as updateStatus.
+   */
+  public static void updateStatusAsSystem(List<DocumentChecklistItem> changes) {
+    if (simulateStatusUpdates && Test.isRunningTest()) {
+      for (DocumentChecklistItem change : changes) {
+        simulate(change, AccessLevel.SYSTEM_MODE);
+      }
+      return;
+    }
+    Database.update(changes, AccessLevel.SYSTEM_MODE);
+  }
+
+  private static void simulate(
+    DocumentChecklistItem change,
+    AccessLevel access
+  ) {
     DocumentChecklistItem existing = [
       SELECT Id, Name, ParentRecordId, IsRequired, Instruction
       FROM DocumentChecklistItem
       WHERE Id = :change.Id
-      WITH USER_MODE
     ];
-    Database.delete(existing, AccessLevel.USER_MODE);
+    Database.delete(existing, access);
     Database.insert(
       new DocumentChecklistItem(
         Name = existing.Name,
@@ -38,7 +55,7 @@ public inherited sharing class ChecklistItemGateway {
         Status = change.Status,
         RejectReason = change.RejectReason
       ),
-      AccessLevel.USER_MODE
+      access
     );
   }
 }

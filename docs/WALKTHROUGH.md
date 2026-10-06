@@ -161,7 +161,7 @@ Status today: the solution, demo data, scheduled jobs and the Agentforce agent a
 
 ### 3.3 Family portal — My Learning (`P/s/my-learning`)
 
-Learner switcher (for guardians with several children) and sections: **Timetable** (with waitlist position), **Attendance**, **Results** (course grade and report card download), **Fees** (invoices, **Pay online**, instalments, credit), **Messages** inbox, **Documents** (offer letter, invoices, receipts, report cards, hall tickets), **Library** loans, **Transport** (route, stop, times, driver), **Refer a friend** card, learner information.
+Learner switcher (for guardians with several children) and sections: **Timetable** (with waitlist position), **Attendance**, **Results** (course grade and report card download), **Fees** (invoices, **Pay online**, instalments, credit), **Messages** inbox, **Documents** (offer letter, invoices, receipts, report cards, hall tickets), **Library** loans, **Transport** (route, stop, times, driver), **Admission documents** (upload only, while an application is open), **Refer a friend** card, learner information.
 
 ---
 
@@ -433,18 +433,19 @@ All on the Branch page `L/lightning/r/Branch__c/a0MdN000001Y9hqUAC/view` unless 
 
 👤 Guardian **Rohit Sharma** · 📍 `P/s/my-learning` (set-up R2)
 
-| Step | Do                                | You should see                                                                               | Why                                                    |
-| ---- | --------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| H1   | Choose **Ananya**, then **Arjun** | Rohit sees both children; Priya sees only Ananya; Lakshmi sees only Kavya                    | Strict privacy: each family sees only its own children |
-| H2   | **Timetable**                     | Upcoming sessions, cancellations, waitlist position                                          | Parents plan the week                                  |
-| H3   | **Attendance**                    | Rate and history                                                                             | Parents see absences the same day                      |
-| H4   | **Results**                       | Course grade (A+ Final) and **Report card** download                                         | No paper report cards to lose                          |
-| H5   | **Fees**                          | Invoices, balance, **Pay online** (Test mode), instalments, credit                           | Transparent fees; pay from the phone                   |
-| H6   | **Messages**                      | Invoice, payment, reminders, transport notice, hall ticket, referral reward, progress update | One inbox for everything the school sends              |
-| H7   | **Documents**                     | Offer letter, invoices, receipts, report cards, **hall ticket** PDF                          | Download any document any time                         |
-| H8   | **Transport**                     | Route, stop, pick-up and drop times, vehicle, driver                                         | Parents know where and when                            |
-| H9   | **Library**                       | Loans, due dates, fines                                                                      | —                                                      |
-| H10  | **Refer a friend**                | Code `SHA-S8EZ`, referred 1, joined 1, reward 500                                            | Parents bring friends and are rewarded                 |
+| Step | Do                                                     | You should see                                                                                                                                                                              | Why                                                     |
+| ---- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| H1   | Choose **Ananya**, then **Arjun**                      | Rohit sees both children; Priya sees only Ananya; Lakshmi sees only Kavya                                                                                                                   | Strict privacy: each family sees only its own children  |
+| H2   | **Timetable**                                          | Upcoming sessions, cancellations, waitlist position                                                                                                                                         | Parents plan the week                                   |
+| H3   | **Attendance**                                         | Rate and history                                                                                                                                                                            | Parents see absences the same day                       |
+| H4   | **Results**                                            | Course grade (A+ Final) and **Report card** download                                                                                                                                        | No paper report cards to lose                           |
+| H5   | **Fees**                                               | Invoices, balance, **Pay online** (Test mode), instalments, credit                                                                                                                          | Transparent fees; pay from the phone                    |
+| H6   | **Messages**                                           | Invoice, payment, reminders, transport notice, hall ticket, referral reward, progress update                                                                                                | One inbox for everything the school sends               |
+| H7   | **Documents**                                          | Offer letter, invoices, receipts, report cards, **hall ticket** PDF                                                                                                                         | Download any document any time                          |
+| H8   | **Transport**                                          | Route, stop, pick-up and drop times, vehicle, driver                                                                                                                                        | Parents know where and when                             |
+| H9   | **Library**                                            | Loans, due dates, fines                                                                                                                                                                     | —                                                       |
+| H10  | **Refer a friend**                                     | Code `SHA-S8EZ`, referred 1, joined 1, reward 500                                                                                                                                           | Parents bring friends and are rewarded                  |
+| H11  | **Admission documents** (while an application is open) | Each document with its status and a file picker; after an upload it reads _Sent – awaiting review_; staff see the file on the application checklist with **View**; no accept or reject here | Families send certificates from home; only staff decide |
 
 Negative: asking for another family's learner or document → "You do not have access to this learner." / "Document not found or not available to you."
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description
+  >Published by the family portal after a parent or learner uploads an admission document. Its trigger (running as the Automated Process user) attaches the file to the checklist item and marks it Pending for staff review. Families can only upload; they never accept, reject or waive.</description>
+    <eventType>HighVolume</eventType>
+    <label>Admission Document</label>
+    <pluralLabel>Admission Documents</pluralLabel>
+    <publishBehavior>PublishAfterCommit</publishBehavior>
+</CustomObject>

@@ -80,6 +80,36 @@
                       Rejected: {item.rejectReason}
                     </div>
                   </template>
+                  <template lwc:if={item.hasFiles}>
+                    <ul class="files" aria-label="Uploaded files">
+                      <template for:each={item.fileRows} for:item="file">
+                        <li key={file.documentId} class="file">
+                          <lightning-icon
+                            icon-name={file.icon}
+                            size="x-small"
+                            alternative-text={file.extensionLabel}
+                          ></lightning-icon>
+                          <span class="file-name" title={file.title}
+                            >{file.title}</span
+                          >
+                          <span class="kem-muted small">{file.meta}</span>
+                          <template lwc:if={file.fromPortal}>
+                            <span class="kem-badge kem-badge_info"
+                              >From portal</span
+                            >
+                          </template>
+                          <lightning-button
+                            variant="base"
+                            label="View"
+                            icon-name="utility:preview"
+                            data-id={file.documentId}
+                            onclick={handleViewFile}
+                            class="file-view"
+                          ></lightning-button>
+                        </li>
+                      </template>
+                    </ul>
+                  </template>
                 </div>
                 <div class="item-actions">
                   <lightning-file-upload

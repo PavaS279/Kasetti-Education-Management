@@ -3,6 +3,28 @@ import KemApplicationWorkbench from "c/kemApplicationWorkbench";
 import getApplication from "@salesforce/apex/ApplicationController.getApplication";
 import performAction from "@salesforce/apex/ApplicationController.performAction";
 import updateChecklistItem from "@salesforce/apex/ApplicationController.updateChecklistItem";
+import { getNavigateCalledWith } from "lightning/navigation";
+
+jest.mock(
+  "lightning/navigation",
+  () => {
+    const Navigate = Symbol("Navigate");
+    let last;
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](pageRef) {
+          last = pageRef;
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return {
+      __esModule: true,
+      NavigationMixin,
+      getNavigateCalledWith: () => last
+    };
+  },
+  { virtual: true }
+);
 
 jest.mock(
   "@salesforce/apex/ApplicationController.getApplication",
@@ -59,7 +81,17 @@ const VIEW = {
       name: "Birth Certificate",
       status: "Accepted",
       required: true,
-      fileCount: 1
+      fileCount: 1,
+      files: [
+        {
+          documentId: "069000000000001",
+          title: "Birth Certificate – kavin",
+          extension: "pdf",
+          uploadedBy: "Uma Ravichandran",
+          uploadedOn: "2026-10-06T10:00:00.000Z",
+          fromPortal: true
+        }
+      ]
     },
     {
       id: "0dI000000000002",
@@ -140,5 +172,23 @@ describe("c-kem-application-workbench", () => {
       status: "Accepted",
       rejectReason: null
     });
+  });
+
+  it("lists uploaded files with a View button that opens the preview", async () => {
+    const element = await render();
+    const files = element.shadowRoot.querySelectorAll("li.file");
+    expect(files).toHaveLength(1);
+    expect(files[0].textContent).toContain("Birth Certificate – kavin");
+    expect(files[0].textContent).toContain("From portal");
+    const view = files[0].querySelector("lightning-button");
+    expect(view.label).toBe("View");
+    view.click();
+    const nav = getNavigateCalledWith();
+    expect(nav.attributes.pageName).toBe("filePreview");
+    expect(nav.state.selectedRecordId).toBe("069000000000001");
+    // Upload stays available on every item.
+    expect(
+      element.shadowRoot.querySelectorAll("lightning-file-upload")
+    ).toHaveLength(3);
   });
 });

@@ -6,7 +6,35 @@ import getLearner from "@salesforce/apex/PortalController.getLearner";
 import markMessageRead from "@salesforce/apex/PortalController.markMessageRead";
 import downloadDocument from "@salesforce/apex/PortalController.downloadDocument";
 import startPayment from "@salesforce/apex/PortalController.startPayment";
+import uploadAdmissionDocument from "@salesforce/apex/PortalController.uploadAdmissionDocument";
 import { reduceErrors, initials, toneFor } from "c/kemUtils";
+
+const MAX_UPLOAD_BYTES = 3 * 1024 * 1024;
+const ITEM_STATUS_LABEL = {
+  New: "Not uploaded yet",
+  Pending: "Sent – awaiting review",
+  "Not Verified": "Being checked",
+  Accepted: "Accepted",
+  Rejected: "Please upload again",
+  Waived: "Not needed"
+};
+const ITEM_STATUS_CLASS = {
+  Pending: "kem-badge kem-badge_info",
+  "Not Verified": "kem-badge kem-badge_info",
+  Accepted: "kem-badge kem-badge_success",
+  Rejected: "kem-badge kem-badge_danger",
+  Waived: "kem-badge"
+};
+
+/** The file's content as base64 (without the data URL prefix). */
+function readAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(",")[1]);
+    reader.onerror = () => reject(new Error("The file could not be read."));
+    reader.readAsDataURL(file);
+  });
+}
 
 const VIEWS = [
   { value: "timetable", label: "Timetable", icon: "utility:event" },
@@ -101,8 +129,67 @@ export default class KemPortalHome extends LightningElement {
   payingId;
   paymentNotice;
 
+  uploadingItemId;
+  admissionNotice;
+  admissionError;
+
   connectedCallback() {
     this.load();
+  }
+
+  // ------------------------------------------------ admission documents (upload only)
+
+  get hasAdmissions() {
+    return Boolean(this.home?.admissions?.length);
+  }
+
+  get admissionCards() {
+    return (this.home?.admissions || []).map((app) => ({
+      ...app,
+      subtitle: [app.course, app.branch, app.name].filter((x) => x).join(" · "),
+      neededLabel: app.stillNeeded
+        ? `${app.stillNeeded} required document${app.stillNeeded === 1 ? "" : "s"} to go`
+        : "All required documents received",
+      neededClass: app.stillNeeded
+        ? "kem-badge kem-badge_warning"
+        : "kem-badge kem-badge_success",
+      rows: app.items.map((item) => ({
+        ...item,
+        statusLabel: ITEM_STATUS_LABEL[item.status] || "Not uploaded yet",
+        statusClass: ITEM_STATUS_CLASS[item.status] || "kem-badge",
+        filesLabel: item.files.length ? item.files.join(", ") : null,
+        uploadLabel: `Upload ${item.name}`,
+        busy: this.uploadingItemId === item.itemId
+      }))
+    }));
+  }
+
+  /** Reads the chosen file and sends it for review; families can only upload. */
+  async handleAdmissionFile(event) {
+    const file = event.target.files && event.target.files[0];
+    const itemId = event.target.dataset.id;
+    const itemName = event.target.dataset.name;
+    if (!file) {
+      return;
+    }
+    this.admissionNotice = undefined;
+    this.admissionError = undefined;
+    if (file.size > MAX_UPLOAD_BYTES) {
+      this.admissionError = `${file.name} is larger than 3 MB.`;
+      return;
+    }
+    this.uploadingItemId = itemId;
+    try {
+      const base64 = await readAsBase64(file);
+      await uploadAdmissionDocument({ itemId, fileName: file.name, base64 });
+      this.admissionNotice = `${itemName} was sent. Our admissions team will review it.`;
+      const home = await getHome();
+      this.home = { ...this.home, admissions: home.admissions };
+    } catch (error) {
+      this.admissionError = reduceErrors(error).join(" ");
+    } finally {
+      this.uploadingItemId = undefined;
+    }
   }
 
   async load() {

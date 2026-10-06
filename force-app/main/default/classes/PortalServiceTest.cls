@@ -159,6 +159,7 @@ private class PortalServiceTest {
     User guardian = TestDataFactory.createPortalUser(fam.guardianContactId);
 
     System.runAs(guardian) {
+      Test.startTest();
       PortalService.Home home = PortalController.getHome();
       Assert.isTrue(home.isGuardian, 'Guardian');
       Assert.isTrue(home.viewerName.startsWith('Gita'), home.viewerName);
@@ -216,6 +217,7 @@ private class PortalServiceTest {
           );
         }
       }
+      Test.stopTest();
     }
   }
 
@@ -363,6 +365,184 @@ private class PortalServiceTest {
           e.getMessage()
         );
       }
+    }
+  }
+
+  /** Families upload admission documents (upload only); staff see and review them. */
+  @IsTest
+  static void familiesUploadAdmissionDocumentsForReview() {
+    // Checklist status updates cannot run in Apex tests in this org (ADR-004).
+    ChecklistItemGateway.simulateStatusUpdates = true;
+    User admin = TestDataFactory.admin();
+    TestDataFactory.giveRole(admin.Id);
+    Family fam;
+    DocumentChecklistItem fresh = new DocumentChecklistItem(
+      Name = 'Transfer Certificate',
+      IsRequired = true,
+      Status = 'New'
+    );
+    DocumentChecklistItem sent = new DocumentChecklistItem(
+      Name = 'School Report',
+      IsRequired = false,
+      Status = 'Pending'
+    );
+    DocumentChecklistItem accepted = new DocumentChecklistItem(
+      Name = 'Aadhaar Card',
+      IsRequired = true,
+      Status = 'Accepted'
+    );
+    System.runAs(admin) {
+      fam = family();
+      for (
+        DocumentChecklistItem i : new List<DocumentChecklistItem>{
+          fresh,
+          sent,
+          accepted
+        }
+      ) {
+        i.ParentRecordId = fam.applicationId;
+      }
+      insert new List<DocumentChecklistItem>{ fresh, sent, accepted };
+    }
+    User guardian = TestDataFactory.createPortalUser(fam.guardianContactId);
+    String pdf = EncodingUtil.base64Encode(
+      Blob.valueOf('%PDF-1.4 school report')
+    );
+
+    Test.startTest();
+    System.runAs(guardian) {
+      PortalService.Home home = PortalController.getHome();
+      Assert.areEqual(1, home.admissions.size(), 'Open application shown');
+      Assert.areEqual(
+        fam.applicationId,
+        home.admissions[0].applicationId,
+        'Own learner'
+      );
+      Map<Id, PortalService.AdmissionItem> byId = new Map<Id, PortalService.AdmissionItem>();
+      for (PortalService.AdmissionItem item : home.admissions[0].items) {
+        byId.put(item.itemId, item);
+      }
+      Assert.isTrue(byId.get(fresh.Id).canUpload, 'Open item can be uploaded');
+      Assert.isFalse(
+        byId.get(accepted.Id).canUpload,
+        'Accepted item is closed to the family'
+      );
+
+      Integer refused = 0;
+      List<List<Object>> attempts = new List<List<Object>>{
+        new List<Object>{ accepted.Id, 'card.pdf', pdf }, // accepted by staff
+        new List<Object>{ fresh.Id, 'virus.exe', pdf }, // wrong type
+        new List<Object>{ fresh.Id, 'empty.pdf', '' }, // empty
+        new List<Object>{ fam.applicationId, 'x.pdf', pdf } // not a checklist item
+      };
+      for (List<Object> a : attempts) {
+        try {
+          PortalController.uploadAdmissionDocument(
+            (Id) a[0],
+            (String) a[1],
+            (String) a[2]
+          );
+        } catch (AuraHandledException e) {
+          refused++;
+        }
+      }
+      Assert.areEqual(
+        4,
+        refused,
+        'Only valid uploads to open items are accepted'
+      );
+    }
+
+    // The uploads: files need the portal site context, which Apex tests do not
+    // have, so they run for the guardian through the service. The staff-side
+    // step comes from the Admission_Document__e trigger.
+    Id document;
+    System.runAs(admin) {
+      Id first = PortalService.uploadAdmissionDocumentFor(
+        fam.guardianContactId,
+        sent.Id,
+        'report.pdf',
+        pdf
+      );
+      PortalService.uploadAdmissionDocumentFor(
+        fam.guardianContactId,
+        fresh.Id,
+        'tc.pdf',
+        pdf
+      );
+      document = [
+        SELECT ContentDocumentId
+        FROM ContentVersion
+        WHERE Id = :first
+      ]
+      .ContentDocumentId;
+      // An event for an item staff have accepted changes nothing.
+      EventBus.publish(
+        new Admission_Document__e(
+          Item_Id__c = accepted.Id,
+          Document_Id__c = document
+        )
+      );
+    }
+    Test.getEventBus().deliver();
+    Test.stopTest();
+
+    System.runAs(admin) {
+      Assert.areEqual(
+        'Pending',
+        [
+          SELECT Status
+          FROM DocumentChecklistItem
+          WHERE
+            ParentRecordId = :fam.applicationId
+            AND Name = 'Transfer Certificate'
+        ]
+        .Status,
+        'New item now awaits staff review, not accepted'
+      );
+      Assert.areEqual(
+        'Accepted',
+        [SELECT Status FROM DocumentChecklistItem WHERE Id = :accepted.Id]
+        .Status,
+        'Staff decision unchanged'
+      );
+      Assert.areEqual(
+        0,
+        [
+          SELECT COUNT()
+          FROM ContentDocumentLink
+          WHERE LinkedEntityId = :accepted.Id
+        ],
+        'Nothing attached to a decided item'
+      );
+      ApplicationController.ApplicationView view = ApplicationController.getApplication(
+        fam.applicationId
+      );
+      ApplicationController.ChecklistItem staffItem;
+      for (ApplicationController.ChecklistItem i : view.checklist) {
+        if (i.id == sent.Id) {
+          staffItem = i;
+        }
+      }
+      Assert.areEqual(1, staffItem.fileCount, 'Staff see the file');
+      Assert.areEqual(document, staffItem.files[0].documentId, 'Same document');
+      Assert.isTrue(
+        staffItem.files[0].title.startsWith('School Report'),
+        staffItem.files[0].title
+      );
+    }
+
+    // Another family cannot upload to this learner's checklist.
+    try {
+      PortalService.uploadAdmissionDocumentFor(
+        fam.strangerContactId,
+        fresh.Id,
+        'a.pdf',
+        pdf
+      );
+      Assert.fail('Stranger refused');
+    } catch (AppException e) {
+      Assert.isTrue(e.getMessage().contains('not available'), e.getMessage());
     }
   }
 }

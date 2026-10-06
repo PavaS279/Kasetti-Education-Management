@@ -565,3 +565,53 @@
   font-weight: 700;
   letter-spacing: 0.08em;
 }
+
+.admissions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admission {
+  border-top: 1px solid var(--kem-line);
+  padding-top: 0.6rem;
+}
+
+.admission-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.doc-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.doc-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.5rem;
+  background: var(--kem-canvas);
+}
+
+.doc-text {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.doc-name {
+  font-weight: 600;
+  margin-right: 0.35rem;
+}
+
+.admissions .error {
+  color: var(--kem-danger, #ba0517);
+}

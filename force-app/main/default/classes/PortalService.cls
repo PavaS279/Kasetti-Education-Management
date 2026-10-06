@@ -51,6 +51,48 @@ public without sharing class PortalService {
     public List<MessageItem> messages = new List<MessageItem>();
     @AuraEnabled
     public Integer unreadMessages = 0;
+    @AuraEnabled
+    public List<AdmissionApplication> admissions = new List<AdmissionApplication>();
+  }
+
+  /** An open admissions application of one of the viewer's learners, with its document checklist. */
+  public class AdmissionApplication {
+    @AuraEnabled
+    public Id applicationId;
+    @AuraEnabled
+    public String name;
+    @AuraEnabled
+    public String learnerName;
+    @AuraEnabled
+    public String course;
+    @AuraEnabled
+    public String branch;
+    @AuraEnabled
+    public String status;
+    @AuraEnabled
+    public Integer stillNeeded = 0;
+    @AuraEnabled
+    public List<AdmissionItem> items = new List<AdmissionItem>();
+  }
+
+  /** A checklist document the family can see and, until staff accept or waive it, upload. */
+  public class AdmissionItem {
+    @AuraEnabled
+    public Id itemId;
+    @AuraEnabled
+    public String name;
+    @AuraEnabled
+    public String instruction;
+    @AuraEnabled
+    public Boolean required;
+    @AuraEnabled
+    public String status;
+    @AuraEnabled
+    public String rejectReason;
+    @AuraEnabled
+    public List<String> files = new List<String>();
+    @AuraEnabled
+    public Boolean canUpload;
   }
 
   public class ClassItem {
@@ -370,7 +412,204 @@ public without sharing class PortalService {
       }
       result.messages.add(item);
     }
+    result.admissions = admissionsFor(learnerIds);
     return result;
+  }
+
+  // ------------------------------------------------- admission documents (upload only)
+
+  /** Applications families may still send documents for. */
+  private static final Set<String> CLOSED_APPLICATION_STATUSES = new Set<String>{
+    'Withdrawn',
+    'Canceled',
+    'Cancelled',
+    'Enrollment Failed',
+    'Enrolled'
+  };
+  /** Items staff have decided: the family can no longer replace them. */
+  private static final Set<String> DECIDED_ITEM_STATUSES = new Set<String>{
+    'Accepted',
+    'Waived'
+  };
+  private static final Set<String> UPLOAD_EXTENSIONS = new Set<String>{
+    'pdf',
+    'jpg',
+    'jpeg',
+    'png'
+  };
+  @TestVisible
+  private static final Integer MAX_UPLOAD_BYTES = 3 * 1024 * 1024;
+
+  private static List<AdmissionApplication> admissionsFor(Set<Id> learnerIds) {
+    List<AdmissionApplication> result = new List<AdmissionApplication>();
+    if (learnerIds.isEmpty()) {
+      return result;
+    }
+    Map<Id, AdmissionItem> items = new Map<Id, AdmissionItem>();
+    for (IndividualApplication a : [
+      SELECT
+        Id,
+        Name,
+        Status,
+        Contact.Name,
+        Learning_Course__r.Name,
+        Branch__r.Name,
+        (
+          SELECT Id, Name, Instruction, IsRequired, Status, RejectReason
+          FROM DocumentChecklistItemPR
+          ORDER BY IsRequired DESC, CreatedDate ASC
+        )
+      FROM IndividualApplication
+      WHERE
+        ContactId IN :learnerIds
+        AND Status NOT IN :CLOSED_APPLICATION_STATUSES
+      WITH SYSTEM_MODE
+      ORDER BY CreatedDate DESC
+      LIMIT 10
+    ]) {
+      AdmissionApplication app = new AdmissionApplication();
+      app.applicationId = a.Id;
+      app.name = a.Name;
+      app.learnerName = a.Contact?.Name;
+      app.course = a.Learning_Course__r?.Name;
+      app.branch = a.Branch__r?.Name;
+      app.status = a.Status;
+      for (DocumentChecklistItem i : a.DocumentChecklistItemPR) {
+        AdmissionItem item = new AdmissionItem();
+        item.itemId = i.Id;
+        item.name = i.Name;
+        item.instruction = i.Instruction;
+        item.required = i.IsRequired;
+        item.status = i.Status;
+        item.rejectReason = i.Status == 'Rejected' ? i.RejectReason : null;
+        item.canUpload = !DECIDED_ITEM_STATUSES.contains(i.Status);
+        app.items.add(item);
+        if (item.required && item.canUpload) {
+          app.stillNeeded++;
+        }
+        items.put(i.Id, item);
+      }
+      result.add(app);
+    }
+    if (!items.isEmpty()) {
+      for (ContentDocumentLink link : [
+        SELECT LinkedEntityId, ContentDocument.Title
+        FROM ContentDocumentLink
+        WHERE LinkedEntityId IN :items.keySet()
+        WITH SYSTEM_MODE
+      ]) {
+        items.get(link.LinkedEntityId).files.add(link.ContentDocument.Title);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Upload only: the family attaches a document to a checklist item of their
+   * own learner's open application. The item becomes Pending (awaiting staff
+   * review). Families cannot accept, reject or waive items, nor replace an
+   * item staff have accepted or waived.
+   */
+  public static Id uploadAdmissionDocument(
+    Id itemId,
+    String fileName,
+    String base64
+  ) {
+    return uploadAdmissionDocumentFor(
+      viewerContactId(),
+      itemId,
+      fileName,
+      base64
+    );
+  }
+
+  public static Id uploadAdmissionDocumentFor(
+    Id viewerId,
+    Id itemId,
+    String fileName,
+    String base64
+  ) {
+    List<DocumentChecklistItem> found = [
+      SELECT Id, Name, Status, ParentRecordId
+      FROM DocumentChecklistItem
+      WHERE Id = :itemId
+      WITH SYSTEM_MODE
+    ];
+    if (found.isEmpty()) {
+      throw new AppException('Document not found or not available to you.');
+    }
+    DocumentChecklistItem item = found[0];
+    List<IndividualApplication> apps = [
+      SELECT Id, ContactId, Status
+      FROM IndividualApplication
+      WHERE Id = :item.ParentRecordId
+      WITH SYSTEM_MODE
+    ];
+    if (
+      apps.isEmpty() ||
+      !authorisedLearners(viewerId).contains(apps[0].ContactId)
+    ) {
+      throw new AppException('Document not found or not available to you.');
+    }
+    if (CLOSED_APPLICATION_STATUSES.contains(apps[0].Status)) {
+      throw new AppException('This application is closed.');
+    }
+    if (DECIDED_ITEM_STATUSES.contains(item.Status)) {
+      throw new AppException(
+        item.Name + ' has already been ' + item.Status.toLowerCase() + '.'
+      );
+    }
+    String name = String.isBlank(fileName) ? '' : fileName.trim();
+    String extension = name.contains('.')
+      ? name.substringAfterLast('.').toLowerCase()
+      : '';
+    if (!UPLOAD_EXTENSIONS.contains(extension)) {
+      throw new AppException('Upload a PDF, JPG or PNG file.');
+    }
+    if (String.isBlank(base64)) {
+      throw new AppException('The file is empty.');
+    }
+    Blob data = EncodingUtil.base64Decode(base64);
+    if (data.size() == 0) {
+      throw new AppException('The file is empty.');
+    }
+    if (data.size() > MAX_UPLOAD_BYTES) {
+      throw new AppException('The file is larger than 3 MB.');
+    }
+    // Upload only. The family's transaction saves the file; the staff-side
+    // step (linking it to the checklist item and marking it Pending) runs from
+    // the Admission_Document__e trigger, because portal licences cannot
+    // change checklist items.
+    ContentVersion version = new ContentVersion(
+      Title = (item.Name + ' – ' + name.substringBeforeLast('.')).left(255),
+      PathOnClient = name,
+      VersionData = data
+    );
+    Database.insert(version, AccessLevel.SYSTEM_MODE);
+    Id documentId = [
+      SELECT ContentDocumentId
+      FROM ContentVersion
+      WHERE Id = :version.Id
+      WITH SYSTEM_MODE
+    ]
+    .ContentDocumentId;
+    Database.SaveResult published = EventBus.publish(
+      new Admission_Document__e(
+        Item_Id__c = item.Id,
+        Document_Id__c = documentId,
+        Uploaded_By__c = viewerId
+      )
+    );
+    if (!published.isSuccess()) {
+      Logger.errors(
+        'PortalService.uploadAdmissionDocument',
+        new List<Database.SaveResult>{ published }
+      );
+      throw new AppException(
+        'Your file was saved but could not be sent for review. Please try again or contact the centre.'
+      );
+    }
+    return version.Id;
   }
 
   /** Marks one of the viewer's own portal messages as read. */

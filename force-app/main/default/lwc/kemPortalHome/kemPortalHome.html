@@ -67,6 +67,74 @@
         </section>
       </template>
 
+      <template lwc:if={hasAdmissions}>
+        <section
+          class="kem-card panel admissions kem-fade-in"
+          aria-label="Admission documents"
+        >
+          <div class="kem-section-title">Admission documents</div>
+          <div class="kem-muted small">
+            Upload each document as a PDF, JPG or PNG (up to 3 MB). Our
+            admissions team reviews it and the status changes here.
+          </div>
+          <template lwc:if={admissionNotice}>
+            <div class="notice small" role="status">{admissionNotice}</div>
+          </template>
+          <template lwc:if={admissionError}>
+            <div class="error small" role="alert">{admissionError}</div>
+          </template>
+          <template for:each={admissionCards} for:item="app">
+            <div key={app.applicationId} class="admission">
+              <div class="admission-head">
+                <strong>{app.learnerName}</strong>
+                <span class="kem-muted small">{app.subtitle}</span>
+                <span class={app.neededClass}>{app.neededLabel}</span>
+              </div>
+              <ul class="doc-items">
+                <template for:each={app.rows} for:item="item">
+                  <li key={item.itemId} class="doc-item">
+                    <div class="doc-text">
+                      <div>
+                        <span class="doc-name">{item.name}</span>
+                        <template lwc:if={item.required}>
+                          <span class="kem-badge">Required</span>
+                        </template>
+                        <span class={item.statusClass}>{item.statusLabel}</span>
+                      </div>
+                      <template lwc:if={item.instruction}>
+                        <div class="kem-muted small">{item.instruction}</div>
+                      </template>
+                      <template lwc:if={item.rejectReason}>
+                        <div class="error small">
+                          Please upload again: {item.rejectReason}
+                        </div>
+                      </template>
+                      <template lwc:if={item.filesLabel}>
+                        <div class="kem-muted small">
+                          Sent: {item.filesLabel}
+                        </div>
+                      </template>
+                    </div>
+                    <template lwc:if={item.canUpload}>
+                      <lightning-input
+                        type="file"
+                        label={item.uploadLabel}
+                        variant="label-hidden"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        data-id={item.itemId}
+                        data-name={item.name}
+                        onchange={handleAdmissionFile}
+                        disabled={item.busy}
+                      ></lightning-input>
+                    </template>
+                  </li>
+                </template>
+              </ul>
+            </div>
+          </template>
+        </section>
+      </template>
+
       <template lwc:if={referral}>
         <section
           class="kem-card panel refer kem-fade-in"

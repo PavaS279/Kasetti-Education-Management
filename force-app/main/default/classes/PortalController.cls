@@ -45,6 +45,20 @@ public with sharing class PortalController {
     }
   }
 
+  /** Upload only: families attach admission documents; staff review them. */
+  @AuraEnabled
+  public static Id uploadAdmissionDocument(
+    Id itemId,
+    String fileName,
+    String base64
+  ) {
+    try {
+      return PortalService.uploadAdmissionDocument(itemId, fileName, base64);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
   @AuraEnabled
   public static PortalService.ReferralInfo getReferral(Boolean create) {
     try {

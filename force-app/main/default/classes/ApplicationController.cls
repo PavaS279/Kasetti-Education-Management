@@ -17,6 +17,24 @@ public with sharing class ApplicationController {
     public String rejectReason;
     @AuraEnabled
     public Integer fileCount = 0;
+    @AuraEnabled
+    public List<ChecklistFile> files = new List<ChecklistFile>();
+  }
+
+  /** A file attached to a checklist item, by staff or by the family in the portal. */
+  public class ChecklistFile {
+    @AuraEnabled
+    public Id documentId;
+    @AuraEnabled
+    public String title;
+    @AuraEnabled
+    public String extension;
+    @AuraEnabled
+    public Datetime uploadedOn;
+    @AuraEnabled
+    public String uploadedBy;
+    @AuraEnabled
+    public Boolean fromPortal = false;
   }
 
   public class ApplicationView {
@@ -107,15 +125,30 @@ public with sharing class ApplicationController {
         }
       }
       if (!items.isEmpty()) {
-        for (AggregateResult row : [
-          SELECT LinkedEntityId entity, COUNT(Id) files
+        for (ContentDocumentLink link : [
+          SELECT
+            LinkedEntityId,
+            ContentDocumentId,
+            ContentDocument.Title,
+            ContentDocument.FileExtension,
+            ContentDocument.LatestPublishedVersion.CreatedDate,
+            ContentDocument.LatestPublishedVersion.CreatedBy.Name,
+            ContentDocument.LatestPublishedVersion.CreatedBy.ContactId
           FROM ContentDocumentLink
           WHERE LinkedEntityId IN :items.keySet()
-          GROUP BY LinkedEntityId
+          ORDER BY ContentDocument.LatestPublishedVersion.CreatedDate DESC
         ]) {
-          items.get((Id) row.get('entity')).fileCount = (Integer) row.get(
-            'files'
-          );
+          ChecklistFile file = new ChecklistFile();
+          file.documentId = link.ContentDocumentId;
+          file.title = link.ContentDocument.Title;
+          file.extension = link.ContentDocument.FileExtension;
+          ContentVersion latest = link.ContentDocument.LatestPublishedVersion;
+          file.uploadedOn = latest?.CreatedDate;
+          file.uploadedBy = latest?.CreatedBy?.Name;
+          file.fromPortal = latest?.CreatedBy?.ContactId != null;
+          ChecklistItem item = items.get(link.LinkedEntityId);
+          item.files.add(file);
+          item.fileCount = item.files.size();
         }
       }
       view.checklist = items.values();
