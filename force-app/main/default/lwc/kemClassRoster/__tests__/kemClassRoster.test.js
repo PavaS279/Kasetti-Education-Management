@@ -86,6 +86,20 @@ describe("c-kem-class-roster", () => {
     }
   });
 
+  it("leaves blank details out of the header chips", async () => {
+    const element = createElement("c-kem-class-roster", { is: KemClassRoster });
+    element.recordId = "0kF000000000001";
+    document.body.appendChild(element);
+    getRoster.emit({
+      ...ROSTER,
+      offering: { ...ROSTER.offering, Delivery_Mode__c: null }
+    });
+    await Promise.resolve();
+    const chips = [...element.shadowRoot.querySelectorAll(".hero-chip")];
+    expect(chips.length).toBe(4);
+    expect(chips.every((c) => c.textContent.trim().length > 0)).toBe(true);
+  });
+
   it("shows the seat meter and roster with discount actions", async () => {
     const element = createElement("c-kem-class-roster", { is: KemClassRoster });
     element.recordId = "0kF000000000001";

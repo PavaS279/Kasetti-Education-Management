@@ -53,9 +53,16 @@
   grid-template-columns: repeat(3, minmax(16rem, 1fr));
   gap: 1rem;
   margin-top: 1rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
   padding-bottom: 0.5rem;
+}
+
+/* Card menus must be able to open past the board, so it only scrolls
+   sideways when the three columns do not fit. */
+@media (max-width: 56em) {
+  .board {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
 }
 
 .column {

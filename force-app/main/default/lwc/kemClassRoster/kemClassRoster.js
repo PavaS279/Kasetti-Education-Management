@@ -102,6 +102,18 @@ export default class KemClassRoster extends NavigationMixin(LightningElement) {
   get roomName() {
     return this.offering.Room__r?.Name || "Room not assigned";
   }
+  /** Header chips; blank values (e.g. no delivery mode) are left out. */
+  get heroChips() {
+    return [
+      this.statusLabel,
+      this.branchName,
+      this.offering.Delivery_Mode__c,
+      this.teacherName,
+      this.roomName
+    ]
+      .filter((label) => label)
+      .map((label, index) => ({ key: `${index}-${label}`, label }));
+  }
   get statusLabel() {
     return this.offering.Class_Status__c || "Planned";
   }

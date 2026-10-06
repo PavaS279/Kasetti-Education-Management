@@ -7,11 +7,9 @@
             <div class="kem-hero__subtitle">{courseName}</div>
             <div class="kem-hero__title">{offering.Name}</div>
             <div class="chips">
-              <span class="hero-chip">{statusLabel}</span>
-              <span class="hero-chip">{branchName}</span>
-              <span class="hero-chip">{offering.Delivery_Mode__c}</span>
-              <span class="hero-chip">{teacherName}</span>
-              <span class="hero-chip">{roomName}</span>
+              <template for:each={heroChips} for:item="chip">
+                <span key={chip.key} class="hero-chip">{chip.label}</span>
+              </template>
             </div>
           </div>
           <div class="meter" aria-label={meterLabel}>
