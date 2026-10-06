@@ -32,7 +32,7 @@ export default class KemRefundModal extends LightningModal {
     this.amount = this.available;
   }
 
-  get label() {
+  get heading() {
     return `Refund from ${this.creditNoteName}`;
   }
   get needsApproval() {

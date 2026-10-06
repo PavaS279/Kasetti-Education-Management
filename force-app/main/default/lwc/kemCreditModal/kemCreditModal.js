@@ -23,7 +23,7 @@ export default class KemCreditModal extends LightningModal {
   errorMessage;
   isBusy = false;
 
-  get label() {
+  get heading() {
     return `Credit note for ${this.invoiceNumber}`;
   }
   get cannotSubmit() {

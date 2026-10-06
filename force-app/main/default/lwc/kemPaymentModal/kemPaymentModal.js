@@ -33,7 +33,7 @@ export default class KemPaymentModal extends LightningModal {
     this.amount = this.balance;
   }
 
-  get label() {
+  get heading() {
     return `Record payment · ${this.invoiceNumber}`;
   }
   get methodOptions() {

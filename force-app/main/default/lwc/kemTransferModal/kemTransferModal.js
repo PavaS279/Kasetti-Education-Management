@@ -33,7 +33,7 @@ export default class KemTransferModal extends LightningModal {
     this.loadClasses();
   }
 
-  get label() {
+  get heading() {
     return `Transfer ${this.learnerName}`;
   }
   get classOptions() {

@@ -50,7 +50,7 @@ export default class KemBranchCloneModal extends LightningModal {
     }
   }
 
-  get label() {
+  get heading() {
     return this.preview
       ? `New branch from ${this.preview.name}`
       : "New branch from template";

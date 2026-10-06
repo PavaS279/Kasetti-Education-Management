@@ -20,7 +20,7 @@ export default class KemWaitlistJoinModal extends LightningModal {
   errorMessage;
   isSaving = false;
 
-  get label() {
+  get heading() {
     return `Add to waitlist · ${this.className}`;
   }
   get priorityOptions() {

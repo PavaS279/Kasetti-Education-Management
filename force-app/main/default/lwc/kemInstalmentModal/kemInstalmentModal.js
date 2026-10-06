@@ -45,7 +45,7 @@ export default class KemInstalmentModal extends LightningModal {
     this.loadPreview();
   }
 
-  get label() {
+  get heading() {
     return `Instalment plan · ${this.invoiceNumber}`;
   }
   get rows() {

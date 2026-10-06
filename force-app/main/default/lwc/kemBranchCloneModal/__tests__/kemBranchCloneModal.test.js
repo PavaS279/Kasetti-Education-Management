@@ -1,4 +1,6 @@
 import { createElement } from "lwc";
+import fs from "fs";
+import path from "path";
 import KemBranchCloneModal from "c/kemBranchCloneModal";
 import getTemplatePreview from "@salesforce/apex/BranchController.getTemplatePreview";
 import cloneBranch from "@salesforce/apex/BranchController.cloneBranch";
@@ -63,6 +65,43 @@ describe("c-kem-branch-clone-modal", () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+  });
+
+  it("accepts the public properties LightningModal.open() sets", async () => {
+    getTemplatePreview.mockResolvedValue(preview());
+    const element = createElement("c-kem-branch-clone-modal", {
+      is: KemBranchCloneModal
+    });
+    // The real modal framework assigns these when it opens the modal; a
+    // read-only getter with the same name made "Use as template" fail.
+    expect(() => {
+      element.label = "New branch";
+      element.size = "medium";
+      element.description = "Open a branch";
+    }).not.toThrow();
+    element.branchId = "a00000000000001";
+    document.body.appendChild(element);
+    await flush();
+    expect(
+      element.shadowRoot.querySelector("lightning-modal-header").label
+    ).toBe("New branch from Indiranagar");
+  });
+
+  it("no modal redefines label, size or description as a getter", () => {
+    const lwcRoot = path.resolve(__dirname, "../..");
+    const offenders = fs
+      .readdirSync(lwcRoot)
+      .map((name) => path.join(lwcRoot, name, `${name}.js`))
+      .filter((file) => fs.existsSync(file))
+      .filter((file) => {
+        const source = fs.readFileSync(file, "utf8");
+        return (
+          source.includes("extends LightningModal") &&
+          /\bget (label|size|description)\(\)/.test(source)
+        );
+      })
+      .map((file) => path.basename(file));
+    expect(offenders).toEqual([]);
   });
 
   it("shows what will be copied and opens the branch", async () => {
