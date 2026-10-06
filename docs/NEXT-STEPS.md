@@ -1,10 +1,16 @@
 # Next Steps — Hand-over
 
-_Last updated: 2026-10-05 after F2.9 (Phase 2 complete)._
+_Last updated: 2026-10-06 after F3.9 (Phase 3 complete)._
 
 ## Where we are
 
-Phases 0, 1 and 2 are **complete**: features 1.1 – 1.13 and 2.1 – 2.9 are built, deployed to the org, unit-tested (139 Apex tests, 94% coverage; 87 Jest tests) and checked end to end. Phase 1: a full learner journey with financial reconciliation (`FullJourneyTest`, `scripts/demo/full-journey.sh`). Phase 2: exceptions and recurring operations — waitlists, transfers, recurring billing, instalments, credit and refunds, messaging, teacher cover, grading and report cards, the richer portal and the operations console (`Phase2JourneyTest`, `scripts/demo/phase2-journey.sh`, all 31 checks passing live). See [PROGRESS.md](PROGRESS.md), [TEST-LOG.md](TEST-LOG.md) and [DEMO-SCRIPT.md](DEMO-SCRIPT.md).
+Phases 0–3 are **complete**: features 1.1 – 1.13, 2.1 – 2.9 and 3.1 – 3.9 are built, deployed to the org, unit-tested (194 Apex tests, 94% coverage; 128 Jest tests) and checked end to end.
+
+- Phase 1: a full learner journey with financial reconciliation (`FullJourneyTest`, `scripts/demo/full-journey.sh`).
+- Phase 2: exceptions and recurring operations work reliably (`Phase2JourneyTest`, `scripts/demo/phase2-journey.sh`, 31 checks).
+- Phase 3: additional centres and higher volumes — branch templates and comparison, limit-aware recurring billing and reminder batches, generic LMS and ERP APIs with an outbox, analytics, retention workflows, online payments in the portal (switched Off), a library module (`Phase3JourneyTest`, `VolumeTest`, `scripts/demo/phase3-journey.sh`, 26 checks).
+
+See [PROGRESS.md](PROGRESS.md), [TEST-LOG.md](TEST-LOG.md) and [DEMO-SCRIPT.md](DEMO-SCRIPT.md).
 
 ## Org set-up completed on 2026-10-03
 
@@ -17,23 +23,29 @@ Phases 0, 1 and 2 are **complete**: features 1.1 – 1.13 and 2.1 – 2.9 are bu
 
 ## Actions for you
 
-| What                                                | Why it is still open                                                                                                                         | How                                                                                                                     |
-| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Portal logins for the demo guardians                | No passwords were set and no emails sent                                                                                                     | Setup → Users → _Reset Password_ (or log in as the user from the contact)                                               |
-| UI screenshots from the build environment           | The client-credentials login only ever receives the `api` scope, so no browser session can be created; the web scope does not help this flow | Not needed for operation; check the screens in the app                                                                  |
-| Remove **Full access** from the External Client App | You planned to; nothing further needs it                                                                                                     | External Client App → OAuth scopes                                                                                      |
-| Switch email on                                     | `Email_Delivery` is **Off**: notifications are logged as Not Sent; portal messages are delivered                                             | Check Setup → Deliverability ("All email") and the sender address, then set Education Setting `Email_Delivery` = `Live` |
-| Approve the waiting demo refund                     | RFD-000001 (1,200 on CN-000001) needs an approver other than the requester                                                                   | Finance Desk → Refunds → Approve (as an administrator or branch manager)                                                |
-| Check the new screens in the browser                | The build environment has API access only; screens are covered by Jest tests                                                                 | Home (Cover Desk, Operations), class page (Waitlist, Course grades), invoice, credit note, learner Messages, portal     |
+| What                                                | Why it is still open                                                                                                                         | How                                                                                                                                                                                                       |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Portal logins for the demo guardians                | No passwords were set and no emails sent                                                                                                     | Setup → Users → _Reset Password_ (or log in as the user from the contact)                                                                                                                                 |
+| UI screenshots from the build environment           | The client-credentials login only ever receives the `api` scope, so no browser session can be created; the web scope does not help this flow | Not needed for operation; check the screens in the app                                                                                                                                                    |
+| Remove **Full access** from the External Client App | You planned to; nothing further needs it                                                                                                     | External Client App → OAuth scopes                                                                                                                                                                        |
+| Switch email on                                     | `Email_Delivery` is **Off**: notifications are logged as Not Sent; portal messages are delivered                                             | Check Setup → Deliverability ("All email") and the sender address, then set Education Setting `Email_Delivery` = `Live`                                                                                   |
+| Approve the waiting demo refund                     | RFD-000001 (1,200 on CN-000001) needs an approver other than the requester                                                                   | Finance Desk → Refunds → Approve (as an administrator or branch manager)                                                                                                                                  |
+| Check the new screens in the browser                | The build environment has API access only; screens are covered by Jest tests                                                                 | Home (Analytics, Branches, Retention, Cover Desk, Operations), branch page (comparison, analytics, retention, library), Finance Desk (ERP export), invoice (Online payment), portal (Pay online, Library) |
+| Create the integration user                         | The LMS, ERP and payment middleware need an API-only user                                                                                    | New user (API only) → permission set group **KEM Integration Persona** → Connected App with client credentials; keep its secret out of chat and tickets                                                   |
+| Decide on the ERP outbox                            | `ERP_Outbox` is On: every invoice, payment, credit note and refund adds an event that waits until an ERP reads it (deleted after 90 days)    | Keep it On when the ERP will poll `/erp/events`; otherwise set Education Setting `ERP_Outbox` = Off (the journal export does not need it)                                                                 |
+| Online payments                                     | `Payment_Gateway_Mode` is **Off**; the webhook has no secret                                                                                 | Choose the gateway, set `Payment_Checkout_URL`, enter the secret in Setup → Custom Settings → KEM Gateway, try `Test`, then `Live`                                                                        |
+| Map ERP account codes                               | Defaults 1100/1010/1000/4000/2200/2300/4900                                                                                                  | Education Settings `ERP_Account_*` to your chart of accounts                                                                                                                                              |
+| Add administrators                                  | Administrators edit others' classes through the KEM Administrators group                                                                     | After assigning KEM Administrator, use **Sync administrators** in the operations console (or the next deployment syncs it)                                                                                |
 
-## Not in Phase 2 (possible next steps)
+## Possible next steps (after Phase 3)
 
-1. **Payment gateway connector** — signed webhooks (HMAC) in front of `/kem/v1/payments`, hosted payment links on invoices and in the portal, automatic gateway refunds (refunds are paid out manually today).
-2. **SMS / WhatsApp** — messaging covers email and the portal inbox; add a provider through the same templates and consent.
-3. **Billing refinements** — proration of part months, billing On Hold enrolments, pro-rata withdrawal refunds (entered by finance today), credit note PDFs.
-4. **More notices** — enrolment confirmation and transfer templates (8 events today).
-5. **Tabs** — the org is at its custom tab limit; credit notes, refunds and absences are reached through the Finance Desk, Cover Desk and search.
-6. **Portal home page** — the site's `/s/` home page still shows the template components that fail (AssignedResource, action plans); My Learning is unaffected.
+1. **Connect the chosen LMS and ERP** — the generic APIs and outbox are ready; add the named credentials `KEM_LMS` / `KEM_ERP` and switch push on if they prefer push to polling.
+2. **Payment gateway** — connect middleware to the signed webhook; automatic gateway refunds (refunds are paid out manually today).
+3. **SMS / WhatsApp** — messaging covers email and the portal inbox; add a provider through the same templates and consent.
+4. **Billing refinements** — proration of part months, billing On Hold enrolments, pro-rata withdrawal refunds, credit note PDFs; library fines on invoices (settled at the desk today).
+5. **Custom indexes** — request indexes on `Student_Invoice__c.Due_Date__c`, `Message__c.Status__c`, `Enrolment_Fee_Line__c.Next_Bill_Date__c` and `Class_Session__c.Start__c` from Salesforce Support when a table passes ~100,000 rows.
+6. **Tabs** — the org is at its custom tab limit; library, payment links, exports and integration events are reached through the branch page, invoice page, Finance Desk and search.
+7. **Portal home page** — the site's `/s/` home page still shows the template components that fail (AssignedResource, action plans); My Learning is unaffected.
 
 ## How to continue in a new session
 
@@ -42,7 +54,7 @@ Phases 0, 1 and 2 are **complete**: features 1.1 – 1.13 and 2.1 – 2.9 are bu
 3. `./scripts/ci/sf-login.sh` (access token; re-run if it expires).
 4. Change specs in `scripts/tooling/specs.py` → `python3 scripts/tooling/mdgen.py` → `scripts/deploy.sh` (pauses/resumes scheduled jobs, runs all `*Test` classes).
 5. Follow the per-feature rhythm: build → deploy → Apex + Jest tests → live end-to-end check → `docs/features/F*.md` → PROGRESS + TEST-LOG (+ DEMO-SCRIPT and data/security/status docs when they change) → commit.
-6. Demo runners: `scripts/demo/full-journey.sh` (Phase 1) and `scripts/demo/phase2-journey.sh` (Phase 2) — each run creates its own tagged `[KEM Demo]` data.
+6. Demo runners: `scripts/demo/full-journey.sh` (Phase 1), `scripts/demo/phase2-journey.sh` (Phase 2) and `scripts/demo/phase3-journey.sh` (Phase 3) — each run creates its own tagged `[KEM Demo]` data.
 
 ## Lessons that save time (see 06-development-standards.md)
 
@@ -57,8 +69,14 @@ Phases 0, 1 and 2 are **complete**: features 1.1 – 1.13 and 2.1 – 2.9 are bu
 - Long tests hit 100 SOQL queries: give heavy sections their own `Test.startTest()` context or split the test.
 - A queueable cannot start another queueable in tests ("maximum stack depth").
 - The org is at its custom tab limit; new objects cannot get tabs.
+- The Education Cloud licence silently drops View All / Modify All on `CourseOffering` and `CourseOfferingParticipant` (the deploy succeeds; check `ObjectPermissions`). Use sharing rules to a group instead.
+- Production orgs reject Protected custom settings; one class cannot be both Queueable and Schedulable; `Database.queryWithBinds` returns `List<SObject>` (cast to `List<AggregateResult>` for aggregates).
+- In tests, `Request.getCurrent().getRequestId()` is the same for setup and test methods — do not use it for uniqueness.
+- Recurring billing costs ~18 queries per enrolment: keep batches small (Education Setting `Recurring_Billing_Batch_Size`).
 
 ## Demo data in the org (prefixed `[KEM Demo]`)
+
+Phase 3 additions: branch **[KEM Demo] Whitefield** (DEMO-02, prefix WFD) opened from Bengaluru Central with 2 rooms, 1 price, 1 closure and 7 Planned classes (Maths Foundation has 14 generated sessions); demo centres **[KEM Demo] Centre P3A / P3B** (D3-P3A, D3-P3B) from the Phase 3 runner with a learner, invoice, LMS quiz and a returned library loan each; library items **[KEM Demo] Wings of Fire** (DEMO-B-001) and **Robotics Starter Kit** (DEMO-K-001) with loans LN-000000 and the kit to Ananya Sharma; export EXP-000000 (1–6 Oct journal); integration events acknowledged.
 
 Phase 2 additions: monthly course `KEM-DEMO-CODING` (Coding Club, admission 1,000 + tuition 2,500 monthly) with learner Ishaan Rao and invoices BLR-000005/6/7/8 (instalment plan, credit notes CN-000000/1, refunds RFD-000000 paid and RFD-000001 waiting); class _Waitlist Demo – Sunday_; room 102; Kasetti Tech and Anjali Advisor as Teachers at the demo branch; absence ABS-00000 (Saturday 10 Oct covered by Anjali, moved to room 102); the Saturday Maths class with grades finalised and report cards; Phase 2 demo runs ("Guardian ‹tag› [KEM Demo] Phase2").
 

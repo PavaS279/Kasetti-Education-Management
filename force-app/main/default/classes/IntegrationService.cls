@@ -92,6 +92,7 @@ public with sharing class IntegrationService {
       SELECT
         Id,
         CourseOfferingId,
+        CourseOffering.Branch__c,
         Branch__c,
         ParticipationStatus,
         ParticipantContactId,
@@ -109,7 +110,10 @@ public with sharing class IntegrationService {
           LMS,
           'enrolment.updated',
           enrolment.Id,
-          enrolment.Branch__c,
+          // The enrolment's branch is set after insert; the class's branch is the same.
+          enrolment.Branch__c != null
+            ? enrolment.Branch__c
+            : enrolment.CourseOffering?.Branch__c,
           payload
         )
       );

@@ -58,7 +58,25 @@ Organisation defaults (`Education_Setting__mdt`) with branch overrides (`Branch_
 
 Phase 2 settings are `Education_Setting__mdt` records: `Waitlist_Offer_Hours`, `Refund_Auto_Approve_Limit`, `Auto_Apply_Credit`, `Email_Delivery`, `Portal_URL`, `Due_Soon_Days`, `Overdue_Reminder_Days`, `Absent_Counts_As_Zero`. Notification texts are `Message_Template__mdt` records.
 
-Phase 3 settings: `Recurring_Billing_Batch_Size` (enrolments per recurring billing batch, default 5; the job also defers work to a follow-up run when short of limits) and `Dispatch_Rounds` (follow-up email delivery jobs of 100 in a row, default 20).
+Phase 3 settings (`Education_Setting__mdt`):
+
+| Setting                                   | Default                                  | Meaning                                                                                    |
+| ----------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `Recurring_Billing_Batch_Size`            | 5                                        | Enrolments per recurring billing batch (headroom checks defer the rest to a follow-up run) |
+| `Dispatch_Rounds`                         | 20                                       | Follow-up email delivery jobs of 100 in a row                                              |
+| `LMS_Outbox` / `ERP_Outbox`               | On                                       | Record integration events                                                                  |
+| `LMS_Push` / `ERP_Push`                   | Off                                      | Push pending events hourly to the named credential `KEM_LMS` / `KEM_ERP`                   |
+| `Integration_Retention_Days`              | 30                                       | Delivered events deleted after this; undelivered after three times as long                 |
+| `ERP_Daily_Export`                        | On                                       | Export yesterday's journal at 03:15                                                        |
+| `ERP_Account_*`                           | 1100, 1010, 1000, 4000, 2200, 2300, 4900 | Account codes: receivable, bank, cash, revenue, tax, customer credit, credit allowance     |
+| `Payment_Gateway_Mode`                    | **Off**                                  | Off, Test (no money taken; staff simulate) or Live                                         |
+| `Payment_Checkout_URL`                    | example                                  | Gateway checkout address (HTTPS) with `{token}`, `{amount}`, `{invoice}`, `{currency}`     |
+| `Payment_Link_Hours`                      | 24                                       | Payment link validity                                                                      |
+| `Library_Loan_Days`                       | 14                                       | Default loan period                                                                        |
+| `Library_Daily_Fine` / `Library_Max_Fine` | 5 / 500                                  | Late fee per day and cap                                                                   |
+| `Library_Max_Renewals`                    | 2                                        | Renewals per loan                                                                          |
+
+Phase 3 statuses (set by Apex only): integration event Pending → Delivered / Failed (→ Delivered on retry); payment link Active → Paid / Failed / Expired; library loan On Loan → Overdue → Returned / Lost, fine None → Due → Paid / Waived; enrolment risk Low / Medium / High with retention follow-up Follow-up Needed → Contacted / Retained / Leaving.
 
 ## Scheduled jobs
 

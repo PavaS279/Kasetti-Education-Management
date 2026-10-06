@@ -1,6 +1,6 @@
 # Progress Tracker
 
-> **Status 2026-10-05:** Phases 0, 1 and 2 are complete — every feature built, deployed, unit-tested and checked end to end. Phase 1: one learner completes the full journey with financial reconciliation. Phase 2: exceptions and recurring operations (waitlists, transfers, recurring billing, instalments, credit and refunds, messaging, cover, grading, portal, operations console) work reliably.
+> **Status 2026-10-06:** Phases 0, 1, 2 and 3 are complete — every feature built, deployed, unit-tested and checked end to end. Phase 1: one learner completes the full journey with financial reconciliation. Phase 2: exceptions and recurring operations work reliably. Phase 3: additional centres and higher volumes are supported (branch templates, limit-aware batches, LMS and ERP APIs, analytics, retention, online payments, library).
 
 Legend: ✅ done · 🟡 in progress · ⬜ not started
 
@@ -57,7 +57,7 @@ Each feature is complete only when it is **built, deployed to the org, unit-test
 
 ## Phase 3 — Scale and optimisation
 
-**Completion condition — additional centres and higher volumes supported:** 🟡 (in progress)
+**Completion condition — additional centres and higher volumes supported:** ✅ (`Phase3JourneyTest`, `VolumeTest`, the live checks of F3.1–F3.9 and `scripts/demo/phase3-journey.sh` passing 26 of 26 checks live)
 
 Scope chosen by the institution (2026-10-05): a generic LMS API (no LMS yet), a generic ERP export/API, online payments in the portal, and a library/resources module. Administrators now have Modify All on classes and enrolments (deployed 2026-10-05).
 
@@ -65,10 +65,10 @@ Scope chosen by the institution (2026-10-05): a generic LMS API (no LMS yet), a 
 | --- | --------------------------------------------------------------------------------------------- | ----- | -------- | ----- | --------- | ------------------------------------------------------------------------- |
 | 3.1 | Multi-branch templates (clone a branch's set-up; branch KPIs)                                 | ✅    | ✅       | ✅    | ✅        | [F3.1-multi-branch-templates.md](features/F3.1-multi-branch-templates.md) |
 | 3.2 | Scale and performance (bulk-safe batches, selective queries, volume tests)                    | ✅    | ✅       | ✅    | ✅        | [F3.2-scale-and-performance.md](features/F3.2-scale-and-performance.md)   |
-| 3.3 | Generic LMS integration API (outbound events, inbound REST for classes, rosters, grades)      | ⬜    | ⬜       | ⬜    | ⬜        |                                                                           |
-| 3.4 | Generic ERP finance export (journal of invoices, payments, credits, refunds; CSV/JSON + REST) | ⬜    | ⬜       | ⬜    | ⬜        |                                                                           |
-| 3.5 | Advanced analytics (branch comparison, revenue trends, cohorts)                               | ⬜    | ⬜       | ⬜    | ⬜        |                                                                           |
-| 3.6 | Retention workflows (at-risk scoring, follow-up tasks, re-enrolment campaigns)                | ⬜    | ⬜       | ⬜    | ⬜        |                                                                           |
-| 3.7 | Online payments in the portal (gateway-agnostic payment links, signed webhook)                | ⬜    | ⬜       | ⬜    | ⬜        |                                                                           |
-| 3.8 | Library and resources (catalogue, loans, due dates, fines)                                    | ⬜    | ⬜       | ⬜    | ⬜        |                                                                           |
-| 3.9 | Phase 3 journey, volume test and demo script                                                  | ⬜    | ⬜       | ⬜    | ⬜        |                                                                           |
+| 3.3 | Generic LMS integration API (outbound events, inbound REST for classes, rosters, grades)      | ✅    | ✅       | ✅    | ✅        | [F3.3-lms-integration.md](features/F3.3-lms-integration.md)               |
+| 3.4 | Generic ERP finance export (journal of invoices, payments, credits, refunds; CSV/JSON + REST) | ✅    | ✅       | ✅    | ✅        | [F3.4-erp-export.md](features/F3.4-erp-export.md)                         |
+| 3.5 | Advanced analytics (branch comparison, revenue trends, cohorts)                               | ✅    | ✅       | ✅    | ✅        | [F3.5-advanced-analytics.md](features/F3.5-advanced-analytics.md)         |
+| 3.6 | Retention workflows (at-risk scoring, follow-up tasks, re-enrolment campaigns)                | ✅    | ✅       | ✅    | ✅        | [F3.6-retention-workflows.md](features/F3.6-retention-workflows.md)       |
+| 3.7 | Online payments in the portal (gateway-agnostic payment links, signed webhook)                | ✅    | ✅       | ✅    | ✅        | [F3.7-online-payments.md](features/F3.7-online-payments.md)               |
+| 3.8 | Library and resources (catalogue, loans, due dates, fines)                                    | ✅    | ✅       | ✅    | ✅        | [F3.8-library.md](features/F3.8-library.md)                               |
+| 3.9 | Phase 3 journey, volume test and demo script                                                  | ✅    | ✅       | ✅    | ✅        | [F3.9-phase3-journey.md](features/F3.9-phase3-journey.md)                 |

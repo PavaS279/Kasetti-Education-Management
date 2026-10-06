@@ -290,3 +290,50 @@ Latest live run: tag `P2A` on 2026-10-05 — **all checks passed** (guardian "Gu
 1. Home → **Operations** → **Run now** on _KEM Payment Reminders_: a `ReminderJob` batch appears under background runs (Completed) with a log entry "Payment reminders for …: n messages", followed by a delivery job.
 2. **Run now** on _KEM Recurring Billing_: the batch runs in small batches of 5 enrolments; the log line reports invoices raised, failures and any enrolments left for an automatic follow-up run.
 3. Setup → Custom Metadata Types → Education Setting: `Recurring_Billing_Batch_Size` (5) and `Dispatch_Rounds` (20) tune throughput without code changes.
+
+### G3. Automated run (about 4 minutes, 26 checks)
+
+```bash
+scripts/demo/phase3-journey.sh P3C     # any new tag
+```
+
+Opens "[KEM Demo] Centre ‹tag›" from the demo branch and checks: classes and rooms copied; LMS outbox, API classes, roster, grades (created, then updated), events acknowledged; invoice with the centre's prefix in a balanced journal (Apex and ERP API) and the ERP event; payments refused and webhook 503 while Off; retention scoring and desk; library issue and return; analytics; branch comparison; nine scheduled jobs and administrators in their group. Last run: P3B, 26 of 26.
+
+### G4. Integrations (5 minutes, with any REST client as the integration user)
+
+1. `GET /services/apexrest/kem/v1/lms/classes?branch=DEMO-01` → the demo classes with course code, branch code and teacher email.
+2. `GET …/lms/classes/{id}/roster` → learners with emails.
+3. `POST …/lms/grades` with an `externalId` → 201 Draft; send again with `"publish": true` → 200 Published; once more → 400 "published; its results are locked".
+4. `GET …/lms/events?limit=10` → paged events; `POST …/lms/events/ack` → acknowledged.
+5. `GET …/erp/journal?from=2026-10-01&to=2026-10-31&format=csv` → balanced CSV; Finance Desk → **ERP export** → Preview / Export CSV / Download.
+6. As a teacher (no KEM Integration permission) any call → 403.
+
+### G5. Analytics and retention (5 minutes)
+
+1. Home → **Analytics**: tiles, invoiced vs collected, enrolment flow, attendance line (hover a month), retention by enrolment month, receivables ageing, courses; switch branch and period; **Show as table**.
+2. Home → **Retention**: risk counts; **At risk** with reasons → **Log follow-up** (Contacted needs a note; Retained does not); **Re-enrolment** → select learners whose class ends soon → **Send invitations** (portal message to the fee payer). Administrators: **Recalculate**.
+
+### G6. Online payments (3 minutes; needs Test mode)
+
+1. Set Education Setting `Payment_Gateway_Mode` = `Test` (Setup → Custom Metadata Types).
+2. Portal (Rohit) → Fees → **Pay online** on an open invoice → "Test mode: payment request PL-… was created. No money is taken."
+3. Staff: invoice page → **Online payment** → the link (Portal, Active) → **Simulate payment** → payment recorded, invoice Paid, receipt and notice as usual.
+4. Set the mode back to `Off`.
+
+### G7. Library (3 minutes)
+
+Branch **[KEM Demo] Bengaluru Central** → **Library**: counts; **Catalogue** → search "kalam" → **Issue** the robotics kit to a learner found by name (the last copy cannot be lent twice); **On loan** → **Renew** / **Return** / **Return damaged** / **Lost** (replacement cost); **Fines** → **Paid** / **Waive**. Portal → **Library** tab shows the learner's loans and late fees.
+
+### Phase 3 negative tests
+
+| #   | Try                                                            | Expected                                                                        |
+| --- | -------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| 1   | Open a branch with an existing code or invoice prefix          | "Branch code … is already used by …"                                            |
+| 2   | Post grades for a learner not in the class                     | 400 "Not enrolled in this class: …" and nothing saved                           |
+| 3   | Call the LMS or ERP API without the KEM Integration permission | 403                                                                             |
+| 4   | Export more than 92 days                                       | "Export at most 92 days at a time."                                             |
+| 5   | Pay online while `Payment_Gateway_Mode` is Off                 | "Online payments are not available yet. Please pay at the branch."              |
+| 6   | Webhook with a wrong signature                                 | 401 "Invalid signature." (logged)                                               |
+| 7   | Issue a library item to a learner with an overdue loan         | "… has an overdue loan. Return it before borrowing again."                      |
+| 8   | Renew an overdue loan, or a third time                         | "Overdue items must be returned, not renewed." / "already been renewed 2 times" |
+| 9   | Log a "Contacted" follow-up without a note                     | "Add a note about the conversation."                                            |

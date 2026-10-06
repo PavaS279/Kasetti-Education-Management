@@ -103,12 +103,25 @@ The matrix is extended per feature in `scripts/tooling/specs.py` (`PERMISSION_SE
 
 ## Phase 3 permissions
 
-| Permission / access                              | Administrator | Branch Manager | Admissions  | Academic    | Teacher | Finance |
-| ------------------------------------------------ | ------------- | -------------- | ----------- | ----------- | ------- | ------- |
-| Branch comparison (`BranchController`)           | ✅            | ✅             | —           | —           | —       | —       |
-| Open a branch from a template (create on Branch) | ✅            | —              | —           | —           | —       | —       |
-| Classes (`CourseOffering`)                       | Modify All    | Create/Edit    | Read        | Create/Edit | Read    | Read    |
-| Enrolments (`CourseOfferingParticipant`)         | Modify All    | Create/Edit    | Create/Edit | Create/Edit | Read    | Read    |
+| Permission / access                              | Administrator            | Branch Manager | Admissions  | Academic       | Teacher | Finance      | Integration                                  |
+| ------------------------------------------------ | ------------------------ | -------------- | ----------- | -------------- | ------- | ------------ | -------------------------------------------- |
+| Branch comparison (`BranchController`)           | ✅                       | ✅             | —           | —              | —       | —            | —                                            |
+| Open a branch from a template (create on Branch) | ✅                       | —              | —           | —              | —       | —            | —                                            |
+| Classes (`CourseOffering`)                       | Edit all (group sharing) | Create/Edit    | Read        | Create/Edit    | Read    | Read         | Read                                         |
+| Enrolments (`CourseOfferingParticipant`)         | Edit all (group sharing) | Create/Edit    | Create/Edit | Create/Edit    | Read    | Read         | Read                                         |
+| Analytics (`AnalyticsController`)                | ✅                       | ✅             | —           | ✅             | —       | ✅           | —                                            |
+| Retention desk (`RetentionController`)           | ✅ (+ recalculate)       | ✅             | —           | ✅             | —       | —            | —                                            |
+| Library desk (`LibraryController`)               | ✅ lend, items           | ✅ lend, items | read        | ✅ lend, items | read    | fines (read) | —                                            |
+| ERP export (`FinanceExportController`, exports)  | ✅                       | —              | —           | —              | —       | ✅           | ✅ (API)                                     |
+| Payment links (`PaymentLinkController`)          | ✅                       | ✅ (view)      | ✅ (view)   | —              | —       | ✅           | —                                            |
+| Integration events                               | Modify All               | —              | —           | —              | —       | View All     | View All                                     |
+| LMS / ERP / payment webhook APIs                 | —                        | —              | —           | —              | —       | —            | ✅ (`KEM Integration`, `KEM Manage Billing`) |
+
+**Administrator edit access to classes and enrolments:** the Education Cloud licence silently drops View All and Modify All on `CourseOffering` and `CourseOfferingParticipant` (the permission set says Modify All; the org stores neither). Edit access is therefore granted by **sharing**: owner-based sharing rules give the public group **KEM Administrators** Edit on every class and enrolment owned by internal users. The group's members are the users holding the KEM Administrator permission set; `AdminGroupService` keeps it in step — run after every deployment (`scripts/deploy.sh`) and from the operations console (**Sync administrators**, shown when an administrator is missing; needs user-management rights).
+
+**KEM Integration persona** (permission set group `KEM_Integration_Persona`): an API-only user for the LMS, the ERP and the payment middleware. Reads classes, enrolments and learners (View All on accounts and contacts), finance documents (View All), creates assessments and results and finance exports, reads integration events (acknowledged through the API), and holds the KEM Integration and KEM Manage Billing custom permissions (the webhook records gateway payments).
+
+**Secrets:** the payment webhook secret is stored in the custom setting `KEM_Gateway__c` (Public: production orgs cannot create Protected custom settings). No permission set grants access to custom settings; only administrators with View All Custom Settings can read it. It is entered in Setup only.
 
 `BranchTemplateService` runs entirely as the user (user-mode queries and inserts), so cloning needs create access on every copied object; comparison figures only include records the user can see.
 

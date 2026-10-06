@@ -1,17 +1,17 @@
 # Kasetti Education Management — Salesforce Education Cloud
 
-Education management on Salesforce Education Cloud for Kasetti Technologies: enquiries, admissions, enrolment, scheduling, attendance, assessment, billing, documents, portal (Phase 1), and waitlists, transfers, recurring billing, instalments, credit and refunds, messaging, teacher cover, grading and report cards, a richer portal and an operations console (Phase 2).
+Education management on Salesforce Education Cloud for Kasetti Technologies: enquiries, admissions, enrolment, scheduling, attendance, assessment, billing, documents, portal (Phase 1), and waitlists, transfers, recurring billing, instalments, credit and refunds, messaging, teacher cover, grading and report cards, a richer portal and an operations console (Phase 2), and multi-branch templates, limit-aware batch processing, generic LMS and ERP APIs, advanced analytics, retention workflows, online payments in the portal and a library module (Phase 3).
 
 **Status (2026-10-05):** Phases 0, 1 and 2 complete — 139 Apex tests (94% coverage), 87 Jest tests, every feature checked live in the org.
 
-| Start here                                 |                                                 |
-| ------------------------------------------ | ----------------------------------------------- |
-| [docs/PROGRESS.md](docs/PROGRESS.md)       | What is built, deployed and tested              |
-| [docs/DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md) | Demo and acceptance tests (Phase 1 and Phase 2) |
-| [docs/NEXT-STEPS.md](docs/NEXT-STEPS.md)   | Hand-over: open actions, how to continue        |
-| [docs/README.md](docs/README.md)           | All documentation                               |
+| Start here                                 |                                          |
+| ------------------------------------------ | ---------------------------------------- |
+| [docs/PROGRESS.md](docs/PROGRESS.md)       | What is built, deployed and tested       |
+| [docs/DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md) | Demo and acceptance tests (Phases 1–3)   |
+| [docs/NEXT-STEPS.md](docs/NEXT-STEPS.md)   | Hand-over: open actions, how to continue |
+| [docs/README.md](docs/README.md)           | All documentation                        |
 
-Demo runners: `scripts/demo/full-journey.sh` (Phase 1) and `scripts/demo/phase2-journey.sh` (Phase 2). Deploy with `scripts/deploy.sh`.
+Demo runners: `scripts/demo/full-journey.sh` (Phase 1) and `scripts/demo/phase2-journey.sh` (Phase 2) and `scripts/demo/phase3-journey.sh` (Phase 3). Deploy with `scripts/deploy.sh`.
 
 ---
 

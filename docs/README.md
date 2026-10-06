@@ -1,6 +1,6 @@
 # Kasetti Education Management — Documentation
 
-> **Demo & test:** [DEMO-SCRIPT.md](DEMO-SCRIPT.md) — Phase 1 journey (`scripts/demo/full-journey.sh`) and Phase 2 operations (`scripts/demo/phase2-journey.sh`). Hand-over: [NEXT-STEPS.md](NEXT-STEPS.md).
+> **Demo & test:** [DEMO-SCRIPT.md](DEMO-SCRIPT.md) — Phase 1 journey (`scripts/demo/full-journey.sh`), Phase 2 operations (`scripts/demo/phase2-journey.sh`) and Phase 3 scale (`scripts/demo/phase3-journey.sh`). Hand-over: [NEXT-STEPS.md](NEXT-STEPS.md).
 
 Delivery documentation for the Salesforce Education Cloud implementation. Read in this order:
 
@@ -44,3 +44,12 @@ Target org: Kasetti Technologies Pvt Ltd (Enterprise Edition, Education Cloud), 
 | F2.7 Grading & report cards               | [features/F2.7-advanced-grading.md](features/F2.7-advanced-grading.md)                           |
 | F2.8 Richer portal                        | [features/F2.8-richer-portal.md](features/F2.8-richer-portal.md)                                 |
 | F2.9 Operations console & Phase 2 journey | [features/F2.9-operations-console.md](features/F2.9-operations-console.md)                       |
+| F3.1 Multi-branch templates               | [features/F3.1-multi-branch-templates.md](features/F3.1-multi-branch-templates.md)               |
+| F3.2 Scale and performance                | [features/F3.2-scale-and-performance.md](features/F3.2-scale-and-performance.md)                 |
+| F3.3 LMS integration API                  | [features/F3.3-lms-integration.md](features/F3.3-lms-integration.md)                             |
+| F3.4 ERP finance export                   | [features/F3.4-erp-export.md](features/F3.4-erp-export.md)                                       |
+| F3.5 Advanced analytics                   | [features/F3.5-advanced-analytics.md](features/F3.5-advanced-analytics.md)                       |
+| F3.6 Retention workflows                  | [features/F3.6-retention-workflows.md](features/F3.6-retention-workflows.md)                     |
+| F3.7 Online payments                      | [features/F3.7-online-payments.md](features/F3.7-online-payments.md)                             |
+| F3.8 Library and resources                | [features/F3.8-library.md](features/F3.8-library.md)                                             |
+| F3.9 Phase 3 journey                      | [features/F3.9-phase3-journey.md](features/F3.9-phase3-journey.md)                               |
