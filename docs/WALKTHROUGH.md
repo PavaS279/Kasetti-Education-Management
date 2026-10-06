@@ -14,13 +14,15 @@ Time needed: the full walkthrough is about 3 hours; a 45-minute highlights path 
 
 ---
 
+> **Operating data:** besides the `[KEM Demo]` records used below, the org now holds a realistic data set for three KT Edutech centres (64 families, 107 enrolments, July–October history). Every step below works the same on it; see [DATA-SEED.md](DATA-SEED.md) for the records to open.
+
 ## Part 1 — The story, the people and the addresses
 
 ### 1.1 The institution
 
 **Kasetti Technologies Pvt Ltd** runs after-school learning centres (maths, coding, art) in Bengaluru. Families enquire through the website, walk-ins and referrals; children are admitted, placed in weekly classes, attend, sit tests and exams, travel on the centre bus, and families pay monthly or termly fees. Head office needs every centre to work the same way, see the numbers, and use AI safely to save staff time.
 
-The solution runs on **Salesforce Education Cloud** in the production org _Kasetti Technologies Pvt Ltd_ (Enterprise Edition), inside the Lightning app **Kasetti Education**, plus a family portal.
+The solution runs on **Salesforce Education Cloud** in the production org _Kasetti Technologies Pvt Ltd_ (Enterprise Edition), inside the Lightning app **KTEdutech** (API name `Kasetti_Education`), plus a family portal.
 
 ### 1.2 The demo world (all records are tagged `[KEM Demo]`)
 
@@ -57,7 +59,7 @@ The solution runs on **Salesforce Education Cloud** in the production org _Kaset
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | Login (staff)        | `https://kasettitechnologiespvtltd.my.salesforce.com`                                                                                       |
 | Lightning base (`L`) | `https://kasettitechnologiespvtltd.lightning.force.com`                                                                                     |
-| The app              | App Launcher (9 dots) → **Kasetti Education** (or `L/lightning/app/c__Kasetti_Education`)                                                   |
+| The app              | App Launcher (9 dots) → **KTEdutech** (or `L/lightning/app/c__Kasetti_Education`)                                                           |
 | Family portal (`P`)  | Site **TrialOrgPortal** on `https://kasettitechnologiespvtltd.my.site.com` → page **My Learning** `P/s/my-learning` (log in at `P/s/login`) |
 | REST APIs            | `https://kasettitechnologiespvtltd.my.salesforce.com/services/apexrest/kem/v1/…`                                                            |
 
@@ -117,7 +119,7 @@ Status today: the solution, demo data, scheduled jobs and the Agentforce agent a
 
 ## Part 3 — Map of the application
 
-### 3.1 Tabs in the Kasetti Education app
+### 3.1 Tabs in the KTEdutech app
 
 | Tab                                | Address                                                                          | Who uses it                        | What it is                                                                                                                    |
 | ---------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |

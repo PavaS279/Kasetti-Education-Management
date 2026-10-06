@@ -116,7 +116,7 @@
   >Kasetti Education Management: enquiries, admissions, classes, attendance, assessments, and finance.</description>
     <formFactors>Small</formFactors>
     <formFactors>Large</formFactors>
-    <label>Kasetti Education</label>
+    <label>KTEdutech</label>
     <navType>Standard</navType>
     <tabs>standard-home</tabs>
     <tabs>KEM_Admissions</tabs>

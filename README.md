@@ -1,16 +1,17 @@
 # Kasetti Education Management — Salesforce Education Cloud
 
-Education management on Salesforce Education Cloud for Kasetti Technologies: enquiries, admissions, enrolment, scheduling, attendance, assessment, billing, documents, portal (Phase 1), and waitlists, transfers, recurring billing, instalments, credit and refunds, messaging, teacher cover, grading and report cards, a richer portal and an operations console (Phase 2), and multi-branch templates, limit-aware batch processing, generic LMS and ERP APIs, advanced analytics, retention workflows, online payments in the portal and a library module (Phase 3), and AI and expansion: Salesforce Einstein assistants with review and measurement, the Agentforce **KEM Staff Assistant**, document extraction, enrolment and cash forecasting, transport, exams and hall tickets, and alumni and referrals (Phase 4).
+**KTEdutech** — education management on Salesforce Education Cloud for Kasetti Technologies: enquiries, admissions, enrolment, scheduling, attendance, assessment, billing, documents, portal (Phase 1), and waitlists, transfers, recurring billing, instalments, credit and refunds, messaging, teacher cover, grading and report cards, a richer portal and an operations console (Phase 2), and multi-branch templates, limit-aware batch processing, generic LMS and ERP APIs, advanced analytics, retention workflows, online payments in the portal and a library module (Phase 3), and AI and expansion: Salesforce Einstein assistants with review and measurement, the Agentforce **KEM Staff Assistant**, document extraction, enrolment and cash forecasting, transport, exams and hall tickets, and alumni and referrals (Phase 4).
 
 **Status (2026-10-06):** Phases 0–4 complete — 245 Apex tests (93% coverage), 163 Jest tests, every feature checked live in the org. AI benefit: [docs/ai/MEASURED-BENEFIT.md](docs/ai/MEASURED-BENEFIT.md).
 
-| Start here                                 |                                                            |
-| ------------------------------------------ | ---------------------------------------------------------- |
-| [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) | Complete walkthrough by role (set-up, addresses, examples) |
-| [docs/PROGRESS.md](docs/PROGRESS.md)       | What is built, deployed and tested                         |
-| [docs/DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md) | Demo and acceptance tests (Phases 1–4)                     |
-| [docs/NEXT-STEPS.md](docs/NEXT-STEPS.md)   | Hand-over: open actions, how to continue                   |
-| [docs/README.md](docs/README.md)           | All documentation                                          |
+| Start here                                 |                                                             |
+| ------------------------------------------ | ----------------------------------------------------------- |
+| [docs/DATA-SEED.md](docs/DATA-SEED.md)     | Realistic operating data in the org and how to re-create it |
+| [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) | Complete walkthrough by role (set-up, addresses, examples)  |
+| [docs/PROGRESS.md](docs/PROGRESS.md)       | What is built, deployed and tested                          |
+| [docs/DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md) | Demo and acceptance tests (Phases 1–4)                      |
+| [docs/NEXT-STEPS.md](docs/NEXT-STEPS.md)   | Hand-over: open actions, how to continue                    |
+| [docs/README.md](docs/README.md)           | All documentation                                           |
 
 Demo runners: `scripts/demo/full-journey.sh` (Phase 1), `scripts/demo/phase2-journey.sh` (Phase 2), `scripts/demo/phase3-journey.sh` (Phase 3) and `scripts/demo/phase4-journey.sh` (Phase 4). Deploy with `scripts/deploy.sh`.
 

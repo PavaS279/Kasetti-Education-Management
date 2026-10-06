@@ -68,7 +68,7 @@ Last verified: 2026-10-03 (run D2 — IA-0000000034, BLR-000004, RCT-000004).
 
 **Before you start**
 
-- Log in as **Kasetti Tech** (administrator) → App Launcher → **Kasetti Education**.
+- Log in as **Kasetti Tech** (administrator) → App Launcher → **KTEdutech**.
 - Optional persona view: Setup → Users → _Login_ next to a staff user (needs _Administrators Can Log in as Any User_ in Login Access Policies). Personas: Adam Admissions (counsellor), Anjali Advisor (academic coordinator), Rahul Registrar (branch manager), Andrea Advancement (finance).
 - Demo data: branch **[KEM Demo] Bengaluru Central** (code `DEMO-01`), course **[KEM Demo] Mathematics Foundation** (Admission 2,000 + Term tuition 10,500 + Workbooks 1,500, 18% tax → **16,520**), discount code **SIBLING10**.
 - Use the class **[KEM Demo] Journey D2** (capacity 10, Mondays 16:00) — the original Saturday class is intentionally Full (3/3).
