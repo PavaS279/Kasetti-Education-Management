@@ -1,6 +1,7 @@
 import { LightningElement } from "lwc";
 import CURRENCY from "@salesforce/i18n/currency";
 import getHome from "@salesforce/apex/PortalController.getHome";
+import getReferral from "@salesforce/apex/PortalController.getReferral";
 import getLearner from "@salesforce/apex/PortalController.getLearner";
 import markMessageRead from "@salesforce/apex/PortalController.markMessageRead";
 import downloadDocument from "@salesforce/apex/PortalController.downloadDocument";
@@ -93,6 +94,7 @@ export default class KemPortalHome extends LightningElement {
   detailError;
   isLoadingDetail = false;
   showInbox = false;
+  referral;
   openMessageId;
   downloadingId;
   payingId;
@@ -106,12 +108,43 @@ export default class KemPortalHome extends LightningElement {
     try {
       this.home = await getHome();
       this.errorMessage = undefined;
+      this.loadReferral(false);
       if (this.home.learners.length) {
         await this.select(this.home.learners[0].learnerContactId);
       }
     } catch (error) {
       this.errorMessage = reduceErrors(error).join(" ");
     }
+  }
+
+  async loadReferral(create) {
+    try {
+      this.referral = await getReferral({ create });
+    } catch {
+      // The referral card is optional.
+    }
+  }
+
+  get hasReferralCode() {
+    return Boolean(this.referral?.code);
+  }
+  get referralSummary() {
+    const r = this.referral;
+    if (!r) {
+      return "";
+    }
+    const reward = r.rewardsOn
+      ? ` We say thank you with a credit of ${r.rewardAmount} on your fees when they join.`
+      : "";
+    return `Share your code with friends and family.${reward}`;
+  }
+  get referralStats() {
+    const r = this.referral;
+    return r && r.referred ? `${r.referred} referred · ${r.joined} joined` : "";
+  }
+
+  handleReferralCode() {
+    this.loadReferral(true);
   }
 
   async select(learnerContactId) {

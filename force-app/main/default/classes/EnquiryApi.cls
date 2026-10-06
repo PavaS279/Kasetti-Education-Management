@@ -35,6 +35,8 @@ global with sharing class EnquiryApi {
     public String message;
     public Date birthdate;
     public GuardianPayload guardian;
+    /** Optional referral code of the family or alumnus who referred the enquirer (F4.11). */
+    public String referralCode;
   }
 
   global class EnquiryResponse {
@@ -131,6 +133,9 @@ global with sharing class EnquiryApi {
         : payload.channel,
       Preferred_Delivery_Mode__c = payload.deliveryMode,
       Description = payload.message,
+      Referral_Code__c = payload.referralCode == null
+        ? null
+        : payload.referralCode.left(20),
       LeadSource = 'Web'
     );
     if (String.isNotBlank(payload.courseExternalId)) {

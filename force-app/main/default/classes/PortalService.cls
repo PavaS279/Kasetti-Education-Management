@@ -272,6 +272,58 @@ public without sharing class PortalService {
     return learnerFor(viewerContactId(), learnerContactId);
   }
 
+  /** The family's referral code and how their referrals went (F4.11). */
+  public class ReferralInfo {
+    @AuraEnabled
+    public String code;
+    @AuraEnabled
+    public Integer referred = 0;
+    @AuraEnabled
+    public Integer joined = 0;
+    @AuraEnabled
+    public Decimal rewardAmount;
+    @AuraEnabled
+    public Boolean rewardsOn = false;
+  }
+
+  public static ReferralInfo referral(Boolean create) {
+    return referralFor(viewerContactId(), create);
+  }
+
+  /** Referral details of the viewer; creates their code when asked. */
+  public static ReferralInfo referralFor(Id viewerId, Boolean create) {
+    Contact viewer = [
+      SELECT AccountId, Account.Referral_Code__c
+      FROM Contact
+      WHERE Id = :viewerId
+      WITH SYSTEM_MODE
+    ];
+    ReferralInfo info = new ReferralInfo();
+    info.code = create == true
+      ? ReferralService.codeForViewer(viewer.AccountId)
+      : viewer.Account.Referral_Code__c;
+    info.rewardsOn = ReferralService.rewardMode() != 'Off';
+    info.rewardAmount = info.rewardsOn ? ReferralService.rewardAmount() : null;
+    for (AggregateResult row : [
+      SELECT Status__c status, COUNT(Id) total
+      FROM Referral__c
+      WHERE Referrer__c = :viewer.AccountId
+      WITH SYSTEM_MODE
+      GROUP BY Status__c
+    ]) {
+      Integer total = (Integer) row.get('total');
+      info.referred += total;
+      String status = (String) row.get('status');
+      if (
+        status == ReferralService.ENROLLED ||
+        status == ReferralService.REWARDED
+      ) {
+        info.joined += total;
+      }
+    }
+    return info;
+  }
+
   /** Home as seen by the given contact (Apex only; the portal passes the signed-in contact). */
   public static Home homeFor(Id viewerId) {
     Contact viewer = [

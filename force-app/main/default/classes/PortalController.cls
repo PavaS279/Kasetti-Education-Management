@@ -44,4 +44,13 @@ public with sharing class PortalController {
       throw AppException.toAura(e);
     }
   }
+
+  @AuraEnabled
+  public static PortalService.ReferralInfo getReferral(Boolean create) {
+    try {
+      return PortalService.referral(create);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
 }

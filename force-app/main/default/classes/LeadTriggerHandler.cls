@@ -10,6 +10,7 @@ public with sharing class LeadTriggerHandler extends TriggerHandler {
     List<Lead> leads = (List<Lead>) newRecords;
     EnquiryAssignmentService.assign(leads);
     EnquiryDuplicateService.flagDuplicates(leads);
+    ReferralService.resolveCodes(leads);
     for (Lead enquiry : leads) {
       if (enquiry.Branch__c != null && enquiry.Next_Follow_Up__c == null) {
         enquiry.Next_Follow_Up__c = System.now().addHours(FIRST_CONTACT_HOURS);
@@ -39,6 +40,7 @@ public with sharing class LeadTriggerHandler extends TriggerHandler {
   }
 
   protected override void afterInsert(List<SObject> newRecords) {
+    ReferralService.recordReferrals((List<Lead>) newRecords);
     List<Task> tasks = new List<Task>();
     for (Lead enquiry : (List<Lead>) newRecords) {
       if (

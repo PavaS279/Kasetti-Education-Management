@@ -501,7 +501,7 @@ OBJECTS = [
             {"name": "Source_Invoice__c", "label": "Source Invoice", "type": "Lookup", "ref": "Student_Invoice__c", "relName": "Credit_Notes", "relLabel": "Credit Notes", "systemManaged": True},
             {"name": "Source_Payment__c", "label": "Source Payment", "type": "Lookup", "ref": "Student_Payment__c", "relName": "Credit_Notes", "relLabel": "Credit Notes", "systemManaged": True},
             {"name": "Branch__c", "label": "Branch", "type": "Lookup", "ref": "Branch__c", "relName": "Credit_Notes", "relLabel": "Credit Notes", "systemManaged": True},
-            {"name": "Origin__c", "label": "Origin", "type": "Picklist", "values": ["Overpayment", "Transfer", "Withdrawal", "Goodwill", "Other"], "systemManaged": True},
+            {"name": "Origin__c", "label": "Origin", "type": "Picklist", "values": ["Overpayment", "Transfer", "Withdrawal", "Goodwill", "Referral", "Other"], "systemManaged": True},
             {"name": "Reason__c", "label": "Reason", "type": "Text", "length": 255, "systemManaged": True},
             {"name": "Issue_Date__c", "label": "Issue Date", "type": "Date", "systemManaged": True},
             {"name": "Amount__c", "label": "Amount", "type": "Currency", "precision": 16, "scale": 2, "systemManaged": True, "track": True},

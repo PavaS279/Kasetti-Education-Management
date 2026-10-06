@@ -67,6 +67,30 @@
         </section>
       </template>
 
+      <template lwc:if={referral}>
+        <section
+          class="kem-card panel refer kem-fade-in"
+          aria-label="Refer a friend"
+        >
+          <div>
+            <div class="kem-section-title">Refer a friend</div>
+            <div class="small">{referralSummary}</div>
+            <template lwc:if={referralStats}>
+              <div class="kem-muted small">{referralStats}</div>
+            </template>
+          </div>
+          <template lwc:if={hasReferralCode}>
+            <span class="refer-code">{referral.code}</span>
+          </template>
+          <template lwc:else>
+            <lightning-button
+              label="Get my referral code"
+              onclick={handleReferralCode}
+            ></lightning-button>
+          </template>
+        </section>
+      </template>
+
       <template lwc:if={hasLearners}>
         <template lwc:if={card}>
           <div class="learner-head kem-fade-in">

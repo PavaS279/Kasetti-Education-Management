@@ -548,3 +548,20 @@
   border-radius: var(--kem-radius-sm);
   font-size: 0.8125rem;
 }
+
+.refer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.refer-code {
+  padding: 0.4rem 0.8rem;
+  border: 2px dashed var(--kem-navy, #1b3a6b);
+  border-radius: var(--kem-radius-sm);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}

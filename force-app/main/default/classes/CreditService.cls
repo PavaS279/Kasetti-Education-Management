@@ -831,6 +831,27 @@ public with sharing class CreditService {
     return used >= nvl(amount) ? 'Used' : used > 0 ? 'Partially Used' : 'Open';
   }
 
+  /** Referral reward (F4.11): credit for the referrer, used on their next invoice. */
+  public static Id issueReferralCredit(
+    Id payerContactId,
+    Id branchId,
+    Decimal amount,
+    String reason
+  ) {
+    if (payerContactId == null || amount == null || amount <= 0) {
+      throw new AppException('A referral credit needs a payer and an amount.');
+    }
+    return insertNote(
+      new Credit_Note__c(
+        Bill_To__c = payerContactId,
+        Branch__c = branchId,
+        Origin__c = 'Referral',
+        Reason__c = reason == null ? null : reason.left(255)
+      ),
+      amount
+    );
+  }
+
   private static Id insertNote(Credit_Note__c note, Decimal amount) {
     note.Amount__c = amount.setScale(2);
     note.Amount_Applied__c = 0;

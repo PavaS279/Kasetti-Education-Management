@@ -1,11 +1,17 @@
 import { createElement } from "lwc";
 import KemPortalHome from "c/kemPortalHome";
 import getHome from "@salesforce/apex/PortalController.getHome";
+import getReferral from "@salesforce/apex/PortalController.getReferral";
 import getLearner from "@salesforce/apex/PortalController.getLearner";
 import markMessageRead from "@salesforce/apex/PortalController.markMessageRead";
 import downloadDocument from "@salesforce/apex/PortalController.downloadDocument";
 import startPayment from "@salesforce/apex/PortalController.startPayment";
 
+jest.mock(
+  "@salesforce/apex/PortalController.getReferral",
+  () => ({ default: jest.fn(() => Promise.resolve(undefined)) }),
+  { virtual: true }
+);
 jest.mock(
   "@salesforce/apex/PortalController.getHome",
   () => ({ default: jest.fn() }),
@@ -419,5 +425,33 @@ describe("c-kem-portal-home", () => {
     expect(root.querySelectorAll(".transport")).toHaveLength(1);
     expect(root.textContent).toContain("Pick-up 07:20 · Drop 15:40");
     expect(root.textContent).toContain("Driver Ravi · +91 98");
+  });
+
+  it("offers a referral code and shows referrals", async () => {
+    getHome.mockResolvedValue(HOME);
+    getLearner.mockImplementation(({ learnerContactId }) =>
+      Promise.resolve(detail(learnerContactId, "Ananya Sharma"))
+    );
+    getReferral.mockImplementation(({ create }) =>
+      Promise.resolve({
+        code: create ? "SHA-7Q2X" : null,
+        referred: 2,
+        joined: 1,
+        rewardsOn: true,
+        rewardAmount: 500
+      })
+    );
+    const element = createElement("c-kem-portal-home", { is: KemPortalHome });
+    document.body.appendChild(element);
+    await flush();
+    await flush();
+    const root = element.shadowRoot;
+    expect(root.querySelector(".refer").textContent).toContain(
+      "2 referred · 1 joined"
+    );
+    root.querySelector(".refer lightning-button").click();
+    await flush();
+    expect(getReferral).toHaveBeenLastCalledWith({ create: true });
+    expect(root.querySelector(".refer-code").textContent).toBe("SHA-7Q2X");
   });
 });

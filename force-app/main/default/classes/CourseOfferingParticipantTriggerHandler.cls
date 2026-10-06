@@ -18,6 +18,7 @@ public with sharing class CourseOfferingParticipantTriggerHandler extends Trigge
   protected override void afterInsert(List<SObject> newRecords) {
     SeatService.recalculate(offeringIds(newRecords));
     IntegrationHooks.enrolments(newRecords, null);
+    ReferralService.onEnrolments((List<CourseOfferingParticipant>) newRecords);
   }
 
   protected override void afterUpdate(
@@ -40,6 +41,10 @@ public with sharing class CourseOfferingParticipantTriggerHandler extends Trigge
     }
     SeatService.recalculate(ids);
     IntegrationHooks.enrolments(newRecords, oldMap);
+    ReferralService.markAlumni(
+      (List<CourseOfferingParticipant>) newRecords,
+      oldMap
+    );
     // A freed seat goes to the next learner on the waitlist.
     WaitlistService.offerNext(ids);
   }
