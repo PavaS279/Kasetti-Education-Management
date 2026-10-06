@@ -22,7 +22,8 @@ const DOC_ICON = {
   Invoice: "doctype:pdf",
   Receipt: "doctype:pdf",
   "Report Card": "doctype:pdf",
-  "Offer Letter": "doctype:pdf"
+  "Offer Letter": "doctype:pdf",
+  "Hall Ticket": "doctype:pdf"
 };
 
 const ATTENDANCE_CLASS = {

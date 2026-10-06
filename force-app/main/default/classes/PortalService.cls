@@ -651,7 +651,7 @@ public without sharing class PortalService {
     return detail;
   }
 
-  /** Current KEM documents (not superseded) of the learners' invoices, receipts and enrolments. */
+  /** Current KEM documents (not superseded) belonging to the learners. */
   private static List<DocumentItem> documentsFor(Set<Id> learnerIds) {
     List<DocumentItem> result = new List<DocumentItem>();
     reportCardOf = new Map<Id, Id>();
@@ -681,6 +681,16 @@ public without sharing class PortalService {
       WITH SYSTEM_MODE
     ]) {
       recordIds.add(e.Id);
+    }
+    // Offer letters are filed on the learner's admissions application.
+    for (IndividualApplication application : [
+      SELECT Id
+      FROM IndividualApplication
+      WHERE ContactId IN :learnerIds
+      WITH SYSTEM_MODE
+      LIMIT 100
+    ]) {
+      recordIds.add(application.Id);
     }
     // Hall tickets (F4.10) are filed on the exam candidate.
     for (Exam_Candidate__c c : [

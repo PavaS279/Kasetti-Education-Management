@@ -2455,6 +2455,10 @@
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
+        <tab>KEM_Finance_Desk</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <tabSettings>
         <tab>KEM_Timetable</tab>
         <visibility>Visible</visibility>
     </tabSettings>

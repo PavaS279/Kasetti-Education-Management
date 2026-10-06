@@ -4,7 +4,7 @@
     <isExposed>true</isExposed>
     <masterLabel>KEM Learner &amp; Guardian Home</masterLabel>
     <description
-  >Portal home for learners and guardians: timetable, results, attendance, and fees.</description>
+  >Portal home for learners and guardians: timetable, results, attendance, fees, messages, documents, library, transport, and referrals.</description>
     <targets>
         <target>lightningCommunity__Page</target>
         <target>lightningCommunity__Default</target>

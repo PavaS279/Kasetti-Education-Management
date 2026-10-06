@@ -6,6 +6,7 @@ private class PortalServiceTest {
     Id hiddenSiblingContactId;
     Id strangerContactId;
     Id invoiceId;
+    Id applicationId;
   }
 
   /**
@@ -68,6 +69,17 @@ private class PortalServiceTest {
     fam.learnerContactId = byId.get(people[1].Id).PersonContactId;
     fam.hiddenSiblingContactId = byId.get(people[2].Id).PersonContactId;
     fam.strangerContactId = byId.get(people[3].Id).PersonContactId;
+
+    IndividualApplication application = new IndividualApplication(
+      Category = 'Education',
+      AccountId = people[1].Id,
+      ContactId = fam.learnerContactId,
+      Status = 'Processing',
+      Branch__c = branch.Id,
+      Learning_Course__c = course.Id
+    );
+    insert application;
+    fam.applicationId = application.Id;
 
     GuardianRelationshipService.GuardianLink visible = new GuardianRelationshipService.GuardianLink();
     visible.guardianContactId = fam.guardianContactId;
@@ -268,6 +280,15 @@ private class PortalServiceTest {
         AccessLevel.SYSTEM_MODE
       );
       DocumentService.generate(fam.invoiceId, DocumentService.INVOICE);
+      Database.update(
+        new IndividualApplication(
+          Id = fam.applicationId,
+          Offer_Status__c = 'Offered',
+          Offer_Expiry_Date__c = Date.today().addDays(14)
+        ),
+        AccessLevel.SYSTEM_MODE
+      );
+      DocumentService.generate(fam.applicationId, DocumentService.OFFER_LETTER);
 
       PortalService.viewerOverride = fam.guardianContactId;
       PortalService.Home home = PortalService.home();
@@ -294,18 +315,28 @@ private class PortalServiceTest {
       Assert.areEqual(1, detail.grades.size(), 'Course grade');
       Assert.areEqual('A+', detail.grades[0].grade, '90% course grade');
       Assert.areEqual('Provisional', detail.grades[0].status, 'Provisional');
-      Assert.areEqual(1, detail.documents.size(), 'Invoice PDF listed');
-      Assert.areEqual('Invoice', detail.documents[0].kind, 'Invoice');
+      Assert.areEqual(2, detail.documents.size(), 'Family PDFs listed');
+      Map<String, PortalService.DocumentItem> documentsByKind = new Map<String, PortalService.DocumentItem>();
+      for (PortalService.DocumentItem document : detail.documents) {
+        documentsByKind.put(document.kind, document);
+      }
+      Assert.isTrue(documentsByKind.containsKey('Invoice'), 'Invoice listed');
+      Assert.isTrue(
+        documentsByKind.containsKey('Offer Letter'),
+        'Offer letter listed'
+      );
 
       PortalService.DocumentFile file = PortalController.downloadDocument(
-        detail.documents[0].versionId
+        documentsByKind.get('Offer Letter').versionId
       );
       Assert.isTrue(file.fileName.endsWith('.pdf'), file.fileName);
       Assert.isTrue(String.isNotBlank(file.base64), 'File content');
 
       PortalService.viewerOverride = fam.strangerContactId;
       try {
-        PortalService.downloadDocument(detail.documents[0].versionId);
+        PortalService.downloadDocument(
+          documentsByKind.get('Offer Letter').versionId
+        );
         Assert.fail('Strangers cannot download');
       } catch (AppException e) {
         Assert.isTrue(e.getMessage().contains('not available'), e.getMessage());
