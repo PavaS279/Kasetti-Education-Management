@@ -277,7 +277,11 @@
                   value="{!IF(ISBLANK(p.Duration_Minutes__c), '', TEXT(p.Duration_Minutes__c) + ' min')}"
                 />
               </td>
-              <td>{!p.Max_Marks__c}</td>
+              <td>
+                <apex:outputText value="{0,number,0.##}">
+                  <apex:param value="{!p.Max_Marks__c}" />
+                </apex:outputText>
+              </td>
             </tr>
           </apex:repeat>
         </table>

@@ -2,7 +2,7 @@
 
 Education management on Salesforce Education Cloud for Kasetti Technologies: enquiries, admissions, enrolment, scheduling, attendance, assessment, billing, documents, portal (Phase 1), and waitlists, transfers, recurring billing, instalments, credit and refunds, messaging, teacher cover, grading and report cards, a richer portal and an operations console (Phase 2), and multi-branch templates, limit-aware batch processing, generic LMS and ERP APIs, advanced analytics, retention workflows, online payments in the portal and a library module (Phase 3), and AI and expansion: Salesforce Einstein assistants with review and measurement, the Agentforce **KEM Staff Assistant**, document extraction, enrolment and cash forecasting, transport, exams and hall tickets, and alumni and referrals (Phase 4).
 
-**Status (2026-10-06):** Phases 0–4 complete — APEX_FIGURES, 163 Jest tests, every feature checked live in the org. AI benefit: [docs/ai/MEASURED-BENEFIT.md](docs/ai/MEASURED-BENEFIT.md).
+**Status (2026-10-06):** Phases 0–4 complete — 245 Apex tests (93% coverage), 163 Jest tests, every feature checked live in the org. AI benefit: [docs/ai/MEASURED-BENEFIT.md](docs/ai/MEASURED-BENEFIT.md).
 
 | Start here                                 |                                          |
 | ------------------------------------------ | ---------------------------------------- |

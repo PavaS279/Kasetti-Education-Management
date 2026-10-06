@@ -349,7 +349,7 @@ Signed in as an administrator with the **KEM AI User** permission set (Kasetti T
 scripts/demo/phase4-journey.sh P4A
 ```
 
-A referred enquiry → Einstein reply reviewed and edited → policy answer with source → conversion and enrolment → referral reward credit → transport from next month → exam and hall ticket → forecast, Agentforce actions, evaluation (every case passes) → AI console. Every run creates its own tagged records at the demo branch.
+A referred enquiry → Einstein reply reviewed and edited → policy answer with source → conversion and enrolment → referral reward credit → transport from next month → exam and hall ticket → forecast, Agentforce actions, evaluation (every case passes) → AI console. Every run creates its own tagged records at the demo branch. Last run (2026-10-06, P4A): **31 of 31 checks passed**, evaluation 11 of 11.
 
 ### H2. Einstein assistants (10 minutes)
 

@@ -4,7 +4,7 @@ _Last updated: 2026-10-06 after F4.12 (Phase 4 complete)._
 
 ## Where we are
 
-Phases 0–4 are **complete**: features 1.1 – 1.13, 2.1 – 2.9, 3.1 – 3.9 and 4.1 – 4.12 are built, deployed to the org, unit-tested (APEX_FIGURES; 163 Jest tests) and checked end to end.
+Phases 0–4 are **complete**: features 1.1 – 1.13, 2.1 – 2.9, 3.1 – 3.9 and 4.1 – 4.12 are built, deployed to the org, unit-tested (245 Apex tests (93% coverage); 163 Jest tests) and checked end to end.
 
 - Phase 1: a full learner journey with financial reconciliation (`FullJourneyTest`, `scripts/demo/full-journey.sh`).
 - Phase 2: exceptions and recurring operations work reliably (`Phase2JourneyTest`, `scripts/demo/phase2-journey.sh`, 31 checks).

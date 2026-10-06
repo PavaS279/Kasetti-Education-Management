@@ -14,7 +14,7 @@
         <field>Body__c</field>
         <value xsi:type="xsd:string">Dear {{RecipientFirstName}},
 
-A message about {{RouteName}}, which {{LearnerName}} travels on:
+A message about {{RouteName}} (riders: {{LearnerName}}):
 
 {{Message}}
 
