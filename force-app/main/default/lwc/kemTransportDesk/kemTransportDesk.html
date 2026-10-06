@@ -9,7 +9,77 @@
           ></lightning-icon
           ><span class="kem-section-title">Transport</span></span
         >
+        <template lwc:if={canSetUp}>
+          <lightning-button
+            label="New route"
+            icon-name="utility:add"
+            onclick={toggleNewRoute}
+          ></lightning-button>
+        </template>
       </div>
+      <template lwc:if={showNewRoute}>
+        <lightning-record-edit-form
+          object-api-name="Transport_Route__c"
+          onsuccess={handleRouteCreated}
+          class="setup"
+        >
+          <lightning-messages></lightning-messages>
+          <div class="form">
+            <template lwc:if={recordId}>
+              <lightning-input-field
+                field-name="Branch__c"
+                value={recordId}
+                class="hidden-field"
+              ></lightning-input-field>
+            </template>
+            <template lwc:else>
+              <lightning-input-field
+                field-name="Branch__c"
+                required
+              ></lightning-input-field>
+            </template>
+            <lightning-input-field
+              field-name="Name"
+              required
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="Route_Code__c"
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="Capacity__c"
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="Monthly_Fee__c"
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="Vehicle_Number__c"
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="Driver_Name__c"
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="Driver_Phone__c"
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="Morning_Start__c"
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="Afternoon_Start__c"
+            ></lightning-input-field>
+            <div class="form-actions">
+              <lightning-button
+                label="Cancel"
+                onclick={toggleNewRoute}
+              ></lightning-button>
+              <lightning-button
+                variant="brand"
+                type="submit"
+                label="Create route"
+              ></lightning-button>
+            </div>
+          </div>
+        </lightning-record-edit-form>
+      </template>
       <template lwc:if={errorMessage}>
         <div
           class="slds-notify slds-notify_alert slds-alert_error"
@@ -58,6 +128,13 @@
                     </div>
                   </div>
                   <div class="actions">
+                    <template lwc:if={canSetUp}>
+                      <lightning-button
+                        label="Add stop"
+                        icon-name="utility:location"
+                        onclick={toggleNewStop}
+                      ></lightning-button>
+                    </template>
                     <template lwc:if={canManage}>
                       <lightning-button
                         label="Add learner"
@@ -78,6 +155,50 @@
                     ></lightning-button-icon>
                   </div>
                 </div>
+
+                <template lwc:if={showNewStop}>
+                  <lightning-record-edit-form
+                    object-api-name="Transport_Stop__c"
+                    onsuccess={handleStopCreated}
+                  >
+                    <lightning-messages></lightning-messages>
+                    <div class="form">
+                      <lightning-input-field
+                        field-name="Route__c"
+                        value={selectedRouteId}
+                        class="hidden-field"
+                      ></lightning-input-field>
+                      <lightning-input-field
+                        field-name="Name"
+                        required
+                      ></lightning-input-field>
+                      <lightning-input-field
+                        field-name="Sequence__c"
+                        value={nextSequence}
+                      ></lightning-input-field>
+                      <lightning-input-field
+                        field-name="Pickup_Time__c"
+                      ></lightning-input-field>
+                      <lightning-input-field
+                        field-name="Drop_Time__c"
+                      ></lightning-input-field>
+                      <lightning-input-field
+                        field-name="Landmark__c"
+                      ></lightning-input-field>
+                      <div class="form-actions">
+                        <lightning-button
+                          label="Cancel"
+                          onclick={toggleNewStop}
+                        ></lightning-button>
+                        <lightning-button
+                          variant="brand"
+                          type="submit"
+                          label="Add stop"
+                        ></lightning-button>
+                      </div>
+                    </div>
+                  </lightning-record-edit-form>
+                </template>
 
                 <template lwc:if={showAssign}>
                   <div class="form">
@@ -218,7 +339,7 @@
         </template>
         <template lwc:else>
           <p class="small muted">
-            No routes yet. Create a Transport Route with its stops to start.
+            No routes yet. Use New route, then add its stops.
           </p>
         </template>
       </template>

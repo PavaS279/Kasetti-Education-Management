@@ -1,4 +1,4 @@
-import { LightningElement, api } from "lwc";
+import { LightningElement, api, wire } from "lwc";
 import LightningConfirm from "lightning/confirm";
 import CURRENCY from "@salesforce/i18n/currency";
 import LOCALE from "@salesforce/i18n/locale";
@@ -9,6 +9,7 @@ import assign from "@salesforce/apex/TransportController.assign";
 import changeStop from "@salesforce/apex/TransportController.changeStop";
 import endAssignment from "@salesforce/apex/TransportController.endAssignment";
 import notifyRoute from "@salesforce/apex/TransportController.notifyRoute";
+import canManageRoutes from "@salesforce/apex/TransportController.canManageRoutes";
 import { reduceErrors, toast, toastError } from "c/kemUtils";
 
 const DIRECTIONS = [
@@ -47,6 +48,16 @@ export default class KemTransportDesk extends LightningElement {
   // Notice form
   showNotice = false;
   notice = "";
+
+  // Set-up forms (routes and stops have no tab of their own)
+  canSetUp = false;
+  showNewRoute = false;
+  showNewStop = false;
+
+  @wire(canManageRoutes)
+  wiredSetUp({ data }) {
+    this.canSetUp = data === true;
+  }
 
   connectedCallback() {
     this.loadRoutes();
@@ -159,6 +170,36 @@ export default class KemTransportDesk extends LightningElement {
   }
   get noticeDisabled() {
     return this.isBusy || this.notice.trim().length < 5;
+  }
+
+  get nextSequence() {
+    return (this.detail?.stops || []).length + 1;
+  }
+
+  // ---------------------------------------------------------------- set-up
+
+  toggleNewRoute() {
+    this.showNewRoute = !this.showNewRoute;
+  }
+
+  toggleNewStop() {
+    this.showNewStop = !this.showNewStop;
+  }
+
+  async handleRouteCreated(event) {
+    this.showNewRoute = false;
+    toast(this, "Route created", "Add its stops next.", "success");
+    this.selectedRouteId = event.detail.id;
+    await this.loadRoutes();
+    await this.selectRoute(event.detail.id);
+    this.showNewStop = true;
+  }
+
+  async handleStopCreated() {
+    this.showNewStop = false;
+    toast(this, "Stop added", "", "success");
+    await this.loadRoutes();
+    await this.selectRoute(this.selectedRouteId);
   }
 
   // ---------------------------------------------------------------- events

@@ -35,6 +35,12 @@
                 <identifier>c_kemRetentionDesk</identifier>
             </componentInstance>
         </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemReferrals</componentName>
+                <identifier>c_kemReferrals</identifier>
+            </componentInstance>
+        </itemInstances>
         <name>bottomLeft</name>
         <type>Region</type>
     </flexiPageRegions>

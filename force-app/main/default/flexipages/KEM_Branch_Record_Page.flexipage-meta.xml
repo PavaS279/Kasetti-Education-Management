@@ -43,6 +43,24 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
+                <componentName>kemTransportDesk</componentName>
+                <identifier>c_kemTransportDesk</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemExamDesk</componentName>
+                <identifier>c_kemExamDesk</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemReferrals</componentName>
+                <identifier>c_kemReferrals</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>force:detailPanel</componentName>
                 <identifier>force_detailPanel</identifier>
             </componentInstance>

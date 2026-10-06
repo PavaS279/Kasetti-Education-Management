@@ -92,4 +92,11 @@ public with sharing class ExamController {
       throw AppException.toAura(e);
     }
   }
+
+  /** Whether the user can create exams and papers (shows the set-up forms). */
+  @AuraEnabled(cacheable=true)
+  public static Boolean canSetUpExams() {
+    return Schema.SObjectType.Exam__c.isCreateable() &&
+      Schema.SObjectType.Exam_Paper__c.isCreateable();
+  }
 }

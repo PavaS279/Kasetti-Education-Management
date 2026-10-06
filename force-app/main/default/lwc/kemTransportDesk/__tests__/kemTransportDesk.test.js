@@ -8,7 +8,16 @@ import changeStop from "@salesforce/apex/TransportController.changeStop";
 import endAssignment from "@salesforce/apex/TransportController.endAssignment";
 import notifyRoute from "@salesforce/apex/TransportController.notifyRoute";
 import LightningConfirm from "lightning/confirm";
+import canManageRoutes from "@salesforce/apex/TransportController.canManageRoutes";
 
+jest.mock(
+  "@salesforce/apex/TransportController.canManageRoutes",
+  () => {
+    const { createApexTestWireAdapter } = require("@salesforce/sfdx-lwc-jest");
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
 jest.mock(
   "@salesforce/apex/TransportController.getRoutes",
   () => ({ default: jest.fn() }),
@@ -114,6 +123,18 @@ async function mount() {
   document.body.appendChild(el);
   await flush();
   return el;
+}
+
+function form(el, objectApiName) {
+  return [...el.shadowRoot.querySelectorAll("lightning-record-edit-form")].find(
+    (f) => f.objectApiName === objectApiName
+  );
+}
+
+function field(container, name) {
+  return [...container.querySelectorAll("lightning-input-field")].find(
+    (f) => f.fieldName === name
+  );
 }
 
 function button(el, label) {
@@ -232,5 +253,31 @@ describe("c-kem-transport-desk", () => {
     });
     const el = await mount();
     expect(el.shadowRoot.querySelector("article")).toBeNull();
+  });
+
+  it("creates a route and a stop with record forms", async () => {
+    const el = await mount();
+    expect(button(el, "New route")).toBeUndefined();
+    canManageRoutes.emit(true);
+    await flush();
+    button(el, "New route").click();
+    await flush();
+    const routeForm = form(el, "Transport_Route__c");
+    expect(routeForm).toBeDefined();
+    const branch = field(routeForm, "Branch__c");
+    expect(branch.value).toBe("b1");
+    routeForm.dispatchEvent(
+      new CustomEvent("success", { detail: { id: "r2" } })
+    );
+    await flush();
+    expect(getRoute).toHaveBeenLastCalledWith({ routeId: "r2" });
+    const stopForm = form(el, "Transport_Stop__c");
+    expect(stopForm).toBeDefined();
+    expect(field(stopForm, "Sequence__c").value).toBe(3);
+    stopForm.dispatchEvent(
+      new CustomEvent("success", { detail: { id: "s9" } })
+    );
+    await flush();
+    expect(form(el, "Transport_Stop__c")).toBeUndefined();
   });
 });

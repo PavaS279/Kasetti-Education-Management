@@ -337,3 +337,58 @@ Branch **[KEM Demo] Bengaluru Central** → **Library**: counts; **Catalogue** �
 | 7   | Issue a library item to a learner with an overdue loan         | "… has an overdue loan. Return it before borrowing again."                      |
 | 8   | Renew an overdue loan, or a third time                         | "Overdue items must be returned, not renewed." / "already been renewed 2 times" |
 | 9   | Log a "Contacted" follow-up without a note                     | "Add a note about the conversation."                                            |
+
+## Part H — Phase 4: AI and expansion
+
+Signed in as an administrator with the **KEM AI User** permission set (Kasetti Tech has it). Einstein answers in 1–6 seconds.
+
+### H1. Automated run (about 4 minutes)
+
+```bash
+./scripts/ci/sf-login.sh
+scripts/demo/phase4-journey.sh P4A
+```
+
+A referred enquiry → Einstein reply reviewed and edited → policy answer with source → conversion and enrolment → referral reward credit → transport from next month → exam and hall ticket → forecast, Agentforce actions, evaluation (every case passes) → AI console. Every run creates its own tagged records at the demo branch.
+
+### H2. Einstein assistants (10 minutes)
+
+1. Enquiry page → **Reply with Einstein**: add a note ("offer a trial on Saturday") → **Draft reply** → edit a sentence → **Copy and record as sent** (logged as a completed task; the console shows it as Edited). **Discard** records a rejection.
+2. Same page → **Einstein summary** → **Summarise** → 👍.
+3. Learner page (Ananya) → **Progress update for the family** → **Draft progress update** → edit → **Send to family** (portal message).
+4. Class page (Maths Saturday) → **Report-card comments** → **Draft with Einstein** for a learner → **Save comment**.
+5. Branch page → **Einstein summary** = the branch's daily brief.
+6. Home → **Ask about our policies**: "How many days do families have to pay an invoice?" (sources shown) and "What is the hostel curfew?" (not in the policies: says so).
+7. Application page → **AI document reader** → **Paste text** with a transfer certificate → proposals next to the record (blanks ticked, conflicts not, another parent's details locked) → correct one value → **Apply**.
+
+### H3. Agentforce (5 minutes)
+
+Agentforce panel → **KEM Staff Assistant**: "How is Ananya Sharma doing?", "Draft a reply to Demo Learner D2 offering a trial", "How is branch demo-01 doing?", "Which learners are at high risk of leaving?", "How many enrolments should we expect next quarter, and will we have enough seats?", "Can I approve a refund I requested myself?".
+
+### H4. Measured benefit (3 minutes)
+
+Home → **AI assistants** (console): requests, staff using AI, Agentforce actions, share used (as is or edited), minutes saved, response time, failures; per feature; latest evaluation → **Run evaluation**. Switches: Education Setting `AI_Enabled` / `AI_Disabled_Features` (panels disappear when off).
+
+### H5. Forecasts (3 minutes)
+
+Home → **Forecasts**: tiles, the enrolment chart with forecast bars and ranges, accuracy (or "not enough history" and the pipeline basis), pipeline, seats by course, invoicing and expected cash; switch branch and 3/6 months; **Explain with Einstein**.
+
+### H6. Transport, exams, referrals (10 minutes)
+
+1. Branch page → **Transport** → **New route** → **Add stop** ×2 → **Add learner** (fee from next month) → manifest → **Print** → **Message families**. Portal → **Transport** tab.
+2. Branch page → **Exams** → **New exam** → **Add paper** → **1. Register** → **2. Check eligibility** (withheld reasons) → **Allow** one with a reason → **3. Allocate seats** → **4. Issue hall tickets** → portal documents show the hall ticket PDF → **Enter marks** → **Save** → **Publish to gradebook** (the class gradebook shows an Exam assessment).
+3. Home → **Referrals and alumni**: referred enquiries, **Grant reward** (credit note), top referrers, alumni → **Invite selected**. Portal → **Refer a friend** → **Get my referral code**.
+
+### Phase 4 negative tests
+
+| #   | Try                                                         | Expected                                                                                            |
+| --- | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| 1   | A user without KEM AI User opens an enquiry                 | No AI panels; Agentforce actions answer "You do not have access to the AI assistants (KEM AI User)" |
+| 2   | Set `AI_Enabled` = Off                                      | All AI panels hidden; calls refused                                                                 |
+| 3   | Ask a policy question the knowledge base does not cover     | "I could not find this in the institution's policies…", not confident                               |
+| 4   | Document reader on a scanned image                          | "Only PDF and text files can be read (scanned images need OCR)."                                    |
+| 5   | Apply a date of birth in the future                         | "Date of birth … is not plausible."                                                                 |
+| 6   | Assign a learner to a full route, or twice                  | "Route … is full" / "… already rides …"                                                             |
+| 7   | Allocate seats in rooms that are too small                  | "The chosen rooms seat … but … candidates are eligible. Add a room."                                |
+| 8   | Allow a withheld candidate without KEM Eligibility Override | "Only staff with KEM Eligibility Override can allow a withheld candidate."                          |
+| 9   | Grant the same referral reward twice                        | "This referral has already been rewarded."                                                          |

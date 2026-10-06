@@ -69,4 +69,11 @@ public with sharing class TransportController {
       throw AppException.toAura(e);
     }
   }
+
+  /** Whether the user can create routes and stops (shows the set-up forms). */
+  @AuraEnabled(cacheable=true)
+  public static Boolean canManageRoutes() {
+    return Schema.SObjectType.Transport_Route__c.isCreateable() &&
+      Schema.SObjectType.Transport_Stop__c.isCreateable();
+  }
 }

@@ -145,3 +145,17 @@ The matrix is extended per feature in `scripts/tooling/specs.py` (`PERMISSION_SE
 **System-mode operations (Phase 4):** AI interaction and evaluation logs are written by the system (`AiService.Writer`, `AiEvaluationService.Writer`) after the access check; the document reader writes `Document_Details__c` in system mode (system-managed field) after reading the application as the user; the prompt catalogue and evaluation cases are read in system mode (configuration).
 
 **Forecasts (F4.8):** `ForecastController` for administrators, branch managers, academic coordinators and finance; every figure is read in user mode (enrolment figures need enrolment access, finance figures need invoice and payment access). The Einstein explanation and the Agentforce forecast action need KEM AI User.
+
+## Phase 4 permissions (transport, exams, referrals)
+
+| Permission / access                    | Administrator                                  | Branch Manager | Admissions               | Academic | Teacher | Finance               |
+| -------------------------------------- | ---------------------------------------------- | -------------- | ------------------------ | -------- | ------- | --------------------- |
+| Transport routes and stops             | Manage                                         | Manage         | Read                     | Read     | Read    | Read                  |
+| Assign / end riders, message a route   | ✅                                             | ✅             | ✅                       | —        | —       | — (reads assignments) |
+| Exams, papers, candidates (desk steps) | ✅                                             | ✅             | —                        | ✅       | Read    | —                     |
+| Allow a withheld candidate             | with KEM Eligibility Override (permission set) |                |                          |          |         |                       |
+| Enter exam marks                       | ✅                                             | ✅             | —                        | ✅       | ✅      | —                     |
+| Referrals desk                         | ✅                                             | ✅             | ✅ (read, invite alumni) | —        | —       | ✅ (read)             |
+| Grant a referral reward / not eligible | KEM Manage Billing (finance, administrators)   |                |                          |          |         |                       |
+
+**System-mode operations (transport, exams, referrals):** seats taken, assignment and fee-line fields, candidate status and seats, marks, and referral fields are system-managed and written by the services after the user-mode checks (create access on the object, the custom permissions above). Referral codes on enquiries are matched in system mode (any channel may give a code; only the referrer's Id is used). Portal: transport details and hall tickets are read in system mode after the portal's own check that the learner belongs to the signed-in family.

@@ -1,0 +1,383 @@
+<template>
+  <template lwc:if={visible}>
+    <article class="kem-card panel">
+      <div class="head">
+        <span class="title"
+          ><lightning-icon
+            icon-name="utility:education"
+            size="x-small"
+          ></lightning-icon
+          ><span class="kem-section-title">Exams</span></span
+        >
+        <template lwc:if={canSetUp}>
+          <lightning-button
+            label="New exam"
+            icon-name="utility:add"
+            onclick={toggleNewExam}
+          ></lightning-button>
+        </template>
+        <template lwc:if={hasExams}>
+          <lightning-combobox
+            class="exam-pick"
+            label="Exam"
+            variant="label-hidden"
+            options={examOptions}
+            value={selectedExamId}
+            onchange={handleExam}
+          ></lightning-combobox>
+        </template>
+      </div>
+      <template lwc:if={showNewExam}>
+        <lightning-record-edit-form
+          object-api-name="Exam__c"
+          onsuccess={handleExamCreated}
+        >
+          <lightning-messages></lightning-messages>
+          <div class="form">
+            <template lwc:if={recordId}>
+              <lightning-input-field
+                field-name="Branch__c"
+                value={recordId}
+                class="hidden-field"
+              ></lightning-input-field>
+            </template>
+            <template lwc:else>
+              <lightning-input-field
+                field-name="Branch__c"
+                required
+              ></lightning-input-field>
+            </template>
+            <lightning-input-field
+              field-name="Name"
+              required
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="Exam_Code__c"
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="Exam_Type__c"
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="Start_Date__c"
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="End_Date__c"
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="Min_Attendance__c"
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="Block_Overdue_Fees__c"
+            ></lightning-input-field>
+            <lightning-input-field
+              field-name="Instructions__c"
+              class="wide"
+            ></lightning-input-field>
+            <div class="form-actions">
+              <lightning-button
+                label="Cancel"
+                onclick={toggleNewExam}
+              ></lightning-button>
+              <lightning-button
+                variant="brand"
+                type="submit"
+                label="Create exam"
+              ></lightning-button>
+            </div>
+          </div>
+        </lightning-record-edit-form>
+      </template>
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+      <template lwc:if={isLoading}>
+        <lightning-spinner
+          alternative-text="Loading exams"
+          size="small"
+        ></lightning-spinner>
+      </template>
+      <template lwc:if={exams}>
+        <template lwc:if={hasExams}>
+          <template lwc:if={exam}>
+            <div class="exam-head">
+              <span class="strong">{exam.name}</span>
+              <span class="kem-badge kem-badge_info">{exam.status}</span>
+              <span class="small muted"
+                >{exam.examType} · {dates} · {exam.branch}</span
+              >
+            </div>
+            <div class="tiles">
+              <template for:each={tiles} for:item="t">
+                <div key={t.key} class={t.className}>
+                  <span class="tile-value">{t.value}</span>
+                  <span class="tile-label">{t.label}</span>
+                </div>
+              </template>
+            </div>
+
+            <template lwc:if={canManage}>
+              <div class="steps">
+                <lightning-button
+                  label="1. Register candidates"
+                  onclick={handleRegister}
+                  disabled={isBusy}
+                ></lightning-button>
+                <lightning-button
+                  label="2. Check eligibility"
+                  onclick={handleCheck}
+                  disabled={isBusy}
+                ></lightning-button>
+                <lightning-checkbox-group
+                  class="rooms"
+                  label="Rooms for seating"
+                  options={roomOptions}
+                  value={selectedRooms}
+                  onchange={handleRooms}
+                ></lightning-checkbox-group>
+                <lightning-button
+                  label="3. Allocate seats"
+                  onclick={handleSeats}
+                  disabled={isBusy}
+                ></lightning-button>
+                <lightning-button
+                  variant="brand"
+                  label="4. Issue hall tickets"
+                  onclick={handleIssue}
+                  disabled={isBusy}
+                ></lightning-button>
+              </div>
+            </template>
+
+            <div class="section-head">
+              <span class="section-title">Papers</span>
+              <template lwc:if={canSetUp}>
+                <lightning-button
+                  variant="base"
+                  label="Add paper"
+                  icon-name="utility:add"
+                  onclick={toggleNewPaper}
+                ></lightning-button>
+              </template>
+            </div>
+            <template lwc:if={showNewPaper}>
+              <lightning-record-edit-form
+                object-api-name="Exam_Paper__c"
+                onsuccess={handlePaperCreated}
+              >
+                <lightning-messages></lightning-messages>
+                <div class="form">
+                  <lightning-input-field
+                    field-name="Exam__c"
+                    value={selectedExamId}
+                    class="hidden-field"
+                  ></lightning-input-field>
+                  <lightning-input-field
+                    field-name="Name"
+                    required
+                  ></lightning-input-field>
+                  <lightning-input-field
+                    field-name="Course_Offering__c"
+                  ></lightning-input-field>
+                  <lightning-input-field
+                    field-name="Paper_Date__c"
+                  ></lightning-input-field>
+                  <lightning-input-field
+                    field-name="Start_Time__c"
+                  ></lightning-input-field>
+                  <lightning-input-field
+                    field-name="Duration_Minutes__c"
+                  ></lightning-input-field>
+                  <lightning-input-field
+                    field-name="Max_Marks__c"
+                  ></lightning-input-field>
+                  <lightning-input-field
+                    field-name="Pass_Marks__c"
+                  ></lightning-input-field>
+                  <lightning-input-field
+                    field-name="Weight__c"
+                  ></lightning-input-field>
+                  <div class="form-actions">
+                    <lightning-button
+                      label="Cancel"
+                      onclick={toggleNewPaper}
+                    ></lightning-button>
+                    <lightning-button
+                      variant="brand"
+                      type="submit"
+                      label="Add paper"
+                    ></lightning-button>
+                  </div>
+                </div>
+              </lightning-record-edit-form>
+            </template>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Paper</th>
+                    <th scope="col">Class</th>
+                    <th scope="col">When</th>
+                    <th scope="col" class="num">Marks</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">
+                      <span class="slds-assistive-text">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={papers} for:item="p">
+                    <tr key={p.paperId}>
+                      <td>{p.name}</td>
+                      <td>{p.className}</td>
+                      <td>{p.when}</td>
+                      <td class="num">{p.maxMarks}</td>
+                      <td>{p.marksStatus}</td>
+                      <td>
+                        <lightning-button
+                          variant="base"
+                          label={p.marksLabel}
+                          data-id={p.paperId}
+                          onclick={handleOpenMarks}
+                          class="marks-button"
+                        ></lightning-button>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+
+            <template lwc:if={sheet}>
+              <section class="sheet">
+                <div class="sheet-head">
+                  <span class="strong">{sheetTitle}</span>
+                  <lightning-button-icon
+                    icon-name="utility:close"
+                    alternative-text="Close"
+                    title="Close"
+                    onclick={handleCloseMarks}
+                  ></lightning-button-icon>
+                </div>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Hall ticket</th>
+                        <th scope="col">Learner</th>
+                        <th scope="col">Marks</th>
+                        <th scope="col">Absent</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <template for:each={markRows} for:item="m">
+                        <tr key={m.candidateId}>
+                          <td>{m.hallTicket}</td>
+                          <td>{m.learner}</td>
+                          <td>
+                            <lightning-input
+                              type="number"
+                              step="0.5"
+                              label="Marks"
+                              variant="label-hidden"
+                              value={m.marks}
+                              data-id={m.candidateId}
+                              data-field="marks"
+                              disabled={m.disabled}
+                              onchange={handleMark}
+                              class="mark-input"
+                            ></lightning-input>
+                          </td>
+                          <td>
+                            <lightning-input
+                              type="checkbox"
+                              label="Absent"
+                              variant="label-hidden"
+                              checked={m.absent}
+                              data-id={m.candidateId}
+                              data-field="absent"
+                              disabled={m.absentDisabled}
+                              onchange={handleMark}
+                            ></lightning-input>
+                          </td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="sheet-actions">
+                  <lightning-button
+                    label="Save marks"
+                    onclick={handleSaveMarks}
+                    disabled={isBusy}
+                  ></lightning-button>
+                  <lightning-button
+                    variant="brand"
+                    label="Publish to gradebook"
+                    onclick={handlePublish}
+                    disabled={publishDisabled}
+                  ></lightning-button>
+                </div>
+              </section>
+            </template>
+
+            <div class="section-title">Candidates</div>
+            <template lwc:if={hasCandidates}>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Hall ticket</th>
+                      <th scope="col">Learner</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Seat</th>
+                      <th scope="col">Note</th>
+                      <th scope="col">
+                        <span class="slds-assistive-text">Actions</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={candidates} for:item="c">
+                      <tr key={c.candidateId}>
+                        <td>{c.hallTicket}</td>
+                        <td>{c.learner}</td>
+                        <td><span class={c.badge}>{c.status}</span></td>
+                        <td>{c.seatLabel}</td>
+                        <td class="small">{c.note}</td>
+                        <td>
+                          <template lwc:if={c.canOverride}>
+                            <lightning-button
+                              variant="base"
+                              label="Allow"
+                              data-id={c.candidateId}
+                              onclick={handleOverride}
+                            ></lightning-button>
+                          </template>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </template>
+            <template lwc:else>
+              <p class="small muted">
+                No candidates yet: register them from the papers' classes.
+              </p>
+            </template>
+          </template>
+        </template>
+        <template lwc:else>
+          <p class="small muted">
+            No exams yet. Use New exam, then add one paper per class.
+          </p>
+        </template>
+      </template>
+    </article>
+  </template>
+</template>

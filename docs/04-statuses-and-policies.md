@@ -99,3 +99,10 @@ Phase 4 settings (`Education_Setting__mdt`):
 | `AI_Disabled_Features` | (empty)                    | Comma-separated features to switch off, for example `Enquiry Reply, Document Extraction` |
 
 Phase 4 statuses (set by Apex only): AI interaction Succeeded / Failed / Blocked, outcome Pending Review → Accepted / Edited / Rejected (Not Applicable for failed, Agentforce and evaluation calls).
+
+| Setting (Phase 4)        | Default | Meaning                                                                                               |
+| ------------------------ | ------- | ----------------------------------------------------------------------------------------------------- |
+| `Referral_Reward_Amount` | 500     | Credit given to the referrer when a referred learner enrols                                           |
+| `Referral_Reward_Mode`   | Manual  | Off, Manual (finance grants on the referrals desk) or Auto (granted when the referred learner enrols) |
+
+More Phase 4 statuses (set by Apex only): transport assignment Active → Ended; exam Draft → Scheduled → Hall Tickets Issued → Results Published (or Cancelled); candidate Registered → Eligible / Withheld → Ticket Issued; paper marks Not Entered → Draft → Published; referral Enquired → Enrolled → Rewarded (or Not Eligible).
