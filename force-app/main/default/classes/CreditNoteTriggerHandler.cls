@@ -25,4 +25,14 @@ public with sharing class CreditNoteTriggerHandler extends TriggerHandler {
       }
     }
   }
+
+  protected override void afterInsert(List<SObject> newRecords) {
+    IntegrationHooks.finance(
+      'credit_note.issued',
+      newRecords,
+      null,
+      Credit_Note__c.Status__c,
+      null
+    );
+  }
 }

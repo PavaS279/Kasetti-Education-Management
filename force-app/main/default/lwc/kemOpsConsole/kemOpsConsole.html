@@ -27,6 +27,14 @@
                 </template>
               </ul>
             </template>
+            <template lwc:if={showSyncAdmins}>
+              <lightning-button
+                class="sync-admins"
+                label="Sync administrators"
+                onclick={handleSyncAdmins}
+                disabled={isBusy}
+              ></lightning-button>
+            </template>
           </div>
         </div>
 

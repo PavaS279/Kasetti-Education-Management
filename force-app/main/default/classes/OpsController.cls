@@ -19,6 +19,15 @@ public with sharing class OpsController {
   }
 
   @AuraEnabled
+  public static AdminGroupService.SyncResult syncAdministrators() {
+    try {
+      return OpsService.syncAdministrators();
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
   public static Id runNow(String jobName) {
     try {
       return OpsService.runNow(jobName);

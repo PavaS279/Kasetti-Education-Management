@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Branch_Required</fullName>
+    <active>true</active>
+    <description>Select the branch that holds this item.</description>
+    <errorConditionFormula>ISBLANK(Branch__c)</errorConditionFormula>
+    <errorDisplayField>Branch__c</errorDisplayField>
+    <errorMessage>Select the branch that holds this item.</errorMessage>
+</ValidationRule>

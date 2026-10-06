@@ -23,10 +23,15 @@ public with sharing class CourseOfferingTriggerHandler extends TriggerHandler {
     );
   }
 
+  protected override void afterInsert(List<SObject> newRecords) {
+    IntegrationHooks.classes(newRecords, null);
+  }
+
   protected override void afterUpdate(
     List<SObject> newRecords,
     Map<Id, SObject> oldMap
   ) {
+    IntegrationHooks.classes(newRecords, oldMap);
     Set<Id> grown = new Set<Id>();
     for (CourseOffering offering : (List<CourseOffering>) newRecords) {
       Integer before = ((CourseOffering) oldMap.get(offering.Id))

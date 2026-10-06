@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Fine_Status__c</fullName>
+    <label>Fine Status</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>None</fullName>
+                <default>true</default>
+                <label>None</label>
+            </value>
+            <value>
+                <fullName>Due</fullName>
+                <default>false</default>
+                <label>Due</label>
+            </value>
+            <value>
+                <fullName>Paid</fullName>
+                <default>false</default>
+                <label>Paid</label>
+            </value>
+            <value>
+                <fullName>Waived</fullName>
+                <default>false</default>
+                <label>Waived</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

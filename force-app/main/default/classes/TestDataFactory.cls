@@ -30,6 +30,13 @@ public class TestDataFactory {
     if (adminUser == null) {
       createReferenceData();
       adminUser = createUserWithLicense(persona('KEM_Administrator'));
+      // As in the org: administrators edit others' classes through the KEM Administrators group.
+      System.runAs(DEPLOYER) {
+        insert new GroupMember(
+          GroupId = AdminGroupService.groupId(),
+          UserOrGroupId = adminUser.Id
+        );
+      }
     }
     return adminUser;
   }

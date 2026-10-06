@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Target__c</fullName>
+    <label>Target</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>LMS</fullName>
+                <default>false</default>
+                <label>LMS</label>
+            </value>
+            <value>
+                <fullName>ERP</fullName>
+                <default>false</default>
+                <label>ERP</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

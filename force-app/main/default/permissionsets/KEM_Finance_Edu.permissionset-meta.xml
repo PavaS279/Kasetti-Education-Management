@@ -394,12 +394,47 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>CourseOfferingParticipant.Reenrolment_Invited_On__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>CourseOfferingParticipant.RegistrationDateTime</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
         <field>CourseOfferingParticipant.Report_Comment__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CourseOfferingParticipant.Retention_Note__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CourseOfferingParticipant.Retention_Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CourseOfferingParticipant.Risk_Assessed_On__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CourseOfferingParticipant.Risk_Level__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CourseOfferingParticipant.Risk_Reasons__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CourseOfferingParticipant.Risk_Score__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

@@ -37,4 +37,11 @@ if sf apex run --file scripts/apex/schedule-kem-jobs.apex --target-org "$target"
 else
   echo "WARNING: could not reschedule KEM jobs; run scripts/apex/schedule-kem-jobs.apex" >&2
 fi
+if [ "$status" -eq 0 ]; then
+  if sf apex run --file scripts/apex/sync-admin-group.apex --target-org "$target" >/dev/null 2>&1; then
+    echo "KEM Administrators group: synced"
+  else
+    echo "WARNING: could not sync the KEM Administrators group; use Sync administrators in the operations console" >&2
+  fi
+fi
 exit $status

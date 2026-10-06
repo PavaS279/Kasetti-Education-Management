@@ -113,4 +113,35 @@ private class OpsServiceTest {
       Assert.areEqual(3, refused, 'Every console action is refused');
     }
   }
+
+  @IsTest
+  static void administratorsAreSyncedIntoTheGroup() {
+    User newAdmin = TestDataFactory.createUserWithLicense(
+      TestDataFactory.persona('KEM_Administrator')
+    );
+    System.runAs(TestDataFactory.admin()) {
+      Assert.isTrue(
+        AdminGroupService.missing() >= 1,
+        'New administrator missing'
+      );
+      Assert.isTrue(
+        OpsService.console().administratorsNotInGroup >= 1,
+        'Console reports it'
+      );
+      AdminGroupService.SyncResult result = OpsController.syncAdministrators();
+      Assert.isTrue(result.added >= 1, 'Added');
+      Assert.areEqual(0, AdminGroupService.missing(), 'Nobody missing');
+      Assert.areEqual(
+        1,
+        [
+          SELECT COUNT()
+          FROM GroupMember
+          WHERE
+            GroupId = :AdminGroupService.groupId()
+            AND UserOrGroupId = :newAdmin.Id
+        ],
+        'In the group'
+      );
+    }
+  }
 }

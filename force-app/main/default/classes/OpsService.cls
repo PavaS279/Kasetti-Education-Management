@@ -16,6 +16,9 @@
 public with sharing class OpsService {
   private static final Set<String> KEM_CLASSES = new Set<String>{
     'RecurringBillingJob',
+    'IntegrationService',
+    'IntegrationSyncJob',
+    'FinanceExportJob',
     'ReminderJob',
     'OfferExpiryJob',
     'WaitlistOfferJob',
@@ -110,6 +113,9 @@ public with sharing class OpsService {
     public Integer errorsLast24h = 0;
     @AuraEnabled
     public Datetime generatedAt;
+    /** Administrators missing from the KEM Administrators group (no edit access to others' classes). */
+    @AuraEnabled
+    public Integer administratorsNotInGroup = 0;
   }
 
   public static Console console() {
@@ -120,6 +126,13 @@ public with sharing class OpsService {
     addRuns(result);
     addErrors(result);
     addQueues(result);
+    result.administratorsNotInGroup = AdminGroupService.missing();
+    if (result.administratorsNotInGroup > 0) {
+      result.issues.add(
+        result.administratorsNotInGroup +
+        ' administrator(s) not in the KEM Administrators group: they cannot edit classes they do not own. Use Sync administrators.'
+      );
+    }
     result.health = result.issues.isEmpty()
       ? 'healthy'
       : hasFailure(result) ? 'failing' : 'attention';
@@ -130,6 +143,12 @@ public with sharing class OpsService {
   public static Integer ensureSchedules() {
     assertAdmin();
     return KemJobs.scheduleAll();
+  }
+
+  /** Adds administrators to (and removes former ones from) the KEM Administrators group. */
+  public static AdminGroupService.SyncResult syncAdministrators() {
+    assertAdmin();
+    return AdminGroupService.sync();
   }
 
   /** Runs a recurring job now, outside its schedule. Returns the async job Id. */
@@ -147,6 +166,12 @@ public with sharing class OpsService {
       }
       when 'KEM Payment Reminders' {
         return ReminderJob.run(Date.today());
+      }
+      when 'KEM Finance Export' {
+        return System.enqueueJob(new FinanceExportJob());
+      }
+      when 'KEM Integration Sync' {
+        return System.enqueueJob(new IntegrationService.SyncJob());
       }
       when 'KEM Message Dispatch' {
         return System.enqueueJob(new MessageService.DispatchJob());
@@ -427,6 +452,35 @@ public with sharing class OpsService {
           WITH SYSTEM_MODE
         ],
         'Class page → Waitlist',
+        'ok'
+      )
+    );
+    result.queues.add(
+      queue(
+        'integration-failed',
+        'Integration events failed',
+        [
+          SELECT COUNT()
+          FROM Integration_Event__c
+          WHERE Status__c = 'Failed'
+          WITH SYSTEM_MODE
+        ],
+        'Integration events: check Last Error; the external system re-reads them',
+        'warning'
+      )
+    );
+    Datetime staleBefore = System.now().addDays(-1);
+    result.queues.add(
+      queue(
+        'integration-waiting',
+        'Integration events waiting over a day',
+        [
+          SELECT COUNT()
+          FROM Integration_Event__c
+          WHERE Status__c = 'Pending' AND CreatedDate < :staleBefore
+          WITH SYSTEM_MODE
+        ],
+        'The LMS or ERP has not read these events; check the connection',
         'ok'
       )
     );

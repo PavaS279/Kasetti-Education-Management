@@ -14,4 +14,27 @@ public with sharing class RefundTriggerHandler extends TriggerHandler {
       }
     }
   }
+
+  protected override void afterInsert(List<SObject> newRecords) {
+    IntegrationHooks.finance(
+      'refund.paid',
+      newRecords,
+      null,
+      Refund__c.Status__c,
+      'Paid'
+    );
+  }
+
+  protected override void afterUpdate(
+    List<SObject> newRecords,
+    Map<Id, SObject> oldMap
+  ) {
+    IntegrationHooks.finance(
+      'refund.paid',
+      newRecords,
+      oldMap,
+      Refund__c.Status__c,
+      'Paid'
+    );
+  }
 }

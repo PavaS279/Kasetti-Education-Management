@@ -344,6 +344,7 @@ public with sharing class GradingService {
     new Writer().updateRecords(updates);
     DocumentService.enqueue(enrolmentIds, DocumentService.REPORT_CARD);
     MessageService.reportCardsReady(enrolmentIds);
+    IntegrationService.gradesFinalised(offeringId);
     return enrolmentIds.size();
   }
 

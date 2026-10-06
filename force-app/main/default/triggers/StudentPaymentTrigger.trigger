@@ -1,6 +1,8 @@
 trigger StudentPaymentTrigger on Student_Payment__c(
   before update,
-  before delete
+  before delete,
+  after insert,
+  after update
 ) {
   new StudentPaymentTriggerHandler().run();
 }

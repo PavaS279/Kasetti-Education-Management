@@ -2,6 +2,7 @@ import { LightningElement } from "lwc";
 import getConsole from "@salesforce/apex/OpsController.getConsole";
 import ensureSchedules from "@salesforce/apex/OpsController.ensureSchedules";
 import runNow from "@salesforce/apex/OpsController.runNow";
+import syncAdministrators from "@salesforce/apex/OpsController.syncAdministrators";
 import { reduceErrors, toast, toastError } from "c/kemUtils";
 
 const HEALTH = {
@@ -22,15 +23,17 @@ const HEALTH = {
   }
 };
 
-const when = (value) =>
-  value
-    ? new Intl.DateTimeFormat(undefined, {
-        day: "numeric",
-        month: "short",
-        hour: "numeric",
-        minute: "2-digit"
-      }).format(new Date(value))
-    : "—";
+function when(value) {
+  if (!value) {
+    return "—";
+  }
+  return new Intl.DateTimeFormat(undefined, {
+    day: "numeric",
+    month: "short",
+    hour: "numeric",
+    minute: "2-digit"
+  }).format(new Date(value));
+}
 
 /** Operations console: scheduled jobs, background runs, errors and exception queues. */
 export default class KemOpsConsole extends LightningElement {
@@ -140,6 +143,27 @@ export default class KemOpsConsole extends LightningElement {
       await this.load();
     } catch (error) {
       toastError(this, error, "Could not schedule jobs");
+    } finally {
+      this.isBusy = false;
+    }
+  }
+
+  get showSyncAdmins() {
+    return this.data.administratorsNotInGroup > 0;
+  }
+
+  async handleSyncAdmins() {
+    this.isBusy = true;
+    try {
+      const result = await syncAdministrators();
+      toast(
+        this,
+        "Administrators synced",
+        `${result.added} added to and ${result.removed} removed from the KEM Administrators group.`
+      );
+      await this.load();
+    } catch (error) {
+      toastError(this, error, "Could not sync administrators");
     } finally {
       this.isBusy = false;
     }

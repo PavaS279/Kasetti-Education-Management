@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingOwnerRules>
+        <fullName>KEM_Administrators_Edit</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description
+    >Administrators edit every record owned by internal users (Education Cloud licences do not allow Modify All on this object).</description>
+        <label>KEM Administrators Edit</label>
+        <sharedTo>
+            <group>KEM_Administrators</group>
+        </sharedTo>
+        <sharedFrom>
+            <allInternalUsers />
+        </sharedFrom>
+    </sharingOwnerRules>
+</SharingRules>

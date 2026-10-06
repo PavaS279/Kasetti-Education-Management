@@ -23,4 +23,34 @@ public with sharing class StudentInvoiceTriggerHandler extends TriggerHandler {
       }
     }
   }
+
+  protected override void afterInsert(List<SObject> newRecords) {
+    IntegrationHooks.finance(
+      'invoice.issued',
+      newRecords,
+      null,
+      Student_Invoice__c.Status__c,
+      'Issued'
+    );
+  }
+
+  protected override void afterUpdate(
+    List<SObject> newRecords,
+    Map<Id, SObject> oldMap
+  ) {
+    IntegrationHooks.finance(
+      'invoice.issued',
+      newRecords,
+      oldMap,
+      Student_Invoice__c.Status__c,
+      'Issued'
+    );
+    IntegrationHooks.finance(
+      'invoice.cancelled',
+      newRecords,
+      oldMap,
+      Student_Invoice__c.Status__c,
+      'Cancelled'
+    );
+  }
 }

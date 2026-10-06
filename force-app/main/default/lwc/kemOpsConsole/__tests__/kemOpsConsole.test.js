@@ -3,6 +3,7 @@ import KemOpsConsole from "c/kemOpsConsole";
 import getConsole from "@salesforce/apex/OpsController.getConsole";
 import ensureSchedules from "@salesforce/apex/OpsController.ensureSchedules";
 import runNow from "@salesforce/apex/OpsController.runNow";
+import syncAdministrators from "@salesforce/apex/OpsController.syncAdministrators";
 
 jest.mock(
   "@salesforce/apex/OpsController.getConsole",
@@ -16,6 +17,12 @@ jest.mock(
 );
 jest.mock(
   "@salesforce/apex/OpsController.runNow",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+
+jest.mock(
+  "@salesforce/apex/OpsController.syncAdministrators",
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -143,6 +150,19 @@ describe("c-kem-ops-console", () => {
       .click();
     await flush();
     expect(runNow).toHaveBeenCalledWith({ jobName: "KEM Message Dispatch" });
+  });
+
+  it("syncs administrators into the KEM Administrators group", async () => {
+    getConsole.mockResolvedValue(consoleData({ administratorsNotInGroup: 2 }));
+    syncAdministrators.mockResolvedValue({ added: 2, removed: 0 });
+    const el = await mount();
+    const sync = [...el.shadowRoot.querySelectorAll("lightning-button")].find(
+      (b) => b.label === "Sync administrators"
+    );
+    sync.click();
+    await flush();
+    expect(syncAdministrators).toHaveBeenCalled();
+    expect(getConsole).toHaveBeenCalledTimes(2);
   });
 
   it("is healthy when nothing needs attention", async () => {

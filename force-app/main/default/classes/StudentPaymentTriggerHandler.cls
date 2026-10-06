@@ -21,4 +21,27 @@ public with sharing class StudentPaymentTriggerHandler extends TriggerHandler {
       }
     }
   }
+
+  protected override void afterInsert(List<SObject> newRecords) {
+    IntegrationHooks.finance(
+      'payment.confirmed',
+      newRecords,
+      null,
+      Student_Payment__c.Status__c,
+      'Confirmed'
+    );
+  }
+
+  protected override void afterUpdate(
+    List<SObject> newRecords,
+    Map<Id, SObject> oldMap
+  ) {
+    IntegrationHooks.finance(
+      'payment.confirmed',
+      newRecords,
+      oldMap,
+      Student_Payment__c.Status__c,
+      'Confirmed'
+    );
+  }
 }

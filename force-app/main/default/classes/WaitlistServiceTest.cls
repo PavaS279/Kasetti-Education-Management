@@ -146,6 +146,7 @@ private class WaitlistServiceTest {
     // Fifteen waitlist operations in one transaction: notifications are covered
     // by MessageServiceTest and would only add queries here.
     MessageService.disabled = true;
+    IntegrationService.disabled = true;
     System.runAs(TestDataFactory.admin()) {
       Fixture f = fixture();
       // Fresh limits for the waitlist operations (set-up is its own transaction in use).

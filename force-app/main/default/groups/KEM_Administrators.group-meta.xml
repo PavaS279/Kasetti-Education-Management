@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Group xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Users with the KEM Administrator persona. Sharing rules give this group edit access to every class and enrolment; the operations console keeps its membership in step with the permission set.</description>
+    <doesIncludeBosses>false</doesIncludeBosses>
+    <name>KEM Administrators</name>
+</Group>
