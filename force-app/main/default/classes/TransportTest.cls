@@ -393,6 +393,19 @@ private class TransportTest {
   static void familiesOnARouteAreMessaged() {
     System.runAs(TestDataFactory.admin()) {
       TransportService.assign(request('Riya', 'Lake View Gate'));
+      // Sam shares Riya's fee payer: the family gets one message.
+      Account sam = learner('Sam');
+      LearnerService.GuardianInput g = new LearnerService.GuardianInput();
+      g.existingAccountId = [
+        SELECT Id
+        FROM Account
+        WHERE FirstName = 'Meena' AND LastName = 'Rider'
+      ]
+      .Id;
+      g.relationship = 'Mother';
+      g.isFeePayer = true;
+      LearnerService.addGuardian(sam.Id, g);
+      TransportService.assign(request('Sam', 'Market Circle'));
       Test.startTest();
       Integer sent = TransportController.notifyRoute(
         route().Id,
@@ -408,6 +421,20 @@ private class TransportTest {
       ];
       Assert.isTrue(m.Subject__c.contains('Route 1'), m.Subject__c);
       Assert.isTrue(m.Body__c.contains('20 minutes late'), m.Body__c);
+      Assert.isTrue(
+        m.Body__c.contains('Riya Rider and Sam Rider') ||
+        m.Body__c.contains('Sam Rider and Riya Rider'),
+        'Both children in one message: ' + m.Body__c
+      );
+      Assert.areEqual(
+        1,
+        [
+          SELECT COUNT()
+          FROM Message__c
+          WHERE Event__c = 'Transport_Notice' AND Channel__c = 'Portal'
+        ],
+        'One portal message for the family'
+      );
     }
   }
 
@@ -473,6 +500,10 @@ private class TransportTest {
         failures++;
       }
       Assert.areEqual(6, failures, 'Every error reported');
+      Assert.isTrue(
+        TransportController.canManageRoutes(),
+        'Admin sets up routes'
+      );
       Assert.isTrue(
         TransportController.searchLearners(route().Id, 'R').isEmpty(),
         'Two letters needed'

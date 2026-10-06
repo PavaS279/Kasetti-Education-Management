@@ -3,7 +3,7 @@
     <fullName>Seat_Number__c</fullName>
     <label>Seat</label>
     <required>false</required>
-    <length>20</length>
+    <length>40</length>
     <unique>false</unique>
     <type>Text</type>
 </CustomField>

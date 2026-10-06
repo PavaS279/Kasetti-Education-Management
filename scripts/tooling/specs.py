@@ -977,7 +977,7 @@ OBJECTS = [
             {"name": "Attendance_Rate__c", "label": "Attendance at Check", "type": "Percent", "precision": 5, "scale": 2, "systemManaged": True},
             {"name": "Overdue_Amount__c", "label": "Overdue at Check", "type": "Currency", "precision": 12, "scale": 2, "systemManaged": True},
             {"name": "Room__c", "label": "Room", "type": "Lookup", "ref": "Room__c", "relName": "Exam_Candidates", "relLabel": "Exam Candidates", "systemManaged": True},
-            {"name": "Seat_Number__c", "label": "Seat", "type": "Text", "length": 20, "systemManaged": True},
+            {"name": "Seat_Number__c", "label": "Seat", "type": "Text", "length": 40, "systemManaged": True},
             {"name": "Ticket_Issued_On__c", "label": "Ticket Issued On", "type": "DateTime", "systemManaged": True},
             {"name": "Unique_Key__c", "label": "Unique Key", "type": "Text", "length": 40, "unique": True, "externalId": True, "systemManaged": True},
         ],

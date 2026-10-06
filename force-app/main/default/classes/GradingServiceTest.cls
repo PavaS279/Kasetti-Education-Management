@@ -310,9 +310,10 @@ private class GradingServiceTest {
     CourseOffering cls = offering();
     System.runAs(TestDataFactory.admin()) {
       DocumentService.suppressJobs = true;
+      // Finalising (notices, report cards) runs in the test's own limits.
+      Test.startTest();
       GradingService.finalise(cls.Id);
       Id ashaId = enrolments().get('Asha').Id;
-      Test.startTest();
       Assert.isNotNull(
         DocumentService.generate(ashaId, DocumentService.REPORT_CARD),
         'Report card issued'

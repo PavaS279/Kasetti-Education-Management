@@ -19,14 +19,7 @@ private class Phase4JourneyTest {
   @TestSetup
   static void setup() {
     TestDataFactory.createReferenceData();
-    User admin = TestDataFactory.admin();
-    System.runAs(new User(Id = UserInfo.getUserId())) {
-      TestDataFactory.assignPermissionSets(
-        admin.Id,
-        new List<String>{ 'KEM_AI_User', 'KEM_Eligibility_Override' }
-      );
-    }
-    System.runAs(admin) {
+    System.runAs(TestDataFactory.admin()) {
       MessageService.disabled = true;
       IntegrationService.disabled = true;
       Branch__c branch = TestDataFactory.buildBranch();
@@ -77,6 +70,18 @@ private class Phase4JourneyTest {
     }
   }
 
+  /** This test's administrator, with KEM AI User. */
+  private static User aiAdmin() {
+    User u = TestDataFactory.admin();
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      TestDataFactory.assignPermissionSets(
+        u.Id,
+        new List<String>{ 'KEM_AI_User' }
+      );
+    }
+    return u;
+  }
+
   private static Branch__c branch() {
     return [SELECT Id FROM Branch__c WHERE Branch_Code__c = 'P4-01'];
   }
@@ -88,8 +93,7 @@ private class Phase4JourneyTest {
   @IsTest
   static void referredFamilyIsAnsweredEnrolledAndBilledForTransport() {
     AiService.testProvider = new StubProvider();
-    User admin = TestDataFactory.admin();
-    System.runAs(admin) {
+    System.runAs(aiAdmin()) {
       // 1. A family enquires with a referral code.
       String code = ReferralService.codeFor(
         [
@@ -202,8 +206,7 @@ private class Phase4JourneyTest {
   }
 
   @IsTest
-  static void learnersSitAnExamAndTheBenefitIsMeasured() {
-    AiService.testProvider = new StubProvider();
+  static void learnersSitAnExam() {
     System.runAs(TestDataFactory.admin()) {
       List<Account> learners = new List<Account>();
       for (String first : new List<String>{ 'Ira', 'Jai' }) {
@@ -271,17 +274,6 @@ private class Phase4JourneyTest {
       ExamController.saveMarks(paper.Id, sheet.rows);
       ExamController.publishMarks(paper.Id);
 
-      // Forecast sees the branch; Einstein explains it.
-      ForecastService.Forecast f = ForecastController.getForecast(
-        branch().Id,
-        3
-      );
-      Assert.isTrue(f.showEnrolments && f.showFinance, 'Forecast figures');
-      AiService.Result explained = ForecastController.explainForecast(
-        branch().Id,
-        3
-      );
-      Assert.isTrue(explained.ok, 'Explained');
       Test.stopTest();
 
       Assert.areEqual(
@@ -303,6 +295,26 @@ private class Phase4JourneyTest {
         ],
         'Hall ticket PDFs'
       );
+    }
+  }
+
+  @IsTest
+  static void forecastIsExplainedAndTheBenefitIsMeasured() {
+    AiService.testProvider = new StubProvider();
+    System.runAs(aiAdmin()) {
+      Test.startTest();
+      // Forecast sees the branch; Einstein explains it.
+      ForecastService.Forecast f = ForecastController.getForecast(
+        branch().Id,
+        3
+      );
+      Assert.isTrue(f.showEnrolments && f.showFinance, 'Forecast figures');
+      AiService.Result explained = ForecastController.explainForecast(
+        branch().Id,
+        3
+      );
+      Assert.isTrue(explained.ok, 'Explained');
+      Test.stopTest();
       AiService.review(
         explained.interactionId,
         'Accepted',

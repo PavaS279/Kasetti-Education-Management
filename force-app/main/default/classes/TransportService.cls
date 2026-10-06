@@ -586,11 +586,22 @@ public with sharing class TransportService {
       learnerContacts.add(a.Learner_Account__r.PersonContactId);
     }
     Map<Id, Id> payers = MessageService.feePayersOf(learnerContacts);
-    List<MessageService.Notice> notices = new List<MessageService.Notice>();
+    // One message per fee payer, naming all their children on the route.
+    Map<String, MessageService.Notice> byPayer = new Map<String, MessageService.Notice>();
     String stamp = String.valueOf(System.now().getTime());
     for (Transport_Assignment__c a : riders) {
-      MessageService.Notice n = new MessageService.Notice();
-      n.recipientId = payers.get(a.Learner_Account__r.PersonContactId);
+      Id payer = payers.get(a.Learner_Account__r.PersonContactId);
+      String key = payer == null ? String.valueOf(a.Id) : String.valueOf(payer);
+      MessageService.Notice n = byPayer.get(key);
+      if (n != null) {
+        n.values.put(
+          'LearnerName',
+          n.values.get('LearnerName') + ' and ' + a.Learner_Account__r.Name
+        );
+        continue;
+      }
+      n = new MessageService.Notice();
+      n.recipientId = payer;
       n.learnerContactId = a.Learner_Account__r.PersonContactId;
       n.learnerAccountId = a.Learner_Account__c;
       n.branchId = route.Branch__c;
@@ -599,8 +610,9 @@ public with sharing class TransportService {
       n.values.put('LearnerName', a.Learner_Account__r.Name);
       n.values.put('RouteName', route.Name);
       n.values.put('Message', message.trim().left(1000));
-      notices.add(n);
+      byPayer.put(key, n);
     }
+    List<MessageService.Notice> notices = byPayer.values();
     return notices.isEmpty()
       ? 0
       : MessageService.notify('Transport_Notice', notices);

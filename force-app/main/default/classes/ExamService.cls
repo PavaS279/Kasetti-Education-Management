@@ -513,7 +513,7 @@ public with sharing class ExamService {
             Seat_Number__c = (room.Name +
               '-' +
               String.valueOf(seat).leftPad(2, '0'))
-              .left(20)
+              .left(40)
           )
         );
         index++;

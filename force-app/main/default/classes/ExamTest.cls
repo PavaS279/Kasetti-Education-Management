@@ -211,6 +211,7 @@ private class ExamTest {
       Test.startTest();
       ExamService.ExamDetail detail = ExamController.getExam(exam().Id);
       Assert.areEqual(2, detail.rooms.size(), 'Rooms of the branch');
+      Assert.isTrue(ExamController.canSetUpExams(), 'Admin sets up exams');
       Assert.isTrue(
         detail.canOverride && detail.canManage,
         'Admin with override'
