@@ -51,3 +51,5 @@ Realistic operating data for the **KTEdutech** app (2026-10-06), created through
 | Refund RFD-000004 waiting for approval                             | `L/lightning/r/Refund__c/a0fdN000003bRihQAE/view`                       |
 
 The earlier `[KEM Demo]` records (Bengaluru Central and its demo families) are still in the org; they are separate from this data set.
+
+**Salesforce sample data.** The org was created with Salesforce's own sample records (1 October 2026): the four US sales leads have been deleted; the Education Cloud samples (Connected University, Sophia Applicant and household, Acme, salesforce.com, Global Media, 12 opportunities, 20 cases) are still there and unrelated to KTEdutech.
