@@ -1,6 +1,6 @@
 # Progress Tracker
 
-> **Status 2026-10-06:** Phases 0, 1, 2 and 3 are complete — every feature built, deployed, unit-tested and checked end to end. Phase 1: one learner completes the full journey with financial reconciliation. Phase 2: exceptions and recurring operations work reliably. Phase 3: additional centres and higher volumes are supported (branch templates, limit-aware batches, LMS and ERP APIs, analytics, retention, online payments, library).
+> **Status 2026-10-06:** All phases (0–4) are complete — every feature built, deployed, unit-tested and checked end to end. Phase 1: one learner completes the full journey with financial reconciliation. Phase 2: exceptions and recurring operations work reliably. Phase 3: additional centres and higher volumes are supported (branch templates, limit-aware batches, LMS and ERP APIs, analytics, retention, online payments, library). Phase 4: AI with measured benefit under controlled access and review (Einstein assistants, the Agentforce staff assistant, document extraction, forecasting), plus transport, exams and hall tickets, and alumni and referrals.
 
 Legend: ✅ done · 🟡 in progress · ⬜ not started
 
@@ -75,11 +75,11 @@ Scope chosen by the institution (2026-10-05): a generic LMS API (no LMS yet), a 
 
 ## Phase 4 — AI and expansion
 
-**Completion condition — measured benefit with controlled access and review:** ⬜
+**Completion condition — measured benefit with controlled access and review:** ✅ (`Phase4JourneyTest`, the AI evaluation passing 11 of 11 live, the live checks of F4.1–F4.11, `scripts/demo/phase4-journey.sh` passing 31 of 31 checks live, and the report [ai/MEASURED-BENEFIT.md](ai/MEASURED-BENEFIT.md))
 
 Choices (2026-10-06): Salesforce Einstein (Models API, Trust Layer) and Agentforce; assistants for enquiry replies, document extraction, learner progress summaries, staff policy Q&A and record summaries; forecasting of enrolments/seats and revenue/collections; transport, exams and hall tickets, alumni and referrals. Analysis: [ai/AI-OPPORTUNITIES.md](ai/AI-OPPORTUNITIES.md).
 
-F4.1–F4.7 live (2026-10-06): Einstein assistants on the enquiry, application, learner, class, branch and Home pages, the **KEM Staff Assistant** Agentforce agent (active), the AI document reader, and the AI console; live evaluation 10 of 10. F4.8 forecasts (enrolments, seats, invoicing, cash) on the Home and Branch pages and as an Agentforce action. Staff need the **KEM AI User** permission set (assigned to Kasetti Tech).
+F4.1–F4.7 live (2026-10-06): Einstein assistants on the enquiry, application, learner, class, branch and Home pages, the **KEM Staff Assistant** Agentforce agent (active), the AI document reader, and the AI console; live evaluation 10 of 10. F4.8 forecasts (enrolments, seats, invoicing, cash) on the Home and Branch pages and as an Agentforce action. F4.9–F4.11 transport, exam and referral desks on each Branch page (no new tabs: the org's custom tab limit is reached), referrals also on Home; the family portal shows transport, hall tickets and a referral card. Staff need the **KEM AI User** permission set (assigned to Kasetti Tech).
 
 | #    | Feature                                                                                               | Built | Deployed | Tests | E2E check | Notes                                                                             |
 | ---- | ----------------------------------------------------------------------------------------------------- | ----- | -------- | ----- | --------- | --------------------------------------------------------------------------------- |
@@ -91,7 +91,7 @@ F4.1–F4.7 live (2026-10-06): Einstein assistants on the enquiry, application, 
 | 4.6  | Agentforce staff assistant topic and actions                                                          | ✅    | ✅       | ✅    | ✅        | [F4.6-agentforce-staff-assistant.md](features/F4.6-agentforce-staff-assistant.md) |
 | 4.7  | Document extraction support for applications                                                          | ✅    | ✅       | ✅    | ✅        | [F4.7-document-extraction.md](features/F4.7-document-extraction.md)               |
 | 4.8  | Forecasting: enrolments and seats, revenue and collections                                            | ✅    | ✅       | ✅    | ✅        | [F4.8-forecasting.md](features/F4.8-forecasting.md)                               |
-| 4.9  | Transport: routes, stops, assignments, transport fees                                                 | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                   |
-| 4.10 | Exams and hall tickets                                                                                | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                   |
-| 4.11 | Alumni and referrals                                                                                  | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                   |
-| 4.12 | Phase 4 journey, evaluation report and demo                                                           | ⬜    | ⬜       | ⬜    | ⬜        |                                                                                   |
+| 4.9  | Transport: routes, stops, assignments, transport fees                                                 | ✅    | ✅       | ✅    | ✅        | [F4.9-transport.md](features/F4.9-transport.md)                                   |
+| 4.10 | Exams and hall tickets                                                                                | ✅    | ✅       | ✅    | ✅        | [F4.10-exams-and-hall-tickets.md](features/F4.10-exams-and-hall-tickets.md)       |
+| 4.11 | Alumni and referrals                                                                                  | ✅    | ✅       | ✅    | ✅        | [F4.11-alumni-and-referrals.md](features/F4.11-alumni-and-referrals.md)           |
+| 4.12 | Phase 4 journey, evaluation report and demo                                                           | ✅    | ✅       | ✅    | ✅        | [F4.12-phase4-journey.md](features/F4.12-phase4-journey.md)                       |

@@ -230,7 +230,7 @@
                 rendered="{!NOT(ISBLANK(candidate.Learner_Account__r.PersonBirthdate))}"
               >
                 <div class="muted">
-                  Date of birth
+                  Date of birth:&nbsp;
                   <apex:outputText value="{0,date,dd/MM/yyyy}">
                     <apex:param
                       value="{!candidate.Learner_Account__r.PersonBirthdate}"
@@ -304,7 +304,8 @@
           </tr>
         </table>
         <p class="muted">
-          Bring this hall ticket to every paper. Issued by {!institutionName} on
+          Bring this hall ticket to every paper. Issued by {!institutionName}
+          on&nbsp;
           <apex:outputText value="{0,date,dd/MM/yyyy}">
             <apex:param value="{!today}" /> </apex:outputText
           >.

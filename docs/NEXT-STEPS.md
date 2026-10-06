@@ -1,14 +1,15 @@
 # Next Steps — Hand-over
 
-_Last updated: 2026-10-06 after F3.9 (Phase 3 complete)._
+_Last updated: 2026-10-06 after F4.12 (Phase 4 complete)._
 
 ## Where we are
 
-Phases 0–3 are **complete**: features 1.1 – 1.13, 2.1 – 2.9 and 3.1 – 3.9 are built, deployed to the org, unit-tested (194 Apex tests, 94% coverage; 128 Jest tests) and checked end to end.
+Phases 0–4 are **complete**: features 1.1 – 1.13, 2.1 – 2.9, 3.1 – 3.9 and 4.1 – 4.12 are built, deployed to the org, unit-tested (APEX_FIGURES; 163 Jest tests) and checked end to end.
 
 - Phase 1: a full learner journey with financial reconciliation (`FullJourneyTest`, `scripts/demo/full-journey.sh`).
 - Phase 2: exceptions and recurring operations work reliably (`Phase2JourneyTest`, `scripts/demo/phase2-journey.sh`, 31 checks).
 - Phase 3: additional centres and higher volumes — branch templates and comparison, limit-aware recurring billing and reminder batches, generic LMS and ERP APIs with an outbox, analytics, retention workflows, online payments in the portal (switched Off), a library module (`Phase3JourneyTest`, `VolumeTest`, `scripts/demo/phase3-journey.sh`, 26 checks).
+- Phase 4: AI with measured benefit under controlled access and review — Einstein assistants (enquiry replies, progress and record summaries, report comments, policy Q&A, forecast explanations), the Agentforce **KEM Staff Assistant**, document extraction for applications, enrolment/seat and invoicing/cash forecasts, transport, exams and hall tickets, alumni and referrals (`Phase4JourneyTest`, `scripts/demo/phase4-journey.sh`, 31 checks, evaluation 11/11; report [ai/MEASURED-BENEFIT.md](ai/MEASURED-BENEFIT.md)).
 
 See [PROGRESS.md](PROGRESS.md), [TEST-LOG.md](TEST-LOG.md) and [DEMO-SCRIPT.md](DEMO-SCRIPT.md).
 
@@ -39,9 +40,10 @@ See [PROGRESS.md](PROGRESS.md), [TEST-LOG.md](TEST-LOG.md) and [DEMO-SCRIPT.md](
 | Give staff the AI assistants                        | Only Kasetti Tech has **KEM AI User**                                                                                                        | Assign the KEM AI User permission set to the counsellors, teachers and managers who should use AI; check their Einstein / Agentforce licences                                                             |
 | Try the KEM Staff Assistant in Lightning            | The agent is active and its actions were checked from Apex; no conversation has been held in the Agentforce panel (no browser session here)  | Open the Agentforce panel in the Kasetti app, pick KEM Staff Assistant and try the example questions in F4.6                                                                                              |
 | Show Document Details on the application            | New fields are not added to page layouts by a deployment                                                                                     | Setup → Object Manager → Individual Application → Page Layouts: add **Document Details**                                                                                                                  |
-| Review AI use monthly                               | The AI console measures use, edits, rejections and minutes saved                                                                             | Look at the console (30 days) and re-run the evaluation after any prompt or model change                                                                                                                  |
+| Review AI use monthly                               | The AI console measures use, edits, rejections and minutes saved                                                                             | Look at the console (30 days), apply the decision rules in ai/MEASURED-BENEFIT.md, re-run the evaluation after any prompt or model change                                                                 |
+| Set up real routes and exams                        | Only `[KEM Demo]` routes and exams exist                                                                                                     | Branch page → Transport desk (**New route**, **Add stop**) and Exam desk (**New exam**, **Add paper**); set `Referral_Reward_Amount` / `Referral_Reward_Mode` (Manual today)                              |
 
-## Possible next steps (after Phase 3)
+## Possible next steps (after Phase 4)
 
 1. **Connect the chosen LMS and ERP** — the generic APIs and outbox are ready; add the named credentials `KEM_LMS` / `KEM_ERP` and switch push on if they prefer push to polling.
 2. **Payment gateway** — connect middleware to the signed webhook; automatic gateway refunds (refunds are paid out manually today).
@@ -49,7 +51,9 @@ See [PROGRESS.md](PROGRESS.md), [TEST-LOG.md](TEST-LOG.md) and [DEMO-SCRIPT.md](
 4. **Billing refinements** — proration of part months, billing On Hold enrolments, pro-rata withdrawal refunds, credit note PDFs; library fines on invoices (settled at the desk today).
 5. **Custom indexes** — request indexes on `Student_Invoice__c.Due_Date__c`, `Message__c.Status__c`, `Enrolment_Fee_Line__c.Next_Bill_Date__c` and `Class_Session__c.Start__c` from Salesforce Support when a table passes ~100,000 rows.
 6. **Tabs** — the org is at its custom tab limit; library, payment links, exports and integration events are reached through the branch page, invoice page, Finance Desk and search.
-7. **Portal home page** — the site's `/s/` home page still shows the template components that fail (AssignedResource, action plans); My Learning is unaffected.
+7. **AI** — after a month of staff use, review the console; candidates: knowledge articles as policy sources, Agentforce in the family portal (read-only), extraction for more document types.
+8. **Transport and exams** — GPS or attendance on the bus; seating plans by class; question-level marks.
+9. **Portal home page** — the site's `/s/` home page still shows the template components that fail (AssignedResource, action plans); My Learning is unaffected.
 
 ## How to continue in a new session
 
@@ -58,7 +62,7 @@ See [PROGRESS.md](PROGRESS.md), [TEST-LOG.md](TEST-LOG.md) and [DEMO-SCRIPT.md](
 3. `./scripts/ci/sf-login.sh` (access token; re-run if it expires).
 4. Change specs in `scripts/tooling/specs.py` → `python3 scripts/tooling/mdgen.py` → `scripts/deploy.sh` (pauses/resumes scheduled jobs, runs all `*Test` classes).
 5. Follow the per-feature rhythm: build → deploy → Apex + Jest tests → live end-to-end check → `docs/features/F*.md` → PROGRESS + TEST-LOG (+ DEMO-SCRIPT and data/security/status docs when they change) → commit.
-6. Demo runners: `scripts/demo/full-journey.sh` (Phase 1), `scripts/demo/phase2-journey.sh` (Phase 2) and `scripts/demo/phase3-journey.sh` (Phase 3) — each run creates its own tagged `[KEM Demo]` data.
+6. Demo runners: `scripts/demo/full-journey.sh` (Phase 1), `scripts/demo/phase2-journey.sh` (Phase 2), `scripts/demo/phase3-journey.sh` (Phase 3) and `scripts/demo/phase4-journey.sh` (Phase 4) — each run creates its own tagged `[KEM Demo]` data.
 
 ## Lessons that save time (see 06-development-standards.md)
 
@@ -76,9 +80,15 @@ See [PROGRESS.md](PROGRESS.md), [TEST-LOG.md](TEST-LOG.md) and [DEMO-SCRIPT.md](
 - The Education Cloud licence silently drops View All / Modify All on `CourseOffering` and `CourseOfferingParticipant` (the deploy succeeds; check `ObjectPermissions`). Use sharing rules to a group instead.
 - Production orgs reject Protected custom settings; one class cannot be both Queueable and Schedulable; `Database.queryWithBinds` returns `List<SObject>` (cast to `List<AggregateResult>` for aggregates).
 - In tests, `Request.getCurrent().getRequestId()` is the same for setup and test methods — do not use it for uniqueness.
+- Einstein calls are callouts: no DML before them in the same transaction (`AiService.deferLogs`), and tests use `AiService.testProvider`.
+- Agentforce: deploy the Apex before the GenAiFunction, then the plugin and agent; activate the agent version through the Connect API (`/connect/bot-versions/<id>/activation`).
+- `when` and `where` are reserved words; `Decimal.round()` returns a Long; static finals cannot be referenced before they are declared.
+- `sf api request rest` corrupts binary bodies; download files as base64 from anonymous Apex (debug lines escape `|`).
 - Recurring billing costs ~18 queries per enrolment: keep batches small (Education Setting `Recurring_Billing_Batch_Size`).
 
 ## Demo data in the org (prefixed `[KEM Demo]`)
+
+Phase 4 additions: route **DEMO-R1** ([KEM Demo] Route 1 – Indiranagar) with riders from 1 November; exam **DEMO-T1** ([KEM Demo] Term 1 Exams) with three hall tickets; Rohit Sharma's referral code SHA-S8EZ, enquiry and learner **Meera Nair [KEM Demo]** (Coding Club – Weekday), referral REF-000000 rewarded with CN-000004 (500); transfer-certificate extractions on IA-0000000032/33; AI interactions and evaluation runs; Phase 4 demo runs ("Learner ‹tag› [KEM Demo] Referred", route and exam D4-‹tag›).
 
 Phase 3 additions: branch **[KEM Demo] Whitefield** (DEMO-02, prefix WFD) opened from Bengaluru Central with 2 rooms, 1 price, 1 closure and 7 Planned classes (Maths Foundation has 14 generated sessions); demo centres **[KEM Demo] Centre P3A / P3B** (D3-P3A, D3-P3B) from the Phase 3 runner with a learner, invoice, LMS quiz and a returned library loan each; library items **[KEM Demo] Wings of Fire** (DEMO-B-001) and **Robotics Starter Kit** (DEMO-K-001) with loans LN-000000 and the kit to Ananya Sharma; export EXP-000000 (1–6 Oct journal); integration events acknowledged.
 

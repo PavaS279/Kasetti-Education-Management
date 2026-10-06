@@ -1,6 +1,6 @@
 # Kasetti Education Management — Documentation
 
-> **Demo & test:** [DEMO-SCRIPT.md](DEMO-SCRIPT.md) — Phase 1 journey (`scripts/demo/full-journey.sh`), Phase 2 operations (`scripts/demo/phase2-journey.sh`) and Phase 3 scale (`scripts/demo/phase3-journey.sh`). Hand-over: [NEXT-STEPS.md](NEXT-STEPS.md).
+> **Demo & test:** [DEMO-SCRIPT.md](DEMO-SCRIPT.md) — Phase 1 journey (`scripts/demo/full-journey.sh`), Phase 2 operations (`scripts/demo/phase2-journey.sh`) Phase 3 scale (`scripts/demo/phase3-journey.sh`) and Phase 4 AI and expansion (`scripts/demo/phase4-journey.sh`). AI: [ai/AI-OPPORTUNITIES.md](ai/AI-OPPORTUNITIES.md) (analysis) and [ai/MEASURED-BENEFIT.md](ai/MEASURED-BENEFIT.md) (measured benefit, access and review). Hand-over: [NEXT-STEPS.md](NEXT-STEPS.md).
 
 Delivery documentation for the Salesforce Education Cloud implementation. Read in this order:
 
@@ -53,3 +53,12 @@ Target org: Kasetti Technologies Pvt Ltd (Enterprise Edition, Education Cloud), 
 | F3.7 Online payments                      | [features/F3.7-online-payments.md](features/F3.7-online-payments.md)                             |
 | F3.8 Library and resources                | [features/F3.8-library.md](features/F3.8-library.md)                                             |
 | F3.9 Phase 3 journey                      | [features/F3.9-phase3-journey.md](features/F3.9-phase3-journey.md)                               |
+| F4.1 AI foundation                        | [features/F4.1-ai-foundation.md](features/F4.1-ai-foundation.md)                                 |
+| F4.2–F4.5 AI assistants                   | [features/F4.2-F4.5-ai-assistants.md](features/F4.2-F4.5-ai-assistants.md)                       |
+| F4.6 Agentforce staff assistant           | [features/F4.6-agentforce-staff-assistant.md](features/F4.6-agentforce-staff-assistant.md)       |
+| F4.7 Document extraction                  | [features/F4.7-document-extraction.md](features/F4.7-document-extraction.md)                     |
+| F4.8 Forecasting                          | [features/F4.8-forecasting.md](features/F4.8-forecasting.md)                                     |
+| F4.9 Transport                            | [features/F4.9-transport.md](features/F4.9-transport.md)                                         |
+| F4.10 Exams and hall tickets              | [features/F4.10-exams-and-hall-tickets.md](features/F4.10-exams-and-hall-tickets.md)             |
+| F4.11 Alumni and referrals                | [features/F4.11-alumni-and-referrals.md](features/F4.11-alumni-and-referrals.md)                 |
+| F4.12 Phase 4 journey                     | [features/F4.12-phase4-journey.md](features/F4.12-phase4-journey.md)                             |
