@@ -1,0 +1,59 @@
+<template>
+  <template lwc:if={available}>
+    <article class="kem-card panel">
+      <div class="head">
+        <lightning-icon
+          icon-name="utility:einstein"
+          size="x-small"
+        ></lightning-icon>
+        <span class="kem-section-title">Progress update for the family</span>
+      </div>
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+      <template lwc:if={result}>
+        <lightning-combobox
+          label="Send to"
+          value={recipientId}
+          options={recipientOptions}
+          onchange={handleRecipient}
+        ></lightning-combobox>
+        <c-kem-ai-draft
+          result={result}
+          editable
+          use-label="Send to family"
+          busy={isBusy}
+          onuse={handleUse}
+          onregenerate={handleDraft}
+          ondiscard={handleDiscard}
+        ></c-kem-ai-draft>
+      </template>
+      <template lwc:else>
+        <p class="kem-muted small">
+          Drafts a short, encouraging summary from classes, attendance, results
+          and grades. You review it before it is sent.
+        </p>
+        <div class="actions">
+          <lightning-button
+            variant="brand"
+            label="Draft progress update"
+            icon-name="utility:einstein"
+            onclick={handleDraft}
+            disabled={isBusy}
+          ></lightning-button>
+        </div>
+        <template lwc:if={isBusy}>
+          <lightning-spinner
+            alternative-text="Drafting"
+            size="small"
+          ></lightning-spinner>
+        </template>
+      </template>
+    </article>
+  </template>
+</template>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Enquiry Reply</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Feature__c</field>
+        <value xsi:type="xsd:string">Enquiry Reply</value>
+    </values>
+    <values>
+        <field>Instructions__c</field>
+        <value
+      xsi:type="xsd:string"
+    >You are an admissions counsellor at Kasetti, a learning centre. Write a warm, professional email reply to a family's enquiry.
+Rules:
+- Use only the facts given (course, ages, prices, classes, branch details). Never invent prices, dates, discounts or promises.
+- If a fact is missing, say the branch will confirm it.
+- Mention one or two suitable upcoming classes when given, and invite the family to a visit or trial session.
+- Address the recipient by first name. Sign off with the counsellor's first name and the branch name.
+- Plain text, no Markdown, no subject line.</value>
+    </values>
+    <values>
+        <field>Max_Words__c</field>
+        <value xsi:type="xsd:double">180</value>
+    </values>
+    <values>
+        <field>Minutes_Saved__c</field>
+        <value xsi:type="xsd:double">4.0</value>
+    </values>
+    <values>
+        <field>Template__c</field>
+        <value xsi:type="xsd:string">Recipient: {{RecipientName}}
+Learner: {{LearnerName}}, age {{LearnerAge}}
+Enquiry channel: {{Channel}}; preferred delivery: {{DeliveryMode}}
+Course of interest: {{Course}}
+Prices: {{Prices}}
+Upcoming classes:
+{{Classes}}
+Branch: {{Branch}}
+Enquiry notes: {{EnquiryNotes}}
+Counsellor's note for this reply: {{CounsellorNote}}
+Counsellor: {{CounsellorName}}</value>
+    </values>
+    <values>
+        <field>Version__c</field>
+        <value xsi:type="xsd:double">1</value>
+    </values>
+</CustomMetadata>

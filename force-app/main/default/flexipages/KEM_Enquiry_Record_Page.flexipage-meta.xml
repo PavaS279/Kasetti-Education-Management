@@ -29,6 +29,18 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>kemAiEnquiryReply</componentName>
+                <identifier>c_kemAiEnquiryReply</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemAiSummary</componentName>
+                <identifier>c_kemAiSummary</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>force:relatedListContainer</componentName>
                 <identifier>force_relatedListContainer</identifier>
             </componentInstance>

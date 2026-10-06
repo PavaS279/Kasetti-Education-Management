@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Context_Json__c</fullName>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <inlineHelpText>Token values as a JSON object.</inlineHelpText>
+    <label>Context JSON</label>
+    <length>32768</length>
+    <visibleLines>10</visibleLines>
+    <type>LongTextArea</type>
+</CustomField>

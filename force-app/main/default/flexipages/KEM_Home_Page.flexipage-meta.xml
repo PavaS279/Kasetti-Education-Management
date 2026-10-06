@@ -35,6 +35,12 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>kemAiConsole</componentName>
+                <identifier>c_kemAiConsole</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>kemOpsConsole</componentName>
                 <identifier>c_kemOpsConsole</identifier>
             </componentInstance>
@@ -43,6 +49,12 @@
         <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemAiAsk</componentName>
+                <identifier>c_kemAiAsk</identifier>
+            </componentInstance>
+        </itemInstances>
         <itemInstances>
             <componentInstance>
                 <componentName>kemBranches</componentName>

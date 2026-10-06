@@ -804,6 +804,51 @@ OBJECTS = [
         ],
     },
 
+    # ------------------------------------------------------------------ Phase 4
+    {
+        "name": "AI_Interaction__c", "label": "AI Interaction", "plural": "AI Interactions", "sharing": "Private", "externalSharing": "Private",
+        "nameField": {"label": "Interaction Number", "type": "AutoNumber", "format": "AI-{00000000}"},
+        "description": "One Einstein generation: feature, prompt version, model, latency, outcome of the staff review. The basis of the measured benefit of AI.",
+        "fields": [
+            {"name": "Feature__c", "label": "Feature", "type": "Text", "length": 60, "systemManaged": True},
+            {"name": "Prompt_Name__c", "label": "Prompt", "type": "Text", "length": 80, "systemManaged": True},
+            {"name": "Prompt_Version__c", "label": "Prompt Version", "type": "Number", "precision": 4, "scale": 0, "systemManaged": True},
+            {"name": "Model__c", "label": "Model", "type": "Text", "length": 120, "systemManaged": True},
+            {"name": "Record_Id__c", "label": "Record ID", "type": "Text", "length": 18, "systemManaged": True},
+            {"name": "Branch__c", "label": "Branch", "type": "Lookup", "ref": "Branch__c", "relName": "AI_Interactions", "relLabel": "AI Interactions", "systemManaged": True},
+            {"name": "Status__c", "label": "Status", "type": "Picklist", "values": ["Succeeded", "Failed", "Blocked"], "systemManaged": True},
+            {"name": "Latency_Ms__c", "label": "Latency (ms)", "type": "Number", "precision": 7, "scale": 0, "systemManaged": True},
+            {"name": "Input_Chars__c", "label": "Input Characters", "type": "Number", "precision": 7, "scale": 0, "systemManaged": True},
+            {"name": "Output_Chars__c", "label": "Output Characters", "type": "Number", "precision": 7, "scale": 0, "systemManaged": True},
+            {"name": "Response__c", "label": "Response", "type": "LongTextArea", "length": 32768, "lines": 8, "systemManaged": True},
+            {"name": "Error__c", "label": "Error", "type": "Text", "length": 255, "systemManaged": True},
+            {"name": "Outcome__c", "label": "Outcome", "type": "Picklist", "values": ["Pending Review", "Accepted", "Edited", "Rejected", "Not Applicable"], "default": "Pending Review", "systemManaged": True},
+            {"name": "Edit_Ratio__c", "label": "Share Edited", "type": "Percent", "precision": 5, "scale": 1, "systemManaged": True},
+            {"name": "Rating__c", "label": "Rating", "type": "Number", "precision": 1, "scale": 0, "systemManaged": True, "help": "1 (poor) to 5 (excellent), given by the reviewer."},
+            {"name": "Feedback__c", "label": "Feedback", "type": "TextArea", "systemManaged": True},
+            {"name": "Reviewed_By__c", "label": "Reviewed By", "type": "Lookup", "ref": "User", "relName": "AI_Reviews", "relLabel": "AI Reviews", "systemManaged": True},
+            {"name": "Reviewed_On__c", "label": "Reviewed On", "type": "DateTime", "systemManaged": True},
+            {"name": "Minutes_Saved__c", "label": "Minutes Saved", "type": "Number", "precision": 5, "scale": 1, "systemManaged": True},
+        ],
+    },
+    {
+        "name": "AI_Evaluation__c", "label": "AI Evaluation", "plural": "AI Evaluations", "sharing": "Private", "externalSharing": "Private",
+        "nameField": {"label": "Evaluation Number", "type": "AutoNumber", "format": "EVAL-{000000}"},
+        "description": "Result of one offline evaluation case run against the live model.",
+        "fields": [
+            {"name": "Run_Label__c", "label": "Run", "type": "Text", "length": 80, "systemManaged": True},
+            {"name": "Prompt_Name__c", "label": "Prompt", "type": "Text", "length": 80, "systemManaged": True},
+            {"name": "Prompt_Version__c", "label": "Prompt Version", "type": "Number", "precision": 4, "scale": 0, "systemManaged": True},
+            {"name": "Case_Name__c", "label": "Case", "type": "Text", "length": 80, "systemManaged": True},
+            {"name": "Model__c", "label": "Model", "type": "Text", "length": 120, "systemManaged": True},
+            {"name": "Passed__c", "label": "Passed", "type": "Checkbox", "default": False, "systemManaged": True},
+            {"name": "Score__c", "label": "Score", "type": "Percent", "precision": 5, "scale": 1, "systemManaged": True},
+            {"name": "Checks__c", "label": "Checks", "type": "TextArea", "systemManaged": True},
+            {"name": "Response__c", "label": "Response", "type": "LongTextArea", "length": 32768, "lines": 6, "systemManaged": True},
+            {"name": "Latency_Ms__c", "label": "Latency (ms)", "type": "Number", "precision": 7, "scale": 0, "systemManaged": True},
+        ],
+    },
+
 ]
 
 # Standard objects that permission sets may grant object-level access to.
@@ -837,6 +882,7 @@ ENROLMENT_CLASSES = ["EnrolmentController", "WaitlistController", "TransferContr
 SCHEDULE_CLASSES = ["TimetableController", "AttendanceController", "AssessmentController", "CoverController", "GradingController"]
 BILLING_CLASSES = ["BillingController", "CreditController", "PaymentLinkController"]
 DOCUMENT_CLASSES = ["DocumentController", "KemDocumentController"]
+AI_CLASSES = ["AiController"]  # extended per Phase 4 feature
 INTEGRATION_CLASSES = ["LmsApi", "ErpApi", "PaymentWebhookApi"]  # extended as the APIs are added (F3.4, F3.7)
 DOCUMENT_PAGES = ["KEM_Offer_Letter", "KEM_Invoice_Pdf", "KEM_Receipt_Pdf", "KEM_Report_Card"]
 
@@ -858,7 +904,7 @@ STAFF_TABS = ["Branch__c", "Room__c", "Branch_Staff__c", "Fee_Price__c", "Discou
 PERMISSION_SETS = [
     {"name": "KEM_Administrator", "label": "KEM Administrator",
      "description": "Institution administrator: configures branches, policies, and has full access to Kasetti Education Management data.",
-     "license": STAFF_LICENSE, "objects": {"Integration_Event__c": "CEDM", "Finance_Export__c": "CEDM", "Payment_Link__c": "CEDM", "Library_Item__c": "CEDM", "Library_Loan__c": "CEDM", "Staff_Absence__c": "CEDM", "Message__c": "CEDM", "Credit_Note__c": "CEDM", "Refund__c": "CEDM", "Instalment__c": "CEDM", "Waitlist_Entry__c": "CEDM", "Student_Invoice__c": "CEDM", "Invoice_Line__c": "CEDM", "Student_Payment__c": "CEDM", "Payment_Allocation__c": "CEDM", "Course_Assessment__c": "CEDM", "Assessment_Result__c": "CEDM", "Session_Attendance__c": "CEDM", "Class_Session__c": "CEDM", "Calendar_Closure__c": "CEDM", "Fee_Price__c": "CEDM", "Discount__c": "CEDM", "Enrolment_Fee_Line__c": "CEDM", "DocumentChecklistItem": "CEDV", "Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "LearnerProfile": "CEDV", "CourseOffering": "CEDM", "CourseOfferingParticipant": "CEDM", "CourseOfferingSchedule": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
+     "license": STAFF_LICENSE, "objects": {"AI_Interaction__c": "CEDM", "AI_Evaluation__c": "CEDM", "Integration_Event__c": "CEDM", "Finance_Export__c": "CEDM", "Payment_Link__c": "CEDM", "Library_Item__c": "CEDM", "Library_Loan__c": "CEDM", "Staff_Absence__c": "CEDM", "Message__c": "CEDM", "Credit_Note__c": "CEDM", "Refund__c": "CEDM", "Instalment__c": "CEDM", "Waitlist_Entry__c": "CEDM", "Student_Invoice__c": "CEDM", "Invoice_Line__c": "CEDM", "Student_Payment__c": "CEDM", "Payment_Allocation__c": "CEDM", "Course_Assessment__c": "CEDM", "Assessment_Result__c": "CEDM", "Session_Attendance__c": "CEDM", "Class_Session__c": "CEDM", "Calendar_Closure__c": "CEDM", "Fee_Price__c": "CEDM", "Discount__c": "CEDM", "Enrolment_Fee_Line__c": "CEDM", "DocumentChecklistItem": "CEDV", "Log_Event__e": "C", "Branch_Staff__c": "CEDM", "Learning": "CEDV", "LearningCourse": "CEDV", "LearningProgram": "CEDV", "LearnerProfile": "CEDV", "CourseOffering": "CEDM", "CourseOfferingParticipant": "CEDM", "CourseOfferingSchedule": "CEDV", "Branch__c": "CEDM", "Room__c": "CEDM", "Error_Log__c": "CEDM", "Lead": "CEDV", "Account": "CEV", "Contact": "CEV",
                  "IndividualApplication": "CEDV", "ContactContactRelation": "CEDV"},
      "userPermissions": ["ConvertLeads", "EditTask"], "classes": ENQUIRY_CLASSES + LEARNER_CLASSES + PRICING_CLASSES + ENROLMENT_CLASSES + SCHEDULE_CLASSES + BILLING_CLASSES + DOCUMENT_CLASSES + ["OpsController", "BranchController", "FinanceExportController", "AnalyticsController", "RetentionController", "LibraryController"], "pages": DOCUMENT_PAGES, "custom": ["KEM_Approve_Refunds", "KEM_Approve_Discounts", "KEM_Manage_Billing"], "apps": STAFF_APPS, "tabs": STAFF_TABS + ["KEM_Admissions", "KEM_Applications", "Error_Log__c", "KEM_Finance_Desk"]},
     {"name": "KEM_Branch_Manager", "label": "KEM Branch Manager",
@@ -885,6 +931,9 @@ PERMISSION_SETS = [
                  "Course_Assessment__c": "CEV", "Assessment_Result__c": "CEV", "Class_Session__c": "", "Student_Invoice__c": "V", "Invoice_Line__c": "V", "Student_Payment__c": "V", "Payment_Allocation__c": "V",
                  "Credit_Note__c": "V", "Refund__c": "V", "Finance_Export__c": "CEV", "Integration_Event__c": "V", "Payment_Link__c": "V", "Log_Event__e": "C"},
      "custom": ["KEM_Integration", "KEM_Manage_Billing"], "classes": INTEGRATION_CLASSES},
+    {"name": "KEM_AI_User", "label": "KEM AI User",
+     "description": "Controlled access to the Einstein assistants (drafts, summaries, policy answers, extraction, forecasts). Assign to staff who should use AI; administrators also see the AI console.",
+     "objects": {"AI_Interaction__c": ""}, "custom": ["KEM_Use_AI"], "classes": AI_CLASSES},
     {"name": "KEM_Eligibility_Override", "label": "KEM Eligibility Override",
      "description": "Allows overriding a failed eligibility check on an application. Grant to administrators and branch managers.",
      "objects": {}, "custom": ["KEM_Override_Eligibility"]},

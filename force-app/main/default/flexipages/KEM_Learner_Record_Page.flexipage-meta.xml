@@ -29,6 +29,18 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>kemAiSummary</componentName>
+                <identifier>c_kemAiSummary</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemAiProgress</componentName>
+                <identifier>c_kemAiProgress</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>kemMessages</componentName>
                 <identifier>c_kemMessages</identifier>
             </componentInstance>

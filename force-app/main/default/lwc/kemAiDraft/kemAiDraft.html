@@ -1,0 +1,57 @@
+<template>
+  <template lwc:if={hasResult}>
+    <div class="draft">
+      <lightning-textarea
+        class="draft-text"
+        label="Einstein draft"
+        variant="label-hidden"
+        value={text}
+        read-only={readOnly}
+        onchange={handleText}
+      ></lightning-textarea>
+      <div class="meta">
+        <span class="ai-badge"
+          ><lightning-icon
+            icon-name="utility:einstein"
+            size="x-small"
+          ></lightning-icon>
+          {footer}</span
+        >
+        <span class="rating" aria-label="Rate this draft">
+          <template for:each={stars} for:item="s">
+            <button
+              key={s.value}
+              type="button"
+              class={s.className}
+              title={s.label}
+              aria-label={s.label}
+              data-value={s.value}
+              onclick={handleRate}
+            >
+              ★
+            </button>
+          </template>
+        </span>
+      </div>
+      <div class="actions">
+        <lightning-button
+          label="Discard"
+          onclick={handleDiscard}
+          disabled={busy}
+        ></lightning-button>
+        <lightning-button
+          label="Regenerate"
+          icon-name="utility:refresh"
+          onclick={handleRegenerate}
+          disabled={busy}
+        ></lightning-button>
+        <lightning-button
+          variant="brand"
+          label={useLabel}
+          onclick={handleUse}
+          disabled={busy}
+        ></lightning-button>
+      </div>
+    </div>
+  </template>
+</template>

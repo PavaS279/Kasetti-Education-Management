@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Institution policies for the staff policy assistant. The label is the article title cited as the source. Body tokens {{Setting:Key}} are replaced with the live Education Setting value.</description>
+    <label>AI Knowledge Article</label>
+    <pluralLabel>AI Knowledge Articles</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

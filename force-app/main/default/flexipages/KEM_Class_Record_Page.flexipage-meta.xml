@@ -35,6 +35,18 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>kemAiSummary</componentName>
+                <identifier>c_kemAiSummary</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemAiReportComments</componentName>
+                <identifier>c_kemAiReportComments</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>kemWaitlist</componentName>
                 <identifier>c_kemWaitlist</identifier>
             </componentInstance>

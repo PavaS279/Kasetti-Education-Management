@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Waitlists and transfers</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Body__c</field>
+        <value
+      xsi:type="xsd:string"
+    >When a class is full, a learner can join its waitlist. When a seat opens it is offered to the next learner and held for {{Setting:Waitlist_Offer_Hours}} hours; the family is notified. An unanswered offer expires and passes to the next learner.
+A learner can be transferred to another class: the price difference is calculated; a cheaper class after invoicing creates credit.</value>
+    </values>
+    <values>
+        <field>Keywords__c</field>
+        <value
+      xsi:type="xsd:string"
+    >waitlist waiting list full class seat offer transfer move class change class</value>
+    </values>
+    <values>
+        <field>Topic__c</field>
+        <value xsi:type="xsd:string">enrolment</value>
+    </values>
+</CustomMetadata>

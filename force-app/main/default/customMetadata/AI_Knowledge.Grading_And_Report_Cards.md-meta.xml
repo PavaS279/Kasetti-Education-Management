@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Grading and report cards</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Body__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Assessments are entered as drafts and published; published results are locked and graded with the grade bands (A+ from 90%, A 80%, B 70%, C 60%, D 50%, F below).
+Course grades are the weighted average of published assessments. Absent counts as zero when {{Setting:Absent_Counts_As_Zero}} is true.
+Finalising grades locks them and issues a report card PDF to each family; grades can be reopened by coordinators or administrators with a reason.</value>
+    </values>
+    <values>
+        <field>Keywords__c</field>
+        <value
+      xsi:type="xsd:string"
+    >grade grades marks results report card report cards assessment exam weight weights final finalise absent zero</value>
+    </values>
+    <values>
+        <field>Topic__c</field>
+        <value xsi:type="xsd:string">grading</value>
+    </values>
+</CustomMetadata>

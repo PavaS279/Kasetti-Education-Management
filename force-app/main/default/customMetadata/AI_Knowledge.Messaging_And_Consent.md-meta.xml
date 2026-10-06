@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Messages and consent</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Body__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Families receive notices for invoices, payments, reminders, waitlist offers, refunds, cancelled sessions, report cards, re-enrolment invitations and library reminders, by email and in the portal.
+Email delivery is currently {{Setting:Email_Delivery}} (Off means emails are logged as not sent; portal messages are still delivered). A guardian or learner who opted out of email still receives portal messages.
+Payment reminders are sent {{Setting:Due_Soon_Days}} days before the due date and on days {{Setting:Overdue_Reminder_Days}} after it.</value>
+    </values>
+    <values>
+        <field>Keywords__c</field>
+        <value
+      xsi:type="xsd:string"
+    >email message messages notification notifications consent opt out portal reminder reminders</value>
+    </values>
+    <values>
+        <field>Topic__c</field>
+        <value xsi:type="xsd:string">messaging</value>
+    </values>
+</CustomMetadata>

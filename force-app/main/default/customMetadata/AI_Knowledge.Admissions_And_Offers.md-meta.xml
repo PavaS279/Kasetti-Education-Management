@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Admissions and offers</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Body__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Applications are checked for eligibility (course age limits and entry requirements) and a document checklist. A coordinator decides Admit, Waitlist or Reject.
+An offer letter is issued and the offer is valid for {{Setting:Offer_Validity_Days}} days; unanswered offers expire automatically every night.</value>
+    </values>
+    <values>
+        <field>Keywords__c</field>
+        <value
+      xsi:type="xsd:string"
+    >application applications offer offers admission eligibility documents checklist age decision accept</value>
+    </values>
+    <values>
+        <field>Topic__c</field>
+        <value xsi:type="xsd:string">admissions</value>
+    </values>
+</CustomMetadata>

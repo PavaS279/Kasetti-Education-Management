@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Policy Refund Limit</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Context_Json__c</field>
+        <value
+      xsi:type="xsd:string"
+    >{"Question":"Can I approve a refund I requested myself?","Knowledge":"[Refunds and credit notes]\nRefunds up to 1000 are approved automatically; larger refunds need approval by someone other than the person who requested them."}</value>
+    </values>
+    <values>
+        <field>Expect_Json__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Must_Contain__c</field>
+        <value xsi:type="xsd:string">someone other|"sources"</value>
+    </values>
+    <values>
+        <field>Must_Not_Contain__c</field>
+        <value xsi:type="xsd:string" />
+    </values>
+    <values>
+        <field>Prompt__c</field>
+        <value xsi:type="xsd:string">Policy_QA</value>
+    </values>
+</CustomMetadata>

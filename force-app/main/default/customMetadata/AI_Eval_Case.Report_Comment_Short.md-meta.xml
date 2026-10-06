@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Report Comment Short</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Context_Json__c</field>
+        <value
+      xsi:type="xsd:string"
+    >{"LearnerName":"Ananya","Course":"Maths Foundation","ClassName":"Saturday AM","Attendance":"100%","SessionsMissed":"0","CourseScore":"92.7%","Grade":"A+","Results":"Unit Test 1, Test, 94%, A+"}</value>
+    </values>
+    <values>
+        <field>Expect_Json__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Must_Contain__c</field>
+        <value xsi:type="xsd:string">Ananya</value>
+    </values>
+    <values>
+        <field>Must_Not_Contain__c</field>
+        <value xsi:type="xsd:string">92.7</value>
+    </values>
+    <values>
+        <field>Prompt__c</field>
+        <value xsi:type="xsd:string">Report_Comment</value>
+    </values>
+</CustomMetadata>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Progress Constructive</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Context_Json__c</field>
+        <value
+      xsi:type="xsd:string"
+    >{"LearnerName":"Arjun","Classes":"Maths Foundation - Saturday AM, Enrolled, attendance 70%, 3 sessions missed, course score 69.0%, grade C (provisional), needs support: Attendance 70%","Results":"Unit Test 1, Test, 66%, C\nQuiz 1, Quiz, 72%, C"}</value>
+    </values>
+    <values>
+        <field>Expect_Json__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Must_Contain__c</field>
+        <value xsi:type="xsd:string">Arjun|attendance</value>
+    </values>
+    <values>
+        <field>Must_Not_Contain__c</field>
+        <value xsi:type="xsd:string">fail|lazy|terrible</value>
+    </values>
+    <values>
+        <field>Prompt__c</field>
+        <value xsi:type="xsd:string">Learner_Progress_Summary</value>
+    </values>
+</CustomMetadata>

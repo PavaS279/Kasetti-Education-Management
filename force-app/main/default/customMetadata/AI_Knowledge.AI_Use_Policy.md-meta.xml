@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Using the AI assistants</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Body__c</field>
+        <value
+      xsi:type="xsd:string"
+    >AI assistants draft replies, summaries and comments; a member of staff always reviews and decides what is sent or saved. Mark each draft as used, edited or discarded so the benefit can be measured.
+AI runs through the Einstein Trust Layer: personal data is masked and the model provider does not keep the data. Do not paste passwords, bank details or medical information into AI prompts.</value>
+    </values>
+    <values>
+        <field>Keywords__c</field>
+        <value
+      xsi:type="xsd:string"
+    >ai assistant assistants einstein draft drafts summary summaries review accept trust</value>
+    </values>
+    <values>
+        <field>Topic__c</field>
+        <value xsi:type="xsd:string">ai</value>
+    </values>
+</CustomMetadata>

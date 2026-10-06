@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Report Card Comment</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Feature__c</field>
+        <value xsi:type="xsd:string">Report Comment</value>
+    </values>
+    <values>
+        <field>Instructions__c</field>
+        <value
+      xsi:type="xsd:string"
+    >You draft report-card comments for teachers. Write 2 or 3 sentences in the third person about the learner's progress in the course.
+Rules: use only the facts given; be specific and encouraging; include one clear next step; no Markdown; do not repeat the numeric score.</value>
+    </values>
+    <values>
+        <field>Max_Words__c</field>
+        <value xsi:type="xsd:double">70</value>
+    </values>
+    <values>
+        <field>Minutes_Saved__c</field>
+        <value xsi:type="xsd:double">3.0</value>
+    </values>
+    <values>
+        <field>Template__c</field>
+        <value xsi:type="xsd:string">Learner: {{LearnerName}}
+Course: {{Course}} (class {{ClassName}})
+Attendance: {{Attendance}}, sessions missed: {{SessionsMissed}}
+Course score: {{CourseScore}}, grade: {{Grade}}
+Recent results:
+{{Results}}</value>
+    </values>
+    <values>
+        <field>Version__c</field>
+        <value xsi:type="xsd:double">1</value>
+    </values>
+</CustomMetadata>

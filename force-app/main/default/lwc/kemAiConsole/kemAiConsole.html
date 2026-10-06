@@ -1,0 +1,111 @@
+<template>
+  <template lwc:if={visible}>
+    <article class="kem-card panel">
+      <header class="head">
+        <div class="title">
+          <lightning-icon
+            icon-name="utility:einstein"
+            size="x-small"
+          ></lightning-icon>
+          <span class="kem-section-title">AI assistants</span>
+          <template lwc:if={data}>
+            <span class={statusClass}>{statusLabel}</span>
+            <span class="kem-muted small">model {modelLabel}</span>
+          </template>
+        </div>
+        <lightning-combobox
+          class="period"
+          label="Period"
+          variant="label-hidden"
+          value={days}
+          options={periodOptions}
+          onchange={handlePeriod}
+        ></lightning-combobox>
+      </header>
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+      <template lwc:if={data}>
+        <div class="tiles">
+          <template for:each={tiles} for:item="t">
+            <div key={t.key} class={t.className}>
+              <span class="tile-value">{t.value}</span>
+              <span class="tile-label">{t.label}</span>
+            </div>
+          </template>
+        </div>
+        <template lwc:if={hasFeatures}>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Feature</th>
+                  <th class="num">Requests</th>
+                  <th class="num">Used</th>
+                  <th class="num">Edited</th>
+                  <th class="num">Discarded</th>
+                  <th class="num">Awaiting review</th>
+                  <th class="num">Used rate</th>
+                  <th class="num">Avg. edit</th>
+                  <th class="num">Rating</th>
+                  <th class="num">Minutes saved</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={features} for:item="f">
+                  <tr key={f.feature}>
+                    <td>{f.feature}</td>
+                    <td class="num">{f.calls}</td>
+                    <td class="num">{f.accepted}</td>
+                    <td class="num">{f.edited}</td>
+                    <td class="num">{f.rejected}</td>
+                    <td class="num">{f.pending}</td>
+                    <td class="num">{f.acceptance}</td>
+                    <td class="num">{f.edit}</td>
+                    <td class="num">{f.rating}</td>
+                    <td class="num">{f.minutesSaved}</td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </template>
+        <template lwc:else>
+          <div class="kem-empty">No AI requests in this period yet.</div>
+        </template>
+        <template lwc:if={data.isAdmin}>
+          <div class="eval">
+            <div>
+              <div class="strong">Offline evaluation</div>
+              <template lwc:if={evaluation}>
+                <span class={evaluation.className}>{evaluation.runLabel}</span>
+                <span class="kem-muted small"> {evaluation.label}</span>
+              </template>
+              <template lwc:else>
+                <span class="kem-muted small"
+                  >Not run yet. Run it after changing a prompt or the
+                  model.</span
+                >
+              </template>
+            </div>
+            <lightning-button
+              label="Run evaluation"
+              onclick={handleEvaluate}
+              disabled={isBusy}
+            ></lightning-button>
+          </div>
+          <p class="kem-muted small controls">
+            Controls: Education Settings AI_Enabled (kill switch),
+            AI_Disabled_Features ({data.disabledFeatures}), AI_Model; access
+            through the KEM AI User permission set.
+          </p>
+        </template>
+      </template>
+    </article>
+  </template>
+</template>

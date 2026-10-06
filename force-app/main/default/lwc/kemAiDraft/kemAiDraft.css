@@ -1,0 +1,52 @@
+@import "c/kemStyles";
+
+.draft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  border: 1px solid #c9d7f2;
+  border-radius: var(--kem-radius-sm);
+  background: #f7f9fe;
+}
+
+.draft-text {
+  --slds-c-textarea-sizing-min-height: 9rem;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--kem-muted);
+}
+
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.star {
+  border: none;
+  background: none;
+  padding: 0 0.1rem;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--kem-line);
+  cursor: pointer;
+}
+
+.star_on {
+  color: var(--kem-amber);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
