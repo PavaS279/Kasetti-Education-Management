@@ -4,12 +4,13 @@ Education management on Salesforce Education Cloud for Kasetti Technologies: enq
 
 **Status (2026-10-06):** Phases 0–4 complete — 245 Apex tests (93% coverage), 163 Jest tests, every feature checked live in the org. AI benefit: [docs/ai/MEASURED-BENEFIT.md](docs/ai/MEASURED-BENEFIT.md).
 
-| Start here                                 |                                          |
-| ------------------------------------------ | ---------------------------------------- |
-| [docs/PROGRESS.md](docs/PROGRESS.md)       | What is built, deployed and tested       |
-| [docs/DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md) | Demo and acceptance tests (Phases 1–4)   |
-| [docs/NEXT-STEPS.md](docs/NEXT-STEPS.md)   | Hand-over: open actions, how to continue |
-| [docs/README.md](docs/README.md)           | All documentation                        |
+| Start here                                 |                                                            |
+| ------------------------------------------ | ---------------------------------------------------------- |
+| [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) | Complete walkthrough by role (set-up, addresses, examples) |
+| [docs/PROGRESS.md](docs/PROGRESS.md)       | What is built, deployed and tested                         |
+| [docs/DEMO-SCRIPT.md](docs/DEMO-SCRIPT.md) | Demo and acceptance tests (Phases 1–4)                     |
+| [docs/NEXT-STEPS.md](docs/NEXT-STEPS.md)   | Hand-over: open actions, how to continue                   |
+| [docs/README.md](docs/README.md)           | All documentation                                          |
 
 Demo runners: `scripts/demo/full-journey.sh` (Phase 1), `scripts/demo/phase2-journey.sh` (Phase 2), `scripts/demo/phase3-journey.sh` (Phase 3) and `scripts/demo/phase4-journey.sh` (Phase 4). Deploy with `scripts/deploy.sh`.
 
