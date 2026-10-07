@@ -1,0 +1,122 @@
+<template>
+  <template lwc:if={errorMessage}>
+    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+      {errorMessage}
+    </div>
+  </template>
+  <div class="form-grid">
+    <lightning-input
+      label="Code"
+      value={form.code}
+      data-field="code"
+      onchange={handleField}
+      max-length="30"
+      placeholder="SIBLING10"
+      required
+      field-level-help="What staff type at enrolment; letters, numbers, - and _ (upper case)."
+    ></lightning-input>
+    <lightning-input
+      label="Description"
+      value={form.description}
+      data-field="description"
+      onchange={handleField}
+      max-length="255"
+      placeholder="Second child in the same family"
+    ></lightning-input>
+    <lightning-combobox
+      label="Kind"
+      value={form.discountType}
+      options={typeOptions}
+      data-field="discountType"
+      onchange={handleField}
+    ></lightning-combobox>
+    <lightning-input
+      type="number"
+      label={valueLabel}
+      value={form.value}
+      data-field="value"
+      onchange={handleField}
+      min="0.01"
+      max={valueMax}
+      step="0.01"
+      required
+    ></lightning-input>
+    <lightning-combobox
+      label="Applies to"
+      value={form.feeType}
+      options={feeOptions}
+      data-field="feeType"
+      onchange={handleField}
+    ></lightning-combobox>
+    <lightning-combobox
+      label="Branch"
+      value={form.branchId}
+      options={branchOptions}
+      data-field="branchId"
+      onchange={handleField}
+    ></lightning-combobox>
+    <lightning-combobox
+      label="Course"
+      value={form.courseId}
+      options={courseOptions}
+      data-field="courseId"
+      onchange={handleField}
+      class="wide"
+    ></lightning-combobox>
+    <lightning-input
+      type="date"
+      label="From"
+      value={form.validFrom}
+      data-field="validFrom"
+      onchange={handleField}
+    ></lightning-input>
+    <lightning-input
+      type="date"
+      label="Until"
+      value={form.validTo}
+      data-field="validTo"
+      onchange={handleField}
+      min={form.validFrom}
+    ></lightning-input>
+    <lightning-input
+      type="number"
+      label="Uses allowed"
+      value={form.maxUses}
+      data-field="maxUses"
+      onchange={handleField}
+      min="1"
+      step="1"
+      placeholder="No limit"
+    ></lightning-input>
+    <div class="toggles">
+      <lightning-input
+        type="toggle"
+        label="Needs approval"
+        checked={form.requiresApproval}
+        data-field="requiresApproval"
+        onchange={handleField}
+        message-toggle-active="Finance approves each use"
+        message-toggle-inactive="Applies at once"
+      ></lightning-input>
+      <lightning-input
+        type="toggle"
+        label="Active"
+        checked={form.active}
+        data-field="active"
+        onchange={handleField}
+        message-toggle-active="Can be used"
+        message-toggle-inactive="Switched off"
+      ></lightning-input>
+    </div>
+  </div>
+  <p class="example kem-muted">{example}</p>
+  <div class="actions">
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      variant="brand"
+      label={saveLabel}
+      onclick={handleSave}
+      disabled={cannotSave}
+    ></lightning-button>
+  </div>
+</template>

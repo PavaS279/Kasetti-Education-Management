@@ -7,6 +7,7 @@ import holdOverpayment from "@salesforce/apex/CreditController.holdOverpayment";
 import approveRefund from "@salesforce/apex/CreditController.approveRefund";
 import markRefundPaid from "@salesforce/apex/CreditController.markRefundPaid";
 import ReasonModal from "c/kemReasonModal";
+import DiscountManager from "c/kemDiscountManagerModal";
 
 jest.mock(
   "@salesforce/apex/BillingController.getFinanceDesk",
@@ -155,6 +156,19 @@ describe("c-kem-finance-desk", () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+  });
+
+  it("opens the discount codes", async () => {
+    getFinanceDesk.mockResolvedValue(DESK);
+    const element = createElement("c-kem-finance-desk", { is: KemFinanceDesk });
+    document.body.appendChild(element);
+    await flush();
+    DiscountManager.open.mockResolvedValueOnce(false);
+    element.shadowRoot.querySelector("lightning-button.discounts").click();
+    await flush();
+    expect(DiscountManager.open).toHaveBeenCalledWith(
+      expect.objectContaining({ label: "Discounts", size: "large" })
+    );
   });
 
   it("shows KPIs and work queues and retries an exception", async () => {

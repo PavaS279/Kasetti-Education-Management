@@ -218,6 +218,7 @@ Each step: 👤 **who** · 📍 **where** · ▶ **do** · ✅ **you should see*
 👤 Administrator / finance · 📍 Course page `L/lightning/r/LearningCourse/0vYdN0000003QkLUAU/view`, Discounts `L/lightning/o/Discount__c/list`
 ▶ Open **Course pricing**: fee lines by branch, type (Admission, Tuition, Workbooks, Transport), frequency (one-time, termly, monthly), dates, tax. Open discount **SIBLING10**.
 ✅ Mathematics Foundation totals 16,520 with tax; SIBLING10 gives 10% (approval rules apply).
+▶ Also: **Finance Desk → Discounts** (or Set-up Centre → Manage discounts): every code with its status and use (SIBLING10: 34 enrolments, ₹17,070 given); **New discount** e.g. `DIWALI15`, 15% on tuition 15 Oct–15 Nov, 30 uses; switch an old code off.
 💡 Prices change every year and differ by centre; enrolments keep the price agreed on the day (a price rise never changes an existing family's bill).
 
 #### A4. Classes and timetable
@@ -439,7 +440,7 @@ All on the Branch page `L/lightning/r/Branch__c/a0MdN000001Y9hqUAC/view` unless 
 #### G3. Library
 
 👤 Branch staff · 📍 **Library** desk
-▶ **Catalogue** → search "kalam" → **Issue** to a learner; **On loan** → **Renew** / **Return** / **Lost**; **Fines** → **Paid** / **Waive**.
+▶ **Catalogue** → search "kalam" → **Issue** to a learner; **On loan** → **Renew** / **Return** / **Lost**; **Fines** → **Paid** / **Waive**. Stock: **Add copies** on an item; **Import** → **Download a template**, fill it, choose the file → **Preview** (new, copies added, or why a line is skipped) → **Import**.
 ✅ Due dates, renewals (max 2), late fines; a learner with an overdue item cannot borrow.
 💡 Books and robotics kits come back; families see loans in the portal.
 

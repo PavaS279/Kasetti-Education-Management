@@ -6,12 +6,20 @@
           <div class="kem-hero__subtitle">Receivables and reconciliation</div>
           <div class="kem-hero__title">Finance Desk</div>
         </div>
-        <lightning-button-icon
-          icon-name="utility:refresh"
-          variant="border-inverse"
-          alternative-text="Refresh"
-          onclick={handleRefresh}
-        ></lightning-button-icon>
+        <div class="hero-actions">
+          <lightning-button
+            label="Discounts"
+            icon-name="utility:percent"
+            onclick={handleDiscounts}
+            class="discounts"
+          ></lightning-button>
+          <lightning-button-icon
+            icon-name="utility:refresh"
+            variant="border-inverse"
+            alternative-text="Refresh"
+            onclick={handleRefresh}
+          ></lightning-button-icon>
+        </div>
       </div>
     </section>
 

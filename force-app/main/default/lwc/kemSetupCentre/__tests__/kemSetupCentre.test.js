@@ -251,7 +251,11 @@ describe("c-kem-setup-centre", () => {
           createLabel: "Add staff member",
           manageLabel: "Manage staff"
         }),
-        t("portal", { createLabel: "Give portal access", objectApiName: null })
+        t("portal", { createLabel: "Give portal access", objectApiName: null }),
+        t("discounts", {
+          createLabel: "New discount",
+          manageLabel: "Manage discounts"
+        })
       ]
     });
     const element = await render();
@@ -291,6 +295,14 @@ describe("c-kem-setup-centre", () => {
     tiles[4].querySelector("lightning-button.create").click();
     await settle();
     expect(LightningModal.open.mock.calls[5][0].label).toBe("Portal access");
+    LightningModal.open.mockResolvedValueOnce("a0DNEW");
+    tiles[5].querySelector("lightning-button.create").click();
+    await settle();
+    expect(LightningModal.open.mock.calls[6][0].label).toBe("New discount");
+    LightningModal.open.mockResolvedValueOnce(true);
+    tiles[5].querySelector("lightning-button.manage").click();
+    await settle();
+    expect(LightningModal.open.mock.calls[7][0].label).toBe("Discounts");
     // Each saved screen refreshes the counts.
     expect(getCentre.mock.calls.length).toBeGreaterThanOrEqual(5);
   });

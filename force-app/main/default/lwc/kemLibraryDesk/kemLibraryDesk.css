@@ -138,3 +138,13 @@
   align-items: end;
   gap: 0.5rem;
 }
+
+.copies-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.copies-input {
+  width: 5rem;
+}

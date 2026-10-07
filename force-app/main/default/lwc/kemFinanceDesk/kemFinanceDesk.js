@@ -1,6 +1,7 @@
 import { LightningElement } from "lwc";
 import { NavigationMixin } from "lightning/navigation";
 import CURRENCY from "@salesforce/i18n/currency";
+import DiscountManager from "c/kemDiscountManagerModal";
 import getFinanceDesk from "@salesforce/apex/BillingController.getFinanceDesk";
 import confirmPayment from "@salesforce/apex/BillingController.confirmPayment";
 import failPayment from "@salesforce/apex/BillingController.failPayment";
@@ -215,6 +216,11 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
 
   handleTab(event) {
     this.activeTab = event.currentTarget.dataset.value;
+  }
+
+  /** Discount codes and how each is used. */
+  async handleDiscounts() {
+    await DiscountManager.open({ size: "large", label: "Discounts" });
   }
 
   handleRefresh() {

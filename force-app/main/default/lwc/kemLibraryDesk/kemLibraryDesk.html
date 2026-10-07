@@ -129,6 +129,12 @@
                 icon-name="utility:add"
                 onclick={handleToggleAdd}
               ></lightning-button>
+              <lightning-button
+                label="Import"
+                icon-name="utility:upload"
+                onclick={handleImport}
+                class="import"
+              ></lightning-button>
             </template>
           </div>
           <template lwc:if={showAdd}>
@@ -192,6 +198,43 @@
                       >{i.itemType} · {i.code} · {i.availability}</span
                     >
                   </div>
+                  <template lwc:if={i.canAddCopies}>
+                    <template lwc:if={i.addingCopies}>
+                      <span class="copies-form">
+                        <lightning-input
+                          type="number"
+                          label="Copies to add"
+                          variant="label-hidden"
+                          value={copiesToAdd}
+                          min="1"
+                          max="1000"
+                          onchange={handleCopiesValue}
+                          class="copies-input"
+                        ></lightning-input>
+                        <lightning-button
+                          variant="brand"
+                          label="Add"
+                          data-id={i.id}
+                          onclick={handleAddCopies}
+                          disabled={isBusy}
+                        ></lightning-button>
+                        <lightning-button
+                          variant="base"
+                          label="Cancel"
+                          onclick={handleCancelCopies}
+                        ></lightning-button>
+                      </span>
+                    </template>
+                    <template lwc:else>
+                      <lightning-button
+                        variant="base"
+                        label="Add copies"
+                        data-id={i.id}
+                        onclick={handleStartCopies}
+                        class="add-copies"
+                      ></lightning-button>
+                    </template>
+                  </template>
                   <template lwc:if={i.canIssue}>
                     <lightning-button
                       variant="base"

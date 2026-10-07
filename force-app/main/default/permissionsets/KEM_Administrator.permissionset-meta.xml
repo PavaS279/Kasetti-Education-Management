@@ -41,6 +41,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>DiscountSetupController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>DocumentController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -86,6 +90,10 @@
     </classAccesses>
     <classAccesses>
         <apexClass>LibraryController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>LibrarySetupController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>

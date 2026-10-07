@@ -264,6 +264,10 @@ public with sharing class SetupCentreService {
         WITH USER_MODE
       ];
       t.detail = 'Active codes';
+      t.wizard = t.canCreate;
+      if (Schema.SObjectType.Discount__c.isUpdateable()) {
+        t.manageLabel = 'Manage discounts';
+      }
       result.tiles.add(t);
     }
     if (readable(CourseOffering.SObjectType)) {

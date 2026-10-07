@@ -8,6 +8,8 @@ import renew from "@salesforce/apex/LibraryController.renew";
 import returnLoan from "@salesforce/apex/LibraryController.returnLoan";
 import markLost from "@salesforce/apex/LibraryController.markLost";
 import settleFine from "@salesforce/apex/LibraryController.settleFine";
+import addCopies from "@salesforce/apex/LibrarySetupController.addCopies";
+import ImportModal from "c/kemLibraryImportModal";
 import { reduceErrors, toast, toastError } from "c/kemUtils";
 
 const TYPES = ["Book", "Device", "Kit", "Media", "Other"].map((t) => ({
@@ -33,6 +35,8 @@ export default class KemLibraryDesk extends LightningElement {
   learnerId;
   // add item form
   showAdd = false;
+  copiesItemId;
+  copiesToAdd = 1;
   newItem = { title: "", code: "", type: "Book", author: "", copies: 1 };
   searchTimer;
 
@@ -110,6 +114,8 @@ export default class KemLibraryDesk extends LightningElement {
       ...i,
       availability: `${i.available} of ${i.copies} available`,
       canIssue: this.data.canLend && i.active && i.available > 0,
+      canAddCopies: this.data.canManageItems,
+      addingCopies: i.id === this.copiesItemId,
       issuing: i.id === this.issuingItemId
     }));
   }
@@ -222,6 +228,42 @@ export default class KemLibraryDesk extends LightningElement {
   // ---- add item
   handleToggleAdd() {
     this.showAdd = !this.showAdd;
+  }
+  async handleImport() {
+    const result = await ImportModal.open({
+      size: "large",
+      label: "Import library items",
+      branchId: this.recordId
+    });
+    if (result) {
+      toast(
+        this,
+        "Library items imported",
+        `${result.created} new, ${result.updated} with copies added (${result.copies} copies)` +
+          (result.skipped ? `; ${result.skipped} lines skipped.` : ".")
+      );
+      await this.load();
+    }
+  }
+  handleStartCopies(event) {
+    this.copiesItemId = event.currentTarget.dataset.id;
+    this.copiesToAdd = 1;
+  }
+  handleCancelCopies() {
+    this.copiesItemId = undefined;
+  }
+  handleCopiesValue(event) {
+    this.copiesToAdd = event.target.value;
+  }
+  async handleAddCopies(event) {
+    const id = event.currentTarget.dataset.id;
+    const copies = Number(this.copiesToAdd);
+    await this.run(
+      () => addCopies({ itemId: id, copies }),
+      "Copies added",
+      `${copies} cop${copies === 1 ? "y" : "ies"} added.`
+    );
+    this.copiesItemId = undefined;
   }
   handleNewItem(event) {
     const field = event.target.dataset.field;

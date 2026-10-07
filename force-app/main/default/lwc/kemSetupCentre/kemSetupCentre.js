@@ -10,6 +10,8 @@ import HolidayModal from "c/kemHolidayModal";
 import StaffModal from "c/kemStaffModal";
 import StaffDirectory from "c/kemStaffDirectoryModal";
 import PortalAccessModal from "c/kemPortalAccessModal";
+import DiscountModal from "c/kemDiscountModal";
+import DiscountManager from "c/kemDiscountManagerModal";
 import { reduceErrors, toast } from "c/kemUtils";
 
 /**
@@ -137,6 +139,15 @@ export default class KemSetupCentre extends NavigationMixin(LightningElement) {
         );
         await this.load();
       }
+    } else if (tile.key === "discounts") {
+      const id = await DiscountModal.open({
+        size: "medium",
+        label: "New discount"
+      });
+      if (id) {
+        toast(this, "Discount created", "Staff can use the code at enrolment.");
+        await this.load();
+      }
     } else if (tile.key === "portal") {
       const given = await PortalAccessModal.open({
         size: "medium",
@@ -189,11 +200,12 @@ export default class KemSetupCentre extends NavigationMixin(LightningElement) {
     });
   }
 
-  async handleManage() {
-    const changed = await StaffDirectory.open({
-      size: "large",
-      label: "Manage staff"
-    });
+  async handleManage(event) {
+    const key = event.currentTarget.dataset.key;
+    const changed =
+      key === "discounts"
+        ? await DiscountManager.open({ size: "large", label: "Discounts" })
+        : await StaffDirectory.open({ size: "large", label: "Manage staff" });
     if (changed) {
       await this.load();
     }

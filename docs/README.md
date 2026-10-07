@@ -68,3 +68,4 @@ Target org: Kasetti Technologies Pvt Ltd (Enterprise Edition, Education Cloud), 
 | F5.2 Course, class and faculty screens    | [features/F5.2-course-class-wizards.md](features/F5.2-course-class-wizards.md)                   |
 | F5.3 Branch, rooms, holidays and staff    | [features/F5.3-branch-rooms-holidays-staff.md](features/F5.3-branch-rooms-holidays-staff.md)     |
 | F5.4 Family, application, portal access   | [features/F5.4-family-application-portal.md](features/F5.4-family-application-portal.md)         |
+| F5.5 Discounts and library import         | [features/F5.5-discounts-library-import.md](features/F5.5-discounts-library-import.md)           |

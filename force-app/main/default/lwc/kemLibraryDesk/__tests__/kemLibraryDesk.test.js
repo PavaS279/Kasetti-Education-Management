@@ -8,7 +8,14 @@ import renew from "@salesforce/apex/LibraryController.renew";
 import returnLoan from "@salesforce/apex/LibraryController.returnLoan";
 import markLost from "@salesforce/apex/LibraryController.markLost";
 import settleFine from "@salesforce/apex/LibraryController.settleFine";
+import addCopies from "@salesforce/apex/LibrarySetupController.addCopies";
+import LightningModal from "lightning/modal";
 
+jest.mock(
+  "@salesforce/apex/LibrarySetupController.addCopies",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 jest.mock(
   "@salesforce/apex/LibraryController.getDesk",
   () => ({ default: jest.fn() }),
@@ -239,6 +246,40 @@ describe("c-kem-library-desk", () => {
         Branch__c: "a0M1"
       })
     });
+  });
+
+  it("imports a catalogue and adds copies to an item", async () => {
+    getDesk.mockResolvedValue(desk());
+    addCopies.mockResolvedValue(1);
+    const el = await mount();
+    tab(el, "catalogue").click();
+    await flush();
+    const root = el.shadowRoot;
+    LightningModal.open.mockResolvedValueOnce({
+      created: 3,
+      updated: 1,
+      copies: 9,
+      skipped: 0
+    });
+    button(root, "Import").click();
+    await flush();
+    await flush();
+    expect(LightningModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({
+        label: "Import library items",
+        branchId: "a0M1"
+      })
+    );
+    root.querySelector("lightning-button.add-copies").click();
+    await flush();
+    const input = root.querySelector("lightning-input.copies-input");
+    input.value = "4";
+    input.dispatchEvent(new CustomEvent("change"));
+    await flush();
+    button(root, "Add").click();
+    await flush();
+    await flush();
+    expect(addCopies).toHaveBeenCalledWith({ itemId: "a1", copies: 4 });
   });
 
   it("settles fines, shows empty states and hides without access", async () => {
