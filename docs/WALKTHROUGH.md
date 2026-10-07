@@ -178,6 +178,13 @@ Each step: 👤 **who** · 📍 **where** · ▶ **do** · ✅ **you should see*
 ✅ Greeting and quick links; seats filled and attendance gauges; receivables (outstanding, overdue, collected this month); admissions tiles; **Analytics**, **Forecasts**, **Cover Desk**, **Retention**, **Referrals and alumni**, **AI assistants** console, **Operations**, **Ask about our policies**, **Branches**.
 💡 The owner sees the whole institution on one screen every morning: are classes full, is money coming in, who needs attention. Log in as Anjali (coordinator) to compare: no money cards — each role sees only what it needs.
 
+#### A1b. Set-up Centre
+
+👤 Administrator (or branch manager / coordinator) · 📍 Home → **Set-up Centre**
+▶ Read the tiles (branches, rooms, staff roles, courses, classes, holidays, discounts, faculty, portal access); click **New** on a tile or **View all**; open a record from **Set-up gaps**.
+✅ Counts for what you can see; New only where you may create; gaps such as classes without a teacher or room, unpriced courses, branches without a manager, running classes with no sessions.
+💡 One place to start setting up a centre and to see what is still missing before the timetable, billing or the portal are affected.
+
 #### A2. Centres, rooms and staff
 
 👤 Administrator · 📍 Branch page `L/lightning/r/Branch__c/a0MdN000001Y9hqUAC/view`

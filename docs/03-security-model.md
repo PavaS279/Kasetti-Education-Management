@@ -159,3 +159,11 @@ The matrix is extended per feature in `scripts/tooling/specs.py` (`PERMISSION_SE
 | Grant a referral reward / not eligible | KEM Manage Billing (finance, administrators)   |                |                          |          |         |                       |
 
 **System-mode operations (transport, exams, referrals):** seats taken, assignment and fee-line fields, candidate status and seats, marks, and referral fields are system-managed and written by the services after the user-mode checks (create access on the object, the custom permissions above). Referral codes on enquiries are matched in system mode (any channel may give a code; only the referrer's Id is used). Portal: transport details and hall tickets are read in system mode after the portal's own check that the learner belongs to the signed-in family.
+
+## Phase 5 permissions (creation screens)
+
+| Screen                                  | Administrator                                     | Branch Manager                                  | Academic             | Others |
+| --------------------------------------- | ------------------------------------------------- | ----------------------------------------------- | -------------------- | ------ |
+| Set-up Centre (`SetupCentreController`) | ✅ all tiles, New on every record they may create | ✅ (New room, class, staff role…; not branches) | ✅ (New room, class) | Hidden |
+
+The Set-up Centre reads in user mode; "New" follows the user's create permission on each object.

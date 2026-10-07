@@ -9,6 +9,12 @@
         </itemInstances>
         <itemInstances>
             <componentInstance>
+                <componentName>kemSetupCentre</componentName>
+                <identifier>c_kemSetupCentre</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>kemAnalytics</componentName>
                 <identifier>c_kemAnalytics</identifier>
             </componentInstance>
