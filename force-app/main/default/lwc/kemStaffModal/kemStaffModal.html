@@ -1,0 +1,170 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <template lwc:if={overview}>
+      <div class={licenceClass}>
+        <lightning-icon
+          icon-name="utility:identity"
+          size="x-small"
+          alternative-text=""
+        ></lightning-icon>
+        <span>{licenceText}</span>
+        <template lwc:if={noLicences}>
+          <span
+            >· deactivate a former staff member or buy a licence first.</span
+          >
+        </template>
+      </div>
+
+      <template lwc:if={rolesSaved}>
+        <p class="hint">
+          The login is ready. Choose the branch roles and save them.
+        </p>
+      </template>
+      <template lwc:else>
+        <div class="form-grid">
+          <lightning-input
+            label="First name"
+            value={form.firstName}
+            data-field="firstName"
+            onchange={handleField}
+            max-length="40"
+          ></lightning-input>
+          <lightning-input
+            label="Last name"
+            value={form.lastName}
+            data-field="lastName"
+            onchange={handleField}
+            max-length="80"
+            required
+          ></lightning-input>
+          <lightning-input
+            type="email"
+            label="Work email"
+            value={form.email}
+            data-field="email"
+            onchange={handleField}
+            required
+            field-level-help="The welcome email with the link to set a password goes here."
+          ></lightning-input>
+          <lightning-input
+            type="tel"
+            label="Mobile"
+            value={form.mobile}
+            data-field="mobile"
+            onchange={handleField}
+          ></lightning-input>
+        </div>
+        <lightning-radio-group
+          label="What they do"
+          options={personaOptions}
+          value={form.persona}
+          data-field="persona"
+          onchange={handleField}
+          type="button"
+          class="persona"
+        ></lightning-radio-group>
+        <template lwc:if={isAdministrator}>
+          <p class="hint hint_warn">
+            Administrators see and change everything at every branch.
+          </p>
+        </template>
+        <div class="toggles">
+          <lightning-input
+            type="toggle"
+            label="Can use Einstein (AI drafts and summaries)"
+            checked={form.aiUser}
+            data-field="aiUser"
+            onchange={handleField}
+            message-toggle-active="Yes"
+            message-toggle-inactive="No"
+          ></lightning-input>
+          <lightning-input
+            type="toggle"
+            label="Send the welcome email now"
+            checked={form.sendEmail}
+            data-field="sendEmail"
+            onchange={handleField}
+            message-toggle-active="Yes"
+            message-toggle-inactive="Later"
+          ></lightning-input>
+        </div>
+        <lightning-input
+          label="Username"
+          value={form.username}
+          data-field="username"
+          onchange={handleField}
+          required
+          field-level-help="Unique across all of Salesforce; looks like an email address. The person signs in with it."
+          class="username"
+        ></lightning-input>
+      </template>
+
+      <h3 class="kem-section-title section">Branch roles</h3>
+      <p class="hint">
+        Roles decide which branches' desks, classes and records the person works
+        with.
+      </p>
+      <ul class="roles">
+        <template for:each={roleRows} for:item="r">
+          <li key={r.key} class="role">
+            <lightning-combobox
+              label="Branch"
+              value={r.branchId}
+              options={branchOptions}
+              data-index={r.index}
+              data-field="branchId"
+              onchange={handleRole}
+            ></lightning-combobox>
+            <lightning-combobox
+              label="Role"
+              value={r.role}
+              options={roleOptions}
+              data-index={r.index}
+              data-field="role"
+              onchange={handleRole}
+            ></lightning-combobox>
+            <template lwc:if={r.canRemove}>
+              <lightning-button-icon
+                icon-name="utility:delete"
+                alternative-text="Remove role"
+                title="Remove role"
+                variant="bare"
+                data-index={r.index}
+                onclick={handleRemoveRole}
+                class="remove"
+              ></lightning-button-icon>
+            </template>
+          </li>
+        </template>
+      </ul>
+      <lightning-button
+        label="Add another role"
+        icon-name="utility:add"
+        variant="base"
+        onclick={handleAddRole}
+      ></lightning-button>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label={submitLabel}
+      onclick={handleSubmit}
+      disabled={cannotSubmit}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

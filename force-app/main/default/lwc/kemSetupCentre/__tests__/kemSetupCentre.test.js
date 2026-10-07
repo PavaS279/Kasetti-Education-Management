@@ -227,4 +227,66 @@ describe("c-kem-setup-centre", () => {
       attributes: { recordId: "001FACULTY", actionName: "view" }
     });
   });
+
+  it("opens the branch, room, holiday and staff screens", async () => {
+    const t = (key, extra = {}) => ({
+      key,
+      label: key,
+      icon: "standard:people",
+      count: 1,
+      objectApiName: "Branch__c",
+      canCreate: true,
+      wizard: true,
+      createLabel: `New ${key}`,
+      ...extra
+    });
+    getCentre.mockResolvedValue({
+      openGaps: 0,
+      gaps: [],
+      tiles: [
+        t("branches"),
+        t("rooms"),
+        t("holidays"),
+        t("staff", {
+          createLabel: "Add staff member",
+          manageLabel: "Manage staff"
+        })
+      ]
+    });
+    const element = await render();
+    const tiles = element.shadowRoot.querySelectorAll("li.tile");
+    const settle = () => flush().then(flush).then(flush);
+
+    LightningModal.open.mockResolvedValueOnce({
+      branchId: "a0MNEW",
+      rooms: 2,
+      holidays: 7
+    });
+    tiles[0].querySelector("lightning-button.create").click();
+    await settle();
+    expect(LightningModal.open.mock.calls[0][0].label).toBe("New branch");
+    expect(getNavigateCalledWith().attributes.recordId).toBe("a0MNEW");
+
+    LightningModal.open.mockResolvedValueOnce(3);
+    tiles[1].querySelector("lightning-button.create").click();
+    await settle();
+    expect(LightningModal.open.mock.calls[1][0].label).toBe("Add rooms");
+
+    LightningModal.open.mockResolvedValueOnce({ created: 7, skipped: 0 });
+    tiles[2].querySelector("lightning-button.create").click();
+    await settle();
+    expect(LightningModal.open.mock.calls[2][0].label).toBe("Add holidays");
+
+    LightningModal.open.mockResolvedValueOnce({ userId: "005NEW", roles: 1 });
+    tiles[3].querySelector("lightning-button.create").click();
+    await settle();
+    expect(LightningModal.open.mock.calls[3][0].label).toBe("Add staff member");
+
+    LightningModal.open.mockResolvedValueOnce(true);
+    tiles[3].querySelector("lightning-button.manage").click();
+    await settle();
+    expect(LightningModal.open.mock.calls[4][0].label).toBe("Manage staff");
+    // Each saved screen refreshes the counts.
+    expect(getCentre.mock.calls.length).toBeGreaterThanOrEqual(5);
+  });
 });

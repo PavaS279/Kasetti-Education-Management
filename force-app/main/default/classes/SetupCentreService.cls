@@ -45,6 +45,9 @@ public with sharing class SetupCentreService {
     /** True when "New" opens the guided screen; false means the standard record form. */
     @AuraEnabled
     public Boolean wizard = false;
+    /** A second action on the tile (Manage staff). */
+    @AuraEnabled
+    public String manageLabel;
     /** A record that lists this tile's records (the faculty account). */
     @AuraEnabled
     public Id listRecordId;
@@ -108,6 +111,7 @@ public with sharing class SetupCentreService {
         WITH USER_MODE
       ];
       t.detail = inactive == 0 ? 'All active' : inactive + ' inactive';
+      t.wizard = t.canCreate;
       result.tiles.add(t);
     }
     if (readable(Room__c.SObjectType)) {
@@ -127,6 +131,7 @@ public with sharing class SetupCentreService {
       ];
       t.count = (Integer) seats.get('n');
       t.detail = nvl((Decimal) seats.get('seats')).intValue() + ' seats';
+      t.wizard = t.canCreate;
       result.tiles.add(t);
     }
     if (readable(Branch_Staff__c.SObjectType)) {
@@ -150,6 +155,13 @@ public with sharing class SetupCentreService {
         people.add(s.User__c);
       }
       t.detail = people.size() + (people.size() == 1 ? ' person' : ' people');
+      if (StaffSetupService.canManage()) {
+        // Administrators add the login and its roles together; "Manage staff" changes roles.
+        t.canCreate = true;
+        t.wizard = true;
+        t.createLabel = 'Add staff member';
+        t.manageLabel = 'Manage staff';
+      }
       result.tiles.add(t);
     }
     if (readable(LearningCourse.SObjectType)) {
@@ -233,6 +245,7 @@ public with sharing class SetupCentreService {
       t.detail = next.isEmpty()
         ? 'None coming up'
         : 'Next: ' + next[0].Name + ', ' + next[0].Start_Date__c.format();
+      t.wizard = t.canCreate;
       result.tiles.add(t);
     }
     if (readable(Discount__c.SObjectType)) {

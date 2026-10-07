@@ -1,0 +1,60 @@
+@import "c/kemStyles";
+
+.path {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.section {
+  margin: 0.75rem 0 0.5rem;
+}
+
+.hint {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 0.75rem;
+  color: var(--kem-muted);
+}
+
+.suggest {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.year {
+  width: 6.5rem;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: 8rem minmax(0, 1fr);
+  gap: 0.375rem 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-canvas);
+  font-size: 0.8125rem;
+}
+
+.summary dt {
+  color: var(--kem-muted);
+  font-weight: 600;
+}
+
+@media (max-width: 40em) {
+  .form-grid,
+  .summary {
+    grid-template-columns: 1fr;
+  }
+}

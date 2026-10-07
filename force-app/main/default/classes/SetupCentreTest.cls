@@ -89,6 +89,12 @@ private class SetupCentreTest {
       );
       Assert.isNotNull(tile(centre, 'portal'), 'Portal tile');
       Assert.isTrue(tile(centre, 'courses').wizard, 'Course wizard');
+      Assert.isTrue(tile(centre, 'branches').wizard, 'Branch wizard');
+      Assert.isTrue(tile(centre, 'holidays').wizard, 'Holiday screen');
+      Assert.isNull(
+        tile(centre, 'staff').manageLabel,
+        'Adding logins needs Manage Users as well'
+      );
       Assert.isTrue(tile(centre, 'classes').wizard, 'Class wizard');
       Assert.isTrue(tile(centre, 'faculty').canCreate, 'New faculty');
       Assert.isNull(

@@ -4,13 +4,19 @@ import getCentre from "@salesforce/apex/SetupCentreController.getCentre";
 import CourseWizard from "c/kemCourseWizardModal";
 import ClassWizard from "c/kemClassWizardModal";
 import FacultyModal from "c/kemFacultyModal";
+import BranchWizard from "c/kemBranchWizardModal";
+import RoomModal from "c/kemRoomModal";
+import HolidayModal from "c/kemHolidayModal";
+import StaffModal from "c/kemStaffModal";
+import StaffDirectory from "c/kemStaffDirectoryModal";
 import { reduceErrors, toast } from "c/kemUtils";
 
 /**
  * Set-up Centre: counts, create buttons and set-up gaps for administrators,
  * branch managers and academic coordinators. Hidden for everyone else.
  * "New" opens a guided screen where one exists and the user can use it
- * (courses, classes, faculty), otherwise the standard record form.
+ * (branches, rooms, staff, courses, classes, holidays, faculty), otherwise
+ * the standard record form.
  */
 export default class KemSetupCentre extends NavigationMixin(LightningElement) {
   centre;
@@ -88,7 +94,49 @@ export default class KemSetupCentre extends NavigationMixin(LightningElement) {
       });
       return;
     }
-    if (tile.key === "courses") {
+    if (tile.key === "branches") {
+      await this.newBranch();
+    } else if (tile.key === "rooms") {
+      const added = await RoomModal.open({
+        size: "medium",
+        label: "Add rooms"
+      });
+      if (added) {
+        toast(
+          this,
+          "Rooms added",
+          `${added} room${added === 1 ? "" : "s"} added.`
+        );
+        await this.load();
+      }
+    } else if (tile.key === "holidays") {
+      const result = await HolidayModal.open({
+        size: "large",
+        label: "Add holidays"
+      });
+      if (result) {
+        toast(
+          this,
+          "Holidays added",
+          `${result.created} added` +
+            (result.skipped ? `, ${result.skipped} already there.` : ".")
+        );
+        await this.load();
+      }
+    } else if (tile.key === "staff") {
+      const result = await StaffModal.open({
+        size: "medium",
+        label: "Add staff member"
+      });
+      if (result?.userId) {
+        toast(
+          this,
+          "Staff member added",
+          `Login created with ${result.roles} branch role${result.roles === 1 ? "" : "s"}.`
+        );
+        await this.load();
+      }
+    } else if (tile.key === "courses") {
       await this.newCourse();
     } else if (tile.key === "classes") {
       await this.newClass();
@@ -105,6 +153,35 @@ export default class KemSetupCentre extends NavigationMixin(LightningElement) {
         );
         await this.load();
       }
+    }
+  }
+
+  async newBranch() {
+    const result = await BranchWizard.open({
+      size: "large",
+      label: "New branch"
+    });
+    if (!result?.branchId) {
+      return;
+    }
+    toast(
+      this,
+      "Branch opened",
+      `${result.rooms} rooms and ${result.holidays} holidays added.`
+    );
+    this[NavigationMixin.Navigate]({
+      type: "standard__recordPage",
+      attributes: { recordId: result.branchId, actionName: "view" }
+    });
+  }
+
+  async handleManage() {
+    const changed = await StaffDirectory.open({
+      size: "large",
+      label: "Manage staff"
+    });
+    if (changed) {
+      await this.load();
     }
   }
 

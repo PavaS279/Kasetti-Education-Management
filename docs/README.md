@@ -66,3 +66,4 @@ Target org: Kasetti Technologies Pvt Ltd (Enterprise Edition, Education Cloud), 
 | F4.12 Phase 4 journey                     | [features/F4.12-phase4-journey.md](features/F4.12-phase4-journey.md)                             |
 | F5.1 Set-up Centre                        | [features/F5.1-setup-centre.md](features/F5.1-setup-centre.md)                                   |
 | F5.2 Course, class and faculty screens    | [features/F5.2-course-class-wizards.md](features/F5.2-course-class-wizards.md)                   |
+| F5.3 Branch, rooms, holidays and staff    | [features/F5.3-branch-rooms-holidays-staff.md](features/F5.3-branch-rooms-holidays-staff.md)     |

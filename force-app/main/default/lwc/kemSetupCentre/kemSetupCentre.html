@@ -63,6 +63,15 @@
                     class="create"
                   ></lightning-button>
                 </template>
+                <template lwc:if={t.manageLabel}>
+                  <lightning-button
+                    label={t.manageLabel}
+                    variant="base"
+                    data-key={t.key}
+                    onclick={handleManage}
+                    class="manage"
+                  ></lightning-button>
+                </template>
                 <template lwc:if={t.canList}>
                   <lightning-button
                     label="View all"
