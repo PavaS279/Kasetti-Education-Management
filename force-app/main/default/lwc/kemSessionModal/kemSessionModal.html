@@ -1,0 +1,54 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <p class="intro">
+      One session outside the weekly times, for example to make up for a
+      cancelled one. It uses the class's teacher and room; a clash is refused.
+    </p>
+    <div class="form-grid">
+      <lightning-combobox
+        label="Kind"
+        value={sessionType}
+        options={typeOptions}
+        onchange={handleType}
+      ></lightning-combobox>
+      <lightning-input
+        type="date"
+        label="Day"
+        value={day}
+        class="day"
+        onchange={handleDay}
+        required
+      ></lightning-input>
+      <lightning-input
+        type="time"
+        label="Starts"
+        value={timeValue}
+        onchange={handleTime}
+        required
+        class="time"
+      ></lightning-input>
+      <lightning-combobox
+        label="Lasts"
+        value={minutes}
+        options={lengthOptions}
+        onchange={handleLength}
+      ></lightning-combobox>
+    </div>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Add session"
+      onclick={handleSave}
+      disabled={cannotSave}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

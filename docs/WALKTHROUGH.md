@@ -248,7 +248,7 @@ Each step: 👤 **who** · 📍 **where** · ▶ **do** · ✅ **you should see*
 
 #### B0. A family walks in ready to join
 
-👤 Admissions counsellor (Adam) or branch manager · 📍 **Admissions → Enquiries** → **New family (walk-in)**
+👤 Admissions counsellor (Adam) or branch manager · 📍 **Admissions** tab (Admissions Pipeline) → **New family (walk-in)**
 ▶ Branch Indiranagar; parent 1 _Shalini Gowda_ (mother, mobile and email, Kannada, WhatsApp, pays the fees), parent 2 _Ramesh Menon_ with his email → **Next**; child _Tanvi_ (12 Mar 2015) → **Enrol in a class now** → _Robotics with Arduino – Wednesday 17:00_; **Add another child** _Kabir_ (2 Aug 2018) → **Start an application** → Abacus → **Next**.
 ✅ The check finds Ramesh already on file → **Use existing** → **Save the family**: Tanvi is enrolled at the agreed price (a seat is taken), Kabir's application starts at Processing with its checklist, Ramesh is linked to all his children. Then on Learner 360 → **Portal access** → **Give access** for Shalini: the welcome email goes out at once (children under 13 use a parent's login).
 💡 Walk-ins no longer need a made-up enquiry; one record per person even when a parent is already on file. ⚠ In the live org this creates real records and a portal login uses a licence and emails the parent: use example addresses.
@@ -300,7 +300,7 @@ Each step: 👤 **who** · 📍 **where** · ▶ **do** · ✅ **you should see*
 #### C2. AI document reader (extraction)
 
 👤 Counsellor (KEM AI User) · 📍 application → **AI document reader**
-▶ **Paste text** of a transfer certificate or choose a PDF → **Read** → review the proposals next to the current values (blanks ticked, conflicts not ticked, another parent's details locked) → correct one value → **Apply**.
+▶ **Paste text** of a transfer certificate → **Read text** (or choose a PDF → **Read**) → review the proposals next to the current values (blanks ticked, conflicts not ticked, another parent's details locked) → correct one value → **Apply**.
 ✅ Address, previous school, dates etc. filled in; extra facts saved in **Document Details**; health, religion, caste, income and ID numbers are never extracted; the console records how many values staff corrected.
 💡 Typing data from certificates is slow and error-prone; AI proposes, staff decide.
 
@@ -323,7 +323,7 @@ Each step: 👤 **who** · 📍 **where** · ▶ **do** · ✅ **you should see*
 #### D2. Waitlist
 
 👤 Coordinator · 📍 Class _Waitlist Demo – Sunday_ (Course Offerings list) → **Waitlist** panel
-▶ **Join waitlist** (priority, discount code); on an offered entry **Accept** / **Decline**.
+▶ **Add to waitlist** (priority, discount code); on an offered entry **Accept seat** / **Declined**.
 ✅ A freed seat is held 48 hours for the next learner and the family is told; if they decline or the hold expires, the seat passes on.
 💡 Popular classes fill fairly and automatically, without phone calls in the evening.
 
@@ -344,7 +344,7 @@ Each step: 👤 **who** · 📍 **where** · ▶ **do** · ✅ **you should see*
 
 #### E2. Attendance register
 
-👤 Teacher · 📍 Session `L/lightning/r/Class_Session__c/a0UdN000007kuHkUAI/view` (registers open one hour before the start; for a live demo add a session starting now — Class → menu → add a make-up session)
+👤 Teacher · 📍 Session `L/lightning/r/Class_Session__c/a0UdN000007kuHkUAI/view` (registers open one hour before the start; for a live demo add a session starting now: class page → class menu → **Add a one-off session**)
 ▶ **Mark all present** → set one learner **Late** with minutes → note → **Save register**.
 ✅ Session **Completed**; attendance rates update; corrections after saving are audited; low attendance raises alerts and retention risk.
 💡 Attendance feeds parents' portal, exam eligibility and the at-risk list — taken once, used everywhere.
@@ -434,14 +434,14 @@ All on the Branch page `L/lightning/r/Branch__c/a0MdN000001Y9hqUAC/view` unless 
 
 #### G1. Transport (bus routes)
 
-👤 Branch manager (Rahul) / counsellor · 📍 **Transport desk**
+👤 Branch manager (Rahul) / counsellor · 📍 Branch page → **Transport** panel
 ▶ Select route **DEMO-R1** → manifest (stops, times, riders, payer phones) → **Print**. **Add learner** (search, stop, direction, start date next month, charge fee) → **Message families** ("Bus 15 minutes late on Monday"). **New route** / **Add stop** for a new one.
 ✅ Seats counted (a full route refuses riders); a monthly **Transport** fee line billed with the class from the start date; one message per family naming all their children; the portal **Transport** section shows route, stop and times.
 💡 The driver gets a correct list, parents get one clear message, and bus fees are never forgotten on the invoice.
 
 #### G2. Exams and hall tickets
 
-👤 Branch manager / coordinator · 📍 **Exam desk** (exam **DEMO-T1**)
+👤 Branch manager / coordinator · 📍 Branch page → **Exams** panel (exam **DEMO-T1**)
 ▶ **New exam** → **Add paper** (class, date, time, marks) → **1. Register candidates** → **2. Check eligibility** (attendance below the minimum or overdue fees → Withheld with the reason; **Allow** with KEM Eligibility Override) → **3. Allocate seats** (choose rooms) → **4. Issue hall tickets**. Then **Enter marks** → **Save marks** → **Publish to gradebook**.
 ✅ Hall ticket PDFs (candidate, seat "[KEM Demo] Room 101-01", papers, instructions) on the candidate and in the family's portal documents; withheld families told why; published marks become an _Exam_ assessment in the class gradebook; exam **Results Published**.
 💡 Exam season paperwork (lists, seating, tickets, mark sheets) done in minutes, with fair, rule-based eligibility.
@@ -529,7 +529,7 @@ Negative: asking for another family's learner or document → "You do not have a
 #### J1. Operations console
 
 👤 Administrator · 📍 Home → **Operations**
-▶ Health banner, queues (e.g. 1 refund awaiting approval), scheduled jobs (recurring billing, payment reminders, library and the others) with next run and **Run now**, background runs, recent errors, **Sync administrators**.
+▶ Health banner, queues (e.g. 1 refund awaiting approval), scheduled jobs (recurring billing, payment reminders, library and the others) with next run and the ▶ **Run … now** button, background runs, recent errors, **Sync administrators**.
 💡 One place to see that the nightly work happened.
 
 #### J2. Reports and dashboard
@@ -611,8 +611,8 @@ Each run creates its own tagged `[KEM Demo]` records, so runs never collide.
 | Agentforce staff assistant                  | Agentforce panel                      | Staff with KEM AI User                  | [F4.6](features/F4.6-agentforce-staff-assistant.md)                                       |
 | Document extraction                         | Application page                      | Counsellor                              | [F4.7](features/F4.7-document-extraction.md)                                              |
 | Forecasts                                   | Home, Branch page                     | Managers, finance                       | [F4.8](features/F4.8-forecasting.md)                                                      |
-| Transport                                   | Branch → Transport desk; portal       | Manager, counsellor; families           | [F4.9](features/F4.9-transport.md)                                                        |
-| Exams and hall tickets                      | Branch → Exam desk; portal            | Manager, coordinator, teacher; families | [F4.10](features/F4.10-exams-and-hall-tickets.md)                                         |
+| Transport                                   | Branch → Transport panel; portal      | Manager, counsellor; families           | [F4.9](features/F4.9-transport.md)                                                        |
+| Exams and hall tickets                      | Branch → Exams panel; portal          | Manager, coordinator, teacher; families | [F4.10](features/F4.10-exams-and-hall-tickets.md)                                         |
 | Alumni and referrals                        | Home/Branch → Referrals; portal       | Manager, finance; families              | [F4.11](features/F4.11-alumni-and-referrals.md)                                           |
 
 More: [DEMO-SCRIPT.md](DEMO-SCRIPT.md) (acceptance tests by phase), [NEXT-STEPS.md](NEXT-STEPS.md) (hand-over), [03-security-model.md](03-security-model.md) (who can do what).

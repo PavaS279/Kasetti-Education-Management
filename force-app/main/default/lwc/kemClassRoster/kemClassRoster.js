@@ -14,6 +14,7 @@ import withdraw from "@salesforce/apex/EnrolmentController.withdraw";
 import decideDiscount from "@salesforce/apex/EnrolmentController.decideDiscount";
 import EnrolModal from "c/kemEnrolModal";
 import PatternModal from "c/kemPatternModal";
+import SessionModal from "c/kemSessionModal";
 import generateSessions from "@salesforce/apex/TimetableController.generateSessions";
 import createInvoice from "@salesforce/apex/BillingController.createInvoice";
 import ReasonModal from "c/kemReasonModal";
@@ -210,6 +211,24 @@ export default class KemClassRoster extends NavigationMixin(LightningElement) {
         attributes: { apiName: "KEM_Timetable" }
       });
 
+      return;
+    }
+
+    if (action === "session") {
+      const sessionId = await SessionModal.open({
+        size: "small",
+        label: "Add a session",
+        offeringId: this.recordId,
+        offeringName: this.offering.Name
+      });
+      if (sessionId) {
+        toast(
+          this,
+          "Session added",
+          "It is on the timetable and in the teacher's sessions."
+        );
+        this.announceChange();
+      }
       return;
     }
 

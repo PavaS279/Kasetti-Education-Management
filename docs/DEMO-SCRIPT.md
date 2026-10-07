@@ -123,7 +123,7 @@ Last verified: 2026-10-03 (run D2 — IA-0000000034, BLR-000004, RCT-000004).
    - ✅ Week view with the Monday sessions; filters for branch, room, teacher, **My sessions**; **Today**.
 2. Drag a session to another slot.
    - ✅ Rescheduled (clashes for the same teacher or room are refused with a message).
-3. Click a session → drawer → **Attendance** (use a session that starts within the next hour; otherwise create one: Class page → menu → **Add weekly pattern**/**Generate sessions**, or add a make-up session on Class Sessions → New with Start = now).
+3. Click a session → drawer → **Attendance** (use a session that starts within the next hour; otherwise create one: Class page → menu → **Add weekly pattern**/**Generate sessions**, or class menu → **Add a one-off session** starting now).
 
 ### 7. Attendance (2 min)
 
@@ -219,7 +219,7 @@ POST /services/apexrest/kem/v1/payments
 | Teacher cover (F2.6)     | Report an absence, ranked cover suggestions, assign or cancel (families told), room swaps                                                                 | Home → **Cover Desk**; Session page → **Teacher and room**                                |
 | Grading (F2.7)           | Weighted course grades, comments, finalise → report card PDFs and family notices, reopen                                                                  | Class page → **Course grades**                                                            |
 | Portal (F2.8)            | Inbox, course grades with report card download, documents, instalments, credit, waitlist position                                                         | Portal → My Learning                                                                      |
-| Operations (F2.9)        | Health, exception queues, scheduled jobs with **Run now**, background runs, errors                                                                        | Home → **Operations** (administrators)                                                    |
+| Operations (F2.9)        | Health, exception queues, scheduled jobs with ▶ **Run … now**, background runs, errors                                                                    | Home → **Operations** (administrators)                                                    |
 
 Email delivery is switched off in this org (Education Setting `Email_Delivery` = Off): emails are logged as **Not Sent**; portal messages are delivered.
 
@@ -249,7 +249,7 @@ Latest live run: tag `P2A` on 2026-10-05 — **all checks passed** (guardian "Gu
 
 ### Click-by-click demo (about 30 minutes)
 
-1. **Waitlist.** Open class _[KEM Demo] Waitlist Demo – Sunday_ → Waitlist panel: queue with positions, held seat and countdown. **Join waitlist** for a learner (priority, sibling discount code). Expected: added at the right position; the class shows Waiting count.
+1. **Waitlist.** Open class _[KEM Demo] Waitlist Demo – Sunday_ → Waitlist panel: queue with positions, held seat and countdown. **Add to waitlist** for a learner (priority, sibling discount code). Expected: added at the right position; the class shows Waiting count.
 2. **Accept or decline an offer** on an Offered entry. Expected: Accept enrols the learner with the code; Decline passes the seat to the next learner (new offer, new countdown).
 3. **Transfer.** Class roster ▾ → **Transfer to another class**. Pick a class: preview shows current vs new price, the difference and what happens to billing. Expected: old enrolment Withdrew "Transferred to …", new enrolment linked; a cheaper class after invoicing creates a credit note.
 4. **Recurring billing.** Open invoice BLR-000005 (Coding Club, Ishaan): line "Tuition (Sep 2026)" with period dates, **Instalments** panel (3 instalments, first paid, second part-paid). On a new issued invoice, **Pay in instalments** → choose 3, monthly → preview → **Create plan**. Expected: due date moves to the first unpaid instalment.
@@ -258,7 +258,7 @@ Latest live run: tag `P2A` on 2026-10-05 — **all checks passed** (guardian "Gu
 7. **Teacher cover.** Home → **Cover Desk** → **Report absence** (a teacher, tomorrow, Training). Expected: their sessions appear under Needs cover with ranked teachers (free, has taught the course, load). **Assign** → session shows "covering for …", teacher attendance Substituted, a task for the cover teacher. On a session page, **Change room** lists free rooms large enough first.
 8. **Grading.** Class _[KEM Demo] Maths Foundation – Saturday AM_ → **Course grades**: weights 10/20 (33.3% / 66.7%), Ananya 92.67 A+, Arjun 69.00 C, Kavya 85.00 A, status **Final** with report card links. **Reopen** (reason) → Provisional, old report cards superseded; change a weight → **Save weights** → scores recalculate; **Finalise & issue report cards** → new PDFs and family notices.
 9. **Portal.** Log in as Rohit Sharma → My Learning: **Messages (n new)**; Ananya → Results starts with the course grade and **Report card** download; **Documents** tab; Fees shows instalments and credit; Timetable shows waitlist position when queued.
-10. **Operations.** Home → **Operations** (administrators): health banner, queues (e.g. 1 refund awaiting approval), the five scheduled jobs with next runs and **Run now**, background runs and recent errors.
+10. **Operations.** Home → **Operations** (administrators): health banner, queues (e.g. 1 refund awaiting approval), the five scheduled jobs with next runs and ▶ **Run … now**, background runs and recent errors.
 
 ### Phase 2 negative tests
 
@@ -287,8 +287,8 @@ Latest live run: tag `P2A` on 2026-10-05 — **all checks passed** (guardian "Gu
 
 ### G2. Scale and background jobs (3 minutes)
 
-1. Home → **Operations** → **Run now** on _KEM Payment Reminders_: a `ReminderJob` batch appears under background runs (Completed) with a log entry "Payment reminders for …: n messages", followed by a delivery job.
-2. **Run now** on _KEM Recurring Billing_: the batch runs in small batches of 5 enrolments; the log line reports invoices raised, failures and any enrolments left for an automatic follow-up run.
+1. Home → **Operations** → ▶ **Run … now** on _KEM Payment Reminders_: a `ReminderJob` batch appears under background runs (Completed) with a log entry "Payment reminders for …: n messages", followed by a delivery job.
+2. ▶ **Run … now** on _KEM Recurring Billing_: the batch runs in small batches of 5 enrolments; the log line reports invoices raised, failures and any enrolments left for an automatic follow-up run.
 3. Setup → Custom Metadata Types → Education Setting: `Recurring_Billing_Batch_Size` (5) and `Dispatch_Rounds` (20) tune throughput without code changes.
 
 ### G3. Automated run (about 4 minutes, 26 checks)
@@ -410,7 +410,7 @@ Every set-up and people record now has a KTEdutech screen. Start from **Home →
 
 ### I3. A family walks in (6 minutes, counsellor)
 
-1. **Admissions → Enquiries → New family (walk-in)**: two parents (one already on file by email), two children: one **Enrol in a class now**, one **Start an application** → the check finds the existing parent → **Use existing** → **Save the family**.
+1. **Admissions** tab (Admissions Pipeline) → **New family (walk-in)**: two parents (one already on file by email), two children: one **Enrol in a class now**, one **Start an application** → the check finds the existing parent → **Use existing** → **Save the family**.
 2. Learner 360 → **Portal access** → **Give access** for the parent (welcome email at once; children under 13 use the parent's login). Applications tab → **New application** for another course.
 
 ### I4. Discounts and library (5 minutes)

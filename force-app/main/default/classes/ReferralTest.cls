@@ -89,6 +89,43 @@ private class ReferralTest {
   }
 
   @IsTest
+  static void aCodeAddedAfterSavingLinksTheReferrer() {
+    System.runAs(TestDataFactory.admin()) {
+      String code = ReferralService.codeFor(person('Priya').Id);
+      Lead l = TestDataFactory.buildEnquiry(
+        [SELECT Id FROM Branch__c WHERE Branch_Code__c = 'REF-01'].Id
+      );
+      insert l;
+      Test.startTest();
+      update new Lead(Id = l.Id, Referral_Code__c = code.toLowerCase());
+      Test.stopTest();
+      Lead saved = [
+        SELECT Referred_By__c, Enquiry_Channel__c, Referral_Code__c
+        FROM Lead
+        WHERE Id = :l.Id
+      ];
+      Assert.areEqual(
+        person('Priya').Id,
+        saved.Referred_By__c,
+        'Referrer linked'
+      );
+      Assert.areEqual('Referral', saved.Enquiry_Channel__c, 'Channel');
+      Assert.areEqual(
+        1,
+        [SELECT COUNT() FROM Referral__c WHERE Enquiry__c = :l.Id],
+        'Referral recorded once'
+      );
+      // Editing the enquiry again does not record a second referral.
+      update new Lead(Id = l.Id, Description = 'Called back');
+      Assert.areEqual(
+        1,
+        [SELECT COUNT() FROM Referral__c WHERE Enquiry__c = :l.Id],
+        'Still one'
+      );
+    }
+  }
+
+  @IsTest
   static void codesAreCreatedOnceAndReadable() {
     System.runAs(TestDataFactory.admin()) {
       String code = ReferralController.referralCode(person('Priya').Id);

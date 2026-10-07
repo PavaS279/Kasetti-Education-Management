@@ -31,11 +31,45 @@ public with sharing class LeadTriggerHandler extends TriggerHandler {
     if (!contactChanged.isEmpty()) {
       EnquiryDuplicateService.flagDuplicates(contactChanged);
     }
+    // A referral code added after the enquiry was saved links the referrer too.
+    List<Lead> newCodes = new List<Lead>();
+    for (Lead enquiry : (List<Lead>) newRecords) {
+      Lead previous = (Lead) oldMap.get(enquiry.Id);
+      if (
+        enquiry.Referred_By__c == null &&
+        String.isNotBlank(enquiry.Referral_Code__c) &&
+        enquiry.Referral_Code__c != previous.Referral_Code__c &&
+        !enquiry.IsConverted
+      ) {
+        newCodes.add(enquiry);
+      }
+    }
+    if (!newCodes.isEmpty()) {
+      ReferralService.resolveCodes(newCodes);
+    }
     for (Lead enquiry : (List<Lead>) newRecords) {
       Lead previous = (Lead) oldMap.get(enquiry.Id);
       if (enquiry.Status == 'Contacted' && previous.Status != 'Contacted') {
         enquiry.Last_Contacted__c = System.now();
       }
+    }
+  }
+
+  protected override void afterUpdate(
+    List<SObject> newRecords,
+    Map<Id, SObject> oldMap
+  ) {
+    List<Lead> referred = new List<Lead>();
+    for (Lead enquiry : (List<Lead>) newRecords) {
+      if (
+        enquiry.Referred_By__c != null &&
+        ((Lead) oldMap.get(enquiry.Id)).Referred_By__c == null
+      ) {
+        referred.add(enquiry);
+      }
+    }
+    if (!referred.isEmpty()) {
+      ReferralService.recordReferrals(referred);
     }
   }
 
