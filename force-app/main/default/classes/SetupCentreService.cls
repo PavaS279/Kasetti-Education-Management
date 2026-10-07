@@ -531,7 +531,12 @@ public with sharing class SetupCentreService {
       null,
       null
     );
-    t.objectApiName = null; // managed in Setup until the portal access button (stage 4)
+    t.objectApiName = null; // logins are listed per family, not as a list view
+    if (PortalAccessService.canGive()) {
+      t.canCreate = true;
+      t.wizard = true;
+      t.createLabel = 'Give portal access';
+    }
     t.count = [
       SELECT COUNT()
       FROM User

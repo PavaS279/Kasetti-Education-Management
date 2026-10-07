@@ -10,6 +10,8 @@ import getLearnerInvoices from "@salesforce/apex/BillingController.getLearnerInv
 import CURRENCY from "@salesforce/i18n/currency";
 import GuardianModal from "c/kemGuardianModal";
 import EnrolModal from "c/kemEnrolModal";
+import ApplicationModal from "c/kemApplicationModal";
+import PortalAccessModal from "c/kemPortalAccessModal";
 import { reduceErrors, toast, toastError, initials, toneFor } from "c/kemUtils";
 
 const DASH = "—";
@@ -290,6 +292,35 @@ export default class KemLearner360 extends NavigationMixin(LightningElement) {
         actionName: "view"
       }
     });
+  }
+
+  async handleNewApplication() {
+    const applicationId = await ApplicationModal.open({
+      size: "small",
+      label: "New application",
+      learnerId: this.recordId,
+      learnerName: this.person.Name,
+      branchId: this.person.Branch__c
+    });
+    if (applicationId) {
+      toast(
+        this,
+        "Application created",
+        "It starts at Processing with its document checklist."
+      );
+      await refreshApex(this.wiredResult);
+    }
+  }
+
+  async handlePortalAccess() {
+    const given = await PortalAccessModal.open({
+      size: "medium",
+      label: "Portal access",
+      accountId: this.recordId
+    });
+    if (given) {
+      await refreshApex(this.wiredResult);
+    }
   }
 
   async handleEnrol() {

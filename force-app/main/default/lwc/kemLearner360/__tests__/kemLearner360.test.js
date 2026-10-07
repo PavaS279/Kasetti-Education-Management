@@ -1,5 +1,6 @@
 import { createElement } from "lwc";
 import KemLearner360 from "c/kemLearner360";
+import LightningModal from "lightning/modal";
 import getLearner360 from "@salesforce/apex/Learner360Controller.getLearner360";
 import updatePreferences from "@salesforce/apex/Learner360Controller.updatePreferences";
 import getLearnerResults from "@salesforce/apex/AssessmentController.getLearnerResults";
@@ -212,6 +213,34 @@ describe("c-kem-learner-360", () => {
       expect.objectContaining({
         accountId: "001000000000001",
         input: expect.objectContaining({ preferredChannel: "WhatsApp" })
+      })
+    );
+  });
+
+  it("opens New application and Portal access for the learner", async () => {
+    const element = createElement("c-kem-learner-360", { is: KemLearner360 });
+    element.recordId = "001000000000001";
+    document.body.appendChild(element);
+    getLearner360.emit(VIEW);
+    await flush();
+    LightningModal.open.mockResolvedValueOnce(null);
+    element.shadowRoot
+      .querySelector("lightning-button.new-application")
+      .click();
+    await flush();
+    expect(LightningModal.open).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        label: "New application",
+        learnerId: "001000000000001"
+      })
+    );
+    LightningModal.open.mockResolvedValueOnce(0);
+    element.shadowRoot.querySelector("lightning-button.portal-access").click();
+    await flush();
+    expect(LightningModal.open).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        label: "Portal access",
+        accountId: "001000000000001"
       })
     );
   });

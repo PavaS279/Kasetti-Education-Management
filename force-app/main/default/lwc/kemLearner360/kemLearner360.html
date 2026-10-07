@@ -92,6 +92,14 @@
       <lightning-tabset variant="scoped">
         <lightning-tab label="Overview">
           <div class="tab-body">
+            <div class="quick-actions">
+              <lightning-button
+                label="Portal access"
+                icon-name="utility:people"
+                onclick={handlePortalAccess}
+                class="portal-access"
+              ></lightning-button>
+            </div>
             <template lwc:if={view.isLearner}>
               <div class="section-head">
                 <div class="kem-section-title">Guardians</div>
@@ -200,6 +208,17 @@
         </lightning-tab>
         <lightning-tab label="Applications">
           <div class="tab-body">
+            <template lwc:if={view.isLearner}>
+              <div class="section-head">
+                <div class="kem-section-title">Applications</div>
+                <lightning-button
+                  label="New application"
+                  icon-name="utility:add"
+                  onclick={handleNewApplication}
+                  class="new-application"
+                ></lightning-button>
+              </div>
+            </template>
             <template for:each={applicationRows} for:item="a">
               <div key={a.Id} class="row kem-card">
                 <div class="row-main">

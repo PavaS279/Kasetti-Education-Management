@@ -250,7 +250,8 @@ describe("c-kem-setup-centre", () => {
         t("staff", {
           createLabel: "Add staff member",
           manageLabel: "Manage staff"
-        })
+        }),
+        t("portal", { createLabel: "Give portal access", objectApiName: null })
       ]
     });
     const element = await render();
@@ -286,6 +287,10 @@ describe("c-kem-setup-centre", () => {
     tiles[3].querySelector("lightning-button.manage").click();
     await settle();
     expect(LightningModal.open.mock.calls[4][0].label).toBe("Manage staff");
+    LightningModal.open.mockResolvedValueOnce(1);
+    tiles[4].querySelector("lightning-button.create").click();
+    await settle();
+    expect(LightningModal.open.mock.calls[5][0].label).toBe("Portal access");
     // Each saved screen refreshes the counts.
     expect(getCentre.mock.calls.length).toBeGreaterThanOrEqual(5);
   });

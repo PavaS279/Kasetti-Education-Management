@@ -4,6 +4,7 @@ import getPipeline from "@salesforce/apex/EnquiryController.getPipeline";
 import getBranches from "@salesforce/apex/EnquiryController.getBranches";
 import updateStatus from "@salesforce/apex/EnquiryController.updateStatus";
 import EnquiryModal from "c/kemEnquiryModal";
+import FamilyModal from "c/kemFamilyModal";
 
 jest.mock(
   "@salesforce/apex/EnquiryController.getPipeline",
@@ -110,6 +111,26 @@ describe("c-kem-enquiry-pipeline", () => {
     await Promise.resolve();
     expect(EnquiryModal.open).toHaveBeenCalledWith(
       expect.objectContaining({ size: "medium" })
+    );
+  });
+
+  it("opens New family for walk-ins", async () => {
+    const element = await render();
+    FamilyModal.open.mockResolvedValueOnce({
+      learnerIds: ["001L1"],
+      guardianIds: ["001G1"],
+      enrolmentIds: ["0eP1"],
+      applicationIds: [],
+      created: 2,
+      reused: 0
+    });
+    [...element.shadowRoot.querySelectorAll("lightning-button")]
+      .find((b) => b.label === "New family (walk-in)")
+      .click();
+    await flush();
+    await flush();
+    expect(FamilyModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ size: "large", label: "New family" })
     );
   });
 

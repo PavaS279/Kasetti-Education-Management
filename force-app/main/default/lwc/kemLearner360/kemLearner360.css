@@ -192,3 +192,9 @@
   font-weight: 800;
   color: var(--kem-ink);
 }
+
+.quick-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}

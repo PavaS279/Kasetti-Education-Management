@@ -7,6 +7,7 @@ import updateStatus from "@salesforce/apex/EnquiryController.updateStatus";
 import LostReasonModal from "c/kemLostReasonModal";
 import ConvertModal from "c/kemEnquiryConvertModal";
 import EnquiryModal from "c/kemEnquiryModal";
+import FamilyModal from "c/kemFamilyModal";
 import {
   reduceErrors,
   toast,
@@ -153,6 +154,29 @@ export default class KemEnquiryPipeline extends NavigationMixin(
       );
       await refreshApex(this.wiredPipeline);
     }
+  }
+
+  /** A family who walks in ready to join: no enquiry needed. */
+  async handleNewFamily() {
+    const result = await FamilyModal.open({
+      size: "large",
+      label: "New family",
+      branchId: this.branchId || null
+    });
+    if (!result?.learnerIds?.length) {
+      return;
+    }
+    const parts = [`${result.created} added`];
+    if (result.reused) parts.push(`${result.reused} already on file`);
+    if (result.enrolmentIds.length)
+      parts.push(`${result.enrolmentIds.length} enrolled`);
+    if (result.applicationIds.length)
+      parts.push(`${result.applicationIds.length} applications started`);
+    toast(this, "Family saved", parts.join(", ") + ".");
+    this[NavigationMixin.Navigate]({
+      type: "standard__recordPage",
+      attributes: { recordId: result.learnerIds[0], actionName: "view" }
+    });
   }
 
   handleRefresh() {

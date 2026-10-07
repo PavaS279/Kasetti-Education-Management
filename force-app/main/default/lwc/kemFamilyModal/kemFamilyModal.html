@@ -1,0 +1,336 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <lightning-progress-indicator current-step={step} type="path" class="path">
+      <template for:each={steps} for:item="s">
+        <lightning-progress-step
+          key={s.value}
+          label={s.label}
+          value={s.value}
+        ></lightning-progress-step>
+      </template>
+    </lightning-progress-indicator>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+
+    <template lwc:if={isFamily}>
+      <div class="form-grid">
+        <lightning-combobox
+          label="Branch"
+          value={form.branchId}
+          options={branchOptions}
+          data-field="branchId"
+          onchange={handleForm}
+          required
+        ></lightning-combobox>
+        <lightning-input
+          label="Street"
+          value={form.street}
+          data-field="street"
+          onchange={handleForm}
+        ></lightning-input>
+        <lightning-input
+          label="City"
+          value={form.city}
+          data-field="city"
+          onchange={handleForm}
+        ></lightning-input>
+        <lightning-input
+          label="PIN code"
+          value={form.postalCode}
+          data-field="postalCode"
+          onchange={handleForm}
+          pattern="[0-9]{6}"
+          message-when-pattern-mismatch="Enter the 6-digit PIN code."
+        ></lightning-input>
+      </div>
+      <template for:each={guardianRows} for:item="g">
+        <fieldset key={g.key} class="person">
+          <legend class="kem-section-title">Parent {g.number}</legend>
+          <div class="person-grid">
+            <lightning-input
+              label="First name"
+              value={g.firstName}
+              data-index={g.index}
+              data-field="firstName"
+              onchange={handleGuardian}
+            ></lightning-input>
+            <lightning-input
+              label="Last name"
+              value={g.lastName}
+              data-index={g.index}
+              data-field="lastName"
+              onchange={handleGuardian}
+            ></lightning-input>
+            <lightning-combobox
+              label="Relationship"
+              value={g.relationship}
+              options={relationshipOptions}
+              data-index={g.index}
+              data-field="relationship"
+              onchange={handleGuardian}
+            ></lightning-combobox>
+            <lightning-input
+              type="email"
+              label="Email"
+              value={g.email}
+              data-index={g.index}
+              data-field="email"
+              onchange={handleGuardian}
+            ></lightning-input>
+            <lightning-input
+              type="tel"
+              label="Mobile"
+              value={g.phone}
+              data-index={g.index}
+              data-field="phone"
+              onchange={handleGuardian}
+              placeholder="+91 98450 12345"
+            ></lightning-input>
+            <lightning-combobox
+              label="Language"
+              value={g.preferredLanguage}
+              options={languageOptions}
+              data-index={g.index}
+              data-field="preferredLanguage"
+              onchange={handleGuardian}
+            ></lightning-combobox>
+            <lightning-combobox
+              label="Prefers"
+              value={g.preferredChannel}
+              options={channelOptions}
+              data-index={g.index}
+              data-field="preferredChannel"
+              onchange={handleGuardian}
+            ></lightning-combobox>
+            <lightning-input
+              type="checkbox"
+              label="Pays the fees"
+              checked={g.isFeePayer}
+              data-index={g.index}
+              data-field="isFeePayer"
+              onchange={handleGuardian}
+              class="payer"
+            ></lightning-input>
+            <template lwc:if={g.canRemove}>
+              <lightning-button
+                label="Remove"
+                variant="base"
+                data-index={g.index}
+                onclick={handleRemoveGuardian}
+                class="remove"
+              ></lightning-button>
+            </template>
+          </div>
+        </fieldset>
+      </template>
+      <lightning-button
+        label="Add another parent or guardian"
+        icon-name="utility:add"
+        variant="base"
+        onclick={handleAddGuardian}
+      ></lightning-button>
+      <p class="hint">
+        Leave a parent empty to skip them. If nobody is ticked, the first parent
+        pays the fees.
+      </p>
+    </template>
+
+    <template lwc:if={isLearners}>
+      <template for:each={learnerRows} for:item="l">
+        <fieldset key={l.key} class="person">
+          <legend class="kem-section-title">Child {l.number}</legend>
+          <div class="person-grid">
+            <lightning-input
+              label="First name"
+              value={l.firstName}
+              data-index={l.index}
+              data-field="firstName"
+              onchange={handleLearner}
+            ></lightning-input>
+            <lightning-input
+              label="Last name"
+              value={l.lastName}
+              data-index={l.index}
+              data-field="lastName"
+              onchange={handleLearner}
+            ></lightning-input>
+            <lightning-input
+              type="date"
+              label="Date of birth"
+              value={l.birthdate}
+              data-index={l.index}
+              data-field="birthdate"
+              onchange={handleLearner}
+            ></lightning-input>
+            <lightning-input
+              label="School"
+              value={l.school}
+              data-index={l.index}
+              data-field="school"
+              onchange={handleLearner}
+            ></lightning-input>
+          </div>
+          <lightning-radio-group
+            label="Next step"
+            options={nextStepChoices}
+            value={l.nextStep}
+            data-index={l.index}
+            data-field="nextStep"
+            onchange={handleLearner}
+            type="button"
+            class="next"
+          ></lightning-radio-group>
+          <template lwc:if={l.isEnrol}>
+            <div class="person-grid">
+              <lightning-combobox
+                label="Course (to narrow the classes)"
+                value={l.courseId}
+                options={courseOptions}
+                data-index={l.index}
+                data-field="courseId"
+                onchange={handleLearner}
+                placeholder="Any course"
+              ></lightning-combobox>
+              <lightning-combobox
+                label="Class"
+                value={l.offeringId}
+                options={l.classOptions}
+                data-index={l.index}
+                data-field="offeringId"
+                onchange={handleLearner}
+                placeholder="Choose a class"
+              ></lightning-combobox>
+            </div>
+            <template lwc:if={l.noClasses}>
+              <p class="hint">
+                No open classes at this branch for that course.
+              </p>
+            </template>
+            <p class="hint">
+              The agreed price is saved now; the family's invoice follows the
+              billing run.
+            </p>
+          </template>
+          <template lwc:if={l.isApply}>
+            <lightning-combobox
+              label="Course"
+              value={l.courseId}
+              options={courseOptions}
+              data-index={l.index}
+              data-field="courseId"
+              onchange={handleLearner}
+              placeholder="Choose a course"
+              class="course"
+            ></lightning-combobox>
+            <p class="hint">
+              The application starts at Processing with its document checklist;
+              age eligibility is checked from the date of birth.
+            </p>
+          </template>
+          <template lwc:if={l.canRemove}>
+            <lightning-button
+              label="Remove child"
+              variant="base"
+              data-index={l.index}
+              onclick={handleRemoveLearner}
+            ></lightning-button>
+          </template>
+        </fieldset>
+      </template>
+      <lightning-button
+        label="Add another child"
+        icon-name="utility:add"
+        variant="base"
+        onclick={handleAddLearner}
+      ></lightning-button>
+    </template>
+
+    <template lwc:if={isCheck}>
+      <template lwc:if={isBusy}>
+        <lightning-spinner
+          alternative-text="Checking"
+          size="small"
+        ></lightning-spinner>
+      </template>
+      <template lwc:if={hasMatches}>
+        <p class="hint hint_warn">
+          These people may already be on file. Use the existing record to keep
+          one record per person (their history, invoices and portal login stay
+          together).
+        </p>
+        <ul class="matches">
+          <template for:each={matchRows} for:item="m">
+            <li key={m.key} class="match">
+              <div>
+                <span class="kem-badge">{m.kindLabel}</span>
+                <span class="entered">{m.entered}</span>
+                <span class="kem-muted"> matches </span>
+                <strong>{m.name}</strong>
+                <div class="kem-muted small">{m.detail}</div>
+              </div>
+              <lightning-button
+                label={m.useLabel}
+                variant={m.useVariant}
+                data-kind={m.kind}
+                data-index={m.index}
+                data-account={m.accountId}
+                onclick={handleUseExisting}
+              ></lightning-button>
+            </li>
+          </template>
+        </ul>
+      </template>
+      <template lwc:elseif={checked}>
+        <div class="kem-empty ok">
+          <lightning-icon
+            icon-name="utility:success"
+            size="x-small"
+            variant="success"
+            alternative-text=""
+          ></lightning-icon>
+          Nobody here is on file yet.
+        </div>
+      </template>
+      <p class="summary">{summary}</p>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <template lwc:if={showBack}>
+      <lightning-button
+        class="slds-m-left_x-small"
+        label="Back"
+        onclick={handleBack}
+        disabled={isBusy}
+      ></lightning-button>
+    </template>
+    <template lwc:if={isCheck}>
+      <lightning-button
+        class="slds-m-left_x-small"
+        variant="brand"
+        label="Save the family"
+        onclick={handleSave}
+        disabled={cannotSave}
+      ></lightning-button>
+    </template>
+    <template lwc:else>
+      <lightning-button
+        class="slds-m-left_x-small"
+        variant="brand"
+        label="Next"
+        onclick={handleNext}
+        disabled={isLoading}
+      ></lightning-button>
+    </template>
+  </lightning-modal-footer>
+</template>

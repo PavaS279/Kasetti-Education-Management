@@ -1,0 +1,55 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <p class="intro">
+      The application starts at Processing with its document checklist; age
+      eligibility is checked from the learner's date of birth. Families can
+      upload documents from the portal.
+    </p>
+    <div class="form-grid">
+      <lightning-combobox
+        label="Branch"
+        value={selectedBranch}
+        options={branchOptions}
+        onchange={handleBranch}
+        required
+      ></lightning-combobox>
+      <lightning-combobox
+        label="Course"
+        value={courseId}
+        options={courseOptions}
+        onchange={handleCourse}
+        placeholder="Choose a course"
+        required
+      ></lightning-combobox>
+      <lightning-combobox
+        label="Preferred class"
+        value={offeringId}
+        options={classOptions}
+        onchange={handleClass}
+        class="wide"
+      ></lightning-combobox>
+    </div>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Create application"
+      onclick={handleSave}
+      disabled={cannotSave}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

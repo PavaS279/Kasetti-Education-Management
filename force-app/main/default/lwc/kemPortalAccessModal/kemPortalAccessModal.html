@@ -1,0 +1,109 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <template lwc:if={givenMessage}>
+      <div
+        class="slds-notify slds-notify_alert slds-alert_offline given"
+        role="status"
+      >
+        {givenMessage}
+      </div>
+    </template>
+
+    <template lwc:if={isSearching}>
+      <lightning-input
+        type="search"
+        label="Find the parent or learner"
+        placeholder="Name, email or mobile"
+        value={term}
+        onchange={handleSearch}
+      ></lightning-input>
+      <ul class="results">
+        <template for:each={results} for:item="r">
+          <li key={r.id}>
+            <button
+              type="button"
+              class="result"
+              data-id={r.id}
+              onclick={handlePick}
+            >
+              <span class="name">{r.name}</span>
+              <span class="kem-muted small">{r.detail}</span>
+            </button>
+          </li>
+        </template>
+      </ul>
+    </template>
+
+    <template lwc:elseif={family}>
+      <div class="top">
+        <span class="kem-muted small"
+          >{licenceText} · families sign in at {family.portalUrl}</span
+        >
+        <template lwc:if={canChangePerson}>
+          <lightning-button
+            label="Another family"
+            variant="base"
+            onclick={handleChangePerson}
+          ></lightning-button>
+        </template>
+      </div>
+      <template lwc:if={noPermission}>
+        <p class="hint hint_warn">
+          Giving portal access needs the KEM Manage Portal permission; ask an
+          administrator.
+        </p>
+      </template>
+      <ul class="people">
+        <template for:each={people} for:item="p">
+          <li key={p.accountId} class="person">
+            <div class="who">
+              <span class="name">{p.name}</span>
+              <span class="kem-muted small">{p.role} · {p.email}</span>
+              <template lwc:if={p.username}>
+                <span class="kem-muted small">Signs in as {p.username}</span>
+              </template>
+              <template lwc:if={p.showReason}>
+                <span class="kem-muted small reason">{p.reason}</span>
+              </template>
+            </div>
+            <span class={p.statusClass}>{p.status}</span>
+            <template lwc:if={p.canGive}>
+              <lightning-button
+                label="Give access"
+                variant="brand"
+                icon-name="utility:email"
+                data-id={p.accountId}
+                onclick={handleGive}
+                disabled={p.isBusy}
+              ></lightning-button>
+            </template>
+          </li>
+        </template>
+      </ul>
+      <p class="hint">
+        Parents see every child they are linked to with portal access; children
+        under 13 use a parent's login. The welcome email is sent as soon as the
+        login is created.
+      </p>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button
+      label="Done"
+      variant="brand"
+      onclick={handleClose}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

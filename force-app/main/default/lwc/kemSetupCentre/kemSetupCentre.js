@@ -9,6 +9,7 @@ import RoomModal from "c/kemRoomModal";
 import HolidayModal from "c/kemHolidayModal";
 import StaffModal from "c/kemStaffModal";
 import StaffDirectory from "c/kemStaffDirectoryModal";
+import PortalAccessModal from "c/kemPortalAccessModal";
 import { reduceErrors, toast } from "c/kemUtils";
 
 /**
@@ -133,6 +134,19 @@ export default class KemSetupCentre extends NavigationMixin(LightningElement) {
           this,
           "Staff member added",
           `Login created with ${result.roles} branch role${result.roles === 1 ? "" : "s"}.`
+        );
+        await this.load();
+      }
+    } else if (tile.key === "portal") {
+      const given = await PortalAccessModal.open({
+        size: "medium",
+        label: "Portal access"
+      });
+      if (given) {
+        toast(
+          this,
+          "Portal access given",
+          `${given} login${given === 1 ? "" : "s"} created; welcome emails sent.`
         );
         await this.load();
       }

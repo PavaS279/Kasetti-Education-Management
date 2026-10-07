@@ -53,6 +53,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>FamilySetupController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>ForecastController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -82,6 +86,10 @@
     </classAccesses>
     <classAccesses>
         <apexClass>PaymentLinkController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>PortalAccessController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
@@ -127,6 +135,10 @@
     <customPermissions>
         <enabled>true</enabled>
         <name>KEM_Manage_Billing</name>
+    </customPermissions>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>KEM_Manage_Portal</name>
     </customPermissions>
     <description
   >Branch manager: manages rooms, classes, staff allocation, and learners for their branch.</description>
@@ -2489,5 +2501,9 @@
     <userPermissions>
         <enabled>true</enabled>
         <name>EditTask</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ManagePartners</name>
     </userPermissions>
 </PermissionSet>
