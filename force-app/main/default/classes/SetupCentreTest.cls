@@ -88,6 +88,13 @@ private class SetupCentreTest {
         tile(centre, 'holidays').detail
       );
       Assert.isNotNull(tile(centre, 'portal'), 'Portal tile');
+      Assert.isTrue(tile(centre, 'courses').wizard, 'Course wizard');
+      Assert.isTrue(tile(centre, 'classes').wizard, 'Class wizard');
+      Assert.isTrue(tile(centre, 'faculty').canCreate, 'New faculty');
+      Assert.isNull(
+        tile(centre, 'faculty').objectApiName,
+        'Faculty list is the faculty account'
+      );
 
       Assert.areEqual(
         1,

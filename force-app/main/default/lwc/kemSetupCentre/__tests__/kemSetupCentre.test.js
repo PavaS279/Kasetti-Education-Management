@@ -2,6 +2,7 @@ import { createElement } from "lwc";
 import KemSetupCentre from "c/kemSetupCentre";
 import getCentre from "@salesforce/apex/SetupCentreController.getCentre";
 import { getNavigateCalledWith } from "lightning/navigation";
+import LightningModal from "lightning/modal";
 
 jest.mock(
   "lightning/navigation",
@@ -155,5 +156,75 @@ describe("c-kem-setup-centre", () => {
     });
     const element = await render();
     expect(element.shadowRoot.querySelector("article")).toBeNull();
+  });
+
+  it("opens the guided screens where the user can use them", async () => {
+    getCentre.mockResolvedValue({
+      openGaps: 0,
+      gaps: [],
+      tiles: [
+        { ...CENTRE.tiles[1], canCreate: true, wizard: true },
+        {
+          key: "classes",
+          label: "Classes",
+          icon: "standard:event",
+          count: 4,
+          objectApiName: "CourseOffering",
+          canCreate: true,
+          wizard: true,
+          createLabel: "New class"
+        },
+        {
+          key: "faculty",
+          label: "Faculty",
+          icon: "standard:avatar",
+          count: 8,
+          objectApiName: null,
+          listRecordId: "001FACULTY",
+          canCreate: true,
+          wizard: true,
+          createLabel: "New faculty"
+        }
+      ]
+    });
+    const element = await render();
+    const tiles = element.shadowRoot.querySelectorAll("li.tile");
+
+    // New course, then straight into New class for that course.
+    LightningModal.open
+      .mockResolvedValueOnce({ courseId: "0ZV1", addClass: true })
+      .mockResolvedValueOnce({ classId: "0P0NEW", sessions: 12 });
+    tiles[0].querySelector("lightning-button.create").click();
+    await flush();
+    await flush();
+    await flush();
+    expect(LightningModal.open).toHaveBeenCalledTimes(2);
+    expect(LightningModal.open.mock.calls[0][0].label).toBe("New course");
+    expect(LightningModal.open.mock.calls[1][0]).toMatchObject({
+      label: "New class",
+      courseId: "0ZV1"
+    });
+    expect(getNavigateCalledWith().attributes.recordId).toBe("0P0NEW");
+
+    // Cancelling a wizard navigates nowhere.
+    LightningModal.open.mockResolvedValueOnce(null);
+    tiles[1].querySelector("lightning-button.create").click();
+    await flush();
+    await flush();
+    expect(getNavigateCalledWith().attributes.recordId).toBe("0P0NEW");
+
+    LightningModal.open.mockResolvedValueOnce("003NEW");
+    tiles[2].querySelector("lightning-button.create").click();
+    await flush();
+    expect(LightningModal.open.mock.calls[3][0].label).toBe(
+      "New faculty member"
+    );
+
+    // Faculty "View all" opens the faculty account.
+    tiles[2].querySelector("lightning-button.list").click();
+    expect(getNavigateCalledWith()).toEqual({
+      type: "standard__recordPage",
+      attributes: { recordId: "001FACULTY", actionName: "view" }
+    });
   });
 });

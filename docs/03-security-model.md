@@ -162,8 +162,9 @@ The matrix is extended per feature in `scripts/tooling/specs.py` (`PERMISSION_SE
 
 ## Phase 5 permissions (creation screens)
 
-| Screen                                  | Administrator                                     | Branch Manager                                  | Academic             | Others |
-| --------------------------------------- | ------------------------------------------------- | ----------------------------------------------- | -------------------- | ------ |
-| Set-up Centre (`SetupCentreController`) | ✅ all tiles, New on every record they may create | ✅ (New room, class, staff role…; not branches) | ✅ (New room, class) | Hidden |
+| Screen                                                        | Administrator                                     | Branch Manager                                              | Academic                                                     | Others |
+| ------------------------------------------------------------- | ------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------ | ------ |
+| Set-up Centre (`SetupCentreController`)                       | ✅ all tiles, New on every record they may create | ✅ (New room, class, staff role…; not branches)             | ✅ (New room, class)                                         | Hidden |
+| New course, New class, New faculty (`CatalogSetupController`) | ✅ with prices                                    | — (standard class form; no course or weekly-pattern access) | ✅ course without prices (finance adds them), class, faculty | —      |
 
-The Set-up Centre reads in user mode; "New" follows the user's create permission on each object.
+The Set-up Centre reads in user mode; "New" follows the user's create permission on each object and opens a guided screen only when the person can complete it (otherwise the standard form). The course, class and faculty screens save in user mode; duplicate checks (course code and name, faculty email) and creating the faculty account run in system mode and return no data.

@@ -42,6 +42,12 @@ public with sharing class SetupCentreService {
     public Boolean canCreate = false;
     @AuraEnabled
     public String createLabel;
+    /** True when "New" opens the guided screen; false means the standard record form. */
+    @AuraEnabled
+    public Boolean wizard = false;
+    /** A record that lists this tile's records (the faculty account). */
+    @AuraEnabled
+    public Id listRecordId;
   }
 
   public class RecordRef {
@@ -162,6 +168,8 @@ public with sharing class SetupCentreService {
         WITH USER_MODE
       ];
       t.detail = 'Active courses';
+      t.wizard =
+        t.canCreate && Learning.SObjectType.getDescribe().isCreateable();
       result.tiles.add(t);
     }
     Map<String, Integer> byStatus = new Map<String, Integer>();
@@ -193,6 +201,10 @@ public with sharing class SetupCentreService {
         ' running · ' +
         nvlInt(byStatus.get('Planned')) +
         ' planned';
+      t.wizard =
+        t.canCreate &&
+        CourseOfferingSchedule.SObjectType.getDescribe().isCreateable() &&
+        LearningCourse.SObjectType.getDescribe().isAccessible();
       result.tiles.add(t);
     }
     if (readable(Calendar_Closure__c.SObjectType)) {
@@ -250,7 +262,13 @@ public with sharing class SetupCentreService {
         null,
         null
       );
-      t.canCreate = false; // the faculty form arrives with the class wizard
+      t.createLabel = 'New faculty';
+      t.canCreate =
+        Contact.SObjectType.getDescribe().isCreateable() &&
+        CourseOffering.SObjectType.getDescribe().isCreateable();
+      t.wizard = t.canCreate;
+      t.listRecordId = CatalogSetupService.facultyAccount();
+      t.objectApiName = null; // "View all" opens the faculty account, not every contact
       Set<Id> faculty = new Set<Id>();
       for (AggregateResult row : [
         SELECT PrimaryFacultyId f

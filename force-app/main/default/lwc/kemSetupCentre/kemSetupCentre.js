@@ -1,12 +1,16 @@
 import { LightningElement } from "lwc";
 import { NavigationMixin } from "lightning/navigation";
 import getCentre from "@salesforce/apex/SetupCentreController.getCentre";
-import { reduceErrors } from "c/kemUtils";
+import CourseWizard from "c/kemCourseWizardModal";
+import ClassWizard from "c/kemClassWizardModal";
+import FacultyModal from "c/kemFacultyModal";
+import { reduceErrors, toast } from "c/kemUtils";
 
 /**
  * Set-up Centre: counts, create buttons and set-up gaps for administrators,
  * branch managers and academic coordinators. Hidden for everyone else.
- * "New" opens the record form for now; later stages swap in guided screens.
+ * "New" opens a guided screen where one exists and the user can use it
+ * (courses, classes, faculty), otherwise the standard record form.
  */
 export default class KemSetupCentre extends NavigationMixin(LightningElement) {
   centre;
@@ -39,7 +43,7 @@ export default class KemSetupCentre extends NavigationMixin(LightningElement) {
   get tiles() {
     return (this.centre?.tiles || []).map((t) => ({
       ...t,
-      canList: Boolean(t.objectApiName)
+      canList: Boolean(t.objectApiName || t.listRecordId)
     }));
   }
 
@@ -75,16 +79,80 @@ export default class KemSetupCentre extends NavigationMixin(LightningElement) {
     this.load();
   }
 
-  handleCreate(event) {
+  async handleCreate(event) {
     const tile = this.tileFor(event.currentTarget.dataset.key);
-    this[NavigationMixin.Navigate]({
-      type: "standard__objectPage",
-      attributes: { objectApiName: tile.objectApiName, actionName: "new" }
+    if (!tile.wizard) {
+      this[NavigationMixin.Navigate]({
+        type: "standard__objectPage",
+        attributes: { objectApiName: tile.objectApiName, actionName: "new" }
+      });
+      return;
+    }
+    if (tile.key === "courses") {
+      await this.newCourse();
+    } else if (tile.key === "classes") {
+      await this.newClass();
+    } else if (tile.key === "faculty") {
+      const id = await FacultyModal.open({
+        size: "small",
+        label: "New faculty member"
+      });
+      if (id) {
+        toast(
+          this,
+          "Faculty member added",
+          "Choose them as faculty on a class."
+        );
+        await this.load();
+      }
+    }
+  }
+
+  async newCourse() {
+    const result = await CourseWizard.open({
+      size: "medium",
+      label: "New course"
     });
+    if (!result?.courseId) {
+      return;
+    }
+    toast(this, "Course created", "The course and its prices are ready.");
+    if (result.addClass) {
+      await this.newClass(result.courseId);
+    } else {
+      await this.load();
+    }
+  }
+
+  async newClass(courseId) {
+    const result = await ClassWizard.open({
+      size: "medium",
+      label: "New class",
+      courseId
+    });
+    await this.load();
+    if (result?.classId) {
+      toast(
+        this,
+        "Class created",
+        `${result.sessions} sessions added to the timetable.`
+      );
+      this[NavigationMixin.Navigate]({
+        type: "standard__recordPage",
+        attributes: { recordId: result.classId, actionName: "view" }
+      });
+    }
   }
 
   handleList(event) {
     const tile = this.tileFor(event.currentTarget.dataset.key);
+    if (tile.listRecordId) {
+      this[NavigationMixin.Navigate]({
+        type: "standard__recordPage",
+        attributes: { recordId: tile.listRecordId, actionName: "view" }
+      });
+      return;
+    }
     const pageRef = {
       type: "standard__objectPage",
       attributes: { objectApiName: tile.objectApiName, actionName: "list" }

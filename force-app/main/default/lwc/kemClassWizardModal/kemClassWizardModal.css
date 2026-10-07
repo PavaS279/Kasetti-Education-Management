@@ -1,0 +1,168 @@
+@import "c/kemStyles";
+
+.path {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.toggle {
+  margin-top: 0.75rem;
+}
+
+.section {
+  margin: 1rem 0 0.5rem;
+}
+
+.hint {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--kem-muted);
+}
+
+.hint_bad {
+  color: var(--kem-red);
+}
+
+.faculty-form {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-canvas);
+}
+
+.faculty-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.patterns {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pattern {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 8rem 8.5rem auto;
+  gap: 0.75rem;
+  align-items: end;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--kem-line);
+}
+
+.days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.chip {
+  min-width: 2.75rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--kem-line);
+  border-radius: 999px;
+  background: var(--kem-surface);
+  color: var(--kem-ink);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s var(--kem-ease),
+    border-color 0.15s var(--kem-ease);
+}
+
+.chip:hover {
+  border-color: var(--kem-blue);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--kem-blue);
+  outline-offset: 2px;
+}
+
+.chip_on {
+  background: var(--kem-blue);
+  border-color: var(--kem-blue);
+  color: #fff;
+}
+
+.remove {
+  padding-bottom: 0.375rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0.75rem 0;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-canvas);
+}
+
+.stat_good {
+  border-color: var(--kem-green);
+}
+
+.stat_bad {
+  border-color: var(--kem-red);
+  background: #fdf0ef;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--kem-muted);
+}
+
+.sessions {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+  font-size: 0.8125rem;
+}
+
+.issues {
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+  font-size: 0.8125rem;
+  color: var(--kem-amber);
+}
+
+.issues_bad {
+  color: var(--kem-red);
+}
+
+@media (max-width: 40em) {
+  .form-grid,
+  .pattern,
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}

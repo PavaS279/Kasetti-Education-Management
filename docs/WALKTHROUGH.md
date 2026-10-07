@@ -185,6 +185,13 @@ Each step: 👤 **who** · 📍 **where** · ▶ **do** · ✅ **you should see*
 ✅ Counts for what you can see; New only where you may create; gaps such as classes without a teacher or room, unpriced courses, branches without a manager, running classes with no sessions.
 💡 One place to start setting up a centre and to see what is still missing before the timetable, billing or the portal are affected.
 
+#### A1c. New course and New class
+
+👤 Administrator, or academic coordinator (Anjali; no prices) · 📍 Home → **Set-up Centre** → Courses **New course**
+▶ Enter _Chess for Beginners_, code KT-CRS-CHS, ages 7–12, monthly tuition 2,200 (admission optional) → **Create and add a class**. In New class: branch Indiranagar, 10 seats → **Next**; room Turing Lab, a teacher, faculty (or **New faculty member**) → **Next**; first day 10 Oct, last day 19 Dec, tick **Sat**, 12:00, 90 minutes → **Next**.
+✅ The check step shows 0 sessions and 10 clashing sessions: Turing Lab is taken by _Python for Kids – Saturday 12:00_, so creating is blocked. Go **Back**, change the time to 15:30 → 10 sessions, Christmas break skipped, no clashes → **Create class**: the class opens with its sessions on the timetable.
+💡 A course with its prices and a class with its whole term's timetable in two minutes, with clashes and holidays checked before anything is saved.
+
 #### A2. Centres, rooms and staff
 
 👤 Administrator · 📍 Branch page `L/lightning/r/Branch__c/a0MdN000001Y9hqUAC/view`

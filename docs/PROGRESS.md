@@ -100,11 +100,11 @@ F4.1–F4.7 live (2026-10-06): Einstein assistants on the enquiry, application, 
 
 **Goal:** every set-up record has its own KTEdutech screen instead of the standard form (decisions 2026-10-07: an admin-only "Add staff member" screen; portal access sends the welcome email at once; the standard New buttons stay as a fallback for administrators; order 1 → 3 → 2 → 4 → 5 → 6).
 
-| #   | Feature                                                                                     | Built | Deployed | Tests | E2E check | Notes                                                 |
-| --- | ------------------------------------------------------------------------------------------- | ----- | -------- | ----- | --------- | ----------------------------------------------------- |
-| 5.1 | Set-up Centre on Home: tiles, create buttons, set-up gaps                                   | ✅    | ✅       | ✅    | ✅        | [F5.1-setup-centre.md](features/F5.1-setup-centre.md) |
-| 5.2 | New course and New class wizards, faculty (stage 3)                                         | ⬜    | ⬜       | ⬜    | ⬜        |                                                       |
-| 5.3 | New branch wizard, rooms, holidays, Add staff member (stage 2)                              | ⬜    | ⬜       | ⬜    | ⬜        |                                                       |
-| 5.4 | New learner/family, New application, Give portal access (stage 4)                           | ⬜    | ⬜       | ⬜    | ⬜        |                                                       |
-| 5.5 | Discounts form, library bulk add and import (stage 5)                                       | ⬜    | ⬜       | ⬜    | ⬜        |                                                       |
-| 5.6 | Standard New buttons routed to the screens; administrators keep the standard form (stage 6) | ⬜    | ⬜       | ⬜    | ⬜        |                                                       |
+| #   | Feature                                                                                     | Built | Deployed | Tests | E2E check | Notes                                                                 |
+| --- | ------------------------------------------------------------------------------------------- | ----- | -------- | ----- | --------- | --------------------------------------------------------------------- |
+| 5.1 | Set-up Centre on Home: tiles, create buttons, set-up gaps                                   | ✅    | ✅       | ✅    | ✅        | [F5.1-setup-centre.md](features/F5.1-setup-centre.md)                 |
+| 5.2 | New course and New class wizards, faculty (stage 3)                                         | ✅    | ✅       | ✅    | ✅        | [F5.2-course-class-wizards.md](features/F5.2-course-class-wizards.md) |
+| 5.3 | New branch wizard, rooms, holidays, Add staff member (stage 2)                              | ⬜    | ⬜       | ⬜    | ⬜        |                                                                       |
+| 5.4 | New learner/family, New application, Give portal access (stage 4)                           | ⬜    | ⬜       | ⬜    | ⬜        |                                                                       |
+| 5.5 | Discounts form, library bulk add and import (stage 5)                                       | ⬜    | ⬜       | ⬜    | ⬜        |                                                                       |
+| 5.6 | Standard New buttons routed to the screens; administrators keep the standard form (stage 6) | ⬜    | ⬜       | ⬜    | ⬜        |                                                                       |

@@ -1,0 +1,413 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <lightning-progress-indicator
+      current-step={step}
+      type="path"
+      variant="base"
+      class="path"
+    >
+      <template for:each={steps} for:item="s">
+        <lightning-progress-step
+          key={s.value}
+          label={s.label}
+          value={s.value}
+        ></lightning-progress-step>
+      </template>
+    </lightning-progress-indicator>
+
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+
+    <!-- Step 1: the class -->
+    <template lwc:if={isDetails}>
+      <div class="form-grid">
+        <lightning-combobox
+          label="Course"
+          value={form.courseId}
+          options={courseOptions}
+          data-field="courseId"
+          onchange={handleField}
+          placeholder="Choose a course"
+          required
+        ></lightning-combobox>
+        <lightning-combobox
+          label="Branch"
+          value={form.branchId}
+          options={branchOptions}
+          data-field="branchId"
+          onchange={handleField}
+          placeholder="Choose a branch"
+          required
+        ></lightning-combobox>
+        <lightning-combobox
+          label="Delivery"
+          value={form.deliveryMode}
+          options={modeOptions}
+          data-field="deliveryMode"
+          onchange={handleField}
+        ></lightning-combobox>
+        <lightning-input
+          type="number"
+          label="Seats"
+          value={form.capacity}
+          data-field="capacity"
+          onchange={handleField}
+          min="1"
+          max="500"
+          required
+          field-level-help="Enrolment stops at this number; further learners join the waitlist."
+        ></lightning-input>
+        <lightning-input
+          label="Class name"
+          value={form.name}
+          data-field="name"
+          onchange={handleField}
+          max-length="80"
+          placeholder="Leave empty for “Course – Saturday 10:00”"
+        ></lightning-input>
+        <lightning-input
+          label="Section code"
+          value={form.section}
+          data-field="section"
+          onchange={handleField}
+          max-length="40"
+          placeholder="Optional, for example KT-IND-PYT-SAT"
+        ></lightning-input>
+      </div>
+      <lightning-input
+        type="toggle"
+        label="Open for enrolment now"
+        checked={form.openForEnrolment}
+        data-field="openForEnrolment"
+        onchange={handleField}
+        message-toggle-active="Open"
+        message-toggle-inactive="Planned"
+        class="toggle"
+      ></lightning-input>
+    </template>
+
+    <!-- Step 2: room and teacher -->
+    <template lwc:if={isPeople}>
+      <div class="form-grid">
+        <div>
+          <lightning-combobox
+            label="Room"
+            value={form.roomId}
+            options={roomOptions}
+            data-field="roomId"
+            onchange={handleField}
+          ></lightning-combobox>
+          <template lwc:if={roomTooSmall}>
+            <p class="hint hint_bad">
+              Only {selectedRoomSeats} seats for a class of {form.capacity}.
+            </p>
+          </template>
+          <template lwc:elseif={noRoomsAtBranch}>
+            <p class="hint">
+              No rooms at this branch yet; add them from the Set-up Centre.
+            </p>
+          </template>
+          <template lwc:elseif={isOnline}>
+            <p class="hint">Online classes do not need a room.</p>
+          </template>
+        </div>
+        <div>
+          <lightning-combobox
+            label="Teacher (login)"
+            value={form.teacherUserId}
+            options={teacherOptions}
+            data-field="teacherUserId"
+            onchange={handleField}
+            field-level-help="The staff member who takes registers and enters marks."
+          ></lightning-combobox>
+          <template lwc:if={noTeachersAtBranch}>
+            <p class="hint">
+              No teachers at this branch yet; give a staff member the Teacher
+              role at the branch.
+            </p>
+          </template>
+        </div>
+        <div class="wide">
+          <lightning-combobox
+            label="Faculty shown to families"
+            value={form.facultyId}
+            options={facultyOptions}
+            data-field="facultyId"
+            onchange={handleField}
+            field-level-help="The teacher named on the timetable, portal and report cards."
+          ></lightning-combobox>
+          <template lwc:if={canCreateFaculty}>
+            <template lwc:if={showFacultyForm}>
+              <div class="faculty-form">
+                <div class="form-grid">
+                  <lightning-input
+                    label="First name"
+                    value={faculty.firstName}
+                    data-field="firstName"
+                    onchange={handleFacultyField}
+                  ></lightning-input>
+                  <lightning-input
+                    label="Last name"
+                    value={faculty.lastName}
+                    data-field="lastName"
+                    onchange={handleFacultyField}
+                    required
+                  ></lightning-input>
+                  <lightning-input
+                    type="email"
+                    label="Email"
+                    value={faculty.email}
+                    data-field="email"
+                    onchange={handleFacultyField}
+                  ></lightning-input>
+                  <lightning-input
+                    label="Subject"
+                    value={faculty.subject}
+                    data-field="subject"
+                    onchange={handleFacultyField}
+                  ></lightning-input>
+                </div>
+                <div class="faculty-actions">
+                  <lightning-button
+                    label="Cancel"
+                    variant="base"
+                    onclick={handleHideFaculty}
+                  ></lightning-button>
+                  <lightning-button
+                    label="Add and choose"
+                    variant="brand-outline"
+                    onclick={handleAddFaculty}
+                    disabled={cannotAddFaculty}
+                  ></lightning-button>
+                </div>
+              </div>
+            </template>
+            <template lwc:else>
+              <lightning-button
+                label="New faculty member"
+                icon-name="utility:add"
+                variant="base"
+                onclick={handleShowFaculty}
+              ></lightning-button>
+            </template>
+          </template>
+        </div>
+      </div>
+    </template>
+
+    <!-- Step 3: timetable -->
+    <template lwc:if={isTimetable}>
+      <div class="form-grid">
+        <lightning-input
+          type="date"
+          label="First day"
+          value={form.startDate}
+          data-field="startDate"
+          onchange={handleField}
+          required
+        ></lightning-input>
+        <lightning-input
+          type="date"
+          label="Last day"
+          value={form.endDate}
+          data-field="endDate"
+          onchange={handleField}
+          required
+        ></lightning-input>
+      </div>
+      <h3 class="kem-section-title section">Weekly times</h3>
+      <ul class="patterns" aria-label="Weekly times">
+        <template for:each={patternRows} for:item="p">
+          <li key={p.key} class="pattern">
+            <div class="days" role="group" aria-label="Days">
+              <template for:each={p.chips} for:item="c">
+                <button
+                  key={c.value}
+                  type="button"
+                  class={c.cls}
+                  aria-pressed={c.pressed}
+                  data-index={p.index}
+                  data-day={c.value}
+                  onclick={handleDay}
+                >
+                  {c.value}
+                </button>
+              </template>
+            </div>
+            <lightning-input
+              type="time"
+              label="Starts"
+              value={p.timeValue}
+              data-index={p.index}
+              onchange={handleTime}
+              class="time"
+            ></lightning-input>
+            <lightning-combobox
+              label="Lasts"
+              value={p.minutes}
+              options={lengthOptions}
+              data-index={p.index}
+              onchange={handleLength}
+              class="length"
+            ></lightning-combobox>
+            <template lwc:if={p.canRemove}>
+              <lightning-button-icon
+                icon-name="utility:delete"
+                alternative-text="Remove weekly time"
+                title="Remove weekly time"
+                variant="bare"
+                data-index={p.index}
+                onclick={handleRemovePattern}
+                class="remove"
+              ></lightning-button-icon>
+            </template>
+          </li>
+        </template>
+      </ul>
+      <lightning-button
+        label="Add another weekly time"
+        icon-name="utility:add"
+        variant="base"
+        onclick={handleAddPattern}
+      ></lightning-button>
+      <p class="hint">
+        Sessions are created for every chosen day between the first and last
+        day; branch holidays are skipped.
+      </p>
+    </template>
+
+    <!-- Step 4: preview -->
+    <template lwc:if={isPreview}>
+      <template lwc:if={isBusy}>
+        <lightning-spinner
+          alternative-text="Checking the timetable"
+          size="small"
+        ></lightning-spinner>
+      </template>
+      <template lwc:if={preview}>
+        <p class="hint">
+          Nothing is saved yet. This is what “{createLabel}” will create.
+        </p>
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-value">{preview.sessions}</span>
+            <span class="stat-label">sessions</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{preview.skippedHolidays}</span>
+            <span class="stat-label">on holidays, skipped</span>
+          </div>
+          <div class={clashTileClass}>
+            <span class="stat-value">{clashCount}</span>
+            <span class="stat-label">clashing sessions, not created</span>
+          </div>
+        </div>
+        <template lwc:if={noSessions}>
+          <p class="hint hint_bad">
+            No sessions can be created: none fall between the first and last day
+            on the chosen days, or every one clashes. Change the dates, days,
+            time, room or teacher.
+          </p>
+        </template>
+        <template lwc:else>
+          <h3 class="kem-section-title section">First sessions</h3>
+          <ul class="sessions">
+            <template for:each={firstSessions} for:item="s">
+              <li key={s.key}>
+                <lightning-formatted-date-time
+                  value={s.value}
+                  weekday="short"
+                  day="numeric"
+                  month="short"
+                  year="numeric"
+                  hour="2-digit"
+                  minute="2-digit"
+                ></lightning-formatted-date-time>
+              </li>
+            </template>
+          </ul>
+          <p class="hint">
+            Last session:
+            <lightning-formatted-date-time
+              value={preview.lastSession}
+              weekday="short"
+              day="numeric"
+              month="short"
+              year="numeric"
+            ></lightning-formatted-date-time>
+          </p>
+        </template>
+        <template lwc:if={hasClashes}>
+          <h3 class="kem-section-title section">Clashes</h3>
+          <ul class="issues issues_bad">
+            <template for:each={clashes} for:item="c">
+              <li key={c.key}>{c.text}</li>
+            </template>
+          </ul>
+          <template lwc:if={moreClashes}>
+            <p class="hint">and {moreClashes} more</p>
+          </template>
+          <p class="hint">
+            The room or teacher is already booked at these times, so these
+            sessions are not created. Change the room, teacher or time, or
+            create the class without them and add sessions later from the
+            timetable.
+          </p>
+        </template>
+        <template lwc:if={hasWarnings}>
+          <h3 class="kem-section-title section">Worth checking</h3>
+          <ul class="issues">
+            <template for:each={warnings} for:item="w">
+              <li key={w.key}>{w.text}</li>
+            </template>
+          </ul>
+        </template>
+      </template>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <template lwc:if={showBack}>
+      <lightning-button
+        class="slds-m-left_x-small"
+        label="Back"
+        onclick={handleBack}
+        disabled={isBusy}
+      ></lightning-button>
+    </template>
+    <template lwc:if={isPreview}>
+      <lightning-button
+        class="slds-m-left_x-small"
+        label="Check again"
+        onclick={handleRefreshPreview}
+        disabled={isBusy}
+      ></lightning-button>
+      <lightning-button
+        class="slds-m-left_x-small"
+        variant="brand"
+        label={createLabel}
+        onclick={handleCreate}
+        disabled={cannotCreate}
+      ></lightning-button>
+    </template>
+    <template lwc:else>
+      <lightning-button
+        class="slds-m-left_x-small"
+        variant="brand"
+        label="Next"
+        onclick={handleNext}
+        disabled={isBusy}
+      ></lightning-button>
+    </template>
+  </lightning-modal-footer>
+</template>
