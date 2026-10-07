@@ -1,0 +1,11 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <c-kem-class-setup
+      record-id={classId}
+      in-modal
+      onsaved={handleSaved}
+      oncancel={handleCancel}
+    ></c-kem-class-setup>
+  </lightning-modal-body>
+</template>

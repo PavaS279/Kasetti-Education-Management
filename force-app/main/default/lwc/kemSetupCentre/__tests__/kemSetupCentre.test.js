@@ -136,8 +136,14 @@ describe("c-kem-setup-centre", () => {
     });
     tiles[0].querySelector("lightning-button.list").click();
     expect(getNavigateCalledWith().state).toEqual({ filterName: "All" });
+    // A branch without rooms opens Add rooms for that branch.
+    LightningModal.open.mockResolvedValueOnce(null);
     gaps[1].querySelector("a").click();
-    expect(getNavigateCalledWith().attributes.recordId).toBe("a0MA");
+    await flush();
+    expect(LightningModal.open.mock.calls[0][0]).toMatchObject({
+      label: "Add rooms",
+      branchId: "a0MA"
+    });
   });
 
   it("says everything is set up when there are no gaps", async () => {
@@ -305,5 +311,46 @@ describe("c-kem-setup-centre", () => {
     expect(LightningModal.open.mock.calls[7][0].label).toBe("Discounts");
     // Each saved screen refreshes the counts.
     expect(getCentre.mock.calls.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it("fixes class gaps in place and opens the record for others", async () => {
+    getCentre.mockResolvedValue({
+      openGaps: 2,
+      tiles: [],
+      gaps: [
+        {
+          key: "classTeacher",
+          label: "Classes without a teacher",
+          advice: "Click a class.",
+          count: 1,
+          records: [{ id: "0P0X", name: "Abacus – Sat" }]
+        },
+        {
+          key: "coursePrice",
+          label: "Courses without a tuition price",
+          advice: "Open the course.",
+          count: 1,
+          records: [{ id: "0ZVX", name: "Chess" }]
+        }
+      ]
+    });
+    const element = await render();
+    const settle = () => flush().then(flush).then(flush);
+    const links = element.shadowRoot.querySelectorAll("li.gap a");
+    expect(links[0].title).toBe("Open the class set-up");
+    LightningModal.open.mockResolvedValueOnce({
+      updated: 11,
+      message: "Saved; 11 upcoming sessions updated."
+    });
+    links[0].click();
+    await settle();
+    expect(LightningModal.open.mock.calls[0][0]).toMatchObject({
+      label: "Class set-up",
+      classId: "0P0X",
+      className: "Abacus – Sat"
+    });
+    links[1].click();
+    await settle();
+    expect(getNavigateCalledWith().attributes.recordId).toBe("0ZVX");
   });
 });

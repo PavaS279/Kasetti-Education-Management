@@ -1,6 +1,7 @@
 /**
  * Class (CourseOffering) rules: governed class status transitions; extra
- * capacity is offered to the waitlist.
+ * capacity is offered to the waitlist; a new teacher or room reaches the
+ * upcoming sessions.
  */
 public with sharing class CourseOfferingTriggerHandler extends TriggerHandler {
   protected override void beforeInsert(List<SObject> newRecords) {
@@ -32,6 +33,8 @@ public with sharing class CourseOfferingTriggerHandler extends TriggerHandler {
     Map<Id, SObject> oldMap
   ) {
     IntegrationHooks.classes(newRecords, oldMap);
+    // Upcoming sessions follow a change of teacher or room.
+    ClassSetupService.propagate((List<CourseOffering>) newRecords, oldMap);
     Set<Id> grown = new Set<Id>();
     for (CourseOffering offering : (List<CourseOffering>) newRecords) {
       Integer before = ((CourseOffering) oldMap.get(offering.Id))

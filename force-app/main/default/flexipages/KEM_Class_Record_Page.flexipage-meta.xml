@@ -35,6 +35,12 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>kemClassSetup</componentName>
+                <identifier>c_kemClassSetup</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>kemAiSummary</componentName>
                 <identifier>c_kemAiSummary</identifier>
             </componentInstance>

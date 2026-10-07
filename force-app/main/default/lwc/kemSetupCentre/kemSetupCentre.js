@@ -12,6 +12,15 @@ import StaffDirectory from "c/kemStaffDirectoryModal";
 import PortalAccessModal from "c/kemPortalAccessModal";
 import DiscountModal from "c/kemDiscountModal";
 import DiscountManager from "c/kemDiscountManagerModal";
+import ClassSetupModal from "c/kemClassSetupModal";
+
+/** Gaps fixed in place: the class set-up screen opens on the class. */
+const CLASS_GAPS = new Set([
+  "classTeacher",
+  "classRoom",
+  "classSeats",
+  "classBranch"
+]);
 import { reduceErrors, toast } from "c/kemUtils";
 
 /**
@@ -61,7 +70,12 @@ export default class KemSetupCentre extends NavigationMixin(LightningElement) {
       .filter((g) => g.count > 0)
       .map((g) => ({
         ...g,
-        more: g.count > g.records.length ? g.count - g.records.length : 0
+        more: g.count > g.records.length ? g.count - g.records.length : 0,
+        fixTitle: CLASS_GAPS.has(g.key)
+          ? "Open the class set-up"
+          : g.key === "branchRooms"
+            ? "Add rooms to this branch"
+            : "Open the record"
       }));
   }
 
@@ -266,14 +280,42 @@ export default class KemSetupCentre extends NavigationMixin(LightningElement) {
     this[NavigationMixin.Navigate](pageRef);
   }
 
-  handleOpenRecord(event) {
+  async handleOpenRecord(event) {
     event.preventDefault();
+    const id = event.currentTarget.dataset.id;
+    const gap = event.currentTarget.dataset.gap;
+    if (CLASS_GAPS.has(gap)) {
+      const result = await ClassSetupModal.open({
+        size: "medium",
+        label: "Class set-up",
+        classId: id,
+        className: event.currentTarget.dataset.name
+      });
+      if (result) {
+        toast(this, "Class saved", result.message || "Saved.");
+        await this.load();
+      }
+      return;
+    }
+    if (gap === "branchRooms") {
+      const added = await RoomModal.open({
+        size: "medium",
+        label: "Add rooms",
+        branchId: id
+      });
+      if (added) {
+        toast(
+          this,
+          "Rooms added",
+          `${added} room${added === 1 ? "" : "s"} added.`
+        );
+        await this.load();
+      }
+      return;
+    }
     this[NavigationMixin.Navigate]({
       type: "standard__recordPage",
-      attributes: {
-        recordId: event.currentTarget.dataset.id,
-        actionName: "view"
-      }
+      attributes: { recordId: id, actionName: "view" }
     });
   }
 }

@@ -338,7 +338,7 @@ public with sharing class SetupCentreService {
       Gap g = gap(
         'branchRooms',
         'Branches without rooms',
-        'Add rooms so classes and exams can be seated.'
+        'Click a branch to add its rooms, so classes and exams can be seated.'
       );
       fill(
         g,
@@ -356,7 +356,7 @@ public with sharing class SetupCentreService {
       Gap m = gap(
         'branchManager',
         'Branches without a branch manager',
-        'Set the branch manager on the branch; they approve refunds and see the branch desks.'
+        'Open the branch → Edit → Branch Manager (KTEdutech section); they approve refunds and see the branch desks.'
       );
       fill(
         m,
@@ -392,7 +392,7 @@ public with sharing class SetupCentreService {
       Gap g = gap(
         'coursePrice',
         'Courses without a tuition price',
-        'Enrolments in these courses would be free. Add a price on the course page.'
+        'Enrolments in these courses would be free. Open the course → Course pricing → add a tuition price.'
       );
       fill(
         g,
@@ -413,7 +413,7 @@ public with sharing class SetupCentreService {
     Gap teacher = gap(
       'classTeacher',
       'Classes without a teacher',
-      'Assign a teacher or faculty member so registers, cover and the timetable work.'
+      'Click a class to choose its teacher (login) and faculty; the upcoming sessions follow.'
     );
     fill(
       teacher,
@@ -434,7 +434,7 @@ public with sharing class SetupCentreService {
     Gap branch = gap(
       'classBranch',
       'Classes without a branch',
-      'Every class needs a branch for prices, invoices and the branch desks.'
+      'Click a class to choose its branch: prices, invoices and the branch desks depend on it.'
     );
     fill(
       branch,
@@ -452,7 +452,7 @@ public with sharing class SetupCentreService {
     Gap room = gap(
       'classRoom',
       'Classroom classes without a room',
-      'Choose a room so the timetable can check clashes and capacity.'
+      'Click a class to choose a room so the timetable can check clashes and capacity.'
     );
     fill(
       room,
@@ -473,7 +473,7 @@ public with sharing class SetupCentreService {
     Gap seats = gap(
       'classSeats',
       'Classes without a seat limit',
-      'Without a seat limit a class can never be full or have a waitlist.'
+      'Click a class to set its seats: without a limit it can never be full or have a waitlist.'
     );
     fill(
       seats,
@@ -504,7 +504,7 @@ public with sharing class SetupCentreService {
       Gap sessions = gap(
         'classSessions',
         'Running classes with no upcoming sessions',
-        'Add a weekly pattern and generate sessions, or close the class.'
+        'Open the class → class menu → Add weekly pattern → Generate sessions, or close the class.'
       );
       fill(
         sessions,
