@@ -322,7 +322,6 @@ private class Phase2JourneyTest {
       absenceId = CoverService.recordAbsence(absence);
     }
     System.runAs(TestDataFactory.admin()) {
-      Test.startTest();
       CoverService.CoverDesk desk = CoverService.desk();
       Assert.areEqual(1, desk.uncovered.size(), 'Tomorrow needs cover');
       Assert.areEqual(
@@ -337,8 +336,9 @@ private class Phase2JourneyTest {
         .Status__c,
         'Absence covered'
       );
-      Test.stopTest();
     }
+    // Grading, report cards and the portal view get their own limits.
+    Test.startTest();
     System.runAs(new User(Id = classA.Teacher_User__c)) {
       Course_Assessment__c quiz = new Course_Assessment__c(
         Name = 'Journey quiz',
@@ -377,5 +377,6 @@ private class Phase2JourneyTest {
       eventsFor(gauri.PersonContactId).contains('Report_Card_Ready'),
       'Gauri told the report card is ready'
     );
+    Test.stopTest();
   }
 }
