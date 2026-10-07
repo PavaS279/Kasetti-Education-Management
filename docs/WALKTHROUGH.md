@@ -182,7 +182,7 @@ Each step: 👤 **who** · 📍 **where** · ▶ **do** · ✅ **you should see*
 
 👤 Administrator (or branch manager / coordinator) · 📍 Home → **Set-up Centre**
 ▶ Read the tiles (branches, rooms, staff roles, courses, classes, holidays, discounts, faculty, portal access); click **New** on a tile or **View all**; open a record from **Set-up gaps**.
-✅ Counts for what you can see; New only where you may create; gaps such as classes without a teacher or room, unpriced courses, branches without a manager, running classes with no sessions.
+✅ Counts for what you can see; New only where you may create; gaps such as classes without a teacher or room, unpriced courses, branches without a manager, running classes with no sessions. **Click a class in a gap** to open its Class set-up and fix it in place (teacher, faculty, room, seats); a branch without rooms opens Add rooms.
 💡 One place to start setting up a centre and to see what is still missing before the timetable, billing or the portal are affected.
 
 💡 **The New buttons everywhere open the same guided screens (F5.6).** New on the Branches, Rooms, Courses or Classes lists and related lists, and New on Accounts with the _Person Account_ record type, open the screens below. Staff go straight in; administrators first choose **Guided screen (recommended)** or **Standard form** (the fallback, also at `…/new?nooverride=1`). Other account record types keep the standard form.
@@ -229,6 +229,13 @@ Each step: 👤 **who** · 📍 **where** · ▶ **do** · ✅ **you should see*
 ▶ On a class: capacity, teacher, room; scheduling menu → **Add weekly pattern** / **Generate sessions**. Open the Timetable, filter by branch, room or teacher, drag a session to another slot.
 ✅ Sessions skip closures (e.g. _Diwali break_); clashes of a teacher or room are refused with a message.
 💡 Replaces the whiteboard timetable: no double-booked rooms or teachers, holidays handled automatically.
+
+#### A4b. Give a class its teacher, faculty and room
+
+👤 Administrator, coordinator or branch manager · 📍 Any class page → **Class set-up** (top of the right-hand column)
+▶ Read what is missing → **Edit** → Teacher (login) _Anjali Advisor_, Faculty _Meenakshi Raghavan_, Room (seats shown) → **Save**.
+✅ "Saved; 11 upcoming sessions updated": the teacher now sees the sessions in My sessions and takes the registers; sessions that would clash are listed and keep their old value; sessions being covered keep the cover teacher. The class details (KTEdutech section) and the related lists (Sessions, Assessments, Waitlist) show the same.
+💡 One place to put a class right; the timetable, registers and cover stay consistent with the class.
 
 #### A5. Open a new centre from a template
 

@@ -70,3 +70,4 @@ Target org: Kasetti Technologies Pvt Ltd (Enterprise Edition, Education Cloud), 
 | F5.4 Family, application, portal access   | [features/F5.4-family-application-portal.md](features/F5.4-family-application-portal.md)         |
 | F5.5 Discounts and library import         | [features/F5.5-discounts-library-import.md](features/F5.5-discounts-library-import.md)           |
 | F5.6 New buttons open guided screens      | [features/F5.6-new-button-routing.md](features/F5.6-new-button-routing.md)                       |
+| F5.7 Set-up gaps fixed in place           | [features/F5.7-setup-gap-fixes.md](features/F5.7-setup-gap-fixes.md)                             |
