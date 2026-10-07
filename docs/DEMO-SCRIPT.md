@@ -1,4 +1,4 @@
-# Demo & Test Script — Phase 1 Learner Journey and Phase 2 Operations
+# Demo & Test Script — Phases 1–5
 
 Use this to demonstrate or acceptance-test the complete Kasetti Education Management flow in the org: **enquiry → application → offer → enrolment → timetable → attendance → assessment → invoice → payment → reconciliation → documents → dashboards → portal**.
 
@@ -392,3 +392,47 @@ Home → **Forecasts**: tiles, the enrolment chart with forecast bars and ranges
 | 7   | Allocate seats in rooms that are too small                  | "The chosen rooms seat … but … candidates are eligible. Add a room."                                |
 | 8   | Allow a withheld candidate without KEM Eligibility Override | "Only staff with KEM Eligibility Override can allow a withheld candidate."                          |
 | 9   | Grant the same referral reward twice                        | "This referral has already been rewarded."                                                          |
+
+## Part I — Phase 5: creation screens (about 30 minutes)
+
+Every set-up and people record now has a KTEdutech screen. Start from **Home → Set-up Centre** (counts, New buttons, set-up gaps). Everything below creates real records in the org: use example names and `@example.com` addresses, and remember that each staff or portal login uses a licence and sends an email.
+
+### I1. A new centre (8 minutes, administrator)
+
+1. Branches **New branch**: _KT Edutech Jayanagar_, code JPN-01 (prefix JPN follows), manager Rahul Registrar → Policies (PIN 560041, 18% GST, 10 days, 75%) → Rooms (Aryabhata Room 14, Kalpana Lab 10) → Holidays (year 2027, **Suggest the year's holidays**, check the dates marked **Check date**) → **Open the branch**.
+2. Holidays **New holiday**: tick the three KT centres → suggest 2027 → **Add … to 3 branches** (holidays already there are skipped).
+3. Staff roles **Add staff member** (System Administrator only): the licence line, name and work email (username suggested), _Teacher_, Einstein optional, Teacher at Jayanagar → **Add staff member** (welcome email). **Manage staff**: add or end a role.
+
+### I2. Courses and classes (6 minutes, administrator or coordinator)
+
+1. Courses **New course**: _Chess for Beginners_, KT-CRS-CHS, ages 7–12, monthly tuition 2,200 → **Create and add a class**.
+2. Class: Indiranagar, 10 seats → Turing Lab, a teacher, faculty (or **New faculty member**) → Saturday 12:00, 90 minutes, 10 Oct–19 Dec → **Check and create** shows 10 clashing sessions with _Python for Kids – Saturday 12:00_ and blocks creating; **Back**, 15:30 → 10 sessions, Christmas skipped → **Create class**.
+
+### I3. A family walks in (6 minutes, counsellor)
+
+1. **Admissions → Enquiries → New family (walk-in)**: two parents (one already on file by email), two children: one **Enrol in a class now**, one **Start an application** → the check finds the existing parent → **Use existing** → **Save the family**.
+2. Learner 360 → **Portal access** → **Give access** for the parent (welcome email at once; children under 13 use the parent's login). Applications tab → **New application** for another course.
+
+### I4. Discounts and library (5 minutes)
+
+1. **Finance Desk → Discounts**: use per code (SIBLING10: 34 enrolments, ₹17,070 given), **New discount** `DIWALI15` (15% on tuition, 15 Oct–15 Nov, 30 uses), switch an old code off.
+2. Branch page → **Library** → Catalogue → **Import** → **Download a template** → choose the file → **Preview** (new, copies added, skipped with reasons) → **Import**; **Add copies** on an item.
+
+### I5. New buttons (3 minutes)
+
+As an administrator: Rooms list **New** → choice → **Guided screen** (Add rooms) or **Standard form**. As a coordinator: Classes **New** opens New class directly. Accounts **New** → _Person Account_ → New family; _Business Account_ → standard form.
+
+### Phase 5 negative tests
+
+| #   | Try                                                                       | Expected                                                                                        |
+| --- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| 1   | New course with a code or name already used                               | "Course code … is already used" / "A course called … already exists"; nothing saved             |
+| 2   | New class in a room smaller than the class                                | Stopped on the Room step: "Only … seats for a class of …"                                       |
+| 3   | New class at a time when every session clashes                            | 0 sessions; creating blocked on screen and refused on the server                                |
+| 4   | New branch with a code or invoice prefix already used                     | "Branch code … is already used by …"                                                            |
+| 5   | Add staff member as a KEM Administrator who is not a System Administrator | Staff tile shows "Add staff role" (standard form) only; the screen refuses without Manage Users |
+| 6   | Add staff member when no licence is free                                  | Licence line in red; Add disabled                                                               |
+| 7   | New family with a child but no date of birth                              | "Enter each child's date of birth."                                                             |
+| 8   | Give portal access to a 9-year-old                                        | "Under 13: uses a guardian's login"; no button                                                  |
+| 9   | New discount `SIBLING10` again, or 120%                                   | "The code SIBLING10 is already used." / "A percentage discount cannot exceed 100%."             |
+| 10  | Library import with a repeated code or "lots" as copies                   | Those lines show _Error_ with the reason and are skipped; the rest import                       |

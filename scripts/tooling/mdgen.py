@@ -143,6 +143,11 @@ def object_xml(o):
     x = HEADER + f"<CustomObject {NS}>\n"
     for a in ("Accept", "CancelEdit", "Clone", "Delete", "Edit", "List", "New", "SaveEdit", "Tab", "View"):
         x += "    <actionOverrides>\n" + tag("actionName", a, 8) + tag("type", "Default", 8) + "    </actionOverrides>\n"
+        if a == "New" and o.get("newOverride"):
+            # Lightning (desktop) New opens the KTEdutech guided screen (Phase 5 stage 6).
+            x += ("    <actionOverrides>\n" + tag("actionName", "New", 8) + tag("content", o["newOverride"], 8)
+                  + tag("formFactor", "Large", 8) + tag("skipRecordTypeSelect", False, 8)
+                  + tag("type", "LightningComponent", 8) + "    </actionOverrides>\n")
     x += tag("allowInChatterGroups", False)
     x += tag("compactLayoutAssignment", "SYSTEM")
     x += tag("deploymentStatus", "Deployed")

@@ -1,6 +1,6 @@
 # Kasetti Education Management — Complete Walkthrough and Demo Script
 
-_One document to understand, set up and demonstrate the whole solution, from the first enquiry to alumni, through the eyes of every user. Last updated 2026-10-06 (Phases 0–4 complete)._
+_One document to understand, set up and demonstrate the whole solution, from the first enquiry to alumni, through the eyes of every user. Last updated 2026-10-07 (Phases 0–5 complete: every set-up and people record now has its own screen, see A1b–A1e and B0)._
 
 **How to use this document**
 
@@ -184,6 +184,8 @@ Each step: 👤 **who** · 📍 **where** · ▶ **do** · ✅ **you should see*
 ▶ Read the tiles (branches, rooms, staff roles, courses, classes, holidays, discounts, faculty, portal access); click **New** on a tile or **View all**; open a record from **Set-up gaps**.
 ✅ Counts for what you can see; New only where you may create; gaps such as classes without a teacher or room, unpriced courses, branches without a manager, running classes with no sessions.
 💡 One place to start setting up a centre and to see what is still missing before the timetable, billing or the portal are affected.
+
+💡 **The New buttons everywhere open the same guided screens (F5.6).** New on the Branches, Rooms, Courses or Classes lists and related lists, and New on Accounts with the _Person Account_ record type, open the screens below. Staff go straight in; administrators first choose **Guided screen (recommended)** or **Standard form** (the fallback, also at `…/new?nooverride=1`). Other account record types keep the standard form.
 
 #### A1c. New course and New class
 
