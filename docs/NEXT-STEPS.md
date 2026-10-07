@@ -4,7 +4,7 @@ _Last updated: 2026-10-07 after F5.6 (Phase 5 complete)._
 
 ## Where we are
 
-Phases 0–5 are **complete**: features 1.1 – 1.13, 2.1 – 2.9, 3.1 – 3.9, 4.1 – 4.12 and 5.1 – 5.6 are built, deployed to the org, unit-tested (321 Apex tests, all passing on 7 Oct when run class by class; 210 Jest tests) and checked end to end.
+Phases 0–5 are **complete**: features 1.1 – 1.13, 2.1 – 2.9, 3.1 – 3.9, 4.1 – 4.12 and 5.1 – 5.6 are built, deployed to the org, unit-tested (299 KTEdutech Apex tests in 59 classes plus 27 Salesforce site tests, all passing on 7 Oct when run class by class; 215 Jest tests) and checked end to end.
 
 - Phase 1: a full learner journey with financial reconciliation (`FullJourneyTest`, `scripts/demo/full-journey.sh`).
 - Phase 2: exceptions and recurring operations work reliably (`Phase2JourneyTest`, `scripts/demo/phase2-journey.sh`, 31 checks).
