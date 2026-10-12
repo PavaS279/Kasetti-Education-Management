@@ -1,6 +1,6 @@
 # Next Steps — Hand-over
 
-_Last updated: 2026-10-07 after F5.6 (Phase 5 complete)._
+_Last updated: 2026-10-12 after the compact demo-data cleanup; Phase 5 remains complete._
 
 ## Where we are
 
@@ -27,9 +27,16 @@ See [PROGRESS.md](PROGRESS.md), [TEST-LOG.md](TEST-LOG.md) and [DEMO-SCRIPT.md](
 | Item           | Done                                                                                                                                                                                                                                                                                                           |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Staff personas | Kasetti Tech → `KEM_Administrator_Persona` + `KEM_Eligibility_Override`; Adam Admissions → `KEM_Admissions_Counsellor_Persona`; Anjali Advisor → `KEM_Academic_Coordinator_Persona`; Rahul Registrar → `KEM_Branch_Manager_Persona`; Andrea Advancement → `KEM_Finance_Persona` (mapped from their job titles) |
-| Branch staff   | All four on `[KEM Demo] Bengaluru Central` with matching roles; Rahul Registrar is the branch manager                                                                                                                                                                                                          |
-| Portal users   | Rohit Sharma, Priya Sharma, Lakshmi Iyer (`*.kemdemo@kasetti-portal.demo`, profile EDC Community User, `EducationCloudExprcCloudAccessPsl` + `KEM_Portal_User`); no welcome emails sent; 3 of 10 Customer Community Plus licences                                                                              |
+| Branch staff   | Bengaluru Central and Indiranagar are active. Matching staff roles remain on those branches; roles on the five historical branches are inactive. Tara Teacher is active at Bengaluru Central with Teacher persona and KEM AI User.                                                                             |
+| Portal users   | Rohit Sharma and Priya Sharma remain active. Lakshmi Iyer and the three Salesforce Sophia sample users were deactivated during the 12 October cleanup.                                                                                                                                                         |
 | Org setting    | ExperienceBundle Metadata API enabled (Setup → Digital Experiences → Settings) so the site can be managed as metadata                                                                                                                                                                                          |
+
+## Compact data baseline completed on 2026-10-12
+
+- Active: 2 branches, 5 operational classes/courses, 2 enquiries, 2 routes, 2 exams and 2 library items.
+- Removed: 32 unwanted enquiries; Salesforce sample cases/opportunities and removable accounts/catalogue; non-retained session, attendance, assessment, waitlist, transport, exam and library detail.
+- Retained for audit: 317 invoices, 248 confirmed payments and their required historical learner/enrolment/catalogue context.
+- Recovery: `.codex-worktrees/cleanup-backup-20261012/` plus the Salesforce Recycle Bin.
 
 ## Actions for you
 
