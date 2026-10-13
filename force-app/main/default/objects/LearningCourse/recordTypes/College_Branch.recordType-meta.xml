@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Branch</fullName>
+    <active>true</active>
+    <label>College Branch</label>
+    <picklistValues>
+        <picklist>CourseLevelDescription</picklist>
+        <values>
+            <fullName>Accepted as high school equivalent</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Advanced</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Advanced Placement</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Basic</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Career and Technical Education</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>College-level</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Core Subject</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dual Credit</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>English Language Learner</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>General</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gifted and Talented</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Graduation Credit</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Honors</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>International Baccalaureate</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Remedial</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Students with disabilities</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Untracked</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>CourseType</picklist>
+        <values>
+            <fullName>Drill</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Exam</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lab</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lecture</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recitation</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>FieldOfStudy</picklist>
+        <values>
+            <fullName>Career and Technical Education</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Composite</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Critical Reading</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>English</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>English Language Arts</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fine and Performing Arts</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Foreign Language and Literature</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Life and Physical Sciences</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mathematics</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Military Science</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Other</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Physical%2C Health%2C and Safety Education</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reading</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Religious Education and Theology</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Science</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Social Sciences and History</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Social Studies</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Writing</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+</RecordType>

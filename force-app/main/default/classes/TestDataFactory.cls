@@ -289,6 +289,9 @@ public class TestDataFactory {
     LearningCourse course = new LearningCourse(
       Name = name,
       LearningId = learning.Id,
+      RecordTypeId = Schema.SObjectType.LearningCourse.getRecordTypeInfosByDeveloperName()
+        .get('Learning_Centre_Course')
+        .getRecordTypeId(),
       External_ID__c = unique('CRS')
     );
     insert course;
@@ -303,6 +306,9 @@ public class TestDataFactory {
   ) {
     CourseOffering offering = new CourseOffering(
       Name = unique('Class').left(80),
+      RecordTypeId = Schema.SObjectType.CourseOffering.getRecordTypeInfosByDeveloperName()
+        .get('Learning_Centre_Class')
+        .getRecordTypeId(),
       LearningCourseId = courseId,
       Branch__c = branchId,
       EnrollmentCapacity = capacity,

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Section_Year_Of_Study</fullName>
+    <active>true</active>
+    <description
+  >Enter a positive year of study for a college section.</description>
+    <errorConditionFormula
+  >AND(RecordType.DeveloperName = 'College_Section', OR(ISBLANK(Year_Of_Study__c), Year_Of_Study__c &lt;= 0))</errorConditionFormula>
+    <errorDisplayField>Year_Of_Study__c</errorDisplayField>
+    <errorMessage
+  >Enter a positive year of study for a college section.</errorMessage>
+</ValidationRule>

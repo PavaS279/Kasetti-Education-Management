@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Branch_Code_Required</fullName>
+    <active>true</active>
+    <description>Enter the two-letter college branch code.</description>
+    <errorConditionFormula
+  >AND(RecordType.DeveloperName = 'College_Branch', ISBLANK(Branch_Code__c))</errorConditionFormula>
+    <errorDisplayField>Branch_Code__c</errorDisplayField>
+    <errorMessage>Enter the two-letter college branch code.</errorMessage>
+</ValidationRule>

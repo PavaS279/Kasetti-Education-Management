@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Payment_Methods_Required</fullName>
+    <active>true</active>
+    <description
+  >Select at least one payment method for a college campus.</description>
+    <errorConditionFormula
+  >AND(ISPICKVAL(Institution_Type__c, 'College'), ISBLANK(Allowed_Payment_Methods__c))</errorConditionFormula>
+    <errorDisplayField>Allowed_Payment_Methods__c</errorDisplayField>
+    <errorMessage
+  >Select at least one payment method for a college campus.</errorMessage>
+</ValidationRule>

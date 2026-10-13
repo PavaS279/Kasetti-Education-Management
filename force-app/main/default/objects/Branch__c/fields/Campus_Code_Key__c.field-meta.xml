@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Campus_Code_Key__c</fullName>
+    <inlineHelpText
+  >Populated for college campuses to enforce unique campus codes.</inlineHelpText>
+    <label>Campus Code Key</label>
+    <required>false</required>
+    <length>1</length>
+    <caseSensitive>false</caseSensitive>
+    <unique>true</unique>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+</CustomField>

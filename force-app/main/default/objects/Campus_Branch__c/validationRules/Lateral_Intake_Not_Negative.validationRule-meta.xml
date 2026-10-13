@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Lateral_Intake_Not_Negative</fullName>
+    <active>true</active>
+    <description>Lateral intake cannot be negative.</description>
+    <errorConditionFormula
+  >AND(NOT(ISBLANK(Intake_Lateral__c)), Intake_Lateral__c &lt; 0)</errorConditionFormula>
+    <errorDisplayField>Intake_Lateral__c</errorDisplayField>
+    <errorMessage>Lateral intake cannot be negative.</errorMessage>
+</ValidationRule>

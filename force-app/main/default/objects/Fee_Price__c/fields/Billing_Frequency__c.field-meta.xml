@@ -24,6 +24,11 @@
                 <default>false</default>
                 <label>Term</label>
             </value>
+            <value>
+                <fullName>Annual</fullName>
+                <default>false</default>
+                <label>Annual</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

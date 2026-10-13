@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Regular_Intake_Not_Negative</fullName>
+    <active>true</active>
+    <description>Regular intake cannot be negative.</description>
+    <errorConditionFormula>Intake_Regular__c &lt; 0</errorConditionFormula>
+    <errorDisplayField>Intake_Regular__c</errorDisplayField>
+    <errorMessage>Regular intake cannot be negative.</errorMessage>
+</ValidationRule>

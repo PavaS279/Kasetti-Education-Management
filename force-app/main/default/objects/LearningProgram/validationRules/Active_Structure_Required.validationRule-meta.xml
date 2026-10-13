@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Active_Structure_Required</fullName>
+    <active>true</active>
+    <description
+  >Enter the duration and terms per year before activating this college programme.</description>
+    <errorConditionFormula
+  >AND(Active__c, OR(ISBLANK(Duration_Years__c), ISBLANK(Terms_Per_Year__c)))</errorConditionFormula>
+    <errorMessage
+  >Enter the duration and terms per year before activating this college programme.</errorMessage>
+</ValidationRule>

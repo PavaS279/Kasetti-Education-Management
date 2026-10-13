@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Terms_Per_Year_Positive</fullName>
+    <active>true</active>
+    <description>Terms per year must be greater than zero.</description>
+    <errorConditionFormula
+  >AND(NOT(ISBLANK(Terms_Per_Year__c)), Terms_Per_Year__c &lt;= 0)</errorConditionFormula>
+    <errorDisplayField>Terms_Per_Year__c</errorDisplayField>
+    <errorMessage>Terms per year must be greater than zero.</errorMessage>
+</ValidationRule>

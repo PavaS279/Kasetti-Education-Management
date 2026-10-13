@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Programme__c</fullName>
+    <label>Programme</label>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <referenceTo>LearningProgram</referenceTo>
+    <relationshipLabel>College Branches</relationshipLabel>
+    <relationshipName>College_Branches</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

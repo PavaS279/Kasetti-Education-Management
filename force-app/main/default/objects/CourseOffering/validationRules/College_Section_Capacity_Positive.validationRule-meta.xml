@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Section_Capacity_Positive</fullName>
+    <active>true</active>
+    <description
+  >College section capacity must be greater than zero.</description>
+    <errorConditionFormula
+  >AND(RecordType.DeveloperName = 'College_Section', OR(ISBLANK(EnrollmentCapacity), EnrollmentCapacity &lt;= 0))</errorConditionFormula>
+    <errorDisplayField>EnrollmentCapacity</errorDisplayField>
+    <errorMessage
+  >College section capacity must be greater than zero.</errorMessage>
+</ValidationRule>

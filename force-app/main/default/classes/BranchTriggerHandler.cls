@@ -4,6 +4,17 @@
  * Only, so this share is what lets a manager maintain their branch policies.
  */
 public without sharing class BranchTriggerHandler extends TriggerHandler {
+  protected override void beforeInsert(List<SObject> newRecords) {
+    stampCampusCode((List<Branch__c>) newRecords);
+  }
+
+  protected override void beforeUpdate(
+    List<SObject> newRecords,
+    Map<Id, SObject> oldMap
+  ) {
+    stampCampusCode((List<Branch__c>) newRecords);
+  }
+
   protected override void afterInsert(List<SObject> newRecords) {
     syncManagerShares((List<Branch__c>) newRecords, null);
   }
@@ -62,5 +73,18 @@ public without sharing class BranchTriggerHandler extends TriggerHandler {
       AccessLevel.SYSTEM_MODE
     );
     Logger.errors('BranchTriggerHandler.syncManagerShares', results);
+  }
+
+  private static void stampCampusCode(List<Branch__c> branches) {
+    for (Branch__c branch : branches) {
+      if (branch.Institution_Type__c == 'College') {
+        branch.Campus_Code__c = branch.Campus_Code__c == null
+          ? null
+          : branch.Campus_Code__c.trim().toUpperCase();
+        branch.Campus_Code_Key__c = branch.Campus_Code__c;
+      } else {
+        branch.Campus_Code_Key__c = null;
+      }
+    }
   }
 }

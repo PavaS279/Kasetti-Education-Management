@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Section_Campus_Branch</fullName>
+    <active>true</active>
+    <description>Select the campus branch for a college section.</description>
+    <errorConditionFormula
+  >AND(RecordType.DeveloperName = 'College_Section', ISBLANK(Campus_Branch__c))</errorConditionFormula>
+    <errorDisplayField>Campus_Branch__c</errorDisplayField>
+    <errorMessage>Select the campus branch for a college section.</errorMessage>
+</ValidationRule>

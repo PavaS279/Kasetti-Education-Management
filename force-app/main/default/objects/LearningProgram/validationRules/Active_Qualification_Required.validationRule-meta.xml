@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Active_Qualification_Required</fullName>
+    <active>true</active>
+    <description
+  >Select a qualification level before activating this college programme.</description>
+    <errorConditionFormula
+  >AND(Active__c, ISBLANK(TEXT(Qualification_Level__c)))</errorConditionFormula>
+    <errorDisplayField>Qualification_Level__c</errorDisplayField>
+    <errorMessage
+  >Select a qualification level before activating this college programme.</errorMessage>
+</ValidationRule>

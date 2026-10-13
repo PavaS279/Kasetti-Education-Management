@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Section_Code_Required</fullName>
+    <active>true</active>
+    <description>Enter the section code for a college section.</description>
+    <errorConditionFormula
+  >AND(RecordType.DeveloperName = 'College_Section', ISBLANK(Section_Code__c))</errorConditionFormula>
+    <errorDisplayField>Section_Code__c</errorDisplayField>
+    <errorMessage>Enter the section code for a college section.</errorMessage>
+</ValidationRule>

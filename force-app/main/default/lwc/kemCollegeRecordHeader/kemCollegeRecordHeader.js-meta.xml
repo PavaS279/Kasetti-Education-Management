@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>KT College Record Header</masterLabel>
+    <description
+  >App-specific record header for the KT College catalogue.</description>
+    <targets><target>lightning__RecordPage</target></targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <objects>
+                <object>Branch__c</object>
+                <object>LearningCourse</object>
+                <object>CourseOffering</object>
+                <object>LearningProgram</object>
+                <object>Campus_Branch__c</object>
+                <object>Subject__c</object>
+                <object>Section_Subject__c</object>
+            </objects>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

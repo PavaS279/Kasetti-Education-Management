@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Discounts_Disallowed</fullName>
+    <active>true</active>
+    <description>Discounts are not allowed for college campuses.</description>
+    <errorConditionFormula
+  >AND(ISPICKVAL(Institution_Type__c, 'College'), Discounts_Allowed__c)</errorConditionFormula>
+    <errorDisplayField>Discounts_Allowed__c</errorDisplayField>
+    <errorMessage>Discounts are not allowed for college campuses.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Campus_Code_Format</fullName>
+    <active>true</active>
+    <description>Campus code must be one uppercase letter.</description>
+    <errorConditionFormula
+  >AND(ISPICKVAL(Institution_Type__c, 'College'), NOT(ISBLANK(Campus_Code__c)), NOT(REGEX(Campus_Code__c, '^[A-Z]$')))</errorConditionFormula>
+    <errorDisplayField>Campus_Code__c</errorDisplayField>
+    <errorMessage>Campus code must be one uppercase letter.</errorMessage>
+</ValidationRule>

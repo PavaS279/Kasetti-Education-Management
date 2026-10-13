@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Curriculum_Required</fullName>
+    <active>true</active>
+    <description
+  >Enter the curriculum version for a college branch.</description>
+    <errorConditionFormula
+  >AND(RecordType.DeveloperName = 'College_Branch', ISBLANK(Curriculum_Version__c))</errorConditionFormula>
+    <errorDisplayField>Curriculum_Version__c</errorDisplayField>
+    <errorMessage
+  >Enter the curriculum version for a college branch.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Minimum_Amount_Required</fullName>
+    <active>true</active>
+    <description
+  >Enter a positive minimum amount for this release rule.</description>
+    <errorConditionFormula
+  >AND(ISPICKVAL(Roll_Release_Rule__c, 'Minimum Amount'), OR(ISBLANK(Roll_Release_Amount__c), Roll_Release_Amount__c &lt;= 0))</errorConditionFormula>
+    <errorDisplayField>Roll_Release_Amount__c</errorDisplayField>
+    <errorMessage
+  >Enter a positive minimum amount for this release rule.</errorMessage>
+</ValidationRule>

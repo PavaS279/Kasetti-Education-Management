@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Section_Code_Format</fullName>
+    <active>true</active>
+    <description
+  >Section code can contain only uppercase letters, numbers, and hyphens.</description>
+    <errorConditionFormula
+  >AND(RecordType.DeveloperName = 'College_Section', NOT(ISBLANK(Section_Code__c)), NOT(REGEX(Section_Code__c, '^[A-Z0-9-]{1,10}$')))</errorConditionFormula>
+    <errorDisplayField>Section_Code__c</errorDisplayField>
+    <errorMessage
+  >Section code can contain only uppercase letters, numbers, and hyphens.</errorMessage>
+</ValidationRule>

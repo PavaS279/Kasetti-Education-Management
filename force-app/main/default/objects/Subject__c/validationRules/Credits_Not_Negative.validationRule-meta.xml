@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Credits_Not_Negative</fullName>
+    <active>true</active>
+    <description>Credits cannot be negative.</description>
+    <errorConditionFormula
+  >AND(NOT(ISBLANK(Credits__c)), Credits__c &lt; 0)</errorConditionFormula>
+    <errorDisplayField>Credits__c</errorDisplayField>
+    <errorMessage>Credits cannot be negative.</errorMessage>
+</ValidationRule>

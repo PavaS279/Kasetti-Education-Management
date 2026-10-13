@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Subject_Code__c</fullName>
+    <label>Subject Code</label>
+    <required>true</required>
+    <length>30</length>
+    <unique>false</unique>
+    <trackHistory>true</trackHistory>
+    <type>Text</type>
+</CustomField>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Active_Term_Label_Required</fullName>
+    <active>true</active>
+    <description
+  >Select a term label before activating this college programme.</description>
+    <errorConditionFormula
+  >AND(Active__c, ISBLANK(TEXT(Term_Label__c)))</errorConditionFormula>
+    <errorDisplayField>Term_Label__c</errorDisplayField>
+    <errorMessage
+  >Select a term label before activating this college programme.</errorMessage>
+</ValidationRule>

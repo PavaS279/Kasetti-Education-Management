@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Regular_Seat_Counters_Valid</fullName>
+    <active>true</active>
+    <description
+  >Regular reserved and finalised seats must be non-negative and cannot exceed regular intake.</description>
+    <errorConditionFormula
+  >OR(BLANKVALUE(Reserved_Regular__c, 0) &lt; 0, BLANKVALUE(Finalised_Regular__c, 0) &lt; 0, BLANKVALUE(Reserved_Regular__c, 0) + BLANKVALUE(Finalised_Regular__c, 0) &gt; Intake_Regular__c)</errorConditionFormula>
+    <errorMessage
+  >Regular reserved and finalised seats must be non-negative and cannot exceed regular intake.</errorMessage>
+</ValidationRule>

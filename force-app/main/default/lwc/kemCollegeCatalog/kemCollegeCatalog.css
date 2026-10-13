@@ -1,0 +1,131 @@
+:host {
+  display: block;
+  --college-navy: #142b4a;
+  --college-gold: #c79a32;
+}
+.shell {
+  min-height: 100%;
+  padding: 1.25rem;
+  background: linear-gradient(145deg, #f6f8fb, #eef3f8);
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+.eyebrow {
+  margin: 0 0 0.2rem;
+  color: #765500;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+h1 {
+  margin: 0;
+  color: var(--college-navy);
+  font-size: 1.65rem;
+  font-weight: 750;
+}
+.subtitle {
+  max-width: 52rem;
+  margin: 0.3rem 0 0;
+  color: #526273;
+}
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.summary span {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid #d7dfeb;
+  border-radius: 999px;
+  background: white;
+  color: #334960;
+  font-weight: 600;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 0.9rem;
+}
+.card {
+  overflow: hidden;
+  border: 1px solid #d9e1ea;
+  border-radius: 0.65rem;
+  background: white;
+  box-shadow: 0 2px 8px rgb(20 43 74 / 7%);
+}
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0.9rem;
+  border-bottom: 3px solid var(--college-gold);
+  background: var(--college-navy);
+  color: white;
+}
+h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.card-head span {
+  min-width: 1.6rem;
+  text-align: center;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 18%);
+}
+ul {
+  max-height: 19rem;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+li {
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid #edf0f4;
+}
+li:last-child {
+  border-bottom: 0;
+}
+.row-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+a {
+  color: #0b5cab;
+  font-weight: 650;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+.badge {
+  flex: none;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: #edf3fa;
+  color: #334960;
+  font-size: 0.72rem;
+}
+.detail,
+.empty {
+  margin-top: 0.15rem;
+  color: #66788a;
+  font-size: 0.78rem;
+}
+.empty {
+  padding: 0.9rem;
+}
+@media (max-width: 30rem) {
+  .shell {
+    padding: 0.7rem;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

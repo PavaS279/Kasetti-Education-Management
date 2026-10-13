@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Branch_Code_Format</fullName>
+    <active>true</active>
+    <description
+  >College branch code must be two uppercase letters.</description>
+    <errorConditionFormula
+  >AND(RecordType.DeveloperName = 'College_Branch', NOT(ISBLANK(Branch_Code__c)), NOT(REGEX(Branch_Code__c, '^[A-Z]{2}$')))</errorConditionFormula>
+    <errorDisplayField>Branch_Code__c</errorDisplayField>
+    <errorMessage
+  >College branch code must be two uppercase letters.</errorMessage>
+</ValidationRule>

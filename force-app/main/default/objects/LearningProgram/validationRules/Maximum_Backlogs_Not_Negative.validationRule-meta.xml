@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Maximum_Backlogs_Not_Negative</fullName>
+    <active>true</active>
+    <description
+  >Maximum backlogs for promotion cannot be negative.</description>
+    <errorConditionFormula
+  >AND(NOT(ISBLANK(Max_Backlogs_For_Promotion__c)), Max_Backlogs_For_Promotion__c &lt; 0)</errorConditionFormula>
+    <errorDisplayField>Max_Backlogs_For_Promotion__c</errorDisplayField>
+    <errorMessage
+  >Maximum backlogs for promotion cannot be negative.</errorMessage>
+</ValidationRule>
