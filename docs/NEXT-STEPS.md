@@ -66,6 +66,8 @@ See [PROGRESS.md](PROGRESS.md), [TEST-LOG.md](TEST-LOG.md) and [DEMO-SCRIPT.md](
 
 ## Possible next steps (after Phase 5)
 
+**Planned next: College mode** (PUC, Diploma, BE at two campuses) — design in [COLLEGE-DESIGN.md](COLLEGE-DESIGN.md), build phases C1–C6; nothing built or deployed yet.
+
 1. **Connect the chosen LMS and ERP** — the generic APIs and outbox are ready; add the named credentials `KEM_LMS` / `KEM_ERP` and switch push on if they prefer push to polling.
 2. **Payment gateway** — connect middleware to the signed webhook; automatic gateway refunds (refunds are paid out manually today).
 3. **SMS / WhatsApp** — messaging covers email and the portal inbox; add a provider through the same templates and consent.

@@ -1,0 +1,10 @@
+# ADR-005 — College mode: naming, structure and configurable admission rules
+
+- **Status:** Proposed (2026-10-13) — design only, see [COLLEGE-DESIGN.md](../COLLEGE-DESIGN.md)
+- **Context:** The solution was demonstrated for after-school learning centres (short courses, monthly fees, age-based eligibility, parent-paid). The institution now needs a college model for two campuses (Yelahanka, Rajajinagar), each running PUC (4 branches), Diploma (3) and BE (4), with marks- and rank-based cut-offs that differ by branch and entry route, yearly fees, a Dean interview, DD/cheque/online payments only, roll numbers, and lateral entry from Diploma to BE Year 2.
+- **Decision:**
+  1. Map the college words onto existing objects instead of a parallel model: Campus = `Branch__c`, Programme = `LearningProgram`, Branch = `LearningCourse`, Section = `CourseOffering`, Section enrolment = `CourseOfferingParticipant`. Labels change; API names do not.
+  2. A campus is a _Learning Centre_ or a _College_ (`Branch__c.Institution_Type__c`). College logic runs only for college campuses, so the existing behaviour and its 298 tests stay valid.
+  3. Cut-offs are records (`Admission_Rule__c`: branch, entry route, academic year, optional campus, qualifying level/stream, minimum %, entrance exam and rank) evaluated by one `AdmissionEligibilityService`; fees stay in `Fee_Price__c` with an _Annual_ frequency and year of study; documents stay in `Application_Checklist_Item__mdt` with programme/route filters.
+  4. The roll number (`KT` + year + campus + programme + branch + serial; lateral from 401) lives on a programme-level enrolment and is issued when the first fee is confirmed, from a locked sequence record.
+- **Consequences:** Admissions staff change cut-offs and fees every year without a deployment. A student keeps one person record across PUC → Diploma → BE, with one programme enrolment and roll number per programme; completing a programme creates the qualification that the next admission checks. The labels _Branch_ (discipline) and `Branch__c` (campus) differ by design; the glossary in COLLEGE-DESIGN.md §1 is the reference for both.
