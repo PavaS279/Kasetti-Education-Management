@@ -2,7 +2,7 @@
 
 > **Start here:** [WALKTHROUGH.md](WALKTHROUGH.md) — the complete walkthrough by role, with set-up, addresses and real-world examples.
 >
-> **College mode (planned):** [COLLEGE-DESIGN.md](COLLEGE-DESIGN.md) — PUC, Diploma and BE at Yelahanka and Rajajinagar: naming, configuration, admission logic, roll numbers, build plan and demo script ([ADR-005](adr/ADR-005-college-mode-structure.md)).
+> **College mode (planned):** [COLLEGE-DESIGN.md](COLLEGE-DESIGN.md) version 2 — PUC, Diploma and BE at Yelahanka and Rajajinagar: terminology, data model, configuration, admission, seats, fees and roll numbers, results, security, constraints, service boundaries, build plan and demo script ([ADR-005](adr/ADR-005-college-mode-structure.md)).
 >
 > **Demo & test:** [DEMO-SCRIPT.md](DEMO-SCRIPT.md) — Phase 1 journey (`scripts/demo/full-journey.sh`), Phase 2 operations (`scripts/demo/phase2-journey.sh`) Phase 3 scale (`scripts/demo/phase3-journey.sh`) and Phase 4 AI and expansion (`scripts/demo/phase4-journey.sh`). AI: [ai/AI-OPPORTUNITIES.md](ai/AI-OPPORTUNITIES.md) (analysis) and [ai/MEASURED-BENEFIT.md](ai/MEASURED-BENEFIT.md) (measured benefit, access and review). Hand-over: [NEXT-STEPS.md](NEXT-STEPS.md).
 

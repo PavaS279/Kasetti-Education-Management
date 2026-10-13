@@ -66,7 +66,7 @@ See [PROGRESS.md](PROGRESS.md), [TEST-LOG.md](TEST-LOG.md) and [DEMO-SCRIPT.md](
 
 ## Possible next steps (after Phase 5)
 
-**Planned next: College mode** (PUC, Diploma, BE at two campuses) — design in [COLLEGE-DESIGN.md](COLLEGE-DESIGN.md), build phases C1–C6; nothing built or deployed yet.
+**Planned next: College mode** (PUC, Diploma, BE at two campuses) — product design approved and C0 technical architecture in [COLLEGE-DESIGN.md](COLLEGE-DESIGN.md) version 2 ([ADR-005](adr/ADR-005-college-mode-structure.md)); build phases C1–C6 start with the checks in §14 (the `edu-org` CLI session must be re-authenticated first); nothing built or deployed yet.
 
 1. **Connect the chosen LMS and ERP** — the generic APIs and outbox are ready; add the named credentials `KEM_LMS` / `KEM_ERP` and switch push on if they prefer push to polling.
 2. **Payment gateway** — connect middleware to the signed webhook; automatic gateway refunds (refunds are paid out manually today).
