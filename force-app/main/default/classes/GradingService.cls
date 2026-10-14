@@ -126,7 +126,7 @@ public with sharing class GradingService {
     }
     Map<Id, CourseOffering> offerings = new Map<Id, CourseOffering>(
       [
-        SELECT Id, Grading_Status__c
+        SELECT Id, Grading_Status__c, RecordType.DeveloperName
         FROM CourseOffering
         WHERE Id IN :offeringIds
         WITH SYSTEM_MODE
@@ -134,7 +134,11 @@ public with sharing class GradingService {
     );
     Set<Id> open = new Set<Id>();
     for (CourseOffering offering : offerings.values()) {
-      if (offering.Grading_Status__c != FINAL_STATUS) {
+      // College sections hold many subjects: they use subject results, never one class grade.
+      if (
+        offering.Grading_Status__c != FINAL_STATUS &&
+        offering.RecordType.DeveloperName != COLLEGE_SECTION
+      ) {
         open.add(offering.Id);
       }
     }
@@ -298,6 +302,7 @@ public with sharing class GradingService {
   /** Locks the grades, issues report cards and notifies families. */
   public static Integer finalise(Id offeringId) {
     CourseOffering offering = loadOffering(offeringId);
+    assertNotCollege(offering);
     assertOpenAndEditable(offering);
     Model model = new Model(offeringId);
     if (model.allAssessments.isEmpty()) {
@@ -696,6 +701,16 @@ public with sharing class GradingService {
     return result;
   }
 
+  public static final String COLLEGE_SECTION = 'College_Section';
+
+  private static void assertNotCollege(CourseOffering offering) {
+    if (offering.RecordType.DeveloperName == COLLEGE_SECTION) {
+      throw new AppException(
+        'College sections are graded by subject: finalise each section subject instead.'
+      );
+    }
+  }
+
   private static CourseOffering loadOffering(Id offeringId) {
     List<CourseOffering> rows = [
       SELECT
@@ -704,7 +719,8 @@ public with sharing class GradingService {
         Teacher_User__c,
         Grading_Status__c,
         Grades_Finalised_On__c,
-        Grades_Finalised_By__r.Name
+        Grades_Finalised_By__r.Name,
+        RecordType.DeveloperName
       FROM CourseOffering
       WHERE Id = :offeringId
       WITH USER_MODE

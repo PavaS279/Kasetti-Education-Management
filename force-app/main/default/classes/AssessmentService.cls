@@ -181,8 +181,12 @@ public with sharing class AssessmentService {
         )
       }
     );
-    // Provisional course grades follow every publication.
-    GradingService.calculate(new Set<Id>{ assessment.Course_Offering__c });
+    // Provisional course grades (college: subject results) follow every publication.
+    if (assessment.Section_Subject__c != null) {
+      ResultService.recalculate(new Set<Id>{ assessment.Section_Subject__c });
+    } else {
+      GradingService.calculate(new Set<Id>{ assessment.Course_Offering__c });
+    }
   }
 
   public static String gradeFor(Decimal percent, List<Band> scale) {
@@ -254,7 +258,10 @@ public with sharing class AssessmentService {
 
   @TestVisible
   private static Boolean canEdit(Course_Assessment__c assessment) {
-    if (assessment.Course_Offering__r.Teacher_User__c == UserInfo.getUserId()) {
+    if (
+      assessment.Course_Offering__r.Teacher_User__c == UserInfo.getUserId() ||
+      assessment.Section_Subject__r.Faculty__c == UserInfo.getUserId()
+    ) {
       return true;
     }
     List<UserRecordAccess> access = [
@@ -274,6 +281,13 @@ public with sharing class AssessmentService {
     if (assessment.Status__c != 'Draft') {
       throw new AppException('Published results are locked.');
     }
+    if (
+      assessment.Section_Subject__r.Status__c == ResultService.RESULTS_FINAL
+    ) {
+      throw new AppException(
+        'The results of this subject are final. The Dean can reopen them with a reason.'
+      );
+    }
   }
 
   private static Course_Assessment__c load(Id assessmentId) {
@@ -284,6 +298,7 @@ public with sharing class AssessmentService {
         Course_Offering__c,
         Course_Offering__r.Name,
         Course_Offering__r.Teacher_User__c,
+        Course_Offering__r.RecordType.DeveloperName,
         Assessment_Type__c,
         Max_Score__c,
         Weight__c,
@@ -299,7 +314,33 @@ public with sharing class AssessmentService {
     if (rows.isEmpty()) {
       throw new AppException('Assessment not found or not accessible.');
     }
-    return rows[0];
+    Course_Assessment__c result = rows[0];
+    if (
+      result.Course_Offering__r?.RecordType?.DeveloperName !=
+      GradingService.COLLEGE_SECTION
+    ) {
+      result.Section_Subject__c = null;
+      result.putSObject('Section_Subject__r', new Section_Subject__c());
+      return result;
+    }
+    // College subject link (structural, read in system mode after the user-mode access check).
+    Course_Assessment__c college = [
+      SELECT
+        Section_Subject__c,
+        Section_Subject__r.Faculty__c,
+        Section_Subject__r.Status__c
+      FROM Course_Assessment__c
+      WHERE Id = :assessmentId
+      WITH SYSTEM_MODE
+    ];
+    result.Section_Subject__c = college.Section_Subject__c;
+    result.putSObject(
+      'Section_Subject__r',
+      college.Section_Subject__c != null
+        ? college.Section_Subject__r
+        : new Section_Subject__c()
+    );
+    return result;
   }
 
   /** Writes authorised by the teacher-or-editor rule above, not by record ownership. */

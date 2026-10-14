@@ -64,6 +64,15 @@
         <pageOrSobjectType>LearningProgram</pageOrSobjectType>
     </actionOverrides>
     <actionOverrides>
+        <actionName>View</actionName>
+        <comment>KT College programme enrolment</comment>
+        <content>KT_College_Programme_Enrolment_Record_Page</content>
+        <formFactor>Large</formFactor>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Flexipage</type>
+        <pageOrSobjectType>Programme_Enrolment__c</pageOrSobjectType>
+    </actionOverrides>
+    <actionOverrides>
         <actionName>Tab</actionName>
         <comment>KT College catalogue</comment>
         <content>KT_College_Home</content>

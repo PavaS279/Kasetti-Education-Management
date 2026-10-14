@@ -17,6 +17,12 @@
                 <identifier>college_section_details</identifier>
             </componentInstance>
         </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemSectionResults</componentName>
+                <identifier>college_section_results</identifier>
+            </componentInstance>
+        </itemInstances>
         <name>main</name>
         <type>Region</type>
     </flexiPageRegions>

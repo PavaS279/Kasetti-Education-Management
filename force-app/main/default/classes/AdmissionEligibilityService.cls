@@ -14,13 +14,18 @@ public without sharing class AdmissionEligibilityService {
         Branch__c,
         Learning_Course__c,
         Academic_Year__c,
-        Entry_Route__c
+        Entry_Route__c,
+        College_Stage__c
       FROM IndividualApplication
       WHERE Id = :applicationId
       WITH SYSTEM_MODE
       FOR UPDATE
     ];
-    if (isFrozen(application.Status)) {
+    // College admissions track their lifecycle in College_Stage__c (ADR-005 fallback).
+    if (
+      isFrozen(application.Status) ||
+      isCollegeFrozen(application.College_Stage__c)
+    ) {
       throw new AppException(
         'Eligibility evidence is locked after the application decision.'
       );
@@ -211,6 +216,18 @@ public without sharing class AdmissionEligibilityService {
         'Canceled'
       }
       .contains(status);
+  }
+
+  /** College stages after the Dean's decision: the evidence snapshot is frozen. */
+  private static Boolean isCollegeFrozen(String stage) {
+    return new Set<String>{
+        'Application Decision',
+        'Fee Pending',
+        'Enrolled',
+        'Enrollment Failed',
+        'Withdrawn'
+      }
+      .contains(stage);
   }
 
   private class Evaluation {

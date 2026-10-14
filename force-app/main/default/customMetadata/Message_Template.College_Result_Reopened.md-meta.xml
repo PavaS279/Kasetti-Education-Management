@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>College Result Reopened</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Body__c</field>
+        <value xsi:type="xsd:string">Dear {{RecipientFirstName}},
+
+The term {{Term}} result of {{StudentName}} ({{RollNumber}}) in {{SubjectName}} has been reopened for review by the Dean.
+
+Reason: {{Reason}}
+
+The result will be published again once it is final.
+
+{{BranchName}}</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Sent when the Dean cancels a provisional college admission.</value>
+    </values>
+    <values>
+        <field>Send_Email__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Send_Portal__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Subject__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Result under review - {{SubjectName}}</value>
+    </values>
+</CustomMetadata>

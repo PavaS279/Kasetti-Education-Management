@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <classAccesses>
+        <apexClass>CollegeAcademicController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>CollegeCatalogController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -34,6 +38,26 @@
     </customPermissions>
     <description
   >API user for external systems (LMS, ERP, payment gateway middleware): reads classes, rosters and the finance journal, writes grades, polls and acknowledges integration events.</description>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Class_Session__c.Section_Subject__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Course_Assessment__c.Component__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Course_Assessment__c.Section_Subject__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Assessment_Result__c.Subject_Result__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
         <field>Student_Invoice__c.Programme_Enrolment__c</field>

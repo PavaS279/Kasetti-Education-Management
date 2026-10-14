@@ -16,6 +16,17 @@ public with sharing class RecordAccess {
     }
   }
 
+  public static void assertReadable(Id recordId) {
+    List<UserRecordAccess> access = [
+      SELECT RecordId, HasReadAccess
+      FROM UserRecordAccess
+      WHERE UserId = :UserInfo.getUserId() AND RecordId = :recordId
+    ];
+    if (access.isEmpty() || !access[0].HasReadAccess) {
+      throw new AppException('You do not have access to this record.');
+    }
+  }
+
   public static void assertPermission(String customPermission) {
     if (!FeatureManagement.checkPermission(customPermission)) {
       throw new AppException(

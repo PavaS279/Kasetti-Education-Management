@@ -44,7 +44,8 @@ public with sharing class SessionService {
         Branch__c,
         Delivery_Mode__c,
         StartDate,
-        EndDate
+        EndDate,
+        RecordType.DeveloperName
       FROM CourseOffering
       WHERE Id = :offeringId
       WITH USER_MODE
@@ -68,6 +69,22 @@ public with sharing class SessionService {
       WHERE CourseOfferingId = :offeringId
       WITH USER_MODE
     ];
+    // College periods: the section subject's faculty and room (structural, system mode).
+    Map<Id, CourseOfferingSchedule> subjectOf = new Map<Id, CourseOfferingSchedule>();
+    if (details.RecordType?.DeveloperName == GradingService.COLLEGE_SECTION) {
+      subjectOf = new Map<Id, CourseOfferingSchedule>(
+        [
+          SELECT
+            Id,
+            Section_Subject__c,
+            Section_Subject__r.Faculty__c,
+            Section_Subject__r.Default_Room__c
+          FROM CourseOfferingSchedule
+          WHERE CourseOfferingId = :offeringId AND Section_Subject__c != NULL
+          WITH SYSTEM_MODE
+        ]
+      );
+    }
     if (patterns.isEmpty()) {
       throw new AppException(
         'Add a weekly pattern to the class before generating sessions.'
@@ -125,8 +142,18 @@ public with sharing class SessionService {
             Name = (offering.Name + ' · ' + day.format()).left(80),
             Course_Offering__c = offeringId,
             Branch__c = details.Branch__c,
-            Room__c = details.Room__c,
-            Teacher_User__c = details.Teacher_User__c,
+            // A college period is taught by the subject's faculty in its default room.
+            Room__c = subjectOf.get(pattern.Id)
+                ?.Section_Subject__r
+                ?.Default_Room__c != null
+              ? subjectOf.get(pattern.Id).Section_Subject__r.Default_Room__c
+              : details.Room__c,
+            Teacher_User__c = subjectOf.get(pattern.Id)
+                ?.Section_Subject__r
+                ?.Faculty__c != null
+              ? subjectOf.get(pattern.Id).Section_Subject__r.Faculty__c
+              : details.Teacher_User__c,
+            Section_Subject__c = subjectOf.get(pattern.Id)?.Section_Subject__c,
             Delivery_Mode__c = details.Delivery_Mode__c,
             Start__c = startAt,
             End__c = Datetime.newInstance(day, pattern.EndTime),

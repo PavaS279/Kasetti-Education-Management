@@ -1,0 +1,106 @@
+<template>
+  <section class="kem-card results">
+    <header>
+      <div>
+        <p class="eyebrow">RESULTS</p>
+        <h2>Subject results</h2>
+        <p class="subtitle">
+          Marks are calculated from published internal and exam assessments.
+          Finalising locks and publishes them to students.
+        </p>
+      </div>
+      <lightning-button-icon
+        icon-name="utility:refresh"
+        alternative-text="Refresh"
+        title="Refresh"
+        onclick={load}
+      ></lightning-button-icon>
+    </header>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <template for:each={subjects} for:item="s">
+      <article key={s.id} class="subject">
+        <div class="subject-head">
+          <div>
+            <strong>{s.subject}</strong>
+            <span class="detail">Term {s.term} · {s.faculty} · {s.status}</span>
+          </div>
+          <template lwc:if={canFinalise}>
+            <lightning-button
+              label="Finalise"
+              variant="brand"
+              data-id={s.id}
+              onclick={handleFinalise}
+              disabled={s.isFinal}
+            ></lightning-button>
+          </template>
+        </div>
+        <template lwc:if={s.results.length}>
+          <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+            <thead>
+              <tr>
+                <th scope="col">Student</th>
+                <th scope="col">Attempt</th>
+                <th scope="col">Internal</th>
+                <th scope="col">Exam</th>
+                <th scope="col">Total</th>
+                <th scope="col">Result</th>
+                <th scope="col">Status</th>
+                <template lwc:if={canReopen}><th scope="col"></th></template>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={s.results} for:item="r">
+                <tr key={r.id}>
+                  <td>{r.student}</td>
+                  <td>{r.attempt}</td>
+                  <td>{r.internalMarks}</td>
+                  <td>{r.examMarks}</td>
+                  <td>{r.total} / {r.max}</td>
+                  <td>{r.result}</td>
+                  <td>{r.status}</td>
+                  <template lwc:if={canReopen}>
+                    <td>
+                      <template lwc:if={r.isFinal}>
+                        <lightning-button
+                          label="Reopen"
+                          variant="base"
+                          data-id={r.id}
+                          onclick={handleReopen}
+                        ></lightning-button>
+                      </template>
+                    </td>
+                  </template>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </template>
+      </article>
+    </template>
+    <template lwc:if={showReason}>
+      <div class="reason">
+        <lightning-input
+          label="Reason for reopening"
+          value={reason}
+          onchange={handleReason}
+        ></lightning-input>
+        <lightning-button
+          label="Reopen result"
+          variant="destructive"
+          onclick={confirmReopen}
+        ></lightning-button>
+        <lightning-button
+          label="Cancel"
+          onclick={cancelReopen}
+        ></lightning-button>
+      </div>
+    </template>
+    <template lwc:if={isEmpty}>
+      <p class="empty">No section subjects yet.</p>
+    </template>
+  </section>
+</template>

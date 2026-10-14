@@ -31,6 +31,14 @@ public without sharing class CollegeEligibilityReevaluationJob implements Queuea
             'Cancelled',
             'Canceled'
           )
+          AND (College_Stage__c = NULL
+          OR College_Stage__c NOT IN (
+            'Application Decision',
+            'Fee Pending',
+            'Enrolled',
+            'Enrollment Failed',
+            'Withdrawn'
+          ))
         WITH SYSTEM_MODE
         ORDER BY CreatedDate, Id
       ]) {

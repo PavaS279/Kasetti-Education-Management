@@ -25,6 +25,11 @@
                 <default>false</default>
                 <label>Diploma</label>
             </value>
+            <value>
+                <fullName>BE</fullName>
+                <default>false</default>
+                <label>BE</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

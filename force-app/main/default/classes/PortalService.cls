@@ -760,7 +760,11 @@ public without sharing class PortalService {
         Course_Assessment__r.Assessment_Date__c,
         Course_Assessment__r.Course_Offering__r.Name
       FROM Assessment_Result__c
-      WHERE Learner__c = :learnerContactId AND Status__c = 'Published'
+      WHERE
+        Learner__c = :learnerContactId
+        AND Status__c = 'Published'
+        AND (Course_Assessment__r.Section_Subject__c = NULL
+        OR Subject_Result__r.Status__c = 'Final')
       WITH SYSTEM_MODE
       ORDER BY Course_Assessment__r.Assessment_Date__c DESC NULLS LAST
       LIMIT 100

@@ -109,3 +109,17 @@ F4.1–F4.7 live (2026-10-06): Einstein assistants on the enquiry, application, 
 | 5.5 | Discounts form, library bulk add and import (stage 5)                                                           | ✅    | ✅       | ✅    | ✅        | [F5.5-discounts-library-import.md](features/F5.5-discounts-library-import.md)       |
 | 5.6 | Standard New buttons routed to the screens; administrators keep the standard form (stage 6)                     | ✅    | ✅       | ✅    | ✅        | [F5.6-new-button-routing.md](features/F5.6-new-button-routing.md)                   |
 | 5.7 | Set-up gaps fixed in place: Class set-up card, sessions follow teacher/room, complete layouts and related lists | ✅    | ✅       | ✅    | ✅        | [F5.7-setup-gap-fixes.md](features/F5.7-setup-gap-fixes.md)                         |
+
+## College mode — KT College (PUC, Diploma, BE at two campuses)
+
+**Goal:** the college model in [COLLEGE-DESIGN.md](COLLEGE-DESIGN.md) ([ADR-005](adr/ADR-005-college-mode-structure.md)), built additively next to the learning-centre mode.
+
+| #   | Phase                                                                                                                               | Built | Deployed | Tests | E2E check | Notes                                                    |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------- | ----- | -------- | ----- | --------- | -------------------------------------------------------- |
+| C0  | Technical architecture                                                                                                              | ✅    | —        | —     | —         | ADR-005 reopened for the `College_Admission` record type |
+| C1  | Catalogue: campuses, programmes, branches, intake, subjects, sections, section subjects, KT College app                             | ✅    | ✅       | ✅    | —         | Commit 0c45718                                           |
+| C2  | Admissions: qualifications, versioned rules, eligibility evidence, documents, interview, seat reservation                           | ✅    | ✅       | ✅    | —         | Commit 2bfe48c                                           |
+| C3  | Fees: programme invoices, DD/cheque clearance, cash refused, roll release, expiry, Dean extend/cancel, reconciliation, College dues | ✅    | ✅       | ✅    | —         | Commits 709cee1, 60ff619                                 |
+| C4  | Academics: joining, section-subject timetable and attendance, subject and term results, finalise/reopen, promotion to completion    | ✅    | ✅       | ✅    | —         | As-built notes: COLLEGE-DESIGN.md §19                    |
+| C5  | Student-first portal and optional parent access                                                                                     | —     | —        | —     | —         |                                                          |
+| C6  | Seed data, persona UAT, full regression, walkthrough                                                                                | —     | —        | —     | —         |                                                          |
