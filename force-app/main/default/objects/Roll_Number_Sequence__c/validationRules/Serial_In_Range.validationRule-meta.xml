@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Serial_In_Range</fullName>
+    <active>true</active>
+    <errorConditionFormula
+  >OR(Range_Start__c &gt; Range_End__c, Next_Serial__c &lt; Range_Start__c, Next_Serial__c &gt; Range_End__c + 1)</errorConditionFormula>
+    <errorMessage
+  >The next serial must remain within the configured roll-number range.</errorMessage>
+</ValidationRule>

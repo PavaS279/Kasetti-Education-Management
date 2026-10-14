@@ -352,6 +352,9 @@ private class BillingServiceTest {
       request.amount = 2000;
       request.method = 'Cheque';
       request.confirmed = false;
+      request.instrumentNumber = 'CHQ-1001';
+      request.instrumentBank = 'Demo Bank';
+      request.instrumentDate = Date.today();
       BillingService.PaymentResult cheque = BillingService.recordPayment(
         request
       );
@@ -504,6 +507,9 @@ private class BillingServiceTest {
       request.amount = 50;
       request.method = 'Cheque';
       request.confirmed = false;
+      request.instrumentNumber = 'CHQ-DELETE';
+      request.instrumentBank = 'Demo Bank';
+      request.instrumentDate = Date.today();
       Id pendingId = BillingService.recordPayment(request).paymentId;
       Database.delete(pendingId, AccessLevel.SYSTEM_MODE);
       Id spare = BillingService.createInvoice(enrol(f, f.learner.Id), false);
@@ -513,6 +519,81 @@ private class BillingServiceTest {
         [SELECT COUNT() FROM Student_Invoice__c WHERE Id = :spare],
         'Drafts can be deleted'
       );
+    }
+  }
+
+  @IsTest
+  static void collegeMethodsAndClearingInstrumentsAreEnforced() {
+    System.runAs(TestDataFactory.admin()) {
+      Fixture f = fixture();
+      update new Branch__c(
+        Id = f.branch.Id,
+        Institution_Type__c = 'College',
+        Campus_Code__c = 'P',
+        Allowed_Payment_Methods__c = 'Demand Draft;Online Gateway',
+        Discounts_Allowed__c = false
+      );
+      Id invoiceId = BillingService.createInvoice(f.enrolmentId, true);
+
+      BillingService.PaymentRequest cash = new BillingService.PaymentRequest();
+      cash.invoiceId = invoiceId;
+      cash.amount = 100;
+      cash.method = 'Cash';
+      try {
+        BillingService.recordPayment(cash);
+        Assert.fail('College campuses must refuse cash.');
+      } catch (DmlException expected) {
+        Assert.isTrue(
+          expected.getMessage().contains('not allowed'),
+          expected.getMessage()
+        );
+      }
+
+      BillingService.PaymentRequest draft = new BillingService.PaymentRequest();
+      draft.invoiceId = invoiceId;
+      draft.amount = 500;
+      draft.method = 'Demand Draft';
+      try {
+        BillingService.recordPayment(draft);
+        Assert.fail('Demand draft details are required.');
+      } catch (DmlException expected) {
+        Assert.isTrue(
+          expected.getMessage().contains('instrument'),
+          expected.getMessage()
+        );
+      }
+      draft.instrumentNumber = 'DD-9001';
+      draft.instrumentBank = 'College Bank';
+      draft.instrumentDate = Date.today();
+      draft.confirmed = true;
+      BillingService.PaymentResult recorded = BillingService.recordPayment(
+        draft
+      );
+      Assert.areEqual(
+        'Pending',
+        recorded.status,
+        'A DD always awaits bank clearance.'
+      );
+
+      Student_Payment__c imported = new Student_Payment__c(
+        Payer__c = f.guardianContactId,
+        Branch__c = f.branch.Id,
+        Amount__c = 10,
+        Method__c = 'Card',
+        Payment_Date__c = Date.today(),
+        Status__c = 'Pending',
+        Reconciliation_Status__c = 'Unreconciled'
+      );
+      Database.SaveResult direct = Database.insert(
+        imported,
+        false,
+        AccessLevel.SYSTEM_MODE
+      );
+      Assert.isFalse(
+        direct.isSuccess(),
+        'Direct DML uses the same campus policy.'
+      );
+      Assert.isTrue(direct.getErrors()[0].getMessage().contains('not allowed'));
     }
   }
 

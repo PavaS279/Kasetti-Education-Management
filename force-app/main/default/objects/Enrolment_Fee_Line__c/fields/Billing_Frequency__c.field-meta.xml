@@ -3,6 +3,7 @@
     <fullName>Billing_Frequency__c</fullName>
     <label>Billing Frequency</label>
     <required>false</required>
+    <trackTrending>false</trackTrending>
     <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>
@@ -22,6 +23,11 @@
                 <fullName>Term</fullName>
                 <default>false</default>
                 <label>Term</label>
+            </value>
+            <value>
+                <fullName>Annual</fullName>
+                <default>false</default>
+                <label>Annual</label>
             </value>
         </valueSetDefinition>
     </valueSet>

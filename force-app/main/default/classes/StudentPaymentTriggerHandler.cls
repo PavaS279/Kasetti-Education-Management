@@ -3,10 +3,15 @@
  * deleted (they are part of the reconciled ledger).
  */
 public with sharing class StudentPaymentTriggerHandler extends TriggerHandler {
+  protected override void beforeInsert(List<SObject> newRecords) {
+    CollegePaymentPolicy.validate((List<Student_Payment__c>) newRecords, true);
+  }
+
   protected override void beforeUpdate(
     List<SObject> newRecords,
     Map<Id, SObject> oldMap
   ) {
+    CollegePaymentPolicy.validate((List<Student_Payment__c>) newRecords, false);
     StatusTransitionService.validate(
       newRecords,
       oldMap,

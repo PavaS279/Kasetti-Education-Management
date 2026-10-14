@@ -35,6 +35,12 @@ public with sharing class BillingService {
     public String gatewayTransactionId { get; set; }
     @AuraEnabled
     public Date paymentDate { get; set; }
+    @AuraEnabled
+    public String instrumentNumber { get; set; }
+    @AuraEnabled
+    public String instrumentBank { get; set; }
+    @AuraEnabled
+    public Date instrumentDate { get; set; }
     /** False records the payment as Pending (for example a cheque awaiting clearance). */
     @AuraEnabled
     public Boolean confirmed { get; set; }
@@ -110,6 +116,217 @@ public with sharing class BillingService {
       issueNow,
       Date.today()
     );
+  }
+
+  /** Raises one retry-safe college invoice from the programme price book. */
+  public static Id createProgrammeInvoice(
+    Id programmeEnrolmentId,
+    Integer yearOfStudy,
+    String invoiceKind
+  ) {
+    RecordAccess.assertPermission(MANAGE_PERMISSION);
+    return raiseProgrammeInvoice(
+      programmeEnrolmentId,
+      yearOfStudy,
+      invoiceKind
+    );
+  }
+
+  /** Internal admission/promotion entry point; callers own their workflow permission check. */
+  public static Id createProgrammeInvoiceSystem(
+    Id programmeEnrolmentId,
+    Integer yearOfStudy,
+    String invoiceKind
+  ) {
+    return raiseProgrammeInvoice(
+      programmeEnrolmentId,
+      yearOfStudy,
+      invoiceKind
+    );
+  }
+
+  private static Id raiseProgrammeInvoice(
+    Id programmeEnrolmentId,
+    Integer yearOfStudy,
+    String invoiceKind
+  ) {
+    if (yearOfStudy == null || yearOfStudy < 1) {
+      throw new AppException('Enter a valid year of study.');
+    }
+    if (invoiceKind != 'Annual' && invoiceKind != 'Admission') {
+      throw new AppException('Choose Annual or Admission as the invoice kind.');
+    }
+    Programme_Enrolment__c enrolment = [
+      SELECT
+        Id,
+        Student__c,
+        Student__r.PersonContactId,
+        Programme__c,
+        Programme__r.Roll_Release_Rule__c,
+        Branch__c,
+        Campus__c,
+        Academic_Year__c,
+        Status__c
+      FROM Programme_Enrolment__c
+      WHERE Id = :programmeEnrolmentId
+      WITH SYSTEM_MODE
+      FOR UPDATE
+    ];
+    if (
+      enrolment.Status__c != 'Provisional' &&
+      enrolment.Status__c != 'Enrolled'
+    ) {
+      throw new AppException(
+        'Only provisional or enrolled programme enrolments can be invoiced.'
+      );
+    }
+    String invoiceKey =
+      String.valueOf(enrolment.Id) +
+      '|' +
+      yearOfStudy +
+      '|' +
+      invoiceKind;
+    List<Student_Invoice__c> existing = [
+      SELECT Id
+      FROM Student_Invoice__c
+      WHERE Programme_Invoice_Key__c = :invoiceKey
+      WITH SYSTEM_MODE
+      LIMIT 1
+    ];
+    if (!existing.isEmpty())
+      return existing[0].Id;
+
+    List<Fee_Price__c> prices = programmePrices(
+      enrolment,
+      yearOfStudy,
+      invoiceKind
+    );
+    if (prices.isEmpty()) {
+      throw new AppException(
+        'No active ' +
+          invoiceKind.toLowerCase() +
+          ' prices are configured for this programme and year.'
+      );
+    }
+    BranchPolicy policy = new BranchPolicy(loadBranch(enrolment.Campus__c));
+    Decimal taxRate = policy.taxRate();
+    List<Enrolment_Fee_Line__c> snapshots = new List<Enrolment_Fee_Line__c>();
+    for (Fee_Price__c price : prices) {
+      Decimal tax = (price.Amount__c * taxRate).setScale(2);
+      snapshots.add(
+        new Enrolment_Fee_Line__c(
+          Programme_Enrolment__c = enrolment.Id,
+          Year_Of_Study__c = yearOfStudy,
+          Fee_Price__c = price.Id,
+          Fee_Type__c = price.Fee_Type__c,
+          Billing_Frequency__c = price.Billing_Frequency__c,
+          Description__c = price.Description__c,
+          Unit_Amount__c = price.Amount__c,
+          Discount_Amount__c = 0,
+          Tax_Rate__c = taxRate * 100,
+          Tax_Amount__c = tax,
+          Line_Total__c = price.Amount__c + tax,
+          Invoiced__c = true
+        )
+      );
+    }
+    Writer writer = new Writer();
+    writer.insertRecords(snapshots);
+    Student_Invoice__c invoice = new Student_Invoice__c(
+      Name = 'DRAFT',
+      Programme_Enrolment__c = enrolment.Id,
+      Year_Of_Study__c = yearOfStudy,
+      Invoice_Kind__c = invoiceKind,
+      Programme_Invoice_Key__c = invoiceKey,
+      Learner__c = enrolment.Student__r.PersonContactId,
+      Learner_Account__c = enrolment.Student__c,
+      Bill_To__c = billToFor(enrolment.Student__r.PersonContactId),
+      Branch__c = enrolment.Campus__c,
+      Status__c = 'Draft',
+      Billing_Period__c = enrolment.Academic_Year__c
+    );
+    stampIssue(invoice, policy);
+    writer.insertRecords(new List<SObject>{ invoice });
+    String sequence = [
+      SELECT Sequence__c
+      FROM Student_Invoice__c
+      WHERE Id = :invoice.Id
+      WITH SYSTEM_MODE
+    ]
+    .Sequence__c;
+    writer.updateRecords(
+      new List<SObject>{
+        new Student_Invoice__c(
+          Id = invoice.Id,
+          Name = policy.invoicePrefix() + '-' + sequence
+        )
+      }
+    );
+    List<Invoice_Line__c> lines = new List<Invoice_Line__c>();
+    for (Enrolment_Fee_Line__c snapshot : snapshots) {
+      Invoice_Line__c line = invoiceLine(snapshot, snapshot.Description__c);
+      line.Student_Invoice__c = invoice.Id;
+      lines.add(line);
+    }
+    writer.insertRecords(lines);
+    refreshInvoices(new Set<Id>{ invoice.Id });
+    CreditService.autoApply(new Set<Id>{ invoice.Id });
+    MessageService.invoicesIssued(new Set<Id>{ invoice.Id });
+    queueInvoiceDocuments(new Set<Id>{ invoice.Id });
+    return invoice.Id;
+  }
+
+  private static List<Fee_Price__c> programmePrices(
+    Programme_Enrolment__c enrolment,
+    Integer yearOfStudy,
+    String invoiceKind
+  ) {
+    Boolean separateAdmission =
+      enrolment.Programme__r.Roll_Release_Rule__c == 'Admission Fee';
+    Map<String, Fee_Price__c> selected = new Map<String, Fee_Price__c>();
+    for (Fee_Price__c price : [
+      SELECT
+        Id,
+        Branch__c,
+        Fee_Type__c,
+        Billing_Frequency__c,
+        Description__c,
+        Amount__c,
+        Effective_From__c
+      FROM Fee_Price__c
+      WHERE
+        Learning_Course__c = :enrolment.Branch__c
+        AND (Branch__c = NULL
+        OR Branch__c = :enrolment.Campus__c)
+        AND Active__c = TRUE
+        AND (Effective_From__c = NULL
+        OR Effective_From__c <= TODAY)
+        AND (Effective_To__c = NULL
+        OR Effective_To__c >= TODAY)
+        AND (Year_Of_Study__c = NULL
+        OR Year_Of_Study__c = :yearOfStudy)
+        AND (Academic_Year__c = NULL
+        OR Academic_Year__c = :enrolment.Academic_Year__c)
+      WITH SYSTEM_MODE
+      ORDER BY Effective_From__c DESC NULLS LAST
+    ]) {
+      Boolean include = invoiceKind == 'Admission'
+        ? price.Fee_Type__c == 'Admission'
+        : price.Billing_Frequency__c == 'Annual' ||
+          (!separateAdmission && price.Fee_Type__c == 'Admission');
+      if (!include)
+        continue;
+      String key = price.Fee_Type__c + '|' + price.Billing_Frequency__c;
+      Fee_Price__c current = selected.get(key);
+      if (
+        current == null ||
+        (current.Branch__c == null &&
+        price.Branch__c != null)
+      ) {
+        selected.put(key, price);
+      }
+    }
+    return selected.values();
   }
 
   /**
@@ -691,7 +908,9 @@ public with sharing class BillingService {
     if (payerId == null) {
       throw new AppException('Select the invoice or the payer.');
     }
-    Boolean confirmed = request.confirmed != false;
+    Boolean awaitingClearance = new Set<String>{ 'Cheque', 'Demand Draft' }
+      .contains(request.method);
+    Boolean confirmed = !awaitingClearance && request.confirmed != false;
     Student_Payment__c payment = new Student_Payment__c(
       Payer__c = payerId,
       Learner__c = invoice?.Learner__c,
@@ -702,6 +921,13 @@ public with sharing class BillingService {
       Reference__c = String.isBlank(request.reference)
         ? null
         : request.reference.left(100),
+      Instrument_Number__c = String.isBlank(request.instrumentNumber)
+        ? null
+        : request.instrumentNumber.left(50),
+      Instrument_Bank__c = String.isBlank(request.instrumentBank)
+        ? null
+        : request.instrumentBank.left(100),
+      Instrument_Date__c = request.instrumentDate,
       Gateway_Transaction_Id__c = String.isBlank(request.gatewayTransactionId)
         ? null
         : request.gatewayTransactionId,
@@ -1144,6 +1370,7 @@ public with sharing class BillingService {
     Writer writer = new Writer();
     writer.updateRecords(changes.values());
     writer.updateRecords(instalmentUpdates);
+    ProgrammeEnrolmentService.onInvoicesPaid(invoiceIds);
     refreshEnrolments(enrolmentIds);
   }
 
@@ -1307,7 +1534,7 @@ public with sharing class BillingService {
       return null;
     }
     return [
-      SELECT Id, Invoice_Prefix__c, Invoice_Due_Days__c
+      SELECT Id, Invoice_Prefix__c, Invoice_Due_Days__c, Tax_Rate__c
       FROM Branch__c
       WHERE Id = :branchId
       WITH SYSTEM_MODE

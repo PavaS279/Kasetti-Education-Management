@@ -23,6 +23,9 @@ global with sharing class PaymentApi {
     public String status;
     public String method;
     public Date paidOn;
+    public String instrumentNumber;
+    public String instrumentBank;
+    public Date instrumentDate;
   }
 
   global class PaymentResponse {
@@ -101,6 +104,9 @@ global with sharing class PaymentApi {
       : note.method;
     request.gatewayTransactionId = note.transactionId;
     request.paymentDate = note.paidOn;
+    request.instrumentNumber = note.instrumentNumber;
+    request.instrumentBank = note.instrumentBank;
+    request.instrumentDate = note.instrumentDate;
     request.confirmed = status == 'success';
     BillingService.PaymentResult outcome = BillingService.recordPayment(
       request

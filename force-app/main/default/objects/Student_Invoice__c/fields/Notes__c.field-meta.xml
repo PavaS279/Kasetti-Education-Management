@@ -4,5 +4,6 @@
     <label>Notes</label>
     <required>false</required>
     <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
     <type>TextArea</type>
 </CustomField>
