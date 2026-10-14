@@ -192,6 +192,11 @@
             </div>
           </div>
 
+          <template lwc:if={collegeSummary}>
+            <c-kem-portal-college
+              summary={collegeSummary}
+            ></c-kem-portal-college>
+          </template>
           <nav class="segments" role="tablist" aria-label="Learner information">
             <template for:each={views} for:item="v">
               <button

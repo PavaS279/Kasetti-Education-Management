@@ -276,6 +276,11 @@ export default class KemPortalHome extends LightningElement {
   get card() {
     return this.detail?.learner;
   }
+
+  /** College students also see their programme card (null for other learners). */
+  get collegeSummary() {
+    return this.detail?.college;
+  }
   get summary() {
     const c = this.card;
     if (!c) {

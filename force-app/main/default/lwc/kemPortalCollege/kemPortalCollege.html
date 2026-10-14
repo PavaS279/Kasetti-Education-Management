@@ -1,0 +1,82 @@
+<template>
+  <section class="kem-card college kem-fade-in" aria-label="College">
+    <header>
+      <div>
+        <p class="eyebrow">{summary.campus}</p>
+        <h2>{summary.programme} · {summary.branch}</h2>
+        <p class="subtitle">
+          {rollLabel} · {summary.academicYear} · year {summary.yearOfStudy}
+          <template lwc:if={summary.section}> · {summary.section}</template>
+        </p>
+      </div>
+      <div class="facts">
+        <span class="fact">{summary.status}</span>
+        <span class={duesClass}>Fees due {feesDue}</span>
+        <template lwc:if={summary.paymentDueBy}>
+          <span class="fact warn">Pay by {summary.paymentDueBy}</span>
+        </template>
+        <template lwc:if={summary.openBacklogs}>
+          <span class="fact warn">Backlogs {summary.openBacklogs}</span>
+        </template>
+      </div>
+    </header>
+
+    <h3>Today</h3>
+    <template lwc:if={hasToday}>
+      <ul class="periods">
+        <template for:each={periods} for:item="p">
+          <li key={p.key}>
+            <span class="time">{p.time}</span>
+            <span class="strong">{p.subject}</span>
+            <span class="small">{p.where}</span>
+          </li>
+        </template>
+      </ul>
+    </template>
+    <template lwc:else>
+      <p class="empty">No classes today.</p>
+    </template>
+
+    <h3>Subjects</h3>
+    <template lwc:if={hasSubjects}>
+      <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+        <thead>
+          <tr>
+            <th scope="col">Subject</th>
+            <th scope="col">Term</th>
+            <th scope="col">Attendance</th>
+            <th scope="col">Internal</th>
+            <th scope="col">Exam</th>
+            <th scope="col">Total</th>
+            <th scope="col">Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template for:each={subjects} for:item="s">
+            <tr key={s.key}>
+              <td>{s.name}</td>
+              <td>{s.term}</td>
+              <td>{s.attendance}</td>
+              <td>{s.internal}</td>
+              <td>{s.exam}</td>
+              <td>{s.total}</td>
+              <td>{s.result}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </template>
+    <template lwc:else>
+      <p class="empty">Subjects appear once you join a section.</p>
+    </template>
+
+    <template lwc:if={hasTerms}>
+      <h3>Term results</h3>
+      <ul class="terms">
+        <template for:each={terms} for:item="t">
+          <li key={t.key}>{t.label}</li>
+        </template>
+      </ul>
+    </template>
+  </section>
+</template>

@@ -302,6 +302,9 @@ public without sharing class PortalService {
     public List<LibraryService.LoanRow> loans = new List<LibraryService.LoanRow>();
     @AuraEnabled
     public List<TransportService.TransportItem> transport = new List<TransportService.TransportItem>();
+    /** College students: programme, roll number, today's periods and subject results (null otherwise). */
+    @AuraEnabled
+    public CollegePortalService.Summary college;
   }
 
   // ------------------------------------------------------------------ API
@@ -676,6 +679,7 @@ public without sharing class PortalService {
     LearnerDetail detail = new LearnerDetail();
     detail.learner = cards(new Set<Id>{ learnerContactId }, viewerId)
       .get(learnerContactId);
+    detail.college = CollegePortalService.summaryFor(learnerContactId);
     detail.paymentMode = PaymentLinkService.mode();
     detail.payOnline = detail.paymentMode != PaymentLinkService.MODE_OFF;
 
@@ -787,7 +791,13 @@ public without sharing class PortalService {
       InvoiceItem item = new InvoiceItem();
       item.id = i.Id;
       item.invoiceNumber = i.Name;
-      item.className = i.Enrolment__r.CourseOffering.Name;
+      item.className = i.Enrolment__c != null
+        ? i.Enrolment__r.CourseOffering.Name
+        : i.Programme_Enrolment__r?.Programme__r?.Name +
+          ' · ' +
+          i.Programme_Enrolment__r?.Branch__r?.Name +
+          ' · year ' +
+          i.Year_Of_Study__c;
       item.issueDate = i.Issue_Date__c;
       item.dueDate = i.Due_Date__c;
       item.total = i.Total__c;
@@ -1186,7 +1196,11 @@ public without sharing class PortalService {
         Status__c,
         Overdue__c,
         Billing_Period__c,
+        Enrolment__c,
         Enrolment__r.CourseOffering.Name,
+        Programme_Enrolment__r.Programme__r.Name,
+        Programme_Enrolment__r.Branch__r.Name,
+        Year_Of_Study__c,
         (
           SELECT
             Sequence__c,
