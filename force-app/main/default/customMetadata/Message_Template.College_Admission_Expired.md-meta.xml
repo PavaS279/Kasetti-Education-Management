@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>College Admission Expired</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Body__c</field>
+        <value xsi:type="xsd:string">Dear {{RecipientFirstName}},
+
+The payment for {{StudentName}}'s admission to {{ProgrammeName}} {{BranchOfStudy}} ({{AcademicYear}}) was not received by {{PaymentDueBy}}, so the reserved seat has been released.
+
+Please contact the admission desk if you still wish to join.
+
+{{BranchName}}</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Sent when the nightly run expires an unpaid provisional college admission.</value>
+    </values>
+    <values>
+        <field>Send_Email__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Send_Portal__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Subject__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Admission seat released - payment not received</value>
+    </values>
+</CustomMetadata>

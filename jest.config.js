@@ -7,5 +7,8 @@ module.exports = {
     "^c/kemStyles$": "<rootDir>/jest-mocks/cssModule.js",
     "^lightning/modal$": "<rootDir>/jest-mocks/lightningModal.js"
   },
-  modulePathIgnorePatterns: ["<rootDir>/.localdevserver"]
+  modulePathIgnorePatterns: [
+    "<rootDir>/.localdevserver",
+    "<rootDir>/.codex-worktrees"
+  ]
 };

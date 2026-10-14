@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>College Payment Due Soon</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Body__c</field>
+        <value xsi:type="xsd:string">Dear {{RecipientFirstName}},
+
+The admission of {{StudentName}} to {{ProgrammeName}} {{BranchOfStudy}} ({{AcademicYear}}) is reserved until {{PaymentDueBy}}. Amount due: {{BalanceDue}}.
+
+Pay by demand draft, cheque or online before that date to keep the seat.
+
+{{BranchName}}</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Sent two days before a provisional college admission's payment date, once per due date.</value>
+    </values>
+    <values>
+        <field>Send_Email__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Send_Portal__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Subject__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Admission fee due by {{PaymentDueBy}}</value>
+    </values>
+</CustomMetadata>

@@ -575,6 +575,15 @@ public with sharing class BillingService {
   /** Cancels an unpaid invoice and releases its fee lines so they can be invoiced again. */
   public static void cancel(Id invoiceId, String reason) {
     RecordAccess.assertPermission(MANAGE_PERMISSION);
+    cancelInvoice(invoiceId, reason);
+  }
+
+  /** System entry point for college provisional expiry and cancellation (no allocations allowed). */
+  public static void cancelSystem(Id invoiceId, String reason) {
+    cancelInvoice(invoiceId, reason);
+  }
+
+  private static void cancelInvoice(Id invoiceId, String reason) {
     if (String.isBlank(reason)) {
       throw new AppException('Enter a reason for cancelling the invoice.');
     }

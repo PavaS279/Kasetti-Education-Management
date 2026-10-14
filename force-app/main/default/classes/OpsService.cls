@@ -184,6 +184,12 @@ public with sharing class OpsService {
       when 'KEM Message Dispatch' {
         return System.enqueueJob(new MessageService.DispatchJob());
       }
+      when 'KEM College Admissions' {
+        return Database.executeBatch(
+          new CollegeAdmissionsJob(CollegeAdmissionsJob.PROVISIONAL),
+          5
+        );
+      }
       when else {
         throw new AppException('Unknown job: ' + jobName);
       }

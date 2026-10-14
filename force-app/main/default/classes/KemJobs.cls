@@ -17,7 +17,8 @@ public with sharing class KemJobs {
     'KEM Integration Sync' => '0 40 * * * ?',
     'KEM Finance Export' => '0 15 3 * * ?',
     'KEM Retention' => '0 5 4 * * ?',
-    'KEM Library' => '0 15 7 * * ?'
+    'KEM Library' => '0 15 7 * * ?',
+    'KEM College Admissions' => '0 45 1 * * ?'
   };
 
   /** Names of all KEM scheduled jobs, sorted. */
@@ -75,6 +76,9 @@ public with sharing class KemJobs {
       }
       when 'KEM Library' {
         return new LibraryJob();
+      }
+      when 'KEM College Admissions' {
+        return new CollegeAdmissionsJob(CollegeAdmissionsJob.PROVISIONAL);
       }
       when else {
         throw new AppException('Unknown job: ' + name);

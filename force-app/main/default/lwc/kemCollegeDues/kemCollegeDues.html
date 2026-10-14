@@ -1,0 +1,40 @@
+<template>
+  <template lwc:if={hasRows}>
+    <section class="kem-card dues">
+      <header>
+        <div>
+          <p class="eyebrow">KT COLLEGE</p>
+          <h2>College dues</h2>
+          <p class="subtitle">
+            Billed, paid and due by campus, programme, branch and academic year.
+          </p>
+        </div>
+        <lightning-button-icon
+          icon-name="utility:refresh"
+          alternative-text="Refresh"
+          title="Refresh"
+          onclick={load}
+        ></lightning-button-icon>
+      </header>
+      <div class="totals" aria-label="College dues totals">
+        <span>Billed {total.billed}</span>
+        <span>Paid {total.paid}</span>
+        <span class="due">Due {total.due}</span>
+        <span>Awaiting clearance {total.awaitingClearance}</span>
+        <span>Expiring soon {total.expiringSoon}</span>
+        <span>Fee holds {total.feeHolds}</span>
+      </div>
+      <lightning-datatable
+        key-field="key"
+        data={rows}
+        columns={columns}
+        hide-checkbox-column
+      ></lightning-datatable>
+    </section>
+  </template>
+  <template lwc:if={errorMessage}>
+    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+      {errorMessage}
+    </div>
+  </template>
+</template>

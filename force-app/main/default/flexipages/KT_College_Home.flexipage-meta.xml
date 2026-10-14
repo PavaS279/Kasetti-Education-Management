@@ -7,6 +7,12 @@
                 <identifier>c_kemCollegeCatalog</identifier>
             </componentInstance>
         </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemCollegeOverdue</componentName>
+                <identifier>c_kemCollegeOverdue</identifier>
+            </componentInstance>
+        </itemInstances>
         <name>top</name>
         <type>Region</type>
     </flexiPageRegions>

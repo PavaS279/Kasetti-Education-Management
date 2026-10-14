@@ -5,6 +5,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>CollegeAdmissionsController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>ErpApi</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -30,6 +34,21 @@
     </customPermissions>
     <description
   >API user for external systems (LMS, ERP, payment gateway middleware): reads classes, rosters and the finance journal, writes grades, polls and acknowledges integration events.</description>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Student_Invoice__c.Programme_Enrolment__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Student_Invoice__c.Invoice_Kind__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Student_Invoice__c.Year_Of_Study__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
         <field>Account.Alumni_Contact_Ok__c</field>

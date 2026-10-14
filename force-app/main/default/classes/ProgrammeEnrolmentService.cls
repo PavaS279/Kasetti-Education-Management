@@ -42,6 +42,8 @@ public without sharing class ProgrammeEnrolmentService {
     }
     for (Id enrolmentId : eligible)
       releaseRoll(enrolmentId);
+    if (!eligible.isEmpty())
+      CollegeProvisionalService.confirmAdmissions(eligible);
   }
 
   private static void releaseRoll(Id enrolmentId) {
