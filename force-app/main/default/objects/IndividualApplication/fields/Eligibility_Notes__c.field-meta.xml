@@ -3,5 +3,6 @@
     <fullName>Eligibility_Notes__c</fullName>
     <label>Eligibility Notes</label>
     <required>false</required>
+    <trackHistory>false</trackHistory>
     <type>TextArea</type>
 </CustomField>

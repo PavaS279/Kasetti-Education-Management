@@ -99,6 +99,9 @@ private class DocumentServiceTest {
       request.amount = 100;
       request.method = 'Cheque';
       request.confirmed = false;
+      request.instrumentNumber = 'CHQ-RECEIPT';
+      request.instrumentBank = 'Demo Bank';
+      request.instrumentDate = Date.today();
       Id paymentId = BillingService.recordPayment(request).paymentId;
       try {
         DocumentController.generateDocument(paymentId);

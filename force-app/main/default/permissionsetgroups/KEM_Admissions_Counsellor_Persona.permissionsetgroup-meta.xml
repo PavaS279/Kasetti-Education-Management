@@ -6,5 +6,6 @@
     <label>KEM Admissions Counsellor Persona</label>
     <permissionSets>KEM_Admissions_Counsellor</permissionSets>
     <permissionSets>KEM_Admissions_Counsellor_Edu</permissionSets>
+    <permissionSets>KEM_College_Admissions</permissionSets>
     <status>Updated</status>
 </PermissionSetGroup>

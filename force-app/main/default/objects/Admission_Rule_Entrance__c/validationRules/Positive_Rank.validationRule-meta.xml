@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Positive_Rank</fullName>
+    <active>true</active>
+    <errorConditionFormula
+  >AND(NOT(ISBLANK(Max_Rank__c)),Max_Rank__c&lt;=0)</errorConditionFormula>
+    <errorMessage>Maximum rank must be greater than zero.</errorMessage>
+</ValidationRule>

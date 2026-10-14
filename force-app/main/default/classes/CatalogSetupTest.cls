@@ -70,13 +70,24 @@ private class CatalogSetupTest {
       Test.stopTest();
 
       LearningCourse saved = [
-        SELECT Name, External_ID__c, Minimum_Age__c, Maximum_Age__c, LearningId
+        SELECT
+          Name,
+          External_ID__c,
+          Minimum_Age__c,
+          Maximum_Age__c,
+          LearningId,
+          RecordType.DeveloperName
         FROM LearningCourse
         WHERE Id = :courseId
       ];
       Assert.areEqual('KT-CRS-CHS', saved.External_ID__c, 'Code upper-cased');
       Assert.areEqual(8, saved.Minimum_Age__c.intValue(), 'Minimum age');
       Assert.isNotNull(saved.LearningId, 'Learning record');
+      Assert.areEqual(
+        'Learning_Centre_Course',
+        saved.RecordType.DeveloperName,
+        'Guided setup keeps learning-centre semantics'
+      );
       List<Fee_Price__c> prices = [
         SELECT Fee_Type__c, Amount__c, Description__c, Effective_From__c
         FROM Fee_Price__c
@@ -187,12 +198,22 @@ private class CatalogSetupTest {
       Test.stopTest();
 
       CourseOffering o = [
-        SELECT Name, Class_Status__c, Room__c, EnrollmentCapacity
+        SELECT
+          Name,
+          Class_Status__c,
+          Room__c,
+          EnrollmentCapacity,
+          RecordType.DeveloperName
         FROM CourseOffering
         WHERE Id = :created.classId
       ];
       Assert.isTrue(o.Name.startsWith('Robotics Club – Monday'), o.Name);
       Assert.areEqual('Open', o.Class_Status__c, 'Open for enrolment');
+      Assert.areEqual(
+        'Learning_Centre_Class',
+        o.RecordType.DeveloperName,
+        'Guided setup creates a learning-centre class'
+      );
       Assert.areEqual(
         1,
         [

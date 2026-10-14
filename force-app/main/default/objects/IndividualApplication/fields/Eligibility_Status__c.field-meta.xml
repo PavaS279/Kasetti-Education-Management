@@ -3,6 +3,7 @@
     <fullName>Eligibility_Status__c</fullName>
     <label>Eligibility</label>
     <required>false</required>
+    <trackHistory>false</trackHistory>
     <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>

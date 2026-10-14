@@ -8,6 +8,7 @@ every permission set that grants the object.
 Usage:  python3 scripts/tooling/mdgen.py
 """
 import os
+import shutil
 import sys
 from xml.sax.saxutils import escape
 
@@ -322,6 +323,14 @@ def gen_permsets():
             x += "    </objectPermissions>\n"
         for page in sorted(ps.get("pages", [])):
             x += "    <pageAccesses>\n" + tag("apexPage", page, 8) + tag("enabled", True, 8) + "    </pageAccesses>\n"
+        for oname, record_types in sorted(getattr(specs, "RECORD_TYPE_ACCESS", {}).items()):
+            if oname not in ps["objects"]:
+                continue
+            for record_type in sorted(record_types):
+                x += "    <recordTypeVisibilities>\n"
+                x += tag("recordType", f"{oname}.{record_type}", 8)
+                x += tag("visible", True, 8)
+                x += "    </recordTypeVisibilities>\n"
         for perm in sorted(ps.get("userPermissions", [])):
             x += "    <userPermissions>\n" + tag("enabled", True, 8) + tag("name", perm, 8) + "    </userPermissions>\n"
         for tab in sorted(ps.get("tabs", [])):
@@ -388,7 +397,8 @@ if __name__ == "__main__":
     gen_permsets()
     # Match the repository formatting (lint-staged runs Prettier on commit) so regeneration causes no churn.
     import subprocess
-    subprocess.run(["npx", "--no-install", "prettier", "--log-level", "warn", "--write",
+    npx = shutil.which("npx.cmd") or shutil.which("npx") or "npx"
+    subprocess.run([npx, "--no-install", "prettier", "--log-level", "warn", "--write",
                     "force-app/main/default/objects", "force-app/main/default/permissionsets",
                     "force-app/main/default/customMetadata", "force-app/main/default/permissionsetgroups"], cwd=ROOT, check=False)
     print(f"Generated {len(specs.OBJECTS)} object specs and {len(specs.PERMISSION_SETS)} permission sets.")

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Retention_Valid</fullName>
+    <active>true</active>
+    <errorConditionFormula
+  >OR(Retention_Days__c &lt; 0, AND(Retain_File__c, ISBLANK(Retention_Days__c)))</errorConditionFormula>
+    <errorMessage
+  >Retained files need a non-negative retention period.</errorMessage>
+</ValidationRule>

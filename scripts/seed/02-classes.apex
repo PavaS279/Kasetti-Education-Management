@@ -10,6 +10,7 @@ for (LearningCourse c : [SELECT Id, External_ID__c FROM LearningCourse WHERE Ext
 Map<String, Id> faculty = new Map<String, Id>();
 for (Contact c : [SELECT Id, LastName FROM Contact WHERE Account.External_Id__c = 'KT-FACULTY']) faculty.put(c.LastName, c.Id);
 Set<String> have = new Set<String>();
+Id learningCentreClassRt = Schema.SObjectType.CourseOffering.getRecordTypeInfosByDeveloperName().get('Learning_Centre_Class').getRecordTypeId();
 for (CourseOffering o : [SELECT SectionNumber FROM CourseOffering WHERE SectionNumber LIKE 'KT-%']) have.add(o.SectionNumber);
 
 // section, name, course, branch, room, faculty, teacher user, capacity, days, start h, start m, minutes, start date, status, mode
@@ -34,7 +35,7 @@ for (Object[] r : rows) {
   if (have.contains(section)) continue;
   String branch = (String) r[3];
   Date startDate = (Date) r[12];
-  CourseOffering o = new CourseOffering(Name = (String) r[1], SectionNumber = section, LearningCourseId = courses.get((String) r[2]), Branch__c = branches.get(branch),
+  CourseOffering o = new CourseOffering(Name = (String) r[1], RecordTypeId = learningCentreClassRt, SectionNumber = section, LearningCourseId = courses.get((String) r[2]), Branch__c = branches.get(branch),
     Room__c = rooms.get('KT-RM-' + branch + '-' + ((String) r[4]).replace(' ', '')), PrimaryFacultyId = faculty.get((String) r[5]),
     Teacher_User__c = r[6] == null ? null : users.get((String) r[6]), EnrollmentCapacity = (Integer) r[7], Delivery_Mode__c = (String) r[14], Class_Status__c = (String) r[13],
     StartDate = Datetime.newInstance(startDate, Time.newInstance(8, 0, 0, 0)), EndDate = Datetime.newInstance(Date.newInstance(2026, 12, 20), Time.newInstance(20, 0, 0, 0)));

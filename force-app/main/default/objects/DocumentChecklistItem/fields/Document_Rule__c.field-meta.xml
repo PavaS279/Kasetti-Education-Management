@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Document_Rule__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Document Rule</label>
+    <referenceTo>Admission_Document_Rule__c</referenceTo>
+    <relationshipLabel>Checklist Items</relationshipLabel>
+    <relationshipName>Checklist_Items</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

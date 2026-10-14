@@ -3,5 +3,6 @@
     <fullName>Decision_Date__c</fullName>
     <label>Decision Date</label>
     <required>false</required>
+    <trackHistory>false</trackHistory>
     <type>DateTime</type>
 </CustomField>

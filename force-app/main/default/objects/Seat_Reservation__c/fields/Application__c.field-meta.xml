@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Application__c</fullName><deleteConstraint>Restrict</deleteConstraint><label
+  >Admission</label><referenceTo
+  >IndividualApplication</referenceTo><relationshipLabel
+  >Seat Reservation</relationshipLabel><relationshipName
+  >Seat_Reservation</relationshipName><required>true</required><trackHistory
+  >false</trackHistory><type>Lookup</type></CustomField>

@@ -3,6 +3,7 @@
     <fullName>Offer_Status__c</fullName>
     <label>Offer Status</label>
     <required>false</required>
+    <trackHistory>false</trackHistory>
     <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>

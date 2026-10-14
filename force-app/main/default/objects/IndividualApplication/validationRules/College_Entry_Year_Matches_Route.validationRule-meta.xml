@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Entry_Year_Matches_Route</fullName>
+    <active>true</active>
+    <errorConditionFormula
+  >AND(NOT(ISBLANK(TEXT(Entry_Route__c))), OR(AND(TEXT(Entry_Route__c) = &quot;Regular&quot;, Entry_Year_Of_Study__c &lt;&gt; 1), AND(TEXT(Entry_Route__c) = &quot;Lateral&quot;, Entry_Year_Of_Study__c &lt;&gt; 2)))</errorConditionFormula>
+    <errorMessage
+  >Regular admissions enter Year 1; lateral admissions enter Year 2.</errorMessage>
+</ValidationRule>

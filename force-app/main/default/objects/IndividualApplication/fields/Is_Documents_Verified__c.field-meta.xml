@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Is_Documents_Verified__c</fullName>
+    <formula
+  >OR(ISPICKVAL(College_Stage__c, &quot;Documents Verified&quot;), ISPICKVAL(College_Stage__c, &quot;Interview Scheduled&quot;), ISPICKVAL(College_Stage__c, &quot;Ready For Decision&quot;), ISPICKVAL(College_Stage__c, &quot;Application Decision&quot;), ISPICKVAL(College_Stage__c, &quot;Fee Pending&quot;), ISPICKVAL(College_Stage__c, &quot;Enrolled&quot;))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Documents Verified</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

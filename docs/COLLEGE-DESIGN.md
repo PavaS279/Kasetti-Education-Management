@@ -130,7 +130,7 @@ erDiagram
 
 **Decision: custom `Programme_Enrolment__c`.** Standard `ProgramEnrollment` is not used anywhere in the code base; the portal model (ADR-003) resolves access in Apex, and the Education Cloud licence already behaves unexpectedly for standard education objects (View All/Modify All silently dropped on `CourseOffering`/`CourseOfferingParticipant`, see 03-security-model). A custom object gives full control over sharing, validation, record locking and portal exposure. If native analytics on `ProgramEnrollment` is needed later, a one-way sync can be added without changing the model.
 
-Fields: `Student__c` (person Account), `Programme__c`, `Branch__c` (LearningCourse), `Campus__c`, `Campus_Branch__c`, `Application__c` (unique), `Entry_Route__c`, `Entry_Year_Of_Study__c`, `Admission_Year__c`, `Academic_Year__c` (of admission), `Current_Year_Of_Study__c`, `Status__c`, `Payment_Due_By__c`, `Roll_Number__c` (Text 11, unique, external ID), `Roll_Issued_On__c`, `Joining_Date__c`, `Fee_Hold__c`, `Status_Reason__c`, `Completed_On__c`, `Discontinued_On__c`, `Confirmation_Sent__c`, `Expiry_Reminder_Sent__c`, `Active_Key__c` (Section 12).
+Fields: `Student__c` (person Account), `Programme__c`, `Branch__c` (LearningCourse), `Campus__c`, `Campus_Branch__c`, `Application__c` (one per admission, enforced by unique `Application_Key__c` because Salesforce lookup fields cannot be unique), `Entry_Route__c`, `Entry_Year_Of_Study__c`, `Admission_Year__c`, `Academic_Year__c` (of admission), `Current_Year_Of_Study__c`, `Status__c`, `Payment_Due_By__c`, `Roll_Number__c` (Text 11, unique, external ID), `Roll_Issued_On__c`, `Joining_Date__c`, `Fee_Hold__c`, `Status_Reason__c`, `Completed_On__c`, `Discontinued_On__c`, `Confirmation_Sent__c`, `Expiry_Reminder_Sent__c`, `Active_Key__c` (Section 12). Lifecycle and material business fields use field history; technical uniqueness keys and idempotency flags do not, keeping within Salesforce's 20 tracked-field limit.
 
 ---
 
@@ -272,7 +272,7 @@ Triggered (system context, bulk-safe) when a college admission is created or its
 
 ### 5.3 Admission lifecycle (`IndividualApplication.Status`)
 
-New values: **Documents Verified**, **Interview Scheduled**, **Fee Pending**. All other values exist. Transitions are `Status_Transition__mdt` rows (deployment-managed, like all status transitions today); every arrow below that is not already a row (see 04-statuses-and-policies.md) is added as a new row, scoped to `College_Admission` by the service.
+The business stages are **Documents Verified**, **Interview Scheduled**, **Fee Pending** plus the existing lifecycle stages. **C2 org finding (2026-10-14):** the native `IndividualApplication.Status` picklist does not expose the required college-only values. The deployed implementation therefore stores and governs this lifecycle in `College_Stage__c`; the existing `Status` remains unchanged for learning-centre compatibility. `Status_Transition__mdt` continues to govern the existing status, while the college services enforce the transitions below.
 
 ```mermaid
 stateDiagram-v2
@@ -301,7 +301,7 @@ stateDiagram-v2
 
 ## 6. Seat reservation (`Seat_Reservation__c`)
 
-Fields: `Campus_Branch__c`, `Application__c` (**unique** — one reservation per admission), `Programme_Enrolment__c`, `Entry_Route__c`, `Status__c`, `Reserved_On__c`, `Expires_On__c`, `Finalised_On__c`, `Released_On__c`, `Release_Reason__c`, `Actioned_By__c`. Field history on status. Private; desk, Dean, Accounts and principal read; only `SeatService` writes.
+Fields: `Campus_Branch__c`, `Application__c` (one reservation per admission, enforced by the unique `Application_Key__c`), `Programme_Enrolment__c`, `Entry_Route__c`, `Status__c`, `Reserved_On__c`, `Expires_On__c`, `Finalised_On__c`, `Released_On__c`, `Release_Reason__c`, `Actioned_By__c`. Field history on status. Private; desk, Dean, Accounts and principal read; only `CollegeSeatService` writes. The college-specific name avoids colliding with the existing learning-centre `SeatService` used by course offerings and waitlists.
 
 ```mermaid
 stateDiagram-v2
@@ -352,12 +352,16 @@ stateDiagram-v2
 
 New entry point `BillingService.createProgrammeInvoice(programmeEnrolmentId, yearOfStudy)` (permission `KEM_Manage_Billing`, plus a system variant for admission and promotion). It creates fee-line snapshots and an invoice with `Programme_Enrolment__c`, `Year_Of_Study__c`, `Invoice_Kind__c` (Annual / Admission) and no `Enrolment__c`. Existing `createInvoice(enrolmentId)` and the recurring job are unchanged and **refuse** section enrolments that belong to a programme enrolment ("billed through the programme enrolment"). One invoice per programme enrolment + year of study + invoice kind (unique key) — promotion and retries cannot double-bill. Under the default rule the admission fee is a line on the entry-year Annual invoice; under the _Admission fee_ release rule it is a separate Admission invoice.
 
+**C3 implementation checkpoint (2026-10-14):** the alternative programme-enrolment anchors, invoice year/kind/key and exactly-one-anchor validations are deployed. `BillingService.createProgrammeInvoice` now snapshots the applicable programme prices and raises a retry-safe Annual or Admission invoice. Admission creates that invoice in the same rollback boundary as the provisional programme enrolment and seat reservation: _Admission Fee_ raises the separate Admission invoice; _Full Annual Invoice_ and _Minimum Amount_ raise the entry-year Annual invoice. The existing section-enrolment and recurring-billing paths remain covered by regression tests.
+
 ### 8.2 Methods, clearance, no cash, no discounts
 
 - New method **Demand Draft**; new payment fields `Instrument_Number__c`, `Instrument_Bank__c`, `Instrument_Date__c` (required for DD and cheque).
 - DD and cheque are recorded **Pending** (shown _Awaiting clearance_); Accounts confirms with the existing `BillingService.confirmPayment` when the bank credits them, or fails them if returned.
 - Enforced at **every boundary**: `BillingService.recordPayment`, `PaymentApi`/`PaymentWebhookApi`, payment links, and `StudentPaymentTriggerHandler` (catches imports and direct DML) refuse a method not in the campus's `Allowed_Payment_Methods__c` — Cash can never be recorded at a college campus. `Credit Note` is allowed only when created by `CreditService`.
 - Discounts: `Discounts_Allowed__c = false` hides the picker and the discount service and enrolment trigger refuse discounts for college campuses.
+
+**C3 payment checkpoint (2026-10-14):** Demand Draft and the instrument number, bank and date fields are deployed. Cheques and demand drafts require all three details and are always first recorded as Pending. `BillingService`, the payment API and the `Student_Payment__c` trigger share the same college-campus policy: the method must be selected in `Allowed_Payment_Methods__c`, Cash is refused, and direct imports cannot bypass the rule. Credit Note payments require their source credit-note lookup. Payment links remain Online Gateway transactions and pass through the same service and trigger boundary.
 
 ### 8.3 Roll-number release rule
 
@@ -386,6 +390,8 @@ KT 26 Y B CS 001   →   KT · admission year · campus · programme · branch �
 - `Roll_Number_Sequence__c`: `Key__c` (unique: `YY|campus|programme|branch|band`), `Next_Serial__c`, `Range_Start__c`, `Range_End__c`. Created on first use. Read `FOR UPDATE`; `Next_Serial__c > Range_End__c` → error "Roll-number range full" (regular 001–400, lateral 401–999), never a fourth digit or wrap-around.
 - Idempotent: `issue(programmeEnrolmentId)` returns the existing number if already issued. `Roll_Number__c` is unique as a final guard.
 - Never changes and never reused; a new programme (e.g. Diploma → BE) gets a new programme enrolment and number. `LearnerProfile.Student_Number__c` (STU-00001) stays the person number.
+
+**C3 roll-release checkpoint (2026-10-14):** the roll prefix and regular/lateral ranges, private `Roll_Number_Sequence__c` ledger, locked `RollNumberService`, and allocation callback are deployed. After confirmed allocations refresh an entry-year college invoice, the service evaluates the programme's exact release rule. An eligible provisional enrolment atomically finalises its seat, consumes the next serial from the correct band, receives its immutable roll number and moves to Enrolled. Repeated callbacks and repeated `issue` calls are idempotent; sequence overflow is refused rather than wrapping or producing a fourth digit.
 
 ### 8.5 Messages (idempotent)
 
@@ -547,20 +553,20 @@ Dean-only permissions go in a new permission set **`KEM_College_Dean`** (`KEM_Co
 
 All services `with sharing`, user mode by default; named system-mode sections only where noted (as in the existing code).
 
-| Service (new unless noted)            | Responsibility                                                                       | Entry points (callers)                                                               | Locks / system mode                                                    |
-| ------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| `CollegeSetupService`                 | Catalogue, campus branches, rules (clone/activate/retire), document rules, fees      | College set-up LWC (admin)                                                           | Rule activation in one transaction                                     |
-| `AdmissionEligibilityService`         | Rule selection, evaluation, evidence snapshot, suggestions                           | Application trigger (via `ApplicationService`), qualification/score triggers, screen | System-mode reads of rules and qualifications                          |
-| `DocumentVerificationService`         | College checklist creation, AI suggestions, verify, Identity deletion, retention job | Admission screen, portal upload, scheduled job                                       | File deletion in system mode, logged                                   |
-| `InterviewService`                    | Schedule, record outcome, admit/reject                                               | Interview panel (Dean)                                                               | Calls `SeatService` and `ProgrammeEnrolmentService` in one transaction |
-| `SeatService`                         | Reserve, finalise, release, expire, reconcile                                        | `InterviewService`, `ProgrammeEnrolmentService`, nightly job                         | `FOR UPDATE` on campus branch; system-mode counters                    |
-| `ProgrammeEnrolmentService`           | Provisional creation, release check, expiry/extend/cancel, discontinue, fee hold     | `InterviewService`, `BillingService` (after allocation), nightly job, Dean panel     | System mode for status fields                                          |
-| `RollNumberService`                   | Issue numbers                                                                        | `ProgrammeEnrolmentService` only                                                     | `FOR UPDATE` on sequence; system mode                                  |
-| `BillingService` (existing, extended) | `createProgrammeInvoice`, annual lines, method enforcement, hook after allocation    | Services above; Finance Desk                                                         | Existing ledger `Writer`                                               |
-| `JoiningService`                      | Section enrolment, first-term subject results                                        | Joining panel (Dean)                                                                 | Existing section seat control                                          |
-| `ResultService`                       | Subject and term calculation, finalise, reopen, promotion, repeat, completion        | Gradebook (faculty), Dean panel                                                      | Lock trigger bypass only inside the service                            |
-| `PortalService` (existing, extended)  | Student/parent college views, document upload/download                               | `kemPortalHome`                                                                      | Without-sharing reads filtered by allowed learners                     |
-| `MessageService` (existing)           | Fee received, confirmations, reminders                                               | Services above                                                                       | —                                                                      |
+| Service (new unless noted)            | Responsibility                                                                       | Entry points (callers)                                                               | Locks / system mode                                                                                           |
+| ------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `CollegeSetupService`                 | Catalogue, campus branches, rules (clone/activate/retire), document rules, fees      | College set-up LWC (admin)                                                           | Rule activation in one transaction                                                                            |
+| `AdmissionEligibilityService`         | Rule selection, evaluation, evidence snapshot, suggestions                           | Application trigger (via `ApplicationService`), qualification/score triggers, screen | System-mode reads of rules and qualifications                                                                 |
+| `DocumentVerificationService`         | College checklist creation, AI suggestions, verify, Identity deletion, retention job | Admission screen, portal upload, scheduled job                                       | File deletion in system mode, logged                                                                          |
+| `InterviewService`                    | Schedule, record outcome, admit/reject                                               | Interview panel (Dean)                                                               | Calls `CollegeSeatService` and `ProgrammeEnrolmentService` in one transaction                                 |
+| `CollegeSeatService`                  | Reserve, finalise, release, expire, reconcile                                        | `InterviewService`, `ProgrammeEnrolmentService`, nightly job                         | `FOR UPDATE` on campus branch; system-mode counters; separate from the existing learning-centre `SeatService` |
+| `ProgrammeEnrolmentService`           | Provisional creation, release check, expiry/extend/cancel, discontinue, fee hold     | `InterviewService`, `BillingService` (after allocation), nightly job, Dean panel     | System mode for status fields                                                                                 |
+| `RollNumberService`                   | Issue numbers                                                                        | `ProgrammeEnrolmentService` only                                                     | `FOR UPDATE` on sequence; system mode                                                                         |
+| `BillingService` (existing, extended) | `createProgrammeInvoice`, annual lines, method enforcement, hook after allocation    | Services above; Finance Desk                                                         | Existing ledger `Writer`                                                                                      |
+| `JoiningService`                      | Section enrolment, first-term subject results                                        | Joining panel (Dean)                                                                 | Existing section seat control                                                                                 |
+| `ResultService`                       | Subject and term calculation, finalise, reopen, promotion, repeat, completion        | Gradebook (faculty), Dean panel                                                      | Lock trigger bypass only inside the service                                                                   |
+| `PortalService` (existing, extended)  | Student/parent college views, document upload/download                               | `kemPortalHome`                                                                      | Without-sharing reads filtered by allowed learners                                                            |
+| `MessageService` (existing)           | Fee received, confirmations, reminders                                               | Services above                                                                       | —                                                                                                             |
 
 ---
 
@@ -568,7 +574,7 @@ All services `with sharing`, user mode by default; named system-mode sections on
 
 C0 is documentation-only. Before anything is deployed, C1 must verify in the org (read-only or in a sandbox/scratch org):
 
-1. **Standard-object extensibility:** custom fields and record types on `LearningProgram`, `LearningCourse`, `CourseOffering`, `CourseOfferingSchedule`, `IndividualApplication`; master-detail from `Section_Subject__c` to `CourseOffering` (fallback: required lookup + cascade in Apex).
+1. **Standard-object extensibility:** custom fields and record types on `LearningProgram`, `LearningCourse`, `CourseOffering`, `CourseOfferingSchedule`, `IndividualApplication`; master-detail from `Section_Subject__c` to `CourseOffering` (fallback: required lookup + cascade in Apex). **C2 finding (2026-10-14):** the `College_Admission` record type can be deployed but native inserts fail with `INVALID_INPUT: License Type is a required field`. Runtime college admissions therefore use the working Admissions record type plus validated `College_Mode__c`; ADR-005 is reopened until Salesforce resolves or explains the native dependency.
 2. **Lightning navigation:** app pages with college list components and record-type-assigned record pages show college wording without touching object labels; check the highlights panel header.
 3. **Experience Cloud licensing:** Customer Community Plus count for student logins (and optional parents); Education Cloud for Experience Cloud permission set licence availability.
 4. **Metadata behaviour:** new `IndividualApplication.Status` values and `Status_Transition__mdt` rows; unique fields on objects with existing data (backfill before making unique).

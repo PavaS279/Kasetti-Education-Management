@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Verification_Evidence_Required</fullName>
+    <active>true</active>
+    <errorConditionFormula
+  >AND(Verified__c, OR(ISBLANK(Verified_By__c), ISBLANK(Verified_On__c)))</errorConditionFormula>
+    <errorMessage
+  >Verified qualifications require who verified them and when.</errorMessage>
+</ValidationRule>

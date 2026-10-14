@@ -78,6 +78,7 @@ insert staff;
 
 // Courses
 Map<String, LearningCourse> courses = new Map<String, LearningCourse>();
+Id learningCentreCourseRt = Schema.SObjectType.LearningCourse.getRecordTypeInfosByDeveloperName().get('Learning_Centre_Course').getRecordTypeId();
 for (LearningCourse c : [SELECT Id, External_ID__c FROM LearningCourse WHERE External_ID__c LIKE 'KT-CRS-%']) courses.put(c.External_ID__c, c);
 List<Object[]> courseRows = new List<Object[]>{
   new Object[]{'KT-CRS-ABA','Abacus and Mental Arithmetic', 'Bead-frame arithmetic and mental calculation in eight levels; builds speed, concentration and number sense.', 6, 12},
@@ -92,7 +93,7 @@ for (Object[] r : courseRows) {
   if (courses.containsKey((String) r[0])) continue;
   Learning l = new Learning(Name = (String) r[1], Type = 'LearningCourse', IsActive = true);
   insert l;
-  LearningCourse c = new LearningCourse(Name = (String) r[1], LearningId = l.Id, External_ID__c = (String) r[0], Description = (String) r[2],
+  LearningCourse c = new LearningCourse(Name = (String) r[1], LearningId = l.Id, RecordTypeId = learningCentreCourseRt, External_ID__c = (String) r[0], Description = (String) r[2],
     Minimum_Age__c = (Integer) r[3], Maximum_Age__c = (Integer) r[4]);
   insert c;
   courses.put(c.External_ID__c, c);

@@ -3,5 +3,6 @@
     <fullName>Decision_Reason__c</fullName>
     <label>Decision Reason</label>
     <required>false</required>
+    <trackHistory>false</trackHistory>
     <type>TextArea</type>
 </CustomField>

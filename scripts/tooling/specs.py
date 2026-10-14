@@ -11,8 +11,9 @@ Read access is always granted when an object is listed.
 # ---------------------------------------------------------------------------
 DELIVERY_MODES = ["Classroom", "Online", "Hybrid"]
 FEE_TYPES = ["Tuition", "Admission", "Materials", "Assessment", "Transport", "Other"]
-BILLING_FREQUENCIES = ["One-time", "Monthly", "Term"]
+BILLING_FREQUENCIES = ["One-time", "Monthly", "Term", "Annual"]
 GUARDIAN_RELATIONSHIPS = ["Mother", "Father", "Guardian", "Grandparent", "Sibling", "Other"]
+ACADEMIC_YEAR_INVALID = "IF(REGEX(Academic_Year__c, '[0-9]{4}-[0-9]{2}'), VALUE(RIGHT(Academic_Year__c, 2)) <> MOD(VALUE(LEFT(Academic_Year__c, 4)) + 1, 100), TRUE)"
 
 OBJECTS = [
     # ------------------------------------------------------------------ Phase 0
@@ -46,6 +47,14 @@ OBJECTS = [
             {"name": "Invoice_Prefix__c", "label": "Invoice Prefix", "type": "Text", "length": 10,
              "help": "Prefix for invoice numbers issued by this branch."},
             {"name": "External_Id__c", "label": "External ID", "type": "Text", "length": 80, "unique": True, "externalId": True},
+            {"name": "Institution_Type__c", "label": "Institution Type", "type": "Picklist", "values": ["Learning Centre", "College"], "default": "Learning Centre", "track": True},
+            {"name": "Campus_Code__c", "label": "Campus Code", "type": "Text", "length": 1, "track": True,
+             "help": "One-letter college campus code used in roll numbers."},
+            {"name": "Campus_Code_Key__c", "label": "Campus Code Key", "type": "Text", "length": 1, "unique": True, "systemManaged": True,
+             "help": "Populated for college campuses to enforce unique campus codes."},
+            {"name": "Allowed_Payment_Methods__c", "label": "Allowed Payment Methods", "type": "MultiselectPicklist",
+             "values": ["Demand Draft", "Cheque", "Online Gateway", "UPI", "Card", "Bank Transfer"]},
+            {"name": "Discounts_Allowed__c", "label": "Discounts Allowed", "type": "Checkbox", "default": True, "track": True},
         ],
         "validationRules": [
             {"name": "Attendance_Threshold_Range", "formula": "AND(NOT(ISBLANK(Attendance_Threshold__c)), OR(Attendance_Threshold__c < 0, Attendance_Threshold__c > 1))",
@@ -54,6 +63,14 @@ OBJECTS = [
              "field": "Tax_Rate__c", "message": "Tax rate must be between 0% and 100%."},
             {"name": "Invoice_Due_Days_Positive", "formula": "AND(NOT(ISBLANK(Invoice_Due_Days__c)), Invoice_Due_Days__c < 0)",
              "field": "Invoice_Due_Days__c", "message": "Invoice due days cannot be negative."},
+            {"name": "College_Campus_Code_Required", "formula": "AND(ISPICKVAL(Institution_Type__c, 'College'), ISBLANK(Campus_Code__c))",
+             "field": "Campus_Code__c", "message": "Enter a one-letter campus code for a college campus."},
+            {"name": "College_Campus_Code_Format", "formula": "AND(ISPICKVAL(Institution_Type__c, 'College'), NOT(ISBLANK(Campus_Code__c)), NOT(REGEX(Campus_Code__c, '^[A-Z]$')))",
+             "field": "Campus_Code__c", "message": "Campus code must be one uppercase letter."},
+            {"name": "College_Payment_Methods_Required", "formula": "AND(ISPICKVAL(Institution_Type__c, 'College'), ISBLANK(Allowed_Payment_Methods__c))",
+             "field": "Allowed_Payment_Methods__c", "message": "Select at least one payment method for a college campus."},
+            {"name": "College_Discounts_Disallowed", "formula": "AND(ISPICKVAL(Institution_Type__c, 'College'), Discounts_Allowed__c)",
+             "field": "Discounts_Allowed__c", "message": "Discounts are not allowed for college campuses."},
         ],
     },
     {
@@ -111,12 +128,17 @@ OBJECTS = [
             {"name": "Active__c", "label": "Active", "type": "Checkbox", "default": True, "track": True},
             {"name": "Description__c", "label": "Description", "type": "Text", "length": 255},
             {"name": "External_Id__c", "label": "External ID", "type": "Text", "length": 80, "unique": True, "externalId": True},
+            {"name": "Year_Of_Study__c", "label": "Year of Study", "type": "Number", "precision": 1, "scale": 0},
+            {"name": "Academic_Year__c", "label": "Academic Year", "type": "Text", "length": 7,
+             "help": "Academic year in YYYY-YY format, for example 2026-27."},
         ],
         "validationRules": [
             {"name": "Course_Required", "formula": "ISBLANK(Learning_Course__c)", "field": "Learning_Course__c", "message": "Select the course this price belongs to."},
             {"name": "Amount_Not_Negative", "formula": "Amount__c < 0", "field": "Amount__c", "message": "Amount cannot be negative."},
             {"name": "Effective_Range_Valid", "formula": "AND(NOT(ISBLANK(Effective_To__c)), Effective_To__c < Effective_From__c)",
              "field": "Effective_To__c", "message": "Effective To must be on or after Effective From."},
+            {"name": "Academic_Year_Format", "formula": f"AND(NOT(ISBLANK(Academic_Year__c)), {ACADEMIC_YEAR_INVALID})",
+             "field": "Academic_Year__c", "message": "Enter the academic year as YYYY-YY, for example 2026-27."},
         ],
     },
     {
@@ -170,6 +192,28 @@ OBJECTS = [
              "help": "Learners waiting for a seat."},
             {"name": "Teacher_User__c", "label": "Teacher (User)", "type": "Lookup", "ref": "User", "relName": "Taught_Classes", "relLabel": "Taught Classes",
              "help": "The teacher's Salesforce user. Grants roster, attendance, and results access for this class."},
+            {"name": "Campus_Branch__c", "label": "Campus Branch", "type": "Lookup", "ref": "Campus_Branch__c", "relName": "Sections", "relLabel": "Sections"},
+            {"name": "Academic_Year__c", "label": "Academic Year", "type": "Text", "length": 7},
+            {"name": "Year_Of_Study__c", "label": "Year of Study", "type": "Number", "precision": 1, "scale": 0},
+            {"name": "Section_Code__c", "label": "Section Code", "type": "Text", "length": 10},
+            {"name": "College_Section_Key__c", "label": "College Section Key", "type": "Text", "length": 120,
+             "unique": True, "caseSensitive": False, "systemManaged": True,
+             "help": "Prevents duplicate section codes within a campus branch, academic year, and year of study."},
+        ],
+        "validationRules": [
+            {"name": "College_Section_Campus_Branch", "formula": "AND(RecordType.DeveloperName = 'College_Section', ISBLANK(Campus_Branch__c))", "field": "Campus_Branch__c", "message": "Select the campus branch for a college section."},
+            {"name": "College_Section_Academic_Year", "formula": "AND(RecordType.DeveloperName = 'College_Section', ISBLANK(Academic_Year__c))", "field": "Academic_Year__c", "message": "Enter the academic year for a college section."},
+            {"name": "College_Section_Academic_Year_Format", "formula": f"AND(NOT(ISBLANK(Campus_Branch__c)), NOT(ISBLANK(Academic_Year__c)), {ACADEMIC_YEAR_INVALID})", "field": "Academic_Year__c", "message": "Enter a consecutive academic year as YYYY-YY, for example 2026-27."},
+            {"name": "College_Section_Year_Of_Study", "formula": "AND(RecordType.DeveloperName = 'College_Section', OR(ISBLANK(Year_Of_Study__c), Year_Of_Study__c <= 0))", "field": "Year_Of_Study__c", "message": "Enter a positive year of study for a college section."},
+            {"name": "College_Section_Code_Required", "formula": "AND(RecordType.DeveloperName = 'College_Section', ISBLANK(Section_Code__c))", "field": "Section_Code__c", "message": "Enter the section code for a college section."},
+            {"name": "College_Section_Code_Format", "formula": "AND(RecordType.DeveloperName = 'College_Section', NOT(ISBLANK(Section_Code__c)), NOT(REGEX(Section_Code__c, '^[A-Z0-9-]{1,10}$')))", "field": "Section_Code__c", "message": "Section code can contain only uppercase letters, numbers, and hyphens."},
+            {"name": "College_Section_Capacity_Positive", "formula": "AND(RecordType.DeveloperName = 'College_Section', OR(ISBLANK(EnrollmentCapacity), EnrollmentCapacity <= 0))", "field": "EnrollmentCapacity", "message": "College section capacity must be greater than zero."},
+        ],
+    },
+    {
+        "name": "CourseOfferingSchedule", "label": "Course Offering Schedule", "plural": "Course Offering Schedules", "standard": True,
+        "fields": [
+            {"name": "Section_Subject__c", "label": "Section Subject", "type": "Lookup", "ref": "Section_Subject__c", "relName": "Weekly_Periods", "relLabel": "Weekly Periods"},
         ],
     },
     {
@@ -696,12 +740,135 @@ OBJECTS = [
         ],
     },
     {
+        "name": "LearningProgram", "label": "Learning Program", "plural": "Learning Programs", "standard": True,
+        "fields": [
+            {"name": "Programme_Code__c", "label": "Programme Code", "type": "Text", "length": 1, "unique": True},
+            {"name": "Duration_Years__c", "label": "Duration (Years)", "type": "Number", "precision": 1, "scale": 0},
+            {"name": "Terms_Per_Year__c", "label": "Terms per Year", "type": "Number", "precision": 1, "scale": 0},
+            {"name": "Term_Label__c", "label": "Term Label", "type": "Picklist", "values": ["Year", "Semester"]},
+            {"name": "Qualification_Level__c", "label": "Qualification Level", "type": "Picklist", "values": ["PUC", "Diploma", "BE"]},
+            {"name": "Roll_Release_Rule__c", "label": "Roll Number Release Rule", "type": "Picklist", "values": ["Full Annual Invoice", "Admission Fee", "Minimum Amount"], "default": "Full Annual Invoice"},
+            {"name": "Roll_Release_Amount__c", "label": "Roll Release Minimum Amount", "type": "Currency", "precision": 16, "scale": 2},
+            {"name": "Payment_Window_Days__c", "label": "Payment Window (Days)", "type": "Number", "precision": 3, "scale": 0, "defaultFormula": "7"},
+            {"name": "Max_Backlogs_For_Promotion__c", "label": "Maximum Backlogs for Promotion", "type": "Number", "precision": 2, "scale": 0, "defaultFormula": "0"},
+            {"name": "Active__c", "label": "College Programme Active", "type": "Checkbox", "default": False},
+        ],
+        "validationRules": [
+            {"name": "Active_Programme_Code_Required", "formula": "AND(Active__c, ISBLANK(Programme_Code__c))", "field": "Programme_Code__c", "message": "Enter a programme code before activating this college programme."},
+            {"name": "Active_Structure_Required", "formula": "AND(Active__c, OR(ISBLANK(Duration_Years__c), ISBLANK(Terms_Per_Year__c)))", "message": "Enter the duration and terms per year before activating this college programme."},
+            {"name": "Active_Term_Label_Required", "formula": "AND(Active__c, ISBLANK(TEXT(Term_Label__c)))", "field": "Term_Label__c", "message": "Select a term label before activating this college programme."},
+            {"name": "Active_Qualification_Required", "formula": "AND(Active__c, ISBLANK(TEXT(Qualification_Level__c)))", "field": "Qualification_Level__c", "message": "Select a qualification level before activating this college programme."},
+            {"name": "Programme_Code_Format", "formula": "AND(NOT(ISBLANK(Programme_Code__c)), NOT(REGEX(Programme_Code__c, '^[A-Z]$')))", "field": "Programme_Code__c", "message": "Programme code must be one uppercase letter."},
+            {"name": "Programme_Duration_Positive", "formula": "AND(NOT(ISBLANK(Duration_Years__c)), Duration_Years__c <= 0)", "field": "Duration_Years__c", "message": "Programme duration must be greater than zero."},
+            {"name": "Terms_Per_Year_Positive", "formula": "AND(NOT(ISBLANK(Terms_Per_Year__c)), Terms_Per_Year__c <= 0)", "field": "Terms_Per_Year__c", "message": "Terms per year must be greater than zero."},
+            {"name": "Payment_Window_Positive", "formula": "AND(NOT(ISBLANK(Payment_Window_Days__c)), Payment_Window_Days__c <= 0)", "field": "Payment_Window_Days__c", "message": "Payment window must be greater than zero days."},
+            {"name": "Maximum_Backlogs_Not_Negative", "formula": "AND(NOT(ISBLANK(Max_Backlogs_For_Promotion__c)), Max_Backlogs_For_Promotion__c < 0)", "field": "Max_Backlogs_For_Promotion__c", "message": "Maximum backlogs for promotion cannot be negative."},
+            {"name": "Minimum_Amount_Required", "formula": "AND(ISPICKVAL(Roll_Release_Rule__c, 'Minimum Amount'), OR(ISBLANK(Roll_Release_Amount__c), Roll_Release_Amount__c <= 0))", "field": "Roll_Release_Amount__c", "message": "Enter a positive minimum amount for this release rule."},
+        ],
+    },
+    {
         "name": "LearningCourse", "label": "Learning Course", "plural": "Learning Courses", "standard": True,
         "fields": [
             {"name": "Minimum_Age__c", "label": "Minimum Age", "type": "Number", "precision": 3, "scale": 0,
              "help": "Applicants younger than this (in years, at application) are not eligible."},
             {"name": "Maximum_Age__c", "label": "Maximum Age", "type": "Number", "precision": 3, "scale": 0},
             {"name": "Entry_Requirements__c", "label": "Entry Requirements", "type": "TextArea"},
+            {"name": "Programme__c", "label": "Programme", "type": "Lookup", "ref": "LearningProgram", "relName": "College_Branches", "relLabel": "College Branches"},
+            {"name": "Branch_Code__c", "label": "College Branch Code", "type": "Text", "length": 2},
+            {"name": "Branch_Code_Key__c", "label": "College Branch Code Key", "type": "Text", "length": 40, "unique": True, "systemManaged": True},
+            {"name": "Stream_Group__c", "label": "Stream Group", "type": "Picklist", "values": ["Science", "Commerce", "Arts"]},
+            {"name": "Curriculum_Version__c", "label": "Curriculum Version", "type": "Text", "length": 20},
+        ],
+        "validationRules": [
+            {"name": "College_Branch_Programme_Required", "formula": "AND(RecordType.DeveloperName = 'College_Branch', ISBLANK(Programme__c))", "field": "Programme__c", "message": "Select the programme for a college branch."},
+            {"name": "College_Branch_Code_Required", "formula": "AND(RecordType.DeveloperName = 'College_Branch', ISBLANK(Branch_Code__c))", "field": "Branch_Code__c", "message": "Enter the two-letter college branch code."},
+            {"name": "College_Branch_Code_Format", "formula": "AND(RecordType.DeveloperName = 'College_Branch', NOT(ISBLANK(Branch_Code__c)), NOT(REGEX(Branch_Code__c, '^[A-Z]{2}$')))", "field": "Branch_Code__c", "message": "College branch code must be two uppercase letters."},
+            {"name": "College_Curriculum_Required", "formula": "AND(RecordType.DeveloperName = 'College_Branch', ISBLANK(Curriculum_Version__c))", "field": "Curriculum_Version__c", "message": "Enter the curriculum version for a college branch."},
+        ],
+    },
+    {
+        "name": "Campus_Branch__c", "label": "Campus Branch", "plural": "Campus Branches", "sharing": "Read", "externalSharing": "Private", "history": True,
+        "nameField": {"label": "Campus Branch Number", "type": "AutoNumber", "format": "CB-{00000}"},
+        "description": "A college branch offered at a campus for one academic year, with regular and lateral intake controls.",
+        "fields": [
+            {"name": "Campus__c", "label": "Campus", "type": "Lookup", "ref": "Branch__c", "relName": "Campus_Branches", "relLabel": "Campus Branches", "required": True, "track": True},
+            {"name": "Branch__c", "label": "College Branch", "type": "Lookup", "ref": "LearningCourse", "relName": "Campus_Branches", "relLabel": "Campus Branches", "required": True, "track": True},
+            {"name": "Academic_Year__c", "label": "Academic Year", "type": "Text", "length": 7, "required": True, "track": True},
+            {"name": "Intake_Regular__c", "label": "Regular Intake", "type": "Number", "precision": 5, "scale": 0, "required": True, "track": True},
+            {"name": "Intake_Lateral__c", "label": "Lateral Intake", "type": "Number", "precision": 5, "scale": 0, "track": True},
+            {"name": "Reserved_Regular__c", "label": "Reserved Regular Seats", "type": "Number", "precision": 5, "scale": 0, "systemManaged": True},
+            {"name": "Reserved_Lateral__c", "label": "Reserved Lateral Seats", "type": "Number", "precision": 5, "scale": 0, "systemManaged": True},
+            {"name": "Finalised_Regular__c", "label": "Finalised Regular Seats", "type": "Number", "precision": 5, "scale": 0, "systemManaged": True},
+            {"name": "Finalised_Lateral__c", "label": "Finalised Lateral Seats", "type": "Number", "precision": 5, "scale": 0, "systemManaged": True},
+            {"name": "Admissions_Open__c", "label": "Admissions Open", "type": "Checkbox", "default": True, "track": True},
+            {"name": "Unique_Key__c", "label": "Unique Key", "type": "Text", "length": 80, "unique": True, "systemManaged": True},
+        ],
+        "validationRules": [
+            {"name": "Academic_Year_Format", "formula": ACADEMIC_YEAR_INVALID, "field": "Academic_Year__c", "message": "Enter a consecutive academic year as YYYY-YY, for example 2026-27."},
+            {"name": "Regular_Intake_Not_Negative", "formula": "Intake_Regular__c < 0", "field": "Intake_Regular__c", "message": "Regular intake cannot be negative."},
+            {"name": "Lateral_Intake_Not_Negative", "formula": "AND(NOT(ISBLANK(Intake_Lateral__c)), Intake_Lateral__c < 0)", "field": "Intake_Lateral__c", "message": "Lateral intake cannot be negative."},
+            {"name": "Regular_Seat_Counters_Valid", "formula": "OR(BLANKVALUE(Reserved_Regular__c, 0) < 0, BLANKVALUE(Finalised_Regular__c, 0) < 0, BLANKVALUE(Reserved_Regular__c, 0) + BLANKVALUE(Finalised_Regular__c, 0) > Intake_Regular__c)", "message": "Regular reserved and finalised seats must be non-negative and cannot exceed regular intake."},
+            {"name": "Lateral_Seat_Counters_Valid", "formula": "OR(BLANKVALUE(Reserved_Lateral__c, 0) < 0, BLANKVALUE(Finalised_Lateral__c, 0) < 0, BLANKVALUE(Reserved_Lateral__c, 0) + BLANKVALUE(Finalised_Lateral__c, 0) > BLANKVALUE(Intake_Lateral__c, 0))", "message": "Lateral reserved and finalised seats must be non-negative and cannot exceed lateral intake."},
+            {"name": "Open_Admissions_Require_Intake", "formula": "AND(Admissions_Open__c, BLANKVALUE(Intake_Regular__c, 0) + BLANKVALUE(Intake_Lateral__c, 0) <= 0)", "message": "Open admissions require a positive regular or lateral intake."},
+        ],
+    },
+    {
+        "name": "Subject__c", "label": "Subject", "plural": "Subjects", "sharing": "Read", "externalSharing": "Private", "history": True,
+        "description": "A versioned subject in a college branch curriculum.",
+        "fields": [
+            {"name": "Branch__c", "label": "College Branch", "type": "Lookup", "ref": "LearningCourse", "relName": "College_Subjects", "relLabel": "College Subjects", "required": True, "track": True},
+            {"name": "Curriculum_Version__c", "label": "Curriculum Version", "type": "Text", "length": 20, "required": True, "track": True},
+            {"name": "Subject_Code__c", "label": "Subject Code", "type": "Text", "length": 30, "required": True, "track": True},
+            {"name": "Year_Of_Study__c", "label": "Year of Study", "type": "Number", "precision": 1, "scale": 0, "required": True},
+            {"name": "Term__c", "label": "Term", "type": "Number", "precision": 2, "scale": 0, "required": True},
+            {"name": "Credits__c", "label": "Credits", "type": "Number", "precision": 5, "scale": 2},
+            {"name": "Internal_Max__c", "label": "Internal Maximum", "type": "Number", "precision": 5, "scale": 2},
+            {"name": "Exam_Max__c", "label": "Exam Maximum", "type": "Number", "precision": 5, "scale": 2},
+            {"name": "Internal_Pass_Percent__c", "label": "Internal Pass Percent", "type": "Percent", "precision": 5, "scale": 2},
+            {"name": "Exam_Pass_Percent__c", "label": "Exam Pass Percent", "type": "Percent", "precision": 5, "scale": 2},
+            {"name": "Total_Pass_Percent__c", "label": "Total Pass Percent", "type": "Percent", "precision": 5, "scale": 2},
+            {"name": "Active__c", "label": "Active", "type": "Checkbox", "default": True, "track": True},
+            {"name": "Unique_Key__c", "label": "Unique Key", "type": "Text", "length": 120, "unique": True, "systemManaged": True},
+        ],
+        "validationRules": [
+            {"name": "Year_Of_Study_Positive", "formula": "Year_Of_Study__c <= 0", "field": "Year_Of_Study__c", "message": "Year of study must be greater than zero."},
+            {"name": "Term_Positive", "formula": "Term__c <= 0", "field": "Term__c", "message": "Term must be greater than zero."},
+            {"name": "Subject_Code_Format", "formula": "NOT(REGEX(Subject_Code__c, '^[A-Z0-9-]+$'))", "field": "Subject_Code__c", "message": "Subject code can contain only uppercase letters, numbers, and hyphens."},
+            {"name": "Credits_Not_Negative", "formula": "AND(NOT(ISBLANK(Credits__c)), Credits__c < 0)", "field": "Credits__c", "message": "Credits cannot be negative."},
+            {"name": "Marks_Not_Negative", "formula": "OR(BLANKVALUE(Internal_Max__c, 0) < 0, BLANKVALUE(Exam_Max__c, 0) < 0)", "message": "Maximum marks cannot be negative."},
+            {"name": "Pass_Percentages_In_Range", "formula": "OR(BLANKVALUE(Internal_Pass_Percent__c, 0) < 0, BLANKVALUE(Internal_Pass_Percent__c, 0) > 1, BLANKVALUE(Exam_Pass_Percent__c, 0) < 0, BLANKVALUE(Exam_Pass_Percent__c, 0) > 1, BLANKVALUE(Total_Pass_Percent__c, 0) < 0, BLANKVALUE(Total_Pass_Percent__c, 0) > 1)", "message": "Pass percentages must be between 0 and 100."},
+        ],
+    },
+    {
+        "name": "Section_Subject__c", "label": "Section Subject", "plural": "Section Subjects", "sharing": "ControlledByParent", "externalSharing": "ControlledByParent", "history": True,
+        "nameField": {"label": "Section Subject Number", "type": "AutoNumber", "format": "SS-{000000}"},
+        "description": "A subject taught to one college section in one term, including faculty, room, and frozen marks configuration.",
+        "fields": [
+            {"name": "Section__c", "label": "Section", "type": "MasterDetail", "ref": "CourseOffering", "relName": "Section_Subjects", "relLabel": "Section Subjects"},
+            {"name": "Subject__c", "label": "Subject", "type": "Lookup", "ref": "Subject__c", "relName": "Section_Subjects", "relLabel": "Section Subjects", "required": True, "track": True},
+            {"name": "Term__c", "label": "Term", "type": "Number", "precision": 2, "scale": 0, "required": True},
+            {"name": "Faculty__c", "label": "Faculty", "type": "Lookup", "ref": "User", "relName": "College_Subject_Assignments", "relLabel": "College Subject Assignments", "track": True},
+            {"name": "Default_Room__c", "label": "Default Room", "type": "Lookup", "ref": "Room__c", "relName": "Section_Subjects", "relLabel": "Section Subjects", "track": True},
+            {"name": "Credits__c", "label": "Credits", "type": "Number", "precision": 5, "scale": 2},
+            {"name": "Internal_Max__c", "label": "Internal Maximum", "type": "Number", "precision": 5, "scale": 2},
+            {"name": "Exam_Max__c", "label": "Exam Maximum", "type": "Number", "precision": 5, "scale": 2},
+            {"name": "Internal_Pass_Percent__c", "label": "Internal Pass Percent", "type": "Percent", "precision": 5, "scale": 2},
+            {"name": "Exam_Pass_Percent__c", "label": "Exam Pass Percent", "type": "Percent", "precision": 5, "scale": 2},
+            {"name": "Total_Pass_Percent__c", "label": "Total Pass Percent", "type": "Percent", "precision": 5, "scale": 2},
+            {"name": "Start_Date__c", "label": "Start Date", "type": "Date"},
+            {"name": "End_Date__c", "label": "End Date", "type": "Date"},
+            {"name": "Status__c", "label": "Status", "type": "Picklist", "values": ["Planned", "Active", "Results Final", "Closed"], "default": "Planned", "track": True},
+            {"name": "Unique_Key__c", "label": "Unique Key", "type": "Text", "length": 100, "unique": True, "systemManaged": True},
+        ],
+        "validationRules": [
+            {"name": "Term_Positive", "formula": "Term__c <= 0", "field": "Term__c", "message": "Term must be greater than zero."},
+            {"name": "Credits_Not_Negative", "formula": "AND(NOT(ISBLANK(Credits__c)), Credits__c < 0)", "field": "Credits__c", "message": "Credits cannot be negative."},
+            {"name": "Marks_Not_Negative", "formula": "OR(BLANKVALUE(Internal_Max__c, 0) < 0, BLANKVALUE(Exam_Max__c, 0) < 0)", "message": "Maximum marks cannot be negative."},
+            {"name": "Pass_Percentages_In_Range", "formula": "OR(BLANKVALUE(Internal_Pass_Percent__c, 0) < 0, BLANKVALUE(Internal_Pass_Percent__c, 0) > 1, BLANKVALUE(Exam_Pass_Percent__c, 0) < 0, BLANKVALUE(Exam_Pass_Percent__c, 0) > 1, BLANKVALUE(Total_Pass_Percent__c, 0) < 0, BLANKVALUE(Total_Pass_Percent__c, 0) > 1)", "message": "Pass percentages must be between 0 and 100."},
+            {"name": "Active_Faculty_Required", "formula": "AND(ISPICKVAL(Status__c, 'Active'), ISBLANK(Faculty__c))", "field": "Faculty__c", "message": "Assign faculty before activating this section subject."},
+            {"name": "Active_Room_Required", "formula": "AND(ISPICKVAL(Status__c, 'Active'), ISBLANK(Default_Room__c))", "field": "Default_Room__c", "message": "Assign a room before activating this section subject."},
+            {"name": "Active_Dates_Required", "formula": "AND(ISPICKVAL(Status__c, 'Active'), OR(ISBLANK(Start_Date__c), ISBLANK(End_Date__c)))", "message": "Enter start and end dates before activating this section subject."},
+            {"name": "Date_Range_Valid", "formula": "AND(NOT(ISBLANK(Start_Date__c)), NOT(ISBLANK(End_Date__c)), End_Date__c < Start_Date__c)", "field": "End_Date__c", "message": "End date must be on or after start date."},
         ],
     },
     {
@@ -1036,7 +1203,7 @@ STANDARD_OBJECT_PERMS = {"Learning", "LearningCourse", "LearningProgram", "Party
 
 # Apex classes every staff persona needs.
 COMMON_CLASSES = {
-    "staff": ["InsightsController"],
+    "staff": ["InsightsController", "CollegeCatalogController"],
     "portal": ["PortalController"],
 }
 
@@ -1054,7 +1221,7 @@ DOCUMENT_PAGES = ["KEM_Offer_Letter", "KEM_Invoice_Pdf", "KEM_Receipt_Pdf", "KEM
 # Education Cloud objects are only granted through permission sets tied to these licences.
 STAFF_LICENSE = "EducationCloudAccessPsl"
 PORTAL_LICENSE = "EducationCloudExprcCloudAccessPsl"
-STAFF_APPS = ["Kasetti_Education"]
+STAFF_APPS = ["Kasetti_Education", "KT_College"]
 
 # Objects governed by the Education Cloud licences. Each persona permission set
 # with a "license" is split into <name> (licence-free: custom and CRM objects,
@@ -1063,8 +1230,20 @@ EDU_OBJECTS = {
     "Learning", "LearningCourse", "LearningProgram", "LearningProgramPlan", "IndividualApplication",
     "ContactContactRelation", "PartyRoleRelation", "CourseOffering", "CourseOfferingParticipant",
     "CourseOfferingSchedule", "AcademicTerm", "AcademicSession", "LearnerProfile", "DocumentChecklistItem",
+    # Section_Subject__c is custom, but its Section__c field is master-detail to
+    # CourseOffering. Salesforce requires the master object's Read permission in
+    # the same permission set, so keep both permissions in the licensed _Edu set.
+    "Section_Subject__c",
 }
 STAFF_TABS = ["Branch__c", "Room__c", "Branch_Staff__c", "Fee_Price__c", "Discount__c", "Class_Session__c", "Calendar_Closure__c", "KEM_Timetable", "Course_Assessment__c", "Student_Invoice__c", "Student_Payment__c"]
+
+# Record types exposed through the persona permission sets. mdgen writes each
+# entry only into the split permission set that owns the corresponding object.
+RECORD_TYPE_ACCESS = {
+    "LearningCourse": ["College_Branch", "Learning_Centre_Course"],
+    "CourseOffering": ["College_Section", "Learning_Centre_Class"],
+    "IndividualApplication": ["College_Admission"],
+}
 
 PERMISSION_SETS = [
     {"name": "KEM_Administrator", "label": "KEM Administrator",
@@ -1106,6 +1285,19 @@ PERMISSION_SETS = [
      "description": "Learner or guardian portal access. Record visibility is enforced in Apex through explicit guardian relationships.",
      "license": PORTAL_LICENSE, "objects": {"Log_Event__e": "C", "Admission_Document__e": "C"}},
 ]
+
+# College C1 foundation access. Keeping this matrix beside the existing personas
+# makes mdgen add object and field access without duplicating permission-set XML.
+COLLEGE_C1_ACCESS = {
+    "KEM_Administrator": {"Campus_Branch__c": "CEDM", "Subject__c": "CEDM", "Section_Subject__c": "CEDM"},
+    "KEM_Branch_Manager": {"Campus_Branch__c": "V", "Subject__c": "", "Section_Subject__c": ""},
+    "KEM_Admissions_Counsellor": {"Campus_Branch__c": "", "Subject__c": "", "Section_Subject__c": ""},
+    "KEM_Academic_Coordinator": {"Campus_Branch__c": "", "Subject__c": "", "Section_Subject__c": "CE"},
+    "KEM_Teacher": {"Campus_Branch__c": "", "Subject__c": "", "Section_Subject__c": ""},
+    "KEM_Finance": {"Campus_Branch__c": "", "Subject__c": "", "Section_Subject__c": ""},
+}
+for _permission_set in PERMISSION_SETS:
+    _permission_set["objects"].update(COLLEGE_C1_ACCESS.get(_permission_set["name"], {}))
 
 
 # Allowed status transitions (object, field) -> list of (from, to).

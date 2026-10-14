@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Interview_Outcome_Not_In_Future</fullName>
+    <active>true</active>
+    <errorConditionFormula
+  >AND(NOT(ISBLANK(TEXT(Interview_Outcome__c))), Interview_Date__c &gt; NOW())</errorConditionFormula>
+    <errorMessage
+  >The interview date cannot be in the future when recording an outcome.</errorMessage>
+</ValidationRule>

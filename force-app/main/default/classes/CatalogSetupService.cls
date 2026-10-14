@@ -117,6 +117,7 @@ public with sharing class CatalogSetupService {
       LearningCourse course = new LearningCourse(
         Name = name.left(80),
         LearningId = learning.Id,
+        RecordTypeId = learningCentreCourseRecordTypeId(),
         External_ID__c = code,
         Description = request.description,
         Minimum_Age__c = request.minAge,
@@ -339,6 +340,7 @@ public with sharing class CatalogSetupService {
 
     CourseOffering o = new CourseOffering(
       Name = name.left(80),
+      RecordTypeId = learningCentreClassRecordTypeId(),
       LearningCourseId = r.courseId,
       Branch__c = r.branchId,
       SectionNumber = String.isBlank(r.section) ? null : r.section.trim(),
@@ -662,5 +664,17 @@ public with sharing class CatalogSetupService {
     }
     Database.insert(a, AccessLevel.SYSTEM_MODE);
     return a.Id;
+  }
+
+  private static Id learningCentreCourseRecordTypeId() {
+    return Schema.SObjectType.LearningCourse.getRecordTypeInfosByDeveloperName()
+      .get('Learning_Centre_Course')
+      .getRecordTypeId();
+  }
+
+  private static Id learningCentreClassRecordTypeId() {
+    return Schema.SObjectType.CourseOffering.getRecordTypeInfosByDeveloperName()
+      .get('Learning_Centre_Class')
+      .getRecordTypeId();
   }
 }

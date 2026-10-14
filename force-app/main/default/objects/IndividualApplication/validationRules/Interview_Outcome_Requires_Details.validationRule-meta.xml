@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Interview_Outcome_Requires_Details</fullName>
+    <active>true</active>
+    <errorConditionFormula
+  >AND(NOT(ISBLANK(TEXT(Interview_Outcome__c))), OR(ISBLANK(Interview_Date__c), ISBLANK(Interviewer__c)))</errorConditionFormula>
+    <errorMessage
+  >An interview outcome requires the interview date and interviewer.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Stage__c</fullName>
+    <label>College Stage</label>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Processing</fullName>
+                <default>true</default>
+                <label>Processing</label>
+            </value>
+            <value>
+                <fullName>In Review</fullName>
+                <default>false</default>
+                <label>In Review</label>
+            </value>
+            <value>
+                <fullName>Documents Verified</fullName>
+                <default>false</default>
+                <label>Documents Verified</label>
+            </value>
+            <value>
+                <fullName>Interview Scheduled</fullName>
+                <default>false</default>
+                <label>Interview Scheduled</label>
+            </value>
+            <value>
+                <fullName>Ready For Decision</fullName>
+                <default>false</default>
+                <label>Ready For Decision</label>
+            </value>
+            <value>
+                <fullName>Application Decision</fullName>
+                <default>false</default>
+                <label>Application Decision</label>
+            </value>
+            <value>
+                <fullName>Fee Pending</fullName>
+                <default>false</default>
+                <label>Fee Pending</label>
+            </value>
+            <value>
+                <fullName>Enrolled</fullName>
+                <default>false</default>
+                <label>Enrolled</label>
+            </value>
+            <value>
+                <fullName>Enrollment Failed</fullName>
+                <default>false</default>
+                <label>Enrollment Failed</label>
+            </value>
+            <value>
+                <fullName>Withdrawn</fullName>
+                <default>false</default>
+                <label>Withdrawn</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

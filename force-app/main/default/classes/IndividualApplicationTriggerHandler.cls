@@ -48,8 +48,17 @@ public with sharing class IndividualApplicationTriggerHandler extends TriggerHan
   }
 
   protected override void afterInsert(List<SObject> newRecords) {
-    ApplicationService.createChecklists(
-      new Map<Id, SObject>(newRecords).keySet()
-    );
+    Set<Id> collegeIds = new Set<Id>();
+    Set<Id> learningCentreIds = new Set<Id>();
+    for (SObject record : newRecords) {
+      IndividualApplication application = (IndividualApplication) record;
+      if (application.College_Mode__c) {
+        collegeIds.add(application.Id);
+      } else {
+        learningCentreIds.add(application.Id);
+      }
+    }
+    ApplicationService.createChecklists(learningCentreIds);
+    CollegeDocumentService.createChecklists(collegeIds);
   }
 }
