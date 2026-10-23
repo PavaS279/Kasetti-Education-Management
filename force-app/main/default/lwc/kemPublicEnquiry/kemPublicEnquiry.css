@@ -1,0 +1,225 @@
+:host {
+  display: block;
+  --brand: #1f4f8f;
+  --accent: #2d73da;
+  --ink: #17243b;
+  --muted: #5f6d82;
+}
+.page-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+  color: var(--ink);
+}
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  align-items: flex-end;
+  padding: 2.5rem;
+  border-radius: 1.25rem;
+  color: white;
+  background: linear-gradient(120deg, #173b70, #2e72d7);
+  box-shadow: 0 14px 36px rgba(20, 58, 112, 0.2);
+}
+.eyebrow {
+  margin: 0 0 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  font-size: 0.78rem;
+  opacity: 0.86;
+}
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.08;
+}
+.hero-copy {
+  max-width: 680px;
+  margin: 0.85rem 0 0;
+  font-size: 1.08rem;
+  line-height: 1.6;
+  opacity: 0.92;
+}
+.response-promise {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  min-width: 230px;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.12);
+}
+.card {
+  position: relative;
+  margin-top: 1.25rem;
+  min-height: 180px;
+  padding: 2rem 2.25rem;
+  border: 1px solid #dce4ef;
+  border-radius: 1.1rem;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(23, 36, 59, 0.08);
+}
+.loading {
+  min-height: 160px;
+}
+.form-section {
+  padding: 0 0 2rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e5ebf3;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+.section-heading > span {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  color: white;
+  background: var(--accent);
+  font-weight: 700;
+}
+.section-heading h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.section-heading p {
+  margin: 0.15rem 0 0;
+  color: var(--muted);
+}
+.grid {
+  display: grid;
+  gap: 1rem 1.5rem;
+}
+.two-column {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.span-two {
+  grid-column: 1 / -1;
+}
+.honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.contact-note {
+  margin: 0.55rem 0 0 1.7rem;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+.primary-button,
+.secondary-button {
+  border-radius: 0.55rem;
+  padding: 0.8rem 1.35rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.primary-button {
+  border: 1px solid var(--accent);
+  color: white;
+  background: var(--accent);
+}
+.primary-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+.secondary-button {
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  background: white;
+}
+.error-panel {
+  margin-bottom: 1.25rem;
+  padding: 0.9rem 1rem;
+  border-left: 4px solid #ba0517;
+  color: #5c1118;
+  background: #fef1f2;
+  border-radius: 0.25rem;
+}
+.success {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+.success h2 {
+  margin: 1rem 0 0.5rem;
+}
+.success .secondary-button {
+  margin-top: 1rem;
+}
+.choice-title {
+  margin: 0 0 1.25rem;
+  font-size: 1.4rem;
+}
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+.choice-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 1.5rem;
+  border: 1px solid #d3dce9;
+  border-radius: 1rem;
+  background: #fff;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+.choice-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 10px 24px rgba(45, 115, 218, 0.15);
+  transform: translateY(-2px);
+}
+.choice-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.choice-text {
+  color: var(--muted);
+  line-height: 1.5;
+}
+@media (max-width: 720px) {
+  .choice-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 1.6rem;
+  }
+  .response-promise {
+    min-width: 0;
+  }
+  .card {
+    padding: 1.4rem 1rem;
+  }
+  .two-column {
+    grid-template-columns: 1fr;
+  }
+  .span-two {
+    grid-column: auto;
+  }
+  .actions .primary-button {
+    width: 100%;
+  }
+}

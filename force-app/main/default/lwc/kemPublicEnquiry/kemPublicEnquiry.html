@@ -1,0 +1,294 @@
+<template>
+  <main class="page-shell">
+    <section class="hero" aria-labelledby="enquiry-title">
+      <div>
+        <p class="eyebrow">ADMISSIONS ENQUIRY</p>
+        <h1 id="enquiry-title">Find the right learning path</h1>
+        <p class="hero-copy">
+          Tell us about the learner and what they are interested in. Our
+          admissions team will contact you with suitable options.
+        </p>
+      </div>
+      <div class="response-promise">
+        <lightning-icon
+          icon-name="utility:clock"
+          size="small"
+          alternative-text=""
+        ></lightning-icon>
+        <span>We normally respond within one working day.</span>
+      </div>
+    </section>
+
+    <template lwc:if={isComplete}>
+      <section class="card success" role="status">
+        <lightning-icon
+          icon-name="utility:success"
+          size="large"
+          variant="success"
+          alternative-text="Success"
+        ></lightning-icon>
+        <h2>Thank you. Your enquiry is with our admissions team.</h2>
+        <p>
+          Keep this reference for your records: <strong>{reference}</strong>
+        </p>
+        <button class="secondary-button" type="button" onclick={startAnother}>
+          Submit another enquiry
+        </button>
+      </section>
+    </template>
+
+    <template lwc:elseif={isChoosing}>
+      <section class="card choice" aria-labelledby="interest-title">
+        <h2 id="interest-title" class="choice-title">
+          What are you interested in?
+        </h2>
+        <div class="choice-grid">
+          <button
+            type="button"
+            class="choice-card"
+            data-interest="college"
+            onclick={chooseInterest}
+          >
+            <lightning-icon
+              icon-name="utility:education"
+              size="medium"
+              alternative-text=""
+            ></lightning-icon>
+            <span class="choice-name">College admission</span>
+            <span class="choice-text"
+              >PUC, Diploma and BE at our Yelahanka and Rajajinagar campuses.
+              Check the cut-off for your marks in a minute.</span
+            >
+          </button>
+          <button
+            type="button"
+            class="choice-card"
+            data-interest="courses"
+            onclick={chooseInterest}
+          >
+            <lightning-icon
+              icon-name="utility:knowledge_base"
+              size="medium"
+              alternative-text=""
+            ></lightning-icon>
+            <span class="choice-name">Courses and coaching</span>
+            <span class="choice-text"
+              >Maths, coding, robotics and other courses at our learning
+              centres.</span
+            >
+          </button>
+        </div>
+      </section>
+    </template>
+
+    <template lwc:elseif={isCollege}>
+      <c-kem-public-college-enquiry
+        onback={chooseAgain}
+      ></c-kem-public-college-enquiry>
+    </template>
+
+    <template lwc:else>
+      <section class="card" aria-busy={isSaving}>
+        <template lwc:if={isLoading}>
+          <div class="loading">
+            <lightning-spinner
+              alternative-text="Loading enquiry form"
+            ></lightning-spinner>
+          </div>
+        </template>
+        <template lwc:elseif={loadError}>
+          <div class="error-panel" role="alert">{loadError}</div>
+        </template>
+        <template lwc:else>
+          <form onsubmit={handleSubmit} novalidate>
+            <template lwc:if={submitError}>
+              <div class="error-panel" role="alert">{submitError}</div>
+            </template>
+
+            <div class="form-section">
+              <div class="section-heading">
+                <span>1</span>
+                <div>
+                  <h2>Learner</h2>
+                  <p>Who is interested in learning?</p>
+                </div>
+              </div>
+              <div class="grid two-column">
+                <lightning-input
+                  data-field="firstName"
+                  label="First name"
+                  maxlength="40"
+                  value={form.firstName}
+                  onchange={handleChange}
+                ></lightning-input>
+                <lightning-input
+                  data-field="lastName"
+                  label="Last name"
+                  maxlength="80"
+                  value={form.lastName}
+                  onchange={handleChange}
+                  required
+                ></lightning-input>
+                <lightning-input
+                  data-field="birthdate"
+                  type="date"
+                  label="Date of birth"
+                  max={today}
+                  value={form.birthdate}
+                  onchange={handleChange}
+                ></lightning-input>
+                <lightning-input
+                  data-field="phone"
+                  type="tel"
+                  label="Mobile"
+                  maxlength="40"
+                  value={form.phone}
+                  onchange={handleChange}
+                ></lightning-input>
+                <div class="span-two">
+                  <lightning-input
+                    data-field="email"
+                    type="email"
+                    label="Email"
+                    maxlength="80"
+                    value={form.email}
+                    onchange={handleChange}
+                  ></lightning-input>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-heading">
+                <span>2</span>
+                <div>
+                  <h2>Parent or guardian</h2>
+                  <p>How can we reach the responsible adult?</p>
+                </div>
+              </div>
+              <div class="grid two-column">
+                <lightning-input
+                  data-field="guardianFirstName"
+                  label="First name"
+                  maxlength="40"
+                  value={form.guardianFirstName}
+                  onchange={handleChange}
+                ></lightning-input>
+                <lightning-input
+                  data-field="guardianLastName"
+                  label="Last name"
+                  maxlength="80"
+                  value={form.guardianLastName}
+                  onchange={handleChange}
+                ></lightning-input>
+                <lightning-combobox
+                  data-field="guardianRelationship"
+                  label="Relationship"
+                  options={relationshipOptions}
+                  value={form.guardianRelationship}
+                  onchange={handleChange}
+                ></lightning-combobox>
+                <lightning-input
+                  data-field="guardianPhone"
+                  type="tel"
+                  label="Phone"
+                  maxlength="40"
+                  value={form.guardianPhone}
+                  onchange={handleChange}
+                ></lightning-input>
+                <div class="span-two">
+                  <lightning-input
+                    data-field="guardianEmail"
+                    type="email"
+                    label="Email"
+                    maxlength="80"
+                    value={form.guardianEmail}
+                    onchange={handleChange}
+                  ></lightning-input>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-heading">
+                <span>3</span>
+                <div>
+                  <h2>Interest</h2>
+                  <p>Help us recommend the best option.</p>
+                </div>
+              </div>
+              <div class="grid two-column">
+                <lightning-combobox
+                  data-field="branchCode"
+                  label="Preferred branch"
+                  options={branchOptions}
+                  value={form.branchCode}
+                  onchange={handleChange}
+                  required
+                ></lightning-combobox>
+                <lightning-combobox
+                  data-field="courseExternalId"
+                  label="Interested course"
+                  options={courseOptions}
+                  value={form.courseExternalId}
+                  onchange={handleChange}
+                ></lightning-combobox>
+                <lightning-combobox
+                  data-field="deliveryMode"
+                  label="Preferred delivery mode"
+                  options={deliveryModeOptions}
+                  value={form.deliveryMode}
+                  onchange={handleChange}
+                ></lightning-combobox>
+                <lightning-input
+                  data-field="referralCode"
+                  label="Referral code"
+                  maxlength="20"
+                  value={form.referralCode}
+                  onchange={handleChange}
+                ></lightning-input>
+                <div class="span-two">
+                  <lightning-textarea
+                    data-field="message"
+                    label="Anything else we should know?"
+                    maxlength="2000"
+                    value={form.message}
+                    onchange={handleChange}
+                  ></lightning-textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="honeypot" aria-hidden="true">
+              <lightning-input
+                data-field="website"
+                label="Website"
+                value={form.website}
+                onchange={handleChange}
+                tabindex="-1"
+                autocomplete="off"
+              ></lightning-input>
+            </div>
+            <lightning-input
+              data-field="privacyConsent"
+              type="checkbox"
+              label="I consent to Kasetti Education Management using these details to respond to this enquiry."
+              checked={form.privacyConsent}
+              onchange={handleChange}
+              required
+            ></lightning-input>
+            <p class="contact-note">
+              Provide at least one learner or guardian email address or phone
+              number.
+            </p>
+            <div class="actions">
+              <button class="primary-button" type="submit" disabled={isSaving}>
+                {submitLabel}
+              </button>
+            </div>
+          </form>
+        </template>
+      </section>
+    </template>
+  </main>
+</template>

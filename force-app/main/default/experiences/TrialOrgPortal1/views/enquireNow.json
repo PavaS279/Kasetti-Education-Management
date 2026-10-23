@@ -1,0 +1,55 @@
+{
+  "appPageId": "dd5747ff-594f-4073-9301-c22b43210bee",
+  "componentName": "siteforce:sldsOneColLayout",
+  "dataProviders": [],
+  "id": "bf731ea7-940e-4d88-84fa-e8b958aee512",
+  "label": "Enquire Now",
+  "regions": [
+    {
+      "id": "3fc728c6-fabd-486f-b81f-330fed781e03",
+      "regionName": "header",
+      "type": "region"
+    },
+    {
+      "components": [
+        {
+          "componentAttributes": {},
+          "componentName": "c:kemPublicEnquiry",
+          "id": "6bb15c8d-dd41-4876-9621-eb70b88b3b87",
+          "renderPriority": "NEUTRAL",
+          "renditionMap": {},
+          "type": "component"
+        }
+      ],
+      "id": "cf642a40-4599-4de1-8fc4-aa2a79cb2ffc",
+      "regionName": "content",
+      "type": "region"
+    },
+    {
+      "id": "a18b092e-c8af-4f9d-baf0-bb145eaa0590",
+      "regionName": "footer",
+      "type": "region"
+    },
+    {
+      "components": [
+        {
+          "componentAttributes": {
+            "customHeadTags": "",
+            "description": "Submit an admissions enquiry for a learner. No account is required.",
+            "title": "Enquire Now | Kasetti Education Management"
+          },
+          "componentName": "forceCommunity:seoAssistant",
+          "id": "3cfcf407-36d4-4856-a6f7-37b43441139d",
+          "renditionMap": {},
+          "type": "component"
+        }
+      ],
+      "id": "20db19af-0507-4c4b-b2b3-b44f3e58de81",
+      "regionName": "sfdcHiddenRegion",
+      "type": "region"
+    }
+  ],
+  "themeLayoutType": "Inner",
+  "type": "view",
+  "viewType": "custom-public-enquiry"
+}
