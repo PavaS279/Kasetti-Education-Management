@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <isExposed>false</isExposed>
+    <description
+  >Guided college admission: campus, programme, branch and route, then only the marks that branch needs, checked live against the cut-off before saving.</description>
+</LightningComponentBundle>

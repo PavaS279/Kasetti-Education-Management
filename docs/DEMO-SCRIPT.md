@@ -7,6 +7,7 @@ Use this to demonstrate or acceptance-test the complete Kasetti Education Manage
 - **Part C** — click-by-click demo in the app (about 30–40 minutes), with the expected result after every step.
 - **Part D** — negative tests (the guard rails).
 - **Part E** — portal, reporting and clean-up notes.
+- **College demo** (PUC, Diploma, BE at two campuses) — separate documents: [COLLEGE-SETUP-GUIDE.md](COLLEGE-SETUP-GUIDE.md) (users and set-up) and [COLLEGE-DEMO-SCRIPT.md](COLLEGE-DEMO-SCRIPT.md) (the demo).
 - **Part F** — Phase 2 (operational depth): automated run and click-by-click demo of waitlists, transfers, recurring billing, instalments, credit and refunds, messaging, teacher cover, grading and report cards, the richer portal and the operations console.
 
 ---
@@ -147,7 +148,7 @@ Last verified: 2026-10-03 (run D2 — IA-0000000034, BLR-000004, RCT-000004).
 
 1. **Record payment**: Amount 6,000, Method **UPI**, Reference _UTR-DEMO-1_, **Funds received** on → **Record payment**.
    - ✅ Toast with receipt **RCT-…**; invoice **Partially Paid**, progress bar 36%; payment listed with its receipt; receipt PDF filed on the payment.
-2. **Record payment** again: 10,520, Method **Cheque**, Reference _CHQ-001_ — note **Funds received** switches off → save.
+2. **Record payment** again: 10,520, Method **Cheque**, Reference _CHQ-001_, **DD / cheque number** _000123_, **Drawn on bank** _State Bank of India_, **DD / cheque date** today — note **Funds received** switches off → save.
    - ✅ Listed under **Awaiting confirmation**; balance still 10,520.
 3. Open **Finance Desk** → **Awaiting confirmation** → **Confirm** the cheque.
    - ✅ Invoice **Paid**, balance 0; enrolment billing **Paid**; payment **Reconciled**.

@@ -1,6 +1,6 @@
 # Kasetti Education Management — Complete Walkthrough and Demo Script
 
-_One document to understand, set up and demonstrate the whole solution, from the first enquiry to alumni, through the eyes of every user. Last updated 2026-10-12 after the compact demo-data cleanup; Phases 0–5 remain complete._
+_One document to understand, set up and demonstrate the whole solution, from the first enquiry to alumni, through the eyes of every user. Last updated 2026-10-14: demo usernames added (§1.3); cheque payments capture the cheque number, bank and date. The college demo has its own set-up guide and script (COLLEGE-SETUP-GUIDE.md, COLLEGE-DEMO-SCRIPT.md)._
 
 **How to use this document**
 
@@ -52,6 +52,23 @@ The solution runs on **Salesforce Education Cloud** in the production org _Kaset
 | **Student (learner)**         | Ananya (optional portal user — see 2.3)            | same as guardian                                 | Sees own timetable, results, attendance, documents (hall ticket), library loans, bus                                               |
 | **Integration (system)**      | API-only user (to create — see 2.3)                | `KEM_Integration_Persona`                        | LMS, ERP and payment gateway calls                                                                                                 |
 | **AI add-on**                 | anyone above                                       | + permission set **KEM AI User**                 | Einstein assistants and the Agentforce **KEM Staff Assistant**                                                                     |
+
+#### Demo logins (usernames)
+
+Passwords are not stored anywhere. Log in as Kasetti Tech, then Setup → **Users** → **Login** next to the person (set-up R1); for a portal user open their contact → ▾ → **Log in to Experience as User**.
+
+| Person             | Username                                                                          | Used in                                |
+| ------------------ | --------------------------------------------------------------------------------- | -------------------------------------- |
+| Kasetti Tech       | `pavan.kumar.gs_krbnse6r44dox3@techkasetti.com`                                   | Set-up (Acts A, J)                     |
+| Adam Admissions    | `adamadmissionsuser1708459704071618019.w9ggkb3izggz.dk2pxr8w62ss@techkasetti.com` | Acts B, C (and college admission desk) |
+| Anjali Advisor     | `anjaliadvisoruser17084614018583395001.rkapknwbxzh6.asfwptgocb5j@techkasetti.com` | Acts D, E (and college Dean)           |
+| Tara Teacher       | `tara.teacher.kemdemo@techkasetti.com`                                            | Act E (and college faculty)            |
+| Andrea Advancement | `andreaadvancementuser1708461643214542.k09qcubq0ix1.szcjc385fj75@techkasetti.com` | Act F (and college accounts)           |
+| Rahul Registrar    | `rahulregistraruser1708461561807421398.tm2uovmktdau.hk7rz3vyuumg@techkasetti.com` | Act G                                  |
+| Rohit Sharma       | `rsharma.kemdemo@kasetti-portal.demo` (portal)                                    | Act H                                  |
+| Priya Sharma       | `psharma.kemdemo@kasetti-portal.demo` (portal, password not set — R2)             | Act H                                  |
+
+College demo (PUC, Diploma, BE at Yelahanka and Rajajinagar): see [COLLEGE-SETUP-GUIDE.md](COLLEGE-SETUP-GUIDE.md) and [COLLEGE-DEMO-SCRIPT.md](COLLEGE-DEMO-SCRIPT.md).
 
 ### 1.4 Addresses (URLs)
 
@@ -389,7 +406,7 @@ Each step: 👤 **who** · 📍 **where** · ▶ **do** · ✅ **you should see*
 #### F2. Payments and reconciliation
 
 👤 Finance · 📍 Invoice (e.g. BLR-000007 `L/lightning/r/Student_Invoice__c/a0adN00000ElWkLQAV/view`) → **Record payment**; **Finance Desk** `L/lightning/n/KEM_Finance_Desk`
-▶ Record UPI 6,000 (funds received) → receipt; record a cheque (not yet received) → Finance Desk → **Awaiting confirmation** → **Confirm**. Overpay an invoice → **Reconciliation exceptions** → **Hold as credit** or **Close** with a note.
+▶ Record UPI 6,000 (funds received) → receipt; record a cheque with its **cheque number, bank and date** (cheques and demand drafts are always recorded as pending) → Finance Desk → **Awaiting confirmation** → **Confirm**. Overpay an invoice → **Reconciliation exceptions** → **Hold as credit** or **Close** with a note.
 ✅ Oldest-due-first allocation, receipts **RCT-…** with PDF, invoice Partially Paid → Paid, exceptions queued.
 💡 Every rupee is matched to an invoice; the month-end bank reconciliation is a queue, not a hunt.
 

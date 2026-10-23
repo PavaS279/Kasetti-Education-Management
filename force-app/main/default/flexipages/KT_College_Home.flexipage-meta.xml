@@ -13,6 +13,12 @@
                 <identifier>c_kemCollegeOverdue</identifier>
             </componentInstance>
         </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>kemCollegeNewAdmission</componentName>
+                <identifier>c_kemCollegeNewAdmission</identifier>
+            </componentInstance>
+        </itemInstances>
         <name>top</name>
         <type>Region</type>
     </flexiPageRegions>

@@ -13,6 +13,12 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>kemCollegeAdmission</componentName>
+                <identifier>kem_college_admission</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>kemApplicationWorkbench</componentName>
                 <identifier>c_kemApplicationWorkbench</identifier>
             </componentInstance>

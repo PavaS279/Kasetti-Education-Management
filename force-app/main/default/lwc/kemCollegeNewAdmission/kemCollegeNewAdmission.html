@@ -1,0 +1,24 @@
+<template>
+  <section class="kem-card launcher kem-fade-in">
+    <div class="icon">
+      <lightning-icon
+        icon-name="standard:education"
+        size="medium"
+      ></lightning-icon>
+    </div>
+    <div class="text">
+      <p class="eyebrow">ADMISSION DESK</p>
+      <h2>Walk-in admission</h2>
+      <p class="kem-muted">
+        Choose the campus, programme and branch; the screen asks only for the
+        marks that branch needs and checks the cut-off as you type.
+      </p>
+    </div>
+    <lightning-button
+      variant="brand"
+      label="New college admission"
+      icon-name="utility:add"
+      onclick={handleOpen}
+    ></lightning-button>
+  </section>
+</template>

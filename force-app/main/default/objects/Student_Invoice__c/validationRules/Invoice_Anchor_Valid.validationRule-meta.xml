@@ -3,7 +3,7 @@
     <fullName>Invoice_Anchor_Valid</fullName>
     <active>true</active>
     <errorConditionFormula
-  >OR(AND(ISBLANK(Enrolment__c), ISBLANK(Programme_Enrolment__c)), AND(NOT(ISBLANK(Enrolment__c)), NOT(ISBLANK(Programme_Enrolment__c))))</errorConditionFormula>
+  >AND(NOT(ISBLANK(Enrolment__c)), NOT(ISBLANK(Programme_Enrolment__c)))</errorConditionFormula>
     <errorMessage
-  >An invoice must belong to either a section enrolment or a programme enrolment, not both.</errorMessage>
+  >An invoice cannot belong to both a section enrolment and a programme enrolment.</errorMessage>
 </ValidationRule>

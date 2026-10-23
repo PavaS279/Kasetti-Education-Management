@@ -54,6 +54,29 @@
         onchange={handleDate}
         required
       ></lightning-input>
+      <template lwc:if={needsInstrument}>
+        <lightning-input
+          label="DD / cheque number"
+          value={instrumentNumber}
+          onchange={handleInstrumentNumber}
+          required
+          max-length="40"
+        ></lightning-input>
+        <lightning-input
+          label="Drawn on bank"
+          value={instrumentBank}
+          onchange={handleInstrumentBank}
+          required
+          max-length="80"
+        ></lightning-input>
+        <lightning-input
+          type="date"
+          label="DD / cheque date"
+          value={instrumentDate}
+          onchange={handleInstrumentDate}
+          required
+        ></lightning-input>
+      </template>
     </div>
     <template lwc:if={isOverpayment}>
       <div class="warning">

@@ -1,0 +1,374 @@
+<template>
+  <lightning-modal-header
+    label="New college admission"
+  ></lightning-modal-header>
+  <lightning-modal-body>
+    <lightning-progress-indicator
+      current-step={step}
+      type="path"
+      variant="base"
+      class="path"
+    >
+      <template for:each={steps} for:item="s">
+        <lightning-progress-step
+          key={s.value}
+          label={s.label}
+          value={s.value}
+        ></lightning-progress-step>
+      </template>
+    </lightning-progress-indicator>
+
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+
+    <!-- Step 1: what the student wants to join -->
+    <template lwc:if={isProgramme}>
+      <p class="kem-section-title">Campus</p>
+      <div class="tiles">
+        <template for:each={campusTiles} for:item="c">
+          <button
+            key={c.id}
+            type="button"
+            class={c.className}
+            data-id={c.id}
+            onclick={pickCampus}
+          >
+            <span class="tile-title">{c.name}</span>
+            <span class="kem-muted">{c.academicYear} intake</span>
+          </button>
+        </template>
+      </div>
+
+      <template lwc:if={campus}>
+        <p class="kem-section-title">Programme</p>
+        <div class="tiles">
+          <template for:each={programmeTiles} for:item="p">
+            <button
+              key={p.id}
+              type="button"
+              class={p.className}
+              data-id={p.id}
+              onclick={pickProgramme}
+            >
+              <span class="tile-title">{p.name}</span>
+              <span class="kem-muted"
+                >{p.years} years · {p.count} branches</span
+              >
+            </button>
+          </template>
+        </div>
+      </template>
+
+      <template lwc:if={programme}>
+        <p class="kem-section-title">Branch</p>
+        <div class="branches">
+          <template for:each={branchTiles} for:item="b">
+            <button
+              key={b.campusBranchId}
+              type="button"
+              class={b.className}
+              data-id={b.campusBranchId}
+              onclick={pickBranch}
+            >
+              <span class="tile-title">{b.name}</span>
+              <span class="kem-muted">Cut-off: {b.cutoff}</span>
+              <span class={b.seatClass}>{b.seatsRegular} seats left</span>
+            </button>
+          </template>
+        </div>
+      </template>
+
+      <template lwc:if={showRoute}>
+        <p class="kem-section-title">How is the student joining?</p>
+        <lightning-radio-group
+          label="Entry route"
+          variant="label-hidden"
+          options={routeOptions}
+          value={route}
+          type="button"
+          onchange={pickRoute}
+        ></lightning-radio-group>
+        <p class="kem-muted small">{routeHelp}</p>
+      </template>
+    </template>
+
+    <!-- Step 2: only the marks this branch needs, checked live -->
+    <template lwc:if={isMarks}>
+      <div class="split">
+        <div class="form">
+          <p class="kem-section-title">{marksTitle}</p>
+          <div class="form-grid">
+            <lightning-input
+              type="number"
+              step="0.01"
+              min="0"
+              max="100"
+              label="SSLC / 10th percentage"
+              value={marks.sslc}
+              data-field="sslc"
+              onchange={handleMark}
+              required
+            ></lightning-input>
+            <template lwc:if={needsPuc}>
+              <lightning-combobox
+                label="PUC stream"
+                options={streamOptions}
+                value={marks.stream}
+                data-field="stream"
+                onchange={handleMarkCombo}
+                required
+              ></lightning-combobox>
+              <lightning-input
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                label="PUC percentage"
+                value={marks.qualifying}
+                data-field="qualifying"
+                onchange={handleMark}
+                required
+              ></lightning-input>
+            </template>
+            <template lwc:if={needsDiploma}>
+              <lightning-combobox
+                label="Diploma branch"
+                options={diplomaOptions}
+                value={marks.diplomaBranch}
+                data-field="diplomaBranch"
+                onchange={handleMarkCombo}
+                required
+              ></lightning-combobox>
+              <lightning-input
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                label="Diploma percentage"
+                value={marks.qualifying}
+                data-field="qualifying"
+                onchange={handleMark}
+                required
+              ></lightning-input>
+            </template>
+            <template lwc:if={requirements.entranceRequired}>
+              <lightning-combobox
+                label="Entrance exam"
+                options={examOptions}
+                value={marks.exam}
+                data-field="exam"
+                onchange={handleMarkCombo}
+                required
+              ></lightning-combobox>
+              <lightning-input
+                type="number"
+                min="1"
+                label="Rank"
+                value={marks.rank}
+                data-field="rank"
+                onchange={handleMark}
+                required
+              ></lightning-input>
+            </template>
+          </div>
+        </div>
+
+        <aside class={verdictClass} aria-live="polite">
+          <p class="verdict-title">{verdictTitle}</p>
+          <template lwc:if={preview}>
+            <ul class="checks">
+              <template for:each={checks} for:item="c">
+                <li key={c.label} class={c.className}>
+                  <lightning-icon
+                    icon-name={c.icon}
+                    size="x-small"
+                    class="check-icon"
+                  ></lightning-icon>
+                  <span>
+                    <span class="check-label">{c.label}</span>
+                    <span class="kem-muted"> — {c.actual}</span>
+                  </span>
+                </li>
+              </template>
+            </ul>
+            <p class="small">{preview.reason}</p>
+            <template lwc:if={hasSuggestions}>
+              <p class="kem-section-title">Eligible instead for</p>
+              <template for:each={preview.suggestions} for:item="s">
+                <div key={s.campusBranchId} class="suggestion">
+                  <span
+                    >{s.branch}
+                    <span class="kem-muted">(cut-off {s.minimum}%)</span></span
+                  >
+                  <lightning-button
+                    variant="base"
+                    label="Switch"
+                    data-id={s.campusBranchId}
+                    onclick={switchBranch}
+                  ></lightning-button>
+                </div>
+              </template>
+            </template>
+          </template>
+          <template lwc:else>
+            <p class="kem-muted small">
+              Enter the marks to check them against the {selectedBranchName}
+              cut-off.
+            </p>
+          </template>
+        </aside>
+      </div>
+    </template>
+
+    <!-- Step 3: the student and, optionally, a parent -->
+    <template lwc:if={isStudent}>
+      <p class="kem-section-title">Student</p>
+      <div class="form-grid">
+        <lightning-input
+          label="First name"
+          value={student.firstName}
+          data-field="firstName"
+          onchange={handleStudent}
+        ></lightning-input>
+        <lightning-input
+          label="Last name"
+          value={student.lastName}
+          data-field="lastName"
+          onchange={handleStudent}
+          required
+        ></lightning-input>
+        <lightning-input
+          type="date"
+          label="Date of birth"
+          value={student.birthdate}
+          data-field="birthdate"
+          onchange={handleStudent}
+          required
+        ></lightning-input>
+        <lightning-input
+          type="tel"
+          label="Mobile"
+          value={student.phone}
+          data-field="phone"
+          onchange={handleStudent}
+          required
+        ></lightning-input>
+        <lightning-input
+          type="email"
+          label="Email (for the student login)"
+          value={student.email}
+          data-field="email"
+          onchange={handleStudent}
+        ></lightning-input>
+      </div>
+      <p class="kem-section-title">
+        Parent or guardian <span class="kem-muted">{parentHint}</span>
+      </p>
+      <div class="form-grid">
+        <lightning-input
+          label="First name"
+          value={student.guardianFirstName}
+          data-field="guardianFirstName"
+          onchange={handleStudent}
+        ></lightning-input>
+        <lightning-input
+          label="Last name"
+          value={student.guardianLastName}
+          data-field="guardianLastName"
+          onchange={handleStudent}
+        ></lightning-input>
+        <lightning-input
+          type="tel"
+          label="Mobile"
+          value={student.guardianPhone}
+          data-field="guardianPhone"
+          onchange={handleStudent}
+        ></lightning-input>
+      </div>
+    </template>
+
+    <!-- Step 4: what happens next -->
+    <template lwc:if={isReview}>
+      <div class="review">
+        <div class="kem-card box">
+          <p class="kem-section-title">Admission</p>
+          <p class="tile-title">{studentName}</p>
+          <p>
+            {selectedBranchName} · {selectedCampusName} · {route} entry · year
+            {requirements.entryYear}
+          </p>
+          <p class="ok-text">✓ {preview.reason}</p>
+        </div>
+        <div class="kem-card box">
+          <p class="kem-section-title">Fees for the first year</p>
+          <p>Tuition {tuitionLabel} · Admission fee {admissionFeeLabel}</p>
+          <p class="tile-title">Total {totalLabel}</p>
+          <p class="kem-muted small">
+            Payable by demand draft, cheque or online within 7 days of
+            admission. No cash.
+          </p>
+        </div>
+        <div class="kem-card box wide">
+          <p class="kem-section-title">Documents to bring</p>
+          <ul class="docs">
+            <template for:each={documentRows} for:item="d">
+              <li key={d.label}>
+                <span>{d.label}</span>
+                <span class={d.badgeClass}>{d.badge}</span>
+                <template lwc:if={d.identity}>
+                  <span class="kem-muted small">
+                    · only the last 4 digits are kept</span
+                  >
+                </template>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </div>
+      <lightning-input
+        type="checkbox"
+        class="consent"
+        label="The student (or parent) has read the privacy notice and agrees to KT College using these documents for admission."
+        checked={consent}
+        onchange={handleConsent}
+      ></lightning-input>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <template lwc:if={canGoBack}>
+      <lightning-button
+        class="slds-m-left_x-small"
+        label="Back"
+        onclick={handleBack}
+      ></lightning-button>
+    </template>
+    <template lwc:if={isReview}>
+      <lightning-button
+        class="slds-m-left_x-small"
+        variant="brand"
+        label="Create admission"
+        onclick={handleCreate}
+        disabled={cannotCreate}
+      ></lightning-button>
+    </template>
+    <template lwc:else>
+      <lightning-button
+        class="slds-m-left_x-small"
+        variant="brand"
+        label="Next"
+        onclick={handleNext}
+        disabled={cannotContinue}
+      ></lightning-button>
+    </template>
+  </lightning-modal-footer>
+</template>

@@ -1346,6 +1346,7 @@ public with sharing class BillingService {
     List<SObject> instalmentUpdates = new List<SObject>();
     Set<Id> enrolmentIds = new Set<Id>();
     Map<Id, Student_Invoice__c> open = new Map<Id, Student_Invoice__c>();
+    Set<Id> programmeInvoiceIds = new Set<Id>();
     for (Student_Invoice__c invoice : [
       SELECT
         Id,
@@ -1353,6 +1354,7 @@ public with sharing class BillingService {
         Total__c,
         Amount_Paid__c,
         Enrolment__c,
+        Programme_Enrolment__c,
         Due_Date__c,
         Instalment_Count__c
       FROM Student_Invoice__c
@@ -1360,6 +1362,9 @@ public with sharing class BillingService {
       WITH SYSTEM_MODE
     ]) {
       enrolmentIds.add(invoice.Enrolment__c);
+      if (invoice.Programme_Enrolment__c != null) {
+        programmeInvoiceIds.add(invoice.Id);
+      }
       if (
         !OPEN_STATUSES.contains(invoice.Status__c) &&
         invoice.Status__c != 'Paid'
@@ -1379,7 +1384,10 @@ public with sharing class BillingService {
     Writer writer = new Writer();
     writer.updateRecords(changes.values());
     writer.updateRecords(instalmentUpdates);
-    ProgrammeEnrolmentService.onInvoicesPaid(invoiceIds);
+    // College roll release only for programme invoices (no extra query for learning centres).
+    if (!programmeInvoiceIds.isEmpty()) {
+      ProgrammeEnrolmentService.onInvoicesPaid(programmeInvoiceIds);
+    }
     refreshEnrolments(enrolmentIds);
   }
 

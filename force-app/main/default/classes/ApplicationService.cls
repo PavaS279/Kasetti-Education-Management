@@ -157,6 +157,19 @@ public with sharing class ApplicationService {
   ) {
     Set<Id> courseIds = new Set<Id>();
     Set<Id> accountIds = new Set<Id>();
+    List<IndividualApplication> learningCentre = new List<IndividualApplication>();
+    for (IndividualApplication application : applications) {
+      // College admissions are checked against admission rules after insert.
+      if (application.College_Mode__c == true) {
+        if (application.Id == null) {
+          application.Eligibility_Status__c = 'Not Checked';
+          application.Eligibility_Notes__c = 'Checking the admission rule.';
+        }
+        continue;
+      }
+      learningCentre.add(application);
+    }
+    applications = learningCentre;
     for (IndividualApplication application : applications) {
       if (application.Learning_Course__c != null) {
         courseIds.add(application.Learning_Course__c);

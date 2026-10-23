@@ -679,7 +679,6 @@ public without sharing class PortalService {
     LearnerDetail detail = new LearnerDetail();
     detail.learner = cards(new Set<Id>{ learnerContactId }, viewerId)
       .get(learnerContactId);
-    detail.college = CollegePortalService.summaryFor(learnerContactId);
     detail.paymentMode = PaymentLinkService.mode();
     detail.payOnline = detail.paymentMode != PaymentLinkService.MODE_OFF;
 
@@ -821,13 +820,17 @@ public without sharing class PortalService {
     detail.documents.addAll(documentsFor(new Set<Id>{ learnerContactId }));
     detail.loans = LibraryService.learnerLoans(learnerContactId);
     Set<Id> learnerAccounts = new Set<Id>();
-    for (Contact c : [
-      SELECT AccountId
-      FROM Contact
-      WHERE Id = :learnerContactId
+    // One query gives the learner's account and whether they are a college student.
+    for (Account a : [
+      SELECT Id, (SELECT Id FROM Programme_Enrolments__r LIMIT 1)
+      FROM Account
+      WHERE PersonContactId = :learnerContactId
       WITH SYSTEM_MODE
     ]) {
-      learnerAccounts.add(c.AccountId);
+      learnerAccounts.add(a.Id);
+      if (!a.Programme_Enrolments__r.isEmpty()) {
+        detail.college = CollegePortalService.summaryFor(learnerContactId);
+      }
     }
     detail.transport = TransportService.forLearners(learnerAccounts);
     for (CourseOfferingParticipant enrolment : [

@@ -49,16 +49,49 @@ public with sharing class IndividualApplicationTriggerHandler extends TriggerHan
 
   protected override void afterInsert(List<SObject> newRecords) {
     Set<Id> collegeIds = new Set<Id>();
+    Set<Id> openCollegeIds = new Set<Id>();
     Set<Id> learningCentreIds = new Set<Id>();
     for (SObject record : newRecords) {
       IndividualApplication application = (IndividualApplication) record;
       if (application.College_Mode__c) {
         collegeIds.add(application.Id);
+        if (
+          application.College_Stage__c == null ||
+          application.College_Stage__c == 'Processing' ||
+          application.College_Stage__c == 'In Review'
+        ) {
+          openCollegeIds.add(application.Id);
+        }
       } else {
         learningCentreIds.add(application.Id);
       }
     }
     ApplicationService.createChecklists(learningCentreIds);
     CollegeDocumentService.createChecklists(collegeIds);
+    evaluateCollege(newRecords, openCollegeIds);
+  }
+
+  /** College verdicts straight away for desk-sized inserts; larger loads are queued. */
+  private static void evaluateCollege(
+    List<SObject> newRecords,
+    Set<Id> collegeIds
+  ) {
+    if (collegeIds.isEmpty()) {
+      return;
+    }
+    if (collegeIds.size() <= 5) {
+      for (Id applicationId : collegeIds) {
+        AdmissionEligibilityService.evaluate(applicationId);
+      }
+      return;
+    }
+    Set<Id> students = new Set<Id>();
+    for (SObject record : newRecords) {
+      IndividualApplication application = (IndividualApplication) record;
+      if (application.College_Mode__c && application.AccountId != null) {
+        students.add(application.AccountId);
+      }
+    }
+    System.enqueueJob(new CollegeEligibilityReevaluationJob(students));
   }
 }

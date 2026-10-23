@@ -78,6 +78,38 @@ public with sharing class InterviewService {
     return ProgrammeEnrolmentService.admit(applicationId);
   }
 
+  /** Dean rejects an undecided college admission with a reason (not eligible or interview failed). */
+  public static void reject(Id applicationId, String reason) {
+    authorise(applicationId);
+    if (String.isBlank(reason)) {
+      throw new AppException('Enter the reason for rejecting the admission.');
+    }
+    IndividualApplication application = admission(applicationId);
+    if (
+      !new Set<String>{
+          'Processing',
+          'In Review',
+          'Documents Verified',
+          'Interview Scheduled',
+          'Ready For Decision'
+        }
+        .contains(application.College_Stage__c)
+    ) {
+      throw new AppException('This admission has already been decided.');
+    }
+    Database.update(
+      new IndividualApplication(
+        Id = applicationId,
+        College_Stage__c = 'Application Decision',
+        Decision__c = 'Reject',
+        Decision_Reason__c = reason.trim(),
+        Decided_By__c = UserInfo.getUserId(),
+        Decision_Date__c = System.now()
+      ),
+      AccessLevel.SYSTEM_MODE
+    );
+  }
+
   private static void authorise(Id applicationId) {
     RecordAccess.assertPermission(PERMISSION);
     RecordAccess.assertEditable(applicationId);

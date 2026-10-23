@@ -10,9 +10,11 @@ const METHODS = [
   "Card",
   "Bank Transfer",
   "Cheque",
+  "Demand Draft",
   "Online Gateway"
 ];
-const CLEARS_LATER = ["Cheque", "Bank Transfer"];
+const CLEARS_LATER = ["Cheque", "Demand Draft", "Bank Transfer"];
+const INSTRUMENTS = ["Cheque", "Demand Draft"];
 
 /** Records a payment against an invoice. Resolves to the PaymentResult, or null when cancelled. */
 export default class KemPaymentModal extends LightningModal {
@@ -26,6 +28,9 @@ export default class KemPaymentModal extends LightningModal {
   reference = "";
   paymentDate = new Date().toISOString().slice(0, 10);
   cleared = true;
+  instrumentNumber = "";
+  instrumentBank = "";
+  instrumentDate;
   errorMessage;
   isSaving = false;
 
@@ -41,6 +46,10 @@ export default class KemPaymentModal extends LightningModal {
   }
   get needsReference() {
     return this.method !== "Cash";
+  }
+  /** DD and cheque need the instrument details; they stay pending until the bank clears them. */
+  get needsInstrument() {
+    return INSTRUMENTS.includes(this.method);
   }
   get isOverpayment() {
     return Number(this.amount) > Number(this.balance);
@@ -60,6 +69,15 @@ export default class KemPaymentModal extends LightningModal {
   }
   handleReference(event) {
     this.reference = event.target.value;
+  }
+  handleInstrumentNumber(event) {
+    this.instrumentNumber = event.target.value;
+  }
+  handleInstrumentBank(event) {
+    this.instrumentBank = event.target.value;
+  }
+  handleInstrumentDate(event) {
+    this.instrumentDate = event.target.value;
   }
   handleDate(event) {
     this.paymentDate = event.target.value;
@@ -88,7 +106,10 @@ export default class KemPaymentModal extends LightningModal {
           method: this.method,
           reference: this.reference || null,
           paymentDate: this.paymentDate,
-          confirmed: this.cleared
+          confirmed: this.cleared,
+          instrumentNumber: this.needsInstrument ? this.instrumentNumber : null,
+          instrumentBank: this.needsInstrument ? this.instrumentBank : null,
+          instrumentDate: this.needsInstrument ? this.instrumentDate : null
         }
       });
       this.close(result);

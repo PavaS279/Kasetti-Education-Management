@@ -140,15 +140,22 @@ public with sharing class AdmissionRuleService {
     }
   }
 
+  /** Marks a rule version as used. Runs for any user whose admission is evaluated, so it ignores record sharing. */
   public static void markUsed(Id ruleId) {
     isLifecycleUpdate = true;
     try {
+      new SystemWriter().markUsed(ruleId);
+    } finally {
+      isLifecycleUpdate = false;
+    }
+  }
+
+  private without sharing class SystemWriter {
+    void markUsed(Id ruleId) {
       Database.update(
         new Admission_Rule__c(Id = ruleId, Used__c = true),
         AccessLevel.SYSTEM_MODE
       );
-    } finally {
-      isLifecycleUpdate = false;
     }
   }
 }

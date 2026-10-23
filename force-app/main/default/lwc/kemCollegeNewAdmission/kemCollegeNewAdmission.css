@@ -1,0 +1,27 @@
+@import "c/kemStyles";
+
+.launcher {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+}
+.text {
+  flex: 1;
+}
+.eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--slds-g-color-neutral-base-50, #747474);
+}
+h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+@media (max-width: 48rem) {
+  .launcher {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

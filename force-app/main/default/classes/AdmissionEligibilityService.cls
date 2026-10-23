@@ -2,7 +2,8 @@ public without sharing class AdmissionEligibilityService {
   private static final Map<String, Integer> LEVELS = new Map<String, Integer>{
     'SSLC' => 1,
     'PUC' => 2,
-    'Diploma' => 3
+    'Diploma' => 3,
+    'BE' => 4
   };
 
   public static void evaluate(Id applicationId) {
@@ -55,14 +56,334 @@ public without sharing class AdmissionEligibilityService {
       evidence.put('rank', result.rank);
       AdmissionRuleService.markUsed(rule.Id);
     }
-    update new IndividualApplication(
-      Id = application.Id,
-      Eligibility_Status__c = result.status,
-      Eligibility_Notes__c = result.reason,
-      Evaluated_Rule__c = rule?.Id,
-      Eligibility_Evidence__c = JSON.serialize(evidence),
-      Eligibility_Evaluated_On__c = evaluatedOn
+    Database.update(
+      new IndividualApplication(
+        Id = application.Id,
+        Eligibility_Status__c = result.status,
+        Eligibility_Notes__c = result.reason,
+        Evaluated_Rule__c = rule?.Id,
+        Eligibility_Evidence__c = JSON.serialize(evidence),
+        Eligibility_Evaluated_On__c = evaluatedOn
+      ),
+      AccessLevel.SYSTEM_MODE
     );
+  }
+
+  /**
+   * Other branches at the same campus, route and year whose active rule the
+   * student meets: shown to the admission desk when the chosen branch refuses.
+   */
+  public static List<String> suggestions(Id applicationId) {
+    IndividualApplication application = [
+      SELECT
+        Id,
+        AccountId,
+        Branch__c,
+        Learning_Course__c,
+        Academic_Year__c,
+        Entry_Route__c
+      FROM IndividualApplication
+      WHERE Id = :applicationId
+      WITH SYSTEM_MODE
+    ];
+    Map<Id, Admission_Rule__c> byBranch = new Map<Id, Admission_Rule__c>();
+    for (Admission_Rule__c rule : [
+      SELECT
+        Id,
+        Branch__c,
+        Branch__r.Name,
+        Campus__c,
+        Version_Key__c,
+        Qualifying_Level__c,
+        Qualifying_Streams__c,
+        Qualifying_Branch_Codes__c,
+        Min_Percentage__c,
+        Entrance_Required__c,
+        (
+          SELECT
+            Id,
+            Entrance_Exam__c,
+            Max_Rank__c,
+            Min_Score__c,
+            Exam_Year_From__c,
+            Exam_Year_To__c
+          FROM Accepted_Entrances__r
+        )
+      FROM Admission_Rule__c
+      WHERE
+        Academic_Year__c = :application.Academic_Year__c
+        AND Entry_Route__c = :application.Entry_Route__c
+        AND Status__c = 'Active'
+        AND Branch__c != :application.Learning_Course__c
+        AND (Campus__c = :application.Branch__c
+        OR Campus__c = NULL)
+      WITH SYSTEM_MODE
+      ORDER BY Min_Percentage__c DESC
+      LIMIT 20
+    ]) {
+      // A campus-specific rule wins over the all-campus rule for the same branch.
+      if (!byBranch.containsKey(rule.Branch__c) || rule.Campus__c != null) {
+        byBranch.put(rule.Branch__c, rule);
+      }
+    }
+    List<String> result = new List<String>();
+    for (Admission_Rule__c rule : byBranch.values()) {
+      if (evaluateAgainst(application.AccountId, rule).status == 'Eligible') {
+        result.add(
+          rule.Branch__r.Name +
+            ' (needs ' +
+            rule.Min_Percentage__c.setScale(0) +
+            '%)'
+        );
+      }
+    }
+    return result;
+  }
+
+  // ------------------------------------------------------------ desk preview
+
+  public class Check {
+    @AuraEnabled
+    public String label;
+    @AuraEnabled
+    public String actual;
+    @AuraEnabled
+    public Boolean passed;
+  }
+
+  public class Suggestion {
+    @AuraEnabled
+    public Id campusBranchId;
+    @AuraEnabled
+    public String branch;
+    @AuraEnabled
+    public Decimal minimum;
+  }
+
+  public class Preview {
+    @AuraEnabled
+    public String status;
+    @AuraEnabled
+    public String reason;
+    @AuraEnabled
+    public List<Check> checks = new List<Check>();
+    @AuraEnabled
+    public List<Suggestion> suggestions = new List<Suggestion>();
+  }
+
+  /** The active rule (campus-specific first) for a campus branch and entry route, with its accepted entrances. */
+  public static Admission_Rule__c activeRule(Id campusBranchId, String route) {
+    Campus_Branch__c intake = [
+      SELECT Campus__c, Branch__c, Academic_Year__c
+      FROM Campus_Branch__c
+      WHERE Id = :campusBranchId
+      WITH SYSTEM_MODE
+    ];
+    return selectRule(
+      new IndividualApplication(
+        Branch__c = intake.Campus__c,
+        Learning_Course__c = intake.Branch__c,
+        Academic_Year__c = intake.Academic_Year__c,
+        Entry_Route__c = route
+      )
+    );
+  }
+
+  /**
+   * Live check for the admission desk before anything is saved: the verdict,
+   * one line per criterion and, when refused, the open branches at the same
+   * campus the student meets.
+   */
+  public static Preview preview(
+    Id campusBranchId,
+    String route,
+    List<Academic_Qualification__c> qualifications,
+    List<Entrance_Score__c> scores
+  ) {
+    Preview result = new Preview();
+    Admission_Rule__c rule = activeRule(campusBranchId, route);
+    if (rule == null) {
+      result.status = 'Not Eligible';
+      result.reason = 'Admissions are not open for this branch and route.';
+      return result;
+    }
+    List<Academic_Qualification__c> ordered = sortedBest(qualifications);
+    Evaluation evaluation = evaluateWith(rule, ordered, scores);
+    result.status = evaluation.status;
+    result.reason = evaluation.reason;
+    result.checks = checks(rule, ordered, scores);
+    if (result.status == 'Not Eligible') {
+      Campus_Branch__c intake = [
+        SELECT Campus__c, Branch__c, Academic_Year__c, Branch__r.Programme__c
+        FROM Campus_Branch__c
+        WHERE Id = :campusBranchId
+        WITH SYSTEM_MODE
+      ];
+      // Suggest other branches of the same programme (a BE applicant is offered BE branches).
+      Map<Id, Campus_Branch__c> openIntakes = new Map<Id, Campus_Branch__c>();
+      for (Campus_Branch__c cb : [
+        SELECT Id, Branch__c
+        FROM Campus_Branch__c
+        WHERE
+          Campus__c = :intake.Campus__c
+          AND Academic_Year__c = :intake.Academic_Year__c
+          AND Admissions_Open__c = TRUE
+          AND Branch__c != :intake.Branch__c
+          AND Branch__r.Programme__c = :intake.Branch__r.Programme__c
+        WITH SYSTEM_MODE
+      ]) {
+        openIntakes.put(cb.Branch__c, cb);
+      }
+      for (
+        Admission_Rule__c other : rulesFor(
+          openIntakes.keySet(),
+          intake.Campus__c,
+          intake.Academic_Year__c,
+          route
+        )
+      ) {
+        if (evaluateWith(other, ordered, scores).status == 'Eligible') {
+          Suggestion suggestion = new Suggestion();
+          suggestion.campusBranchId = openIntakes.get(other.Branch__c).Id;
+          suggestion.branch = other.Branch__r.Name;
+          suggestion.minimum = other.Min_Percentage__c;
+          result.suggestions.add(suggestion);
+        }
+      }
+    }
+    return result;
+  }
+
+  private static List<Academic_Qualification__c> sortedBest(
+    List<Academic_Qualification__c> values
+  ) {
+    List<Academic_Qualification__c> result = new List<Academic_Qualification__c>();
+    for (Academic_Qualification__c q : values) {
+      if (q.Percentage__c == null) {
+        continue;
+      }
+      Integer i = 0;
+      while (i < result.size() && result[i].Percentage__c >= q.Percentage__c) {
+        i++;
+      }
+      if (i == result.size()) {
+        result.add(q);
+      } else {
+        result.add(i, q);
+      }
+    }
+    return result;
+  }
+
+  private static List<Check> checks(
+    Admission_Rule__c rule,
+    List<Academic_Qualification__c> qualifications,
+    List<Entrance_Score__c> scores
+  ) {
+    List<Check> result = new List<Check>();
+    Academic_Qualification__c held;
+    for (Academic_Qualification__c q : qualifications) {
+      if (q.Level__c == rule.Qualifying_Level__c) {
+        held = q;
+        break;
+      }
+    }
+    String what = rule.Qualifying_Level__c;
+    if (String.isNotBlank(rule.Qualifying_Streams__c)) {
+      what += ' (' + rule.Qualifying_Streams__c.replace(';', ' or ') + ')';
+    }
+    if (String.isNotBlank(rule.Qualifying_Branch_Codes__c)) {
+      what += ' (' + rule.Qualifying_Branch_Codes__c.replace(';', ' or ') + ')';
+    }
+    result.add(
+      check(
+        what + ' at least ' + rule.Min_Percentage__c.setScale(0) + '%',
+        held == null ? 'not entered' : held.Percentage__c + '%',
+        held != null &&
+          held.Percentage__c >= rule.Min_Percentage__c &&
+          allowed(rule.Qualifying_Streams__c, held.Stream_Group__c) &&
+          allowed(rule.Qualifying_Branch_Codes__c, held.Branch_Code__c)
+      )
+    );
+    if (rule.Entrance_Required__c) {
+      List<String> accepted = new List<String>();
+      Boolean met = false;
+      for (Admission_Rule_Entrance__c e : rule.Accepted_Entrances__r) {
+        accepted.add(
+          e.Entrance_Exam__c +
+          (e.Max_Rank__c == null
+            ? ' (any rank)'
+            : ' rank up to ' + e.Max_Rank__c.format())
+        );
+        for (Entrance_Score__c score : scores) {
+          met |= score.Exam__c == e.Entrance_Exam__c && within(score, e);
+        }
+      }
+      String actual = scores.isEmpty()
+        ? 'not entered'
+        : scores[0].Exam__c +
+          ' ' +
+          (scores[0].Rank__c == null ? '' : scores[0].Rank__c.format());
+      result.add(
+        check('Entrance: ' + String.join(accepted, ' or '), actual, met)
+      );
+    }
+    return result;
+  }
+
+  private static Check check(String label, String actual, Boolean passed) {
+    Check c = new Check();
+    c.label = label;
+    c.actual = actual;
+    c.passed = passed;
+    return c;
+  }
+
+  private static List<Admission_Rule__c> rulesFor(
+    Set<Id> branchIds,
+    Id campusId,
+    String academicYear,
+    String route
+  ) {
+    Map<Id, Admission_Rule__c> byBranch = new Map<Id, Admission_Rule__c>();
+    for (Admission_Rule__c rule : [
+      SELECT
+        Id,
+        Branch__c,
+        Branch__r.Name,
+        Campus__c,
+        Version_Key__c,
+        Qualifying_Level__c,
+        Qualifying_Streams__c,
+        Qualifying_Branch_Codes__c,
+        Min_Percentage__c,
+        Entrance_Required__c,
+        (
+          SELECT
+            Id,
+            Entrance_Exam__c,
+            Max_Rank__c,
+            Min_Score__c,
+            Exam_Year_From__c,
+            Exam_Year_To__c
+          FROM Accepted_Entrances__r
+        )
+      FROM Admission_Rule__c
+      WHERE
+        Branch__c IN :branchIds
+        AND Academic_Year__c = :academicYear
+        AND Entry_Route__c = :route
+        AND Status__c = 'Active'
+        AND (Campus__c = :campusId
+        OR Campus__c = NULL)
+      WITH SYSTEM_MODE
+      ORDER BY Min_Percentage__c DESC
+    ]) {
+      if (!byBranch.containsKey(rule.Branch__c) || rule.Campus__c != null) {
+        byBranch.put(rule.Branch__c, rule);
+      }
+    }
+    return byBranch.values();
   }
 
   private static Admission_Rule__c selectRule(
@@ -118,10 +439,30 @@ public without sharing class AdmissionEligibilityService {
       WITH SYSTEM_MODE
       ORDER BY Percentage__c DESC
     ];
+    List<Entrance_Score__c> scores = !rule.Entrance_Required__c
+      ? new List<Entrance_Score__c>()
+      : [
+          SELECT Id, Exam__c, Exam_Year__c, Rank__c, Score__c
+          FROM Entrance_Score__c
+          WHERE Student__c = :studentId AND Verified__c = TRUE
+          WITH SYSTEM_MODE
+        ];
+    return evaluateWith(rule, qualifications, scores);
+  }
+
+  /** The rule check on given qualifications (best first) and entrance scores; no queries. */
+  private static Evaluation evaluateWith(
+    Admission_Rule__c rule,
+    List<Academic_Qualification__c> qualifications,
+    List<Entrance_Score__c> scores
+  ) {
     Academic_Qualification__c best;
     Integer requiredLevel = LEVELS.get(rule.Qualifying_Level__c);
     for (Academic_Qualification__c candidate : qualifications) {
-      if (LEVELS.get(candidate.Level__c) >= requiredLevel) {
+      if (
+        LEVELS.get(candidate.Level__c) != null &&
+        LEVELS.get(candidate.Level__c) >= requiredLevel
+      ) {
         best = candidate;
         break;
       }
@@ -150,12 +491,6 @@ public without sharing class AdmissionEligibilityService {
           '%.'
       );
     if (rule.Entrance_Required__c) {
-      List<Entrance_Score__c> scores = [
-        SELECT Id, Exam__c, Exam_Year__c, Rank__c, Score__c
-        FROM Entrance_Score__c
-        WHERE Student__c = :studentId AND Verified__c = TRUE
-        WITH SYSTEM_MODE
-      ];
       if (scores.isEmpty())
         return result.notChecked('Add and verify an accepted entrance score.');
       for (Admission_Rule_Entrance__c accepted : rule.Accepted_Entrances__r) {

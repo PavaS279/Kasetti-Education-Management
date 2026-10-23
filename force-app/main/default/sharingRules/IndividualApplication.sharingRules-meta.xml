@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingCriteriaRules>
+        <fullName>KEM_College_Admissions_Edit</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description
+    >College admissions are worked by the admission desk and the Dean together: the KEM College Admissions Team edits every college admission.</description>
+        <label>KEM College Admissions Edit</label>
+        <sharedTo>
+            <group>KEM_College_Admissions_Team</group>
+        </sharedTo>
+        <criteriaItems>
+            <field>College_Mode__c</field>
+            <operation>equals</operation>
+            <value>True</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+</SharingRules>

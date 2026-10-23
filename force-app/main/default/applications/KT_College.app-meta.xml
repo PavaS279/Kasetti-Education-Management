@@ -73,6 +73,15 @@
         <pageOrSobjectType>Programme_Enrolment__c</pageOrSobjectType>
     </actionOverrides>
     <actionOverrides>
+        <actionName>View</actionName>
+        <comment>KT College admission</comment>
+        <content>KEM_Application_Record_Page</content>
+        <formFactor>Large</formFactor>
+        <skipRecordTypeSelect>false</skipRecordTypeSelect>
+        <type>Flexipage</type>
+        <pageOrSobjectType>IndividualApplication</pageOrSobjectType>
+    </actionOverrides>
+    <actionOverrides>
         <actionName>Tab</actionName>
         <comment>KT College catalogue</comment>
         <content>KT_College_Home</content>
@@ -96,6 +105,7 @@
     <label>KT College</label>
     <navType>Standard</navType>
     <tabs>standard-home</tabs>
+    <tabs>KEM_Applications</tabs>
     <tabs>standard-Account</tabs>
     <tabs>standard-report</tabs>
     <tabs>standard-Dashboard</tabs>
