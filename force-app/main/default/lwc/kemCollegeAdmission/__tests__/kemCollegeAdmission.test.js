@@ -156,4 +156,37 @@ describe("c-kem-college-admission", () => {
     await flush();
     expect(element.shadowRoot.querySelector("header")).toBeNull();
   });
+
+  it("prompts the Dean to allot a section once the student is enrolled", async () => {
+    getAdmission.mockResolvedValue(
+      admission({
+        stage: "Enrolled",
+        canDean: true,
+        programmeEnrolmentId: "a0P1",
+        enrolmentStatus: "Enrolled",
+        rollNumber: "KT26YBCS001",
+        needsSection: true
+      })
+    );
+    const element = mount();
+    await flush();
+    expect(element.shadowRoot.querySelector(".next-step")).not.toBeNull();
+    expect(
+      byProp(element.shadowRoot, "lightning-button", "label", "Allot section")
+    ).toBeDefined();
+  });
+
+  it("does not prompt once the section is allotted", async () => {
+    getAdmission.mockResolvedValue(
+      admission({
+        canDean: true,
+        programmeEnrolmentId: "a0P1",
+        enrolmentStatus: "Enrolled",
+        needsSection: false
+      })
+    );
+    const element = mount();
+    await flush();
+    expect(element.shadowRoot.querySelector(".next-step")).toBeNull();
+  });
 });

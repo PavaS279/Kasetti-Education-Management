@@ -1,6 +1,6 @@
 /**
  * Data for the PDF templates KEM_Offer_Letter, KEM_Invoice_Pdf,
- * KEM_Receipt_Pdf and KEM_Report_Card. The record comes from the "id" page parameter and is read in
+ * KEM_Receipt_Pdf, KEM_Report_Card and KEM_College_Admission_Letter. The record comes from the "id" page parameter and is read in
  * user mode, so a user can only render documents for records they can see.
  */
 public with sharing class KemDocumentController {
@@ -18,6 +18,11 @@ public with sharing class KemDocumentController {
   public List<Exam_Paper__c> papers { get; private set; }
   public Date today { get; private set; }
   public String currencyCode { get; private set; }
+  /** College admission letter (KEM_College_Admission_Letter). */
+  public Programme_Enrolment__c collegeEnrolment { get; private set; }
+  public Student_Invoice__c collegeInvoice { get; private set; }
+  public Boolean collegeConfirmed { get; private set; }
+  public String paymentMethods { get; private set; }
 
   /** Visualforce binds to properties only, so quote lines are copied here. */
   public class FeeRow {
@@ -39,7 +44,15 @@ public with sharing class KemDocumentController {
     Id recordId = (Id) ApexPages.currentPage().getParameters().get('id');
     SObjectType type = recordId.getSObjectType();
     if (type == IndividualApplication.SObjectType) {
-      loadApplication(recordId);
+      String kind = ApexPages.currentPage().getParameters().get('kind');
+      if (
+        kind == DocumentService.COLLEGE_ADMISSION_LETTER ||
+        kind == DocumentService.COLLEGE_CONFIRMATION_LETTER
+      ) {
+        loadCollegeAdmission(recordId, kind);
+      } else {
+        loadApplication(recordId);
+      }
     } else if (type == Student_Invoice__c.SObjectType) {
       loadInvoice(recordId);
     } else if (type == Student_Payment__c.SObjectType) {
@@ -138,6 +151,64 @@ public with sharing class KemDocumentController {
       ORDER BY Paper_Date__c, Start_Time__c
     ];
     loadBranch(candidate.Exam__r.Branch__c);
+  }
+
+  /**
+   * College letter: the access rule is DocumentService.assertCollegeLetterAccess
+   * (read access to the admission, or billing staff); the data is then read in
+   * system mode because Finance does not share the private college admissions.
+   */
+  private void loadCollegeAdmission(Id recordId, String kind) {
+    DocumentService.assertCollegeLetterAccess(recordId);
+    application = [
+      SELECT
+        Name,
+        Account.Name,
+        Account.PersonMailingStreet,
+        Account.PersonMailingCity,
+        Branch__c,
+        Learning_Course__r.Name,
+        Learning_Program__r.Name,
+        Academic_Year__c,
+        Entry_Route__c,
+        Entry_Year_Of_Study__c
+      FROM IndividualApplication
+      WHERE Id = :recordId AND College_Mode__c = TRUE
+      WITH SYSTEM_MODE
+    ];
+    loadBranch(application.Branch__c);
+    collegeConfirmed = kind == DocumentService.COLLEGE_CONFIRMATION_LETTER;
+    for (Programme_Enrolment__c enrolment : [
+      SELECT Id, Status__c, Roll_Number__c, Payment_Due_By__c
+      FROM Programme_Enrolment__c
+      WHERE Application__c = :recordId
+      WITH SYSTEM_MODE
+      LIMIT 1
+    ]) {
+      collegeEnrolment = enrolment;
+    }
+    if (collegeEnrolment != null) {
+      for (Student_Invoice__c value : [
+        SELECT Name, Total__c, Balance_Due__c, Due_Date__c, Invoice_Kind__c
+        FROM Student_Invoice__c
+        WHERE
+          Programme_Enrolment__c = :collegeEnrolment.Id
+          AND Status__c != 'Cancelled'
+        WITH SYSTEM_MODE
+        ORDER BY CreatedDate
+        LIMIT 1
+      ]) {
+        collegeInvoice = value;
+      }
+    }
+    String methods = [
+      SELECT Allowed_Payment_Methods__c
+      FROM Branch__c
+      WHERE Id = :application.Branch__c
+      WITH SYSTEM_MODE
+    ]
+    .Allowed_Payment_Methods__c;
+    paymentMethods = String.isBlank(methods) ? '' : methods.replace(';', ', ');
   }
 
   private void loadApplication(Id recordId) {

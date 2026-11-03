@@ -71,3 +71,11 @@ h3 {
   display: inline-block;
   margin-top: 0.75rem;
 }
+
+.next-step {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  border-left: 3px solid var(--slds-g-color-brand-base-50, #0176d3);
+  background: var(--slds-g-color-brand-base-95, #eef4ff);
+}

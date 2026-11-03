@@ -28,6 +28,21 @@
   >Dean-only college interview and seat-transition authority. Eligibility override remains a separate permission.</description>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Lead.Campus_Branch__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.Declared_Marks__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.Entry_Route__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Subject_Result__c.Attempt__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -374,4 +389,8 @@
         <viewAllFields>false</viewAllFields>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
+    <pageAccesses>
+        <apexPage>KEM_College_Admission_Letter</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
 </PermissionSet>

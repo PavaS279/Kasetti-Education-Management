@@ -42,8 +42,23 @@ public without sharing class ProgrammeEnrolmentService {
     }
     for (Id enrolmentId : eligible)
       releaseRoll(enrolmentId);
-    if (!eligible.isEmpty())
+    if (!eligible.isEmpty()) {
       CollegeProvisionalService.confirmAdmissions(eligible);
+      Set<Id> applicationIds = new Set<Id>();
+      for (Programme_Enrolment__c enrolment : [
+        SELECT Application__c
+        FROM Programme_Enrolment__c
+        WHERE Id IN :eligible AND Status__c = 'Enrolled'
+        WITH SYSTEM_MODE
+      ]) {
+        applicationIds.add(enrolment.Application__c);
+      }
+      // The roll number is on the confirmation letter (rendered after commit).
+      DocumentService.enqueue(
+        applicationIds,
+        DocumentService.COLLEGE_CONFIRMATION_LETTER
+      );
+    }
   }
 
   private static void releaseRoll(Id enrolmentId) {
@@ -160,6 +175,11 @@ public without sharing class ProgrammeEnrolmentService {
       enrolment.Id,
       enrolment.Entry_Year_Of_Study__c.intValue(),
       invoiceKind
+    );
+    // Provisional admission letter with the fee and deadline (rendered after commit).
+    DocumentService.enqueue(
+      new Set<Id>{ applicationId },
+      DocumentService.COLLEGE_ADMISSION_LETTER
     );
     return enrolment.Id;
   }

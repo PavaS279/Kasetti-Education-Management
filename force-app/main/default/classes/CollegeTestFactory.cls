@@ -17,6 +17,7 @@ public class CollegeTestFactory {
       new List<String>{
         'KEM_Administrator',
         'KEM_Administrator_Edu',
+        'KEM_College_Admissions',
         'KEM_College_Dean'
       }
     );

@@ -13,6 +13,10 @@ public with sharing class DocumentService {
   public static final String RECEIPT = 'Receipt';
   public static final String REPORT_CARD = 'Report Card';
   public static final String HALL_TICKET = 'Hall Ticket';
+  /** College: provisional admission letter (fee and deadline), filed on the admission. */
+  public static final String COLLEGE_ADMISSION_LETTER = 'College Admission Letter';
+  /** College: admission confirmed with the roll number, filed on the admission. */
+  public static final String COLLEGE_CONFIRMATION_LETTER = 'College Admission Confirmation';
   private static final String SUPERSEDED = ' (superseded)';
   private static final String MARKER = 'KEM ';
 
@@ -96,7 +100,8 @@ public with sharing class DocumentService {
   public static String kindFor(Id recordId) {
     SObjectType type = recordId.getSObjectType();
     if (type == IndividualApplication.SObjectType) {
-      return OFFER_LETTER;
+      String college = collegeLetterKind(recordId);
+      return college == null ? OFFER_LETTER : college;
     }
     if (type == Student_Invoice__c.SObjectType) {
       return INVOICE;
@@ -157,9 +162,57 @@ public with sharing class DocumentService {
 
   // --------------------------------------------------------------- helpers
 
+  /**
+   * The letter a college admission currently has: confirmation once enrolled,
+   * the provisional admission letter while the fee is pending; null for school
+   * applications.
+   */
+  private static String collegeLetterKind(Id applicationId) {
+    IndividualApplication application = [
+      SELECT College_Mode__c
+      FROM IndividualApplication
+      WHERE Id = :applicationId
+      WITH SYSTEM_MODE
+    ];
+    if (application.College_Mode__c != true) {
+      return null;
+    }
+    Programme_Enrolment__c enrolment = collegeEnrolment(applicationId);
+    return enrolment != null &&
+      enrolment.Status__c == 'Enrolled'
+      ? COLLEGE_CONFIRMATION_LETTER
+      : COLLEGE_ADMISSION_LETTER;
+  }
+
+  public static Programme_Enrolment__c collegeEnrolment(Id applicationId) {
+    List<Programme_Enrolment__c> enrolments = [
+      SELECT Id, Status__c, Roll_Number__c
+      FROM Programme_Enrolment__c
+      WHERE Application__c = :applicationId
+      WITH SYSTEM_MODE
+      LIMIT 1
+    ];
+    return enrolments.isEmpty() ? null : enrolments[0];
+  }
+
+  /**
+   * College letters are generated automatically when the Dean admits and when
+   * Finance confirms the fee. Finance does not share the private college
+   * admissions, so the letter is allowed to anyone who can read the admission
+   * or who manages billing (and already sees the same student and fee on the
+   * invoice). Every other document still requires read access.
+   */
+  public static void assertCollegeLetterAccess(Id applicationId) {
+    if (FeatureManagement.checkPermission(BillingService.MANAGE_PERMISSION)) {
+      return;
+    }
+    assertReadable(applicationId);
+  }
+
   private static ContentVersion render(Id recordId, String kind) {
     PageReference page = pageFor(kind);
     page.getParameters().put('id', recordId);
+    page.getParameters().put('kind', kind);
     String title = titleFor(recordId, kind);
     Blob pdf = Test.isRunningTest()
       ? Blob.valueOf('PDF ' + title)
@@ -189,11 +242,23 @@ public with sharing class DocumentService {
     if (kind == HALL_TICKET) {
       return Page.KEM_Hall_Ticket;
     }
+    if (
+      kind == COLLEGE_ADMISSION_LETTER ||
+      kind == COLLEGE_CONFIRMATION_LETTER
+    ) {
+      return Page.KEM_College_Admission_Letter;
+    }
     throw new AppException('Unknown document type: ' + kind);
   }
 
   /** Builds the file title and checks that the running user can read the record. */
   private static String titleFor(Id recordId, String kind) {
+    if (
+      kind == COLLEGE_ADMISSION_LETTER ||
+      kind == COLLEGE_CONFIRMATION_LETTER
+    ) {
+      return collegeLetterTitle(recordId, kind);
+    }
     assertReadable(recordId);
     if (kind == OFFER_LETTER) {
       IndividualApplication application = [
@@ -271,6 +336,41 @@ public with sharing class DocumentService {
       );
     }
     return 'Receipt ' + payment.Receipt_Number__c;
+  }
+
+  private static String collegeLetterTitle(Id applicationId, String kind) {
+    assertCollegeLetterAccess(applicationId);
+    IndividualApplication application = [
+      SELECT Name, Account.Name
+      FROM IndividualApplication
+      WHERE Id = :applicationId AND College_Mode__c = TRUE
+      WITH SYSTEM_MODE
+    ];
+    Programme_Enrolment__c enrolment = collegeEnrolment(applicationId);
+    if (kind == COLLEGE_CONFIRMATION_LETTER) {
+      if (enrolment == null || enrolment.Status__c != 'Enrolled') {
+        throw new AppException(
+          'The confirmation letter is issued once the fee is received.'
+        );
+      }
+      return 'Admission Confirmation ' +
+        enrolment.Roll_Number__c +
+        ' - ' +
+        application.Account.Name;
+    }
+    if (
+      enrolment == null ||
+      (enrolment.Status__c != 'Provisional' &&
+      enrolment.Status__c != 'Enrolled')
+    ) {
+      throw new AppException(
+        'The admission letter is issued once the Dean admits the student.'
+      );
+    }
+    return 'Admission Letter ' +
+      application.Name +
+      ' - ' +
+      application.Account.Name;
   }
 
   private static void assertReadable(Id recordId) {

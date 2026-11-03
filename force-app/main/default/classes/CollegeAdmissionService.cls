@@ -4,9 +4,28 @@
  * and ranks are recorded as verified by the desk user who has seen the marks
  * card, so the eligibility verdict is immediate; the AI document reader and the
  * document checklist confirm them before the Dean's interview.
+ *
+ * A student already on file (same email, or same mobile and last name) is
+ * reused rather than duplicated, so an online enquirer who later walks in, or
+ * a converted enquiry, keeps one student record.
+ *
+ * Writes run in system mode after the explicit create check below: the
+ * qualification, score and guardian records are desk-controlled evidence that
+ * staff must not be able to edit directly (docs/03-security-model.md).
  */
 public with sharing class CollegeAdmissionService {
   public static Id create(CollegeAdmissionController.NewAdmission request) {
+    return create(request, null);
+  }
+
+  /**
+   * Creates the admission for an existing student when existingStudentId is
+   * given (enquiry conversion), otherwise for a matching or new student.
+   */
+  public static Id create(
+    CollegeAdmissionController.NewAdmission request,
+    Id existingStudentId
+  ) {
     if (!Schema.SObjectType.IndividualApplication.isCreateable()) {
       throw new AppException(
         'You do not have permission to create admissions.'
@@ -44,22 +63,8 @@ public with sharing class CollegeAdmissionService {
     }
     Savepoint checkpoint = Database.setSavepoint();
     try {
-      Account student = PersonAccountService.buildPerson(
-        request.firstName,
-        request.lastName,
-        request.email,
-        request.phone,
-        intake.Campus__c,
-        'Learner'
-      );
-      student.PersonBirthdate = request.birthdate;
-      Database.insert(student, AccessLevel.SYSTEM_MODE);
-      student = [
-        SELECT Id, PersonContactId
-        FROM Account
-        WHERE Id = :student.Id
-        WITH SYSTEM_MODE
-      ];
+      Account student = resolveStudent(request, existingStudentId, intake);
+      assertNoOpenAdmission(student.Id, intake.Id);
 
       List<Academic_Qualification__c> qualifications = new List<Academic_Qualification__c>();
       for (
@@ -155,6 +160,80 @@ public with sharing class CollegeAdmissionService {
     } catch (Exception failure) {
       Database.rollback(checkpoint);
       throw failure;
+    }
+  }
+
+  private static Account resolveStudent(
+    CollegeAdmissionController.NewAdmission request,
+    Id existingStudentId,
+    Campus_Branch__c intake
+  ) {
+    Id studentId = existingStudentId;
+    if (studentId == null) {
+      Account match = PersonAccountService.findPerson(
+        request.email,
+        request.phone,
+        request.lastName
+      );
+      studentId = match == null ? null : match.Id;
+    }
+    if (studentId != null) {
+      Account existing = PersonAccountService.reload(new Set<Id>{ studentId })
+        .get(studentId);
+      if (existing == null || existing.PersonContactId == null) {
+        throw new AppException(
+          'The selected student is not a person account you can access.'
+        );
+      }
+      String role = PersonAccountService.mergeRole(
+        existing.KEM_Role__c,
+        'Learner'
+      );
+      if (role != existing.KEM_Role__c) {
+        Database.update(
+          new Account(Id = existing.Id, KEM_Role__c = role),
+          AccessLevel.SYSTEM_MODE
+        );
+      }
+      return existing;
+    }
+    Account student = PersonAccountService.buildPerson(
+      request.firstName,
+      request.lastName,
+      request.email,
+      request.phone,
+      intake.Campus__c,
+      'Learner'
+    );
+    student.PersonBirthdate = request.birthdate;
+    Database.insert(student, AccessLevel.SYSTEM_MODE);
+    return [
+      SELECT Id, PersonContactId
+      FROM Account
+      WHERE Id = :student.Id
+      WITH SYSTEM_MODE
+    ];
+  }
+
+  /** One live admission per student and intake; closed ones do not count. */
+  private static void assertNoOpenAdmission(Id studentId, Id intakeId) {
+    Integer open = [
+      SELECT COUNT()
+      FROM IndividualApplication
+      WHERE
+        AccountId = :studentId
+        AND Campus_Branch__c = :intakeId
+        AND College_Stage__c NOT IN (
+          'Application Decision',
+          'Enrollment Failed',
+          'Withdrawn'
+        )
+      WITH SYSTEM_MODE
+    ];
+    if (open > 0) {
+      throw new AppException(
+        'This student already has an open admission for this programme.'
+      );
     }
   }
 }

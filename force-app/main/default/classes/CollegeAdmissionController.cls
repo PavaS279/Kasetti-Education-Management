@@ -208,6 +208,9 @@ public with sharing class CollegeAdmissionController {
     public String rollNumber;
     @AuraEnabled
     public String enrolmentStatus;
+    /** Enrolled but not yet placed in a section: the Dean's next step. */
+    @AuraEnabled
+    public Boolean needsSection = false;
     @AuraEnabled
     public List<Item> items = new List<Item>();
     @AuraEnabled
@@ -493,7 +496,7 @@ public with sharing class CollegeAdmissionController {
       result.items.add(row);
     }
     for (Programme_Enrolment__c e : [
-      SELECT Id, Status__c, Roll_Number__c
+      SELECT Id, Status__c, Roll_Number__c, Joining_Date__c
       FROM Programme_Enrolment__c
       WHERE Application__c = :a.Id
       WITH SYSTEM_MODE
@@ -502,8 +505,15 @@ public with sharing class CollegeAdmissionController {
       result.programmeEnrolmentId = e.Id;
       result.rollNumber = e.Roll_Number__c;
       result.enrolmentStatus = e.Status__c;
+      result.needsSection =
+        e.Status__c == 'Enrolled' &&
+        e.Joining_Date__c == null;
     }
-    result.canDesk = Schema.SObjectType.DocumentChecklistItem.isUpdateable();
+    result.canDesk =
+      Schema.SObjectType.DocumentChecklistItem.isUpdateable() &&
+      FeatureManagement.checkPermission(
+        CollegeDocumentService.VERIFY_PERMISSION
+      );
     result.canDean = FeatureManagement.checkPermission(
       InterviewService.PERMISSION
     );

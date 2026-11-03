@@ -66,6 +66,11 @@ export default class KemCollegeAdmission extends NavigationMixin(
     return this.admission?.rollNumber || "issued when the fee is received";
   }
 
+  /** Section allotment is the Dean's step once the student is enrolled. */
+  get showSectionPrompt() {
+    return Boolean(this.admission?.needsSection && this.admission?.canDean);
+  }
+
   get undecided() {
     return UNDECIDED.includes(this.admission?.stage);
   }

@@ -14,6 +14,10 @@ export default class KemEnquiryConvertModal extends LightningModal {
   learnerChoice = "new";
   guardianChoice = "new";
   createApplication = true;
+  /** College enquiries: declared marks the desk confirms or corrects. */
+  qualifications = [];
+  entrances = [];
+  marksConfirmed = false;
 
   async connectedCallback() {
     try {
@@ -23,6 +27,14 @@ export default class KemEnquiryConvertModal extends LightningModal {
       }
       if (this.preview.guardianMatch) {
         this.guardianChoice = "existing";
+      }
+      if (this.preview.college) {
+        this.qualifications = (this.preview.college.qualifications || []).map(
+          (q, index) => ({ ...q, key: `q${index}` })
+        );
+        this.entrances = (this.preview.college.entrances || []).map(
+          (e, index) => ({ ...e, key: `e${index}` })
+        );
       }
     } catch (error) {
       this.errorMessage = reduceErrors(error).join(" ");
@@ -95,8 +107,65 @@ export default class KemEnquiryConvertModal extends LightningModal {
     return this.preview.enquiry.Branch__r?.Name || "not selected";
   }
 
+  get isCollege() {
+    return Boolean(this.preview?.college);
+  }
+
+  get collegeRouteLabel() {
+    return this.preview.college.entryRoute === "Lateral"
+      ? "Year 2 (lateral entry)"
+      : "Year 1 (regular)";
+  }
+
+  get qualificationRows() {
+    return this.qualifications.map((q) => ({
+      ...q,
+      label: [q.level, q.stream || q.branchCode].filter(Boolean).join(" ")
+    }));
+  }
+
+  get hasEntrances() {
+    return this.entrances.length > 0;
+  }
+
+  get collegeBlocked() {
+    return this.isCollege && !this.preview.college.canConvert;
+  }
+
   get isConvertDisabled() {
-    return this.isLoading || this.isSaving || !this.preview;
+    return (
+      this.isLoading ||
+      this.isSaving ||
+      !this.preview ||
+      this.collegeBlocked ||
+      (this.isCollege && !this.marksConfirmed)
+    );
+  }
+
+  handleQualification(event) {
+    const key = event.target.dataset.key;
+    const value = event.target.value === "" ? null : Number(event.target.value);
+    this.qualifications = this.qualifications.map((q) => {
+      if (q.key !== key) {
+        return q;
+      }
+      return { ...q, percentage: value };
+    });
+  }
+
+  handleEntrance(event) {
+    const key = event.target.dataset.key;
+    const value = event.target.value === "" ? null : Number(event.target.value);
+    this.entrances = this.entrances.map((e) => {
+      if (e.key !== key) {
+        return e;
+      }
+      return { ...e, rank: value };
+    });
+  }
+
+  handleMarksConfirmed(event) {
+    this.marksConfirmed = event.target.checked;
   }
 
   handleLearnerChoice(event) {
@@ -130,6 +199,13 @@ export default class KemEnquiryConvertModal extends LightningModal {
       createGuardian: this.guardianChoice !== "skip",
       createApplication: this.createApplication
     };
+    if (this.isCollege) {
+      // eslint-disable-next-line no-unused-vars
+      request.qualifications = this.qualifications.map(({ key, ...q }) => q);
+      // eslint-disable-next-line no-unused-vars
+      request.entrances = this.entrances.map(({ key, ...e }) => e);
+      request.marksConfirmed = this.marksConfirmed;
+    }
     try {
       const result = await convertEnquiry({ request });
       this.disableClose = false;

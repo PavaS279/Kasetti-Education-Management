@@ -1789,6 +1789,10 @@
         <enabled>true</enabled>
     </pageAccesses>
     <pageAccesses>
+        <apexPage>KEM_College_Admission_Letter</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
+    <pageAccesses>
         <apexPage>KEM_Offer_Letter</apexPage>
         <enabled>true</enabled>
     </pageAccesses>

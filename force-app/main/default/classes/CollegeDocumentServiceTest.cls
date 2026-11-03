@@ -88,6 +88,13 @@ private class CollegeDocumentServiceTest {
 
   @IsTest
   static void identityVerificationRequiresConsentAndDeletesTheFile() {
+    grantDeskPermission();
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      identityVerificationRequiresConsentAndDeletesTheFileAsDesk();
+    }
+  }
+
+  private static void identityVerificationRequiresConsentAndDeletesTheFileAsDesk() {
     LearningProgram programme = programme();
     insert new Admission_Document_Rule__c(
       Programme__c = programme.Id,
@@ -238,6 +245,13 @@ private class CollegeDocumentServiceTest {
 
   @IsTest
   static void collegeStageAdvancesOnlyAfterEligibilityConsentAndChecklist() {
+    grantDeskPermission();
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      collegeStageAdvancesOnlyAfterEligibilityConsentAndChecklistAsDesk();
+    }
+  }
+
+  private static void collegeStageAdvancesOnlyAfterEligibilityConsentAndChecklistAsDesk() {
     LearningProgram programme = programme();
     insert new Admission_Document_Rule__c(
       Programme__c = programme.Id,
@@ -304,10 +318,37 @@ private class CollegeDocumentServiceTest {
       Learning_Program__c = programmeId,
       Academic_Year__c = '2026-27',
       Entry_Route__c = route,
-      Entry_Year_Of_Study__c = route == 'Lateral' ? 2 : 1
+      Entry_Year_Of_Study__c = route == 'Lateral' ? 2 : 1,
+      College_Stage__c = 'Processing'
     );
     insert value;
     return value;
+  }
+
+  /** Document verification is the admission desk's permission (KEM College Admissions). */
+  private static void grantDeskPermission() {
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      Id deskSet = [
+        SELECT Id
+        FROM PermissionSet
+        WHERE Name = 'KEM_College_Admissions'
+      ]
+      .Id;
+      if (
+        [
+          SELECT COUNT()
+          FROM PermissionSetAssignment
+          WHERE
+            AssigneeId = :UserInfo.getUserId()
+            AND PermissionSetId = :deskSet
+        ] == 0
+      ) {
+        insert new PermissionSetAssignment(
+          AssigneeId = UserInfo.getUserId(),
+          PermissionSetId = deskSet
+        );
+      }
+    }
   }
 
   private static IndividualApplication learningCentreAdmission() {

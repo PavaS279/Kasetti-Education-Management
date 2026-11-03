@@ -80,52 +80,75 @@ public without sharing class CollegePublicController {
     List<CollegeAdmissionController.Entrance> entrances
   ) {
     try {
-      assertIntake(campusBranchId, entryRoute);
-      List<CollegeAdmissionController.Qualification> declared = qualifications ==
-        null
-        ? new List<CollegeAdmissionController.Qualification>()
-        : qualifications;
-      List<CollegeAdmissionController.Entrance> ranks = entrances == null
-        ? new List<CollegeAdmissionController.Entrance>()
-        : entrances;
-      if (declared.size() > 3 || ranks.size() > 2) {
-        throw new AppException(
-          'Enter at most three results and one entrance rank.'
-        );
-      }
-      for (CollegeAdmissionController.Qualification q : declared) {
-        if (
-          !LEVELS.contains(q.level) ||
-          q.percentage == null ||
-          q.percentage < 0 ||
-          q.percentage > 100 ||
-          (String.isNotBlank(q.stream) && !STREAMS.contains(q.stream)) ||
-          (String.isNotBlank(q.branchCode) &&
-          !Pattern.matches('^[A-Za-z]{2}$', q.branchCode))
-        ) {
-          throw new AppException('Check the marks you entered.');
-        }
-      }
-      for (CollegeAdmissionController.Entrance e : ranks) {
-        if (
-          !EXAMS.contains(e.exam) ||
-          e.rank == null ||
-          e.rank < 1 ||
-          e.rank > MAX_RANK
-        ) {
-          throw new AppException(
-            'Check the entrance exam and rank you entered.'
-          );
-        }
-      }
+      validateDeclaration(
+        campusBranchId,
+        entryRoute,
+        qualifications,
+        entrances
+      );
       return CollegeAdmissionController.previewEligibility(
         campusBranchId,
         entryRoute,
-        declared,
-        ranks
+        qualifications == null
+          ? new List<CollegeAdmissionController.Qualification>()
+          : qualifications,
+        entrances == null
+          ? new List<CollegeAdmissionController.Entrance>()
+          : entrances
       );
     } catch (Exception e) {
       throw handled(e, 'The eligibility check is not available right now.');
+    }
+  }
+
+  /**
+   * Validates what a visitor declared: an open college intake, a valid route,
+   * and marks and ranks within range. Shared with the enquiry submission so the
+   * stored declaration obeys the same rules as the self-check.
+   */
+  public static void validateDeclaration(
+    Id campusBranchId,
+    String entryRoute,
+    List<CollegeAdmissionController.Qualification> qualifications,
+    List<CollegeAdmissionController.Entrance> entrances
+  ) {
+    assertIntake(campusBranchId, entryRoute);
+    List<CollegeAdmissionController.Qualification> declared = qualifications ==
+      null
+      ? new List<CollegeAdmissionController.Qualification>()
+      : qualifications;
+    List<CollegeAdmissionController.Entrance> ranks = entrances == null
+      ? new List<CollegeAdmissionController.Entrance>()
+      : entrances;
+    if (declared.size() > 3 || ranks.size() > 2) {
+      throw new AppException(
+        'Enter at most three results and two entrance ranks.'
+      );
+    }
+    for (CollegeAdmissionController.Qualification q : declared) {
+      if (
+        q == null ||
+        !LEVELS.contains(q.level) ||
+        q.percentage == null ||
+        q.percentage < 0 ||
+        q.percentage > 100 ||
+        (String.isNotBlank(q.stream) && !STREAMS.contains(q.stream)) ||
+        (String.isNotBlank(q.branchCode) &&
+        !Pattern.matches('^[A-Za-z]{2}$', q.branchCode))
+      ) {
+        throw new AppException('Check the marks you entered.');
+      }
+    }
+    for (CollegeAdmissionController.Entrance e : ranks) {
+      if (
+        e == null ||
+        !EXAMS.contains(e.exam) ||
+        e.rank == null ||
+        e.rank < 1 ||
+        e.rank > MAX_RANK
+      ) {
+        throw new AppException('Check the entrance exam and rank you entered.');
+      }
     }
   }
 

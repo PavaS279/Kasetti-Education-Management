@@ -40,6 +40,19 @@
           ></lightning-button>
         </div>
       </template>
+      <template lwc:if={showSectionPrompt}>
+        <div class="next-step" role="status">
+          <strong>Next: allot a section.</strong>
+          The fee is received and the roll number is issued. Choose the
+          student's section and joining date on the programme enrolment.
+          <lightning-button
+            class="slds-m-left_x-small"
+            variant="brand"
+            label="Allot section"
+            onclick={openEnrolment}
+          ></lightning-button>
+        </div>
+      </template>
       <template lwc:if={admission.decision}>
         <div class="decided">
           Decision: {admission.decision} — {admission.decisionReason}

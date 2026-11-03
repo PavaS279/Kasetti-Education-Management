@@ -6,6 +6,25 @@
     </classAccesses>
     <description
   >College admission checklist configuration, consent, document verification and read-only seat visibility.</description>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>KEM_Verify_Admission_Documents</name>
+    </customPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.Campus_Branch__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.Declared_Marks__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.Entry_Route__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
         <field>DocumentChecklistItem.AI_Extractable__c</field>
@@ -148,4 +167,8 @@
         <viewAllFields>false</viewAllFields>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
+    <pageAccesses>
+        <apexPage>KEM_College_Admission_Letter</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
 </PermissionSet>

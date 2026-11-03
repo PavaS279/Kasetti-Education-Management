@@ -501,7 +501,7 @@ export default class KemPublicCollegeEnquiry extends LightningElement {
     return this.preview?.status === "Eligible" ? "ok-text" : "muted";
   }
 
-  /** The marks and self-check result travel to the desk inside the enquiry message. */
+  /** A readable summary for the desk; the marks also travel as structured data. */
   summary() {
     const parts = [
       `College admission enquiry: ${this.branch.name}, ${this.campus.name}, ${this.routeLabel}.`
@@ -534,6 +534,10 @@ export default class KemPublicCollegeEnquiry extends LightningElement {
           guardianPhone: this.form.guardianPhone,
           branchCode: this.campus.code,
           courseExternalId: this.branch.externalId,
+          campusBranchId: this.campusBranchId,
+          entryRoute: this.route,
+          qualifications: this.qualifications(),
+          entrances: this.entrances(),
           message: this.summary(),
           website: this.form.website,
           privacyConsent: this.form.privacyConsent,

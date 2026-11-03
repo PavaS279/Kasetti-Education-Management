@@ -84,6 +84,24 @@ public without sharing class PublicEnquiryController {
     public String message { get; set; }
     @AuraEnabled
     public Boolean privacyConsent { get; set; }
+    /** College enquiries only: the intake, route and declared marks. */
+    @AuraEnabled
+    public Id campusBranchId { get; set; }
+    @AuraEnabled
+    public String entryRoute { get; set; }
+    @AuraEnabled
+    public List<CollegeAdmissionController.Qualification> qualifications {
+      get;
+      set;
+    }
+    @AuraEnabled
+    public List<CollegeAdmissionController.Entrance> entrances { get; set; }
+  }
+
+  /** Declared marks stored on the enquiry; unverified until the desk converts it. */
+  public class Declaration {
+    public List<CollegeAdmissionController.Qualification> qualifications;
+    public List<CollegeAdmissionController.Entrance> entrances;
   }
 
   public class SubmissionResult {
@@ -177,6 +195,9 @@ public without sharing class PublicEnquiryController {
       Enquiry_Channel__c = 'Website',
       LeadSource = 'Web'
     );
+    if (request.campusBranchId != null) {
+      applyCollegeDeclaration(enquiry, request, branch.Id, courseId);
+    }
     Database.insert(enquiry, AccessLevel.SYSTEM_MODE);
     return resultFor(request.submissionId);
   }
@@ -253,6 +274,43 @@ public without sharing class PublicEnquiryController {
     if (request.privacyConsent != true) {
       fail('Privacy consent is required.');
     }
+  }
+
+  private static void applyCollegeDeclaration(
+    Lead enquiry,
+    SubmissionRequest request,
+    Id campusId,
+    Id courseId
+  ) {
+    CollegePublicController.validateDeclaration(
+      request.campusBranchId,
+      request.entryRoute,
+      request.qualifications,
+      request.entrances
+    );
+    // The intake must be the campus and branch the visitor chose on the page.
+    Integer matching = [
+      SELECT COUNT()
+      FROM Campus_Branch__c
+      WHERE
+        Id = :request.campusBranchId
+        AND Campus__c = :campusId
+        AND Branch__c = :courseId
+      WITH SYSTEM_MODE
+    ];
+    if (matching == 0) {
+      fail('Choose a programme and entry route.');
+    }
+    Declaration declared = new Declaration();
+    declared.qualifications = request.qualifications == null
+      ? new List<CollegeAdmissionController.Qualification>()
+      : request.qualifications;
+    declared.entrances = request.entrances == null
+      ? new List<CollegeAdmissionController.Entrance>()
+      : request.entrances;
+    enquiry.Campus_Branch__c = request.campusBranchId;
+    enquiry.Entry_Route__c = request.entryRoute;
+    enquiry.Declared_Marks__c = JSON.serialize(declared, true);
   }
 
   private static Branch__c findBranch(String branchCode) {

@@ -974,6 +974,16 @@ public with sharing class BillingService {
     return result(payment.Id);
   }
 
+  /**
+   * True only while confirmPayment writes the status, so the payment trigger
+   * can refuse a Pending to Confirmed change made any other way (list edit,
+   * data loader, API), which would skip allocation, receipts and roll numbers.
+   */
+  public static Boolean confirmingPayments { get; private set; }
+  static {
+    confirmingPayments = false;
+  }
+
   /** Confirms a pending payment, issues the receipt number, and allocates it. */
   public static PaymentResult confirmPayment(Id paymentId) {
     RecordAccess.assertPermission(MANAGE_PERMISSION);
@@ -981,16 +991,21 @@ public with sharing class BillingService {
     if (payment.Status__c != 'Pending') {
       throw new AppException('Only pending payments can be confirmed.');
     }
-    new Writer()
-      .updateRecords(
-        new List<SObject>{
-          new Student_Payment__c(
-            Id = paymentId,
-            Status__c = 'Confirmed',
-            Receipt_Number__c = 'RCT-' + payment.Name.substringAfter('-')
-          )
-        }
-      );
+    confirmingPayments = true;
+    try {
+      new Writer()
+        .updateRecords(
+          new List<SObject>{
+            new Student_Payment__c(
+              Id = paymentId,
+              Status__c = 'Confirmed',
+              Receipt_Number__c = 'RCT-' + payment.Name.substringAfter('-')
+            )
+          }
+        );
+    } finally {
+      confirmingPayments = false;
+    }
     allocate(paymentId);
     MessageService.paymentsReceived(new Set<Id>{ paymentId });
     DocumentService.enqueue(new Set<Id>{ paymentId }, DocumentService.RECEIPT);

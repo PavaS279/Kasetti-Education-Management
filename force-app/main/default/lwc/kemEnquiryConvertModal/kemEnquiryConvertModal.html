@@ -87,17 +87,79 @@
           </template>
         </section>
       </div>
-      <div class="kem-card options">
-        <lightning-input
-          type="toggle"
-          label="Create admissions application"
-          checked={createApplication}
-          onchange={handleApplicationToggle}
-        ></lightning-input>
-        <div class="kem-muted small">
-          Course: {courseLabel} · Branch: {branchLabel}
+      <template lwc:if={isCollege}>
+        <div class="kem-card options">
+          <div class="kem-section-title">College admission</div>
+          <div class="kem-muted small">
+            {preview.college.campusBranchName} · {collegeRouteLabel}
+          </div>
+          <template lwc:if={collegeBlocked}>
+            <div
+              class="slds-notify slds-notify_alert slds-alert_warning slds-m-top_small"
+              role="alert"
+            >
+              Only the college admission desk can convert a college enquiry.
+            </div>
+          </template>
+          <template lwc:else>
+            <p class="kem-muted small slds-m-top_small">
+              Marks as typed by the visitor. Check them against the marks card
+              and correct any value before converting.
+            </p>
+            <div class="marks">
+              <template for:each={qualificationRows} for:item="q">
+                <lightning-input
+                  key={q.key}
+                  type="number"
+                  label={q.label}
+                  value={q.percentage}
+                  data-key={q.key}
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  formatter="decimal"
+                  field-level-help="Percentage"
+                  onchange={handleQualification}
+                ></lightning-input>
+              </template>
+              <template lwc:if={hasEntrances}>
+                <template for:each={entrances} for:item="e">
+                  <lightning-input
+                    key={e.key}
+                    type="number"
+                    label={e.exam}
+                    value={e.rank}
+                    data-key={e.key}
+                    min="1"
+                    field-level-help="Entrance rank"
+                    onchange={handleEntrance}
+                  ></lightning-input>
+                </template>
+              </template>
+            </div>
+            <lightning-input
+              class="slds-m-top_small"
+              type="checkbox"
+              label="I have checked these marks against the marks card"
+              checked={marksConfirmed}
+              onchange={handleMarksConfirmed}
+            ></lightning-input>
+          </template>
         </div>
-      </div>
+      </template>
+      <template lwc:else>
+        <div class="kem-card options">
+          <lightning-input
+            type="toggle"
+            label="Create admissions application"
+            checked={createApplication}
+            onchange={handleApplicationToggle}
+          ></lightning-input>
+          <div class="kem-muted small">
+            Course: {courseLabel} · Branch: {branchLabel}
+          </div>
+        </div>
+      </template>
     </template>
   </lightning-modal-body>
   <lightning-modal-footer>

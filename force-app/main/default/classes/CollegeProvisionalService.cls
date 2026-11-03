@@ -289,6 +289,12 @@ public without sharing class CollegeProvisionalService {
       ),
       AccessLevel.SYSTEM_MODE
     );
+    // The provisional letter no longer holds; it stays on file for history.
+    DocumentService.supersede(
+      new Set<Id>{ enrolment.Application__c },
+      DocumentService.COLLEGE_ADMISSION_LETTER,
+      target == 'Expired' ? 'Payment window expired' : reason
+    );
     notify(
       target == 'Expired'
         ? 'College_Admission_Expired'

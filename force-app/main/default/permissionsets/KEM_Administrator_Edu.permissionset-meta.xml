@@ -3,6 +3,21 @@
     <description
   >Education Cloud object access for the KEM Administrator persona. Requires the Education Cloud licence.</description>
     <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.Campus_Branch__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.Declared_Marks__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.Entry_Route__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>false</editable>
         <field>IndividualApplication.College_Stage__c</field>
         <readable>true</readable>

@@ -1,5 +1,12 @@
 /** College admission checklist snapshots and privacy-consent audit. */
 public with sharing class CollegeDocumentService {
+  /** Custom permission held by the admission desk (KEM College Admissions). */
+  public static final String VERIFY_PERMISSION = 'KEM_Verify_Admission_Documents';
+  /** Documents are verified before the Dean's interview, never after it. */
+  private static final Set<String> VERIFIABLE_STAGES = new Set<String>{
+    'Processing',
+    'In Review'
+  };
   @TestVisible
   private static Boolean suppressStatusUpdates = false;
   public static void createChecklists(Set<Id> applicationIds) {
@@ -127,9 +134,15 @@ public with sharing class CollegeDocumentService {
   }
 
   public static void markDocumentsVerified(Id applicationId) {
+    RecordAccess.assertPermission(VERIFY_PERMISSION);
     RecordAccess.assertEditable(applicationId);
     IndividualApplication application = [
-      SELECT Id, College_Mode__c, Privacy_Consent__c, Eligibility_Status__c
+      SELECT
+        Id,
+        College_Mode__c,
+        College_Stage__c,
+        Privacy_Consent__c,
+        Eligibility_Status__c
       FROM IndividualApplication
       WHERE Id = :applicationId
       WITH SYSTEM_MODE
@@ -139,6 +152,7 @@ public with sharing class CollegeDocumentService {
         'Document verification applies only to college admissions.'
       );
     }
+    assertVerifiableStage(application.College_Stage__c);
     if (!application.Privacy_Consent__c) {
       throw new AppException(
         'Capture privacy consent before verifying documents.'
@@ -172,21 +186,29 @@ public with sharing class CollegeDocumentService {
   }
 
   public static void verify(Id checklistItemId, String last4) {
+    RecordAccess.assertPermission(VERIFY_PERMISSION);
     if (!Schema.SObjectType.DocumentChecklistItem.isUpdateable()) {
       throw new AppException('You do not have permission to verify documents.');
     }
-    DocumentChecklistItem item = [
+    List<DocumentChecklistItem> found = [
       SELECT Id, ParentRecordId, Sensitive_Class__c, Retain_File__c
       FROM DocumentChecklistItem
       WHERE Id = :checklistItemId
       WITH SYSTEM_MODE
     ];
+    if (found.isEmpty()) {
+      throw new AppException('Document not found or not accessible.');
+    }
+    DocumentChecklistItem item = found[0];
+    // The writes below run in system mode, so prove access to the admission first.
+    RecordAccess.assertEditable(item.ParentRecordId);
     IndividualApplication admission = [
-      SELECT Privacy_Consent__c
+      SELECT Privacy_Consent__c, College_Stage__c
       FROM IndividualApplication
       WHERE Id = :item.ParentRecordId
       WITH SYSTEM_MODE
     ];
+    assertVerifiableStage(admission.College_Stage__c);
     if (!admission.Privacy_Consent__c) {
       throw new AppException(
         'Capture privacy consent before verifying documents.'
@@ -226,6 +248,16 @@ public with sharing class CollegeDocumentService {
           File_Deleted_On__c = System.now()
         ),
         AccessLevel.SYSTEM_MODE
+      );
+    }
+  }
+
+  private static void assertVerifiableStage(String stage) {
+    if (!VERIFIABLE_STAGES.contains(stage)) {
+      throw new AppException(
+        'Documents can be verified only before the Dean\'s interview (stage: ' +
+          stage +
+          ').'
       );
     }
   }

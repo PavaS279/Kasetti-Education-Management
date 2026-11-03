@@ -1,0 +1,303 @@
+<apex:page
+  controller="KemDocumentController"
+  renderAs="pdf"
+  applyHtmlTag="false"
+  applyBodyTag="false"
+  showHeader="false"
+  sidebar="false"
+  standardStylesheets="false"
+>
+  <html>
+    <head>
+      <style type="text/css">
+        @page {
+          size: A4;
+          margin: 18mm 16mm 20mm 16mm;
+          @bottom-center {
+            content: "Page " counter(page) " of " counter(pages);
+            font-family: sans-serif;
+            font-size: 8pt;
+            color: #8a94a3;
+          }
+        }
+        body {
+          font-family:
+            Arial Unicode MS,
+            sans-serif;
+          font-size: 10pt;
+          color: #16243a;
+        }
+        .band {
+          background-color: #1b3a6b;
+          color: #ffffff;
+          padding: 14px 18px;
+        }
+        .band-table {
+          width: 100%;
+        }
+        .brand {
+          font-size: 18pt;
+          font-weight: bold;
+        }
+        .brand-sub {
+          font-size: 9pt;
+          color: #c9d8f2;
+        }
+        .doc-title {
+          font-size: 16pt;
+          font-weight: bold;
+          text-align: right;
+          letter-spacing: 1px;
+        }
+        .doc-number {
+          font-size: 10pt;
+          text-align: right;
+          color: #c9d8f2;
+        }
+        .section {
+          margin-top: 18px;
+        }
+        .label {
+          font-size: 8pt;
+          color: #5f6b7a;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        .value {
+          font-size: 10.5pt;
+          font-weight: bold;
+        }
+        .muted {
+          color: #5f6b7a;
+          font-size: 9pt;
+        }
+        .grid {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        .grid td {
+          vertical-align: top;
+          padding: 0 10px 0 0;
+        }
+        table.lines {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 8px;
+        }
+        table.lines th {
+          background-color: #e8f0fd;
+          color: #1b3a6b;
+          font-size: 8pt;
+          text-transform: uppercase;
+          text-align: left;
+          padding: 7px 8px;
+        }
+        table.lines td {
+          padding: 7px 8px;
+          border-bottom: 1px solid #e3e8ef;
+        }
+        .num {
+          text-align: right;
+        }
+        .totals {
+          width: 45%;
+          margin-left: 55%;
+          border-collapse: collapse;
+          margin-top: 10px;
+        }
+        .totals td {
+          padding: 5px 8px;
+        }
+        .totals .grand td {
+          border-top: 2px solid #1b3a6b;
+          font-size: 12pt;
+          font-weight: bold;
+        }
+        .stamp {
+          display: inline-block;
+          padding: 4px 10px;
+          border: 2px solid #2e844a;
+          color: #2e844a;
+          font-weight: bold;
+          font-size: 11pt;
+          letter-spacing: 1px;
+        }
+        .stamp-due {
+          border-color: #c77700;
+          color: #c77700;
+        }
+        .note {
+          margin-top: 20px;
+          padding: 10px 12px;
+          background-color: #f4f7fb;
+          border-left: 3px solid #2e6fd8;
+          font-size: 9pt;
+        }
+        .footer {
+          margin-top: 30px;
+          font-size: 8pt;
+          color: #8a94a3;
+          border-top: 1px solid #e3e8ef;
+          padding-top: 8px;
+        }
+        .signature {
+          margin-top: 40px;
+        }
+        .signature-line {
+          width: 200px;
+          border-top: 1px solid #16243a;
+          padding-top: 4px;
+          font-size: 9pt;
+        }
+      </style>
+    </head>
+    <body>
+      <c:KEM_Document_Header
+        institution="{!institutionName}"
+        branchName="{!branchName}"
+        branchAddress="{!branchAddress}"
+        branchContact="{!branchContact}"
+        title="{!IF(collegeConfirmed, 'ADMISSION CONFIRMED', 'LETTER OF ADMISSION')}"
+        number="{!application.Name}"
+      />
+
+      <div class="section">
+        <table class="grid">
+          <tr>
+            <td>
+              <div class="label">To</div>
+              <div class="value">{!application.Account.Name}</div>
+              <div class="muted">
+                {!application.Account.PersonMailingStreet}
+                {!application.Account.PersonMailingCity}
+              </div>
+            </td>
+            <td style="text-align: right">
+              <div class="label">Date</div>
+              <div class="value">
+                <apex:outputText value="{0, date, dd MMM yyyy}"
+                  ><apex:param value="{!today}"
+                /></apex:outputText>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="section">
+        <table class="grid">
+          <tr>
+            <td>
+              <div class="label">Programme</div>
+              <div class="value">{!application.Learning_Program__r.Name}</div>
+            </td>
+            <td>
+              <div class="label">Branch</div>
+              <div class="value">{!application.Learning_Course__r.Name}</div>
+            </td>
+            <td>
+              <div class="label">Academic year</div>
+              <div class="value">{!application.Academic_Year__c}</div>
+            </td>
+            <td>
+              <div class="label">Entry</div>
+              <div class="value">
+                Year
+                <apex:outputText value="{0, number, 0}"
+                  ><apex:param value="{!application.Entry_Year_Of_Study__c}"
+                /></apex:outputText>
+                ({!application.Entry_Route__c})
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <apex:outputPanel
+        layout="block"
+        styleClass="section"
+        rendered="{!collegeConfirmed}"
+      >
+        <p>Dear {!application.Account.Name},</p>
+        <p>
+          We have received your fee and your admission to
+          <b>{!application.Learning_Course__r.Name}</b> at {!institutionName},
+          {!branchName} is <b>confirmed</b>.
+        </p>
+        <p>
+          <span class="label">Roll number</span><br />
+          <span class="stamp">{!collegeEnrolment.Roll_Number__c}</span>
+        </p>
+        <p>
+          Your roll number stays the same for the whole programme. Please quote
+          it in all correspondence. The college will tell you your section and
+          timetable before classes begin; you can also see them in the student
+          portal.
+        </p>
+      </apex:outputPanel>
+
+      <apex:outputPanel
+        layout="block"
+        styleClass="section"
+        rendered="{!NOT(collegeConfirmed)}"
+      >
+        <p>Dear {!application.Account.Name},</p>
+        <p>
+          Following your interview, we are pleased to offer you admission to
+          <b>{!application.Learning_Course__r.Name}</b> at {!institutionName},
+          {!branchName}. A seat has been reserved for you.
+        </p>
+        <p>
+          Your admission is <b>provisional</b> until the fee below is received.
+          Your roll number is issued as soon as the payment is confirmed.
+        </p>
+        <apex:outputPanel
+          layout="block"
+          rendered="{!NOT(ISNULL(collegeInvoice))}"
+        >
+          <table class="lines">
+            <thead>
+              <tr>
+                <th>Invoice</th>
+                <th>Fee</th>
+                <th>Pay by</th>
+                <th class="num">Amount ({!currencyCode})</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{!collegeInvoice.Name}</td>
+                <td>{!collegeInvoice.Invoice_Kind__c}</td>
+                <td>
+                  <apex:outputText value="{0, date, dd MMM yyyy}"
+                    ><apex:param value="{!collegeEnrolment.Payment_Due_By__c}"
+                  /></apex:outputText>
+                </td>
+                <td class="num">
+                  <apex:outputText value="{0, number, ###,###,##0.00}"
+                    ><apex:param value="{!collegeInvoice.Total__c}"
+                  /></apex:outputText>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </apex:outputPanel>
+        <div class="note">
+          <b>How to pay:</b> {!paymentMethods}. Cash is not accepted. A demand
+          draft or cheque counts once the bank has cleared it. If the fee is not
+          received by the date above, the reserved seat is released to the next
+          student.
+        </div>
+      </apex:outputPanel>
+
+      <div class="signature">
+        <div class="signature-line">Office of the Dean, {!institutionName}</div>
+      </div>
+
+      <div class="footer">
+        This letter was generated electronically and is valid without a
+        signature.
+      </div>
+    </body>
+  </html>
+</apex:page>
