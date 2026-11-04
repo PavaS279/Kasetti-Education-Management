@@ -227,6 +227,38 @@ private class BillingServiceTest {
   }
 
   @IsTest
+  static void financeDeskLeavesOutClosedBranches() {
+    System.runAs(TestDataFactory.admin()) {
+      Fixture f = fixture();
+      Id invoiceId = BillingService.createInvoice(f.enrolmentId, true);
+      Database.update(
+        new Student_Invoice__c(
+          Id = invoiceId,
+          Due_Date__c = Date.today().addDays(-5)
+        ),
+        AccessLevel.SYSTEM_MODE
+      );
+      BillingService.FinanceDesk open = BillingService.financeDesk();
+      Assert.areEqual(1, open.overdue.size(), 'Overdue at an active branch');
+      Assert.areEqual(1, open.overdueCount);
+
+      Database.update(
+        new Branch__c(Id = f.branch.Id, Active__c = false),
+        AccessLevel.SYSTEM_MODE
+      );
+      BillingService.FinanceDesk closed = BillingService.financeDesk();
+      Assert.areEqual(0, closed.overdue.size(), 'Closed branch left out');
+      Assert.areEqual(0, closed.outstanding, 'Not counted as outstanding');
+      Assert.areEqual(
+        'Issued',
+        [SELECT Status__c FROM Student_Invoice__c WHERE Id = :invoiceId]
+        .Status__c,
+        'The invoice itself is unchanged'
+      );
+    }
+  }
+
+  @IsTest
   static void overpaymentRaisesExceptionUntilResolved() {
     System.runAs(TestDataFactory.admin()) {
       Fixture f = fixture();

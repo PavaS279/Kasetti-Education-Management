@@ -1260,13 +1260,17 @@ public with sharing class BillingService {
     ];
   }
 
-  /** Receivables overview for the Finance Desk (records visible to the running user). */
+  /**
+   * Receivables overview for the Finance Desk (records visible to the running
+   * user). Closed branches are left out: their invoices stay on file for audit
+   * but are no longer worked from the desk.
+   */
   public static FinanceDesk financeDesk() {
     FinanceDesk desk = new FinanceDesk();
     for (AggregateResult row : [
       SELECT Overdue__c overdue, SUM(Balance_Due__c) balance, COUNT(Id) total
       FROM Student_Invoice__c
-      WHERE Status__c IN :OPEN_STATUSES
+      WHERE Status__c IN :OPEN_STATUSES AND Branch__r.Active__c = TRUE
       WITH USER_MODE
       GROUP BY Overdue__c
     ]) {
@@ -1300,7 +1304,7 @@ public with sharing class BillingService {
         Bill_To__r.Name,
         Learner__r.Name
       FROM Student_Invoice__c
-      WHERE Overdue__c = TRUE
+      WHERE Overdue__c = TRUE AND Branch__r.Active__c = TRUE
       WITH USER_MODE
       ORDER BY Due_Date__c ASC
       LIMIT 50
