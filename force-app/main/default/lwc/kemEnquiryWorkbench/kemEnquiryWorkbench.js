@@ -278,7 +278,21 @@ export default class KemEnquiryWorkbench extends NavigationMixin(
       label: "Convert enquiry",
       recordId: this.recordId
     });
-    if (result?.learnerId) {
+    if (result?.college && result.applicationId) {
+      toast(
+        this,
+        "Enquiry converted",
+        "The college admission is ready for document verification."
+      );
+      this[NavigationMixin.Navigate]({
+        type: "standard__recordPage",
+        attributes: {
+          recordId: result.applicationId,
+          objectApiName: "IndividualApplication",
+          actionName: "view"
+        }
+      });
+    } else if (result?.learnerId) {
       toast(
         this,
         "Enquiry converted",

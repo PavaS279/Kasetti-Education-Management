@@ -63,6 +63,9 @@ public with sharing class EnquiryConversionService {
     public Boolean learnerCreated = false;
     @AuraEnabled
     public Boolean guardianCreated = false;
+    /** True when a college admission was created: the desk continues there. */
+    @AuraEnabled
+    public Boolean college = false;
   }
 
   public class ConversionPreview {
@@ -152,6 +155,7 @@ public with sharing class EnquiryConversionService {
           request,
           learner
         );
+        result.college = true;
       } else if (request.createApplication != false) {
         IndividualApplication application = new IndividualApplication(
           Category = 'Education',
@@ -350,7 +354,9 @@ public with sharing class EnquiryConversionService {
     Lead row = [
       SELECT
         Campus_Branch__c,
-        Campus_Branch__r.Name,
+        Campus_Branch__r.Campus__r.Name,
+        Campus_Branch__r.Branch__r.Name,
+        Campus_Branch__r.Academic_Year__c,
         Entry_Route__c,
         Declared_Marks__c,
         Privacy_Consent__c
@@ -363,7 +369,13 @@ public with sharing class EnquiryConversionService {
     }
     CollegeEnquiry college = new CollegeEnquiry();
     college.campusBranchId = row.Campus_Branch__c;
-    college.campusBranchName = row.Campus_Branch__r.Name;
+    // Campus branch names are auto-numbers; show what the desk recognises.
+    college.campusBranchName =
+      row.Campus_Branch__r.Campus__r.Name +
+      ' · ' +
+      row.Campus_Branch__r.Branch__r.Name +
+      ' · ' +
+      row.Campus_Branch__r.Academic_Year__c;
     college.entryRoute = String.isBlank(row.Entry_Route__c)
       ? 'Regular'
       : row.Entry_Route__c;

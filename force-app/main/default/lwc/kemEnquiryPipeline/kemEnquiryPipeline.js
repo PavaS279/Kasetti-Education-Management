@@ -302,11 +302,13 @@ export default class KemEnquiryPipeline extends NavigationMixin(
     });
     if (result?.learnerId) {
       await refreshApex(this.wiredPipeline);
+      // A college conversion continues on the admission (document verification).
+      const college = result.college && result.applicationId;
       this[NavigationMixin.Navigate]({
         type: "standard__recordPage",
         attributes: {
-          recordId: result.learnerId,
-          objectApiName: "Account",
+          recordId: college ? result.applicationId : result.learnerId,
+          objectApiName: college ? "IndividualApplication" : "Account",
           actionName: "view"
         }
       });

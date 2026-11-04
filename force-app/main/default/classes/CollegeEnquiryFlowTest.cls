@@ -144,6 +144,10 @@ private class CollegeEnquiryFlowTest {
       );
       Assert.isNotNull(preview.college, 'Recognised as a college enquiry');
       Assert.isTrue(preview.college.canConvert);
+      Assert.isTrue(
+        preview.college.campusBranchName.contains(' · 2026-27'),
+        'The desk sees campus, branch and year, not the record number'
+      );
       Assert.areEqual(72, preview.college.qualifications[0].percentage);
 
       EnquiryConversionService.ConversionRequest convert = new EnquiryConversionService.ConversionRequest();
@@ -177,6 +181,7 @@ private class CollegeEnquiryFlowTest {
       FROM IndividualApplication
       WHERE Id = :result.applicationId
     ];
+    Assert.isTrue(result.college, 'The desk continues on the admission');
     Assert.isTrue(admission.College_Mode__c);
     Assert.areEqual('Processing', admission.College_Stage__c);
     Assert.areEqual(request.campusBranchId, admission.Campus_Branch__c);

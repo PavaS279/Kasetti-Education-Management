@@ -39,13 +39,14 @@ Switch user: Setup → **Users** → **Login** next to the name; **Log out** ret
 
 ## Step 2 — The enquiry is a lead; the desk converts it
 
-👤 **Adam Admissions** · 📍 Enquiry board → the new **Website** enquiry → **Convert**
+👤 **Adam Admissions** · 📍 App Launcher → **KT College** → **Admissions** tab (the enquiry board; also in the KTEdutech app) → the new **Website** enquiry in **New** → **Convert to learner** (or open the enquiry → **Convert**)
 
-1. The convert window shows **College admission · YLK BE CSE · Year 1 (regular)** and the marks **as typed by the visitor** (SSLC 91, PUC Science 92, KCET 12400).
+0. Website enquiries for the college campuses are assigned to Adam, so the card is there with **Mine only** ticked too. Keep the branch filter on **All branches**; if the board was already open, press refresh.
+1. The convert window shows **College admission · Yelahanka Campus · BE Computer Science and Engineering · 2026-27 · Year 1 (regular)** and the marks **as typed by the visitor** (SSLC 91, PUC Science 92, KCET 12400).
 2. Check them against the marks card; correct any value if needed.
 3. **Convert** stays disabled until you tick **I have checked these marks against the marks card** → tick → **Convert**.
 
-✅ The student's record opens. In **Admissions Review** the new admission is at **Processing**, **Eligible**, with privacy consent already recorded (given online) and the document checklist ready. If the student was already on file (same email, or same mobile and surname), that record is reused — no duplicate.
+✅ _Enquiry converted — the college admission is ready for document verification._ The new **admission** opens at **Processing**, **Eligible**, with privacy consent already recorded (given online) and the document checklist ready — Step 3 starts right here. If the student was already on file (same email, or same mobile and surname), that record is reused — no duplicate.
 
 🗣 _"No retyping. The desk only confirms the marks against the original — and the system records who confirmed them."_
 

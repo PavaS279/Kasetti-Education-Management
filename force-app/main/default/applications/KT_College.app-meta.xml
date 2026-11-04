@@ -105,6 +105,7 @@
     <label>KT College</label>
     <navType>Standard</navType>
     <tabs>standard-home</tabs>
+    <tabs>KEM_Admissions</tabs>
     <tabs>KEM_Applications</tabs>
     <tabs>standard-Account</tabs>
     <tabs>standard-report</tabs>
