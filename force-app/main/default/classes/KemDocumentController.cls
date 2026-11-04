@@ -160,54 +160,15 @@ public with sharing class KemDocumentController {
    */
   private void loadCollegeAdmission(Id recordId, String kind) {
     DocumentService.assertCollegeLetterAccess(recordId);
-    application = [
-      SELECT
-        Name,
-        Account.Name,
-        Account.PersonMailingStreet,
-        Account.PersonMailingCity,
-        Branch__c,
-        Learning_Course__r.Name,
-        Learning_Program__r.Name,
-        Academic_Year__c,
-        Entry_Route__c,
-        Entry_Year_Of_Study__c
-      FROM IndividualApplication
-      WHERE Id = :recordId AND College_Mode__c = TRUE
-      WITH SYSTEM_MODE
-    ];
+    DocumentService.CollegeLetterReader reader = new DocumentService.CollegeLetterReader();
+    application = reader.admission(recordId);
     loadBranch(application.Branch__c);
     collegeConfirmed = kind == DocumentService.COLLEGE_CONFIRMATION_LETTER;
-    for (Programme_Enrolment__c enrolment : [
-      SELECT Id, Status__c, Roll_Number__c, Payment_Due_By__c
-      FROM Programme_Enrolment__c
-      WHERE Application__c = :recordId
-      WITH SYSTEM_MODE
-      LIMIT 1
-    ]) {
-      collegeEnrolment = enrolment;
-    }
+    collegeEnrolment = reader.enrolment(recordId);
     if (collegeEnrolment != null) {
-      for (Student_Invoice__c value : [
-        SELECT Name, Total__c, Balance_Due__c, Due_Date__c, Invoice_Kind__c
-        FROM Student_Invoice__c
-        WHERE
-          Programme_Enrolment__c = :collegeEnrolment.Id
-          AND Status__c != 'Cancelled'
-        WITH SYSTEM_MODE
-        ORDER BY CreatedDate
-        LIMIT 1
-      ]) {
-        collegeInvoice = value;
-      }
+      collegeInvoice = reader.invoice(collegeEnrolment.Id);
     }
-    String methods = [
-      SELECT Allowed_Payment_Methods__c
-      FROM Branch__c
-      WHERE Id = :application.Branch__c
-      WITH SYSTEM_MODE
-    ]
-    .Allowed_Payment_Methods__c;
+    String methods = application.Branch__r.Allowed_Payment_Methods__c;
     paymentMethods = String.isBlank(methods) ? '' : methods.replace(';', ', ');
   }
 

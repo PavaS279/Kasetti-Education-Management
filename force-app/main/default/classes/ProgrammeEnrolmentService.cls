@@ -63,7 +63,7 @@ public without sharing class ProgrammeEnrolmentService {
 
   private static void releaseRoll(Id enrolmentId) {
     Programme_Enrolment__c enrolment = [
-      SELECT Id, Status__c
+      SELECT Id, Status__c, Application__c
       FROM Programme_Enrolment__c
       WHERE Id = :enrolmentId
       WITH SYSTEM_MODE
@@ -86,6 +86,17 @@ public without sharing class ProgrammeEnrolmentService {
       new Programme_Enrolment__c(Id = enrolmentId, Status__c = 'Enrolled'),
       AccessLevel.SYSTEM_MODE
     );
+    // The college admission is complete once the fee is received and the roll
+    // number issued. Status (the governed school path) is left unchanged.
+    if (enrolment.Application__c != null) {
+      Database.update(
+        new IndividualApplication(
+          Id = enrolment.Application__c,
+          College_Stage__c = 'Enrolled'
+        ),
+        AccessLevel.SYSTEM_MODE
+      );
+    }
   }
 
   public static Id admit(Id applicationId) {

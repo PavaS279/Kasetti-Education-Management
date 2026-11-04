@@ -102,6 +102,7 @@ private class CollegeAcademicTest {
     );
   }
 
+  /** The fixture's Dean: the newest holder, since real users may also be Deans. */
   private static User dean() {
     return [
       SELECT Id
@@ -112,6 +113,7 @@ private class CollegeAcademicTest {
           FROM PermissionSetAssignment
           WHERE PermissionSet.Name = 'KEM_College_Dean'
         )
+      ORDER BY CreatedDate DESC
       LIMIT 1
     ];
   }

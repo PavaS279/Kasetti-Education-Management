@@ -185,14 +185,61 @@ public with sharing class DocumentService {
   }
 
   public static Programme_Enrolment__c collegeEnrolment(Id applicationId) {
-    List<Programme_Enrolment__c> enrolments = [
-      SELECT Id, Status__c, Roll_Number__c
-      FROM Programme_Enrolment__c
-      WHERE Application__c = :applicationId
-      WITH SYSTEM_MODE
-      LIMIT 1
-    ];
-    return enrolments.isEmpty() ? null : enrolments[0];
+    return new CollegeLetterReader().enrolment(applicationId);
+  }
+
+  /**
+   * Reads what a college letter shows. Without sharing because Finance, who
+   * confirms the fee that triggers the confirmation letter, does not share the
+   * private college admissions. Callers check assertCollegeLetterAccess first.
+   */
+  public without sharing class CollegeLetterReader {
+    public IndividualApplication admission(Id applicationId) {
+      List<IndividualApplication> rows = [
+        SELECT
+          Name,
+          Account.Name,
+          Account.PersonMailingStreet,
+          Account.PersonMailingCity,
+          Branch__c,
+          Branch__r.Allowed_Payment_Methods__c,
+          Learning_Course__r.Name,
+          Learning_Program__r.Name,
+          Academic_Year__c,
+          Entry_Route__c,
+          Entry_Year_Of_Study__c
+        FROM IndividualApplication
+        WHERE Id = :applicationId AND College_Mode__c = TRUE
+        WITH SYSTEM_MODE
+      ];
+      if (rows.isEmpty()) {
+        throw new AppException('College admission not found.');
+      }
+      return rows[0];
+    }
+
+    public Programme_Enrolment__c enrolment(Id applicationId) {
+      List<Programme_Enrolment__c> rows = [
+        SELECT Id, Status__c, Roll_Number__c, Payment_Due_By__c
+        FROM Programme_Enrolment__c
+        WHERE Application__c = :applicationId
+        WITH SYSTEM_MODE
+        LIMIT 1
+      ];
+      return rows.isEmpty() ? null : rows[0];
+    }
+
+    public Student_Invoice__c invoice(Id enrolmentId) {
+      List<Student_Invoice__c> rows = [
+        SELECT Name, Total__c, Balance_Due__c, Due_Date__c, Invoice_Kind__c
+        FROM Student_Invoice__c
+        WHERE Programme_Enrolment__c = :enrolmentId AND Status__c != 'Cancelled'
+        WITH SYSTEM_MODE
+        ORDER BY CreatedDate
+        LIMIT 1
+      ];
+      return rows.isEmpty() ? null : rows[0];
+    }
   }
 
   /**
@@ -340,12 +387,8 @@ public with sharing class DocumentService {
 
   private static String collegeLetterTitle(Id applicationId, String kind) {
     assertCollegeLetterAccess(applicationId);
-    IndividualApplication application = [
-      SELECT Name, Account.Name
-      FROM IndividualApplication
-      WHERE Id = :applicationId AND College_Mode__c = TRUE
-      WITH SYSTEM_MODE
-    ];
+    IndividualApplication application = new CollegeLetterReader()
+      .admission(applicationId);
     Programme_Enrolment__c enrolment = collegeEnrolment(applicationId);
     if (kind == COLLEGE_CONFIRMATION_LETTER) {
       if (enrolment == null || enrolment.Status__c != 'Enrolled') {

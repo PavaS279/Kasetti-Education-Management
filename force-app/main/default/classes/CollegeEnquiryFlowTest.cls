@@ -440,7 +440,66 @@ private class CollegeEnquiryFlowTest {
         .Status__c,
         'The Finance Desk path confirms and releases the roll number'
       );
+      IndividualApplication done = [
+        SELECT College_Stage__c, Status
+        FROM IndividualApplication
+        WHERE Id = :admission.Id
+      ];
+      Assert.areEqual('Enrolled', done.College_Stage__c, 'Admission complete');
+    }
+    // Finance confirms fees without sharing the private admissions; the
+    // confirmation letter must still be generated in their context.
+    User finance = TestDataFactory.createUserWithLicense(
+      new List<String>{ 'KEM_Finance', 'KEM_Finance_Edu' }
+    );
+    System.runAs(finance) {
+      Assert.isNotNull(
+        DocumentService.generate(
+          admission.Id,
+          DocumentService.COLLEGE_CONFIRMATION_LETTER
+        )
+      );
+      KemDocumentController confirmation = letter(
+        admission.Id,
+        DocumentService.COLLEGE_CONFIRMATION_LETTER
+      );
+      Assert.isTrue(confirmation.collegeConfirmed);
+      Assert.isNotNull(
+        confirmation.collegeEnrolment.Roll_Number__c,
+        'The confirmation letter shows the roll number'
+      );
+      KemDocumentController provisional = letter(
+        admission.Id,
+        DocumentService.COLLEGE_ADMISSION_LETTER
+      );
+      Assert.isFalse(provisional.collegeConfirmed);
+      Assert.isNotNull(provisional.collegeInvoice, 'The fee is on the letter');
+      Assert.isTrue(
+        provisional.paymentMethods.contains('Demand Draft'),
+        'How to pay'
+      );
+      Assert.isFalse(provisional.paymentMethods.contains(';'));
+    }
+    User outsider = TestDataFactory.createUserWithLicense(
+      new List<String>{ 'KEM_Teacher', 'KEM_Teacher_Edu' }
+    );
+    System.runAs(outsider) {
+      try {
+        letter(admission.Id, DocumentService.COLLEGE_ADMISSION_LETTER);
+        Assert.fail('Someone without access cannot open the letter.');
+      } catch (AppException expected) {
+        Assert.isTrue(expected.getMessage().contains('not accessible'));
+      }
     }
     Test.stopTest();
+  }
+
+  /** Builds the letter page's controller as the PDF render does. */
+  private static KemDocumentController letter(Id applicationId, String kind) {
+    PageReference page = Page.KEM_College_Admission_Letter;
+    page.getParameters().put('id', applicationId);
+    page.getParameters().put('kind', kind);
+    Test.setCurrentPage(page);
+    return new KemDocumentController();
   }
 }

@@ -21,6 +21,13 @@
             <componentInstance>
                 <componentName>kemApplicationWorkbench</componentName>
                 <identifier>c_kemApplicationWorkbench</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!Record.College_Mode__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>false</rightValue>
+                    </criteria>
+                </visibilityRule>
             </componentInstance>
         </itemInstances>
         <itemInstances>
