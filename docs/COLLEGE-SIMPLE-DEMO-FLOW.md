@@ -19,7 +19,7 @@ Switch user: Setup → **Users** → **Login** next to the name; **Log out** ret
 | Public enquiry    | https://kasettitechnologiespvtltd.my.site.com/s/enquire                                   |
 | Enquiry board     | https://kasettitechnologiespvtltd.lightning.force.com/lightning/n/KEM_Admissions          |
 | Admissions Review | https://kasettitechnologiespvtltd.lightning.force.com/lightning/n/KEM_Applications        |
-| Invoices          | https://kasettitechnologiespvtltd.lightning.force.com/lightning/o/Student_Invoice__c/list |
+| Student Invoices  | https://kasettitechnologiespvtltd.lightning.force.com/lightning/o/Student_Invoice__c/list |
 | Finance Desk      | https://kasettitechnologiespvtltd.lightning.force.com/lightning/n/KEM_Finance_Desk        |
 | Student portal    | https://kasettitechnologiespvtltd.my.site.com/s/my-learning                               |
 
@@ -82,7 +82,7 @@ Switch user: Setup → **Users** → **Login** next to the name; **Log out** ret
 
 ## Step 6 — Fee payment
 
-👤 **Andrea Advancement** · 📍 App Launcher → **KT College** (or KTEdutech) → **Invoices** tab → list view **All** → the student's invoice (₹1,55,000; the student's name is in the Learner column)
+👤 **Andrea Advancement** · 📍 App Launcher → **KT College** (or KTEdutech) → **Student Invoices** tab → list view **All** → the student's invoice (₹1,55,000; the student's name is in the Learner column)
 
 1. **Record payment** → Method **Cash** → refused: _Payment method Cash is not allowed at this college campus._
 2. **Record payment** → **Demand Draft**, reference `DD-4512`, DD number `004512`, bank `Canara Bank`, date today → payment **Pending**.

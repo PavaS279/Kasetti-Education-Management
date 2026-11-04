@@ -226,32 +226,6 @@
               </li>
             </template>
           </template>
-
-          <template lwc:if={showRecent}>
-            <template for:each={recentRows} for:item="p">
-              <li key={p.Id} class="row">
-                <div class="main">
-                  <a
-                    href="#"
-                    data-id={p.Id}
-                    onclick={handleNavigate}
-                    class="strong"
-                    >{p.Receipt_Number__c}</a
-                  >
-                  <div class="kem-muted small">
-                    {p.payer} · {p.Method__c} · {p.dateLabel}
-                  </div>
-                </div>
-                <span class="kem-badge">{p.Reconciliation_Status__c}</span>
-                <lightning-formatted-number
-                  class="money"
-                  value={p.Amount__c}
-                  format-style="currency"
-                  currency-code={currencyCode}
-                ></lightning-formatted-number>
-              </li>
-            </template>
-          </template>
         </ul>
         <template lwc:if={currentEmpty}>
           <div class="kem-empty">{emptyMessage}</div>

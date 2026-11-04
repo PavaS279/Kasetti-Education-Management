@@ -18,8 +18,7 @@ const TABS = [
   { value: "pending", label: "Awaiting confirmation" },
   { value: "exceptions", label: "Reconciliation exceptions" },
   { value: "refunds", label: "Refunds" },
-  { value: "overdue", label: "Overdue invoices" },
-  { value: "recent", label: "Recent receipts" }
+  { value: "overdue", label: "Overdue invoices" }
 ];
 
 function formatDate(value) {
@@ -98,8 +97,7 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
       pending: this.desk.pending.length,
       exceptions: this.desk.exceptions.length,
       refunds: this.refundCount,
-      overdue: this.desk.overdue.length,
-      recent: this.desk.recent.length
+      overdue: this.desk.overdue.length
     };
     return TABS.map((t) => ({
       ...t,
@@ -155,9 +153,6 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
   get showOverdue() {
     return this.activeTab === "overdue";
   }
-  get showRecent() {
-    return this.activeTab === "recent";
-  }
 
   mapPayment(p) {
     return {
@@ -174,9 +169,6 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
   }
   get exceptionRows() {
     return this.desk.exceptions.map((p) => this.mapPayment(p));
-  }
-  get recentRows() {
-    return this.desk.recent.map((p) => this.mapPayment(p));
   }
   get overdueRows() {
     return this.desk.overdue.map((i) => {
@@ -199,8 +191,7 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
       pending: this.desk.pending,
       exceptions: this.desk.exceptions,
       refunds: this.refundRows,
-      overdue: this.desk.overdue,
-      recent: this.desk.recent
+      overdue: this.desk.overdue
     }[this.activeTab];
     return list.length === 0;
   }
@@ -209,8 +200,7 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
       pending: "No payments are waiting for confirmation.",
       exceptions: "Every confirmed payment is reconciled.",
       refunds: "No refunds are waiting for approval or payout.",
-      overdue: "No invoices are overdue.",
-      recent: "No payments received yet."
+      overdue: "No invoices are overdue."
     }[this.activeTab];
   }
 

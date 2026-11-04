@@ -158,6 +158,16 @@ describe("c-kem-finance-desk", () => {
     jest.clearAllMocks();
   });
 
+  it("has no recent receipts tab", async () => {
+    getFinanceDesk.mockResolvedValue(DESK);
+    const element = createElement("c-kem-finance-desk", { is: KemFinanceDesk });
+    document.body.appendChild(element);
+    await flush();
+    await flush();
+    expect(element.shadowRoot.textContent).toContain("Overdue invoices");
+    expect(element.shadowRoot.textContent).not.toContain("Recent receipts");
+  });
+
   it("opens the discount codes", async () => {
     getFinanceDesk.mockResolvedValue(DESK);
     const element = createElement("c-kem-finance-desk", { is: KemFinanceDesk });
