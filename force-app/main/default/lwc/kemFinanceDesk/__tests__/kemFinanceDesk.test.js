@@ -158,6 +158,50 @@ describe("c-kem-finance-desk", () => {
     jest.clearAllMocks();
   });
 
+  it("opens on the college invoices, linking each to its invoice", async () => {
+    getFinanceDesk.mockResolvedValue({
+      ...DESK,
+      collegeInvoices: [
+        {
+          Id: "a0I000000000389",
+          Name: "YLK-000389",
+          Status__c: "Issued",
+          Total__c: 155000,
+          Balance_Due__c: 155000,
+          Due_Date__c: "2026-11-11",
+          Learner__r: { Name: "Spoorti B" },
+          Branch__r: { Name: "Yelahanka Campus" },
+          Programme_Enrolment__r: { Status__c: "Provisional" }
+        },
+        {
+          Id: "a0I000000000390",
+          Name: "YLK-000390",
+          Status__c: "Paid",
+          Total__c: 155000,
+          Balance_Due__c: 0,
+          Learner__r: { Name: "Ravi Kumar" },
+          Branch__r: { Name: "Yelahanka Campus" },
+          Programme_Enrolment__r: {
+            Status__c: "Enrolled",
+            Roll_Number__c: "KT26YBCS001"
+          }
+        }
+      ]
+    });
+    const element = createElement("c-kem-finance-desk", { is: KemFinanceDesk });
+    document.body.appendChild(element);
+    await flush();
+    await flush();
+    const text = element.shadowRoot.textContent;
+    expect(text).toContain("College invoices");
+    expect(text).toContain("YLK-000389");
+    expect(text).toContain("Spoorti B · Yelahanka Campus · due");
+    expect(text).toContain("roll number KT26YBCS001");
+    expect(
+      element.shadowRoot.querySelector('a[data-id="a0I000000000389"]')
+    ).not.toBeNull();
+  });
+
   it("has no recent receipts tab", async () => {
     getFinanceDesk.mockResolvedValue(DESK);
     const element = createElement("c-kem-finance-desk", { is: KemFinanceDesk });
@@ -192,6 +236,8 @@ describe("c-kem-finance-desk", () => {
       (n) => n.value
     );
     expect(values).toEqual([12000, 4080, 9000, 2500]);
+    element.shadowRoot.querySelector('button[data-value="pending"]').click();
+    await flush();
     expect(element.shadowRoot.textContent).toContain(
       "No payments are waiting for confirmation."
     );

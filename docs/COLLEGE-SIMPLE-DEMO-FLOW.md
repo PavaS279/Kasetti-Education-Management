@@ -82,11 +82,11 @@ Switch user: Setup → **Users** → **Login** next to the name; **Log out** ret
 
 ## Step 6 — Fee payment
 
-👤 **Andrea Advancement** · 📍 App Launcher → **KT College** (or KTEdutech) → **Student Invoices** tab → list view **All** → the student's invoice (₹1,55,000; the student's name is in the Learner column)
+👤 **Andrea Advancement** · 📍 App Launcher → **KT College** → **Finance Desk** → **College invoices** (the first tab; newest first) → click the student's invoice (e.g. YLK-000389, ₹1,55,000). The invoice page has the **Record payment** button. (Or: **Student Invoices** tab → list view **All** → the invoice.)
 
 1. **Record payment** → Method **Cash** → refused: _Payment method Cash is not allowed at this college campus._
 2. **Record payment** → **Demand Draft**, reference `DD-4512`, DD number `004512`, bank `Canara Bank`, date today → payment **Pending**.
-3. 📍 **Finance Desk** tab (same app) → **Awaiting confirmation** → the payment → **Confirm** → invoice **Paid**.
+3. 📍 Back to **Finance Desk** → **Awaiting confirmation** → the payment → **Confirm** → invoice **Paid**.
 
 🗣 _"A draft is counted only when the bank clears it — and only through the Finance Desk. Editing the payment status directly is refused, so allocation, receipt and roll number can never be skipped."_
 

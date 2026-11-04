@@ -356,6 +356,11 @@ private class CollegeEnquiryFlowTest {
         Assert.isTrue(expected.getMessage().contains('fee is received'));
       }
       Student_Invoice__c invoice = CollegeTestFactory.invoiceOf(enrolmentId);
+      Assert.areEqual(
+        invoice.Id,
+        BillingService.financeDesk().collegeInvoices[0].Id,
+        'The new college invoice heads the Finance Desk list'
+      );
       CollegeTestFactory.pay(invoice.Id, invoice.Total__c, 'Online Gateway');
       Assert.areEqual(
         DocumentService.COLLEGE_CONFIRMATION_LETTER,

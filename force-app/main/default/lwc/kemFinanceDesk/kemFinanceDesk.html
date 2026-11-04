@@ -201,6 +201,32 @@
             </template>
           </template>
 
+          <template lwc:if={showCollege}>
+            <template for:each={collegeRows} for:item="i">
+              <li key={i.Id} class="row">
+                <div class="main">
+                  <a
+                    href="#"
+                    data-id={i.Id}
+                    onclick={handleNavigate}
+                    class="strong"
+                    title="Open the invoice to record a payment"
+                    >{i.Name}</a
+                  >
+                  <div class="kem-muted small">
+                    {i.learner} · {i.campus} · {i.detail}
+                  </div>
+                </div>
+                <span class={i.statusClass}>{i.Status__c}</span>
+                <lightning-formatted-number
+                  class="money"
+                  value={i.amount}
+                  format-style="currency"
+                  currency-code={currencyCode}
+                ></lightning-formatted-number>
+              </li>
+            </template>
+          </template>
           <template lwc:if={showOverdue}>
             <template for:each={overdueRows} for:item="i">
               <li key={i.Id} class="row">

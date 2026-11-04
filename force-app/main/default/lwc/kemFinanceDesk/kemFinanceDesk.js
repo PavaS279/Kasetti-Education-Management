@@ -15,6 +15,7 @@ import ReasonModal from "c/kemReasonModal";
 import { reduceErrors, toast, toastError } from "c/kemUtils";
 
 const TABS = [
+  { value: "college", label: "College invoices" },
   { value: "pending", label: "Awaiting confirmation" },
   { value: "exceptions", label: "Reconciliation exceptions" },
   { value: "refunds", label: "Refunds" },
@@ -42,7 +43,7 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
   desk;
   refunds;
   errorMessage;
-  activeTab = "pending";
+  activeTab = "college";
   isBusy = false;
 
   connectedCallback() {
@@ -94,6 +95,7 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
 
   get tabs() {
     const counts = {
+      college: this.collegeInvoices.length,
       pending: this.desk.pending.length,
       exceptions: this.desk.exceptions.length,
       refunds: this.refundCount,
@@ -150,6 +152,32 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
       };
     });
   }
+  get showCollege() {
+    return this.activeTab === "college";
+  }
+  get collegeInvoices() {
+    return this.desk.collegeInvoices || [];
+  }
+  /** College invoices: open ones show what is due, paid ones show the roll number. */
+  get collegeRows() {
+    return this.collegeInvoices.map((i) => {
+      const enrolment = i.Programme_Enrolment__r || {};
+      const open = i.Status__c === "Issued" || i.Status__c === "Partially Paid";
+      return {
+        ...i,
+        learner: i.Learner__r?.Name || "—",
+        campus: i.Branch__r?.Name,
+        detail: enrolment.Roll_Number__c
+          ? `roll number ${enrolment.Roll_Number__c}`
+          : `due ${formatDate(i.Due_Date__c)}`,
+        amount: open ? i.Balance_Due__c : i.Total__c,
+        statusClass:
+          i.Status__c === "Paid"
+            ? "kem-badge kem-badge_success"
+            : "kem-badge kem-badge_warning"
+      };
+    });
+  }
   get showOverdue() {
     return this.activeTab === "overdue";
   }
@@ -188,6 +216,7 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
   }
   get currentEmpty() {
     const list = {
+      college: this.collegeInvoices,
       pending: this.desk.pending,
       exceptions: this.desk.exceptions,
       refunds: this.refundRows,
@@ -197,6 +226,8 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
   }
   get emptyMessage() {
     return {
+      college:
+        "No college invoices yet. An invoice is raised when the Dean admits a student.",
       pending: "No payments are waiting for confirmation.",
       exceptions: "Every confirmed payment is reconciled.",
       refunds: "No refunds are waiting for approval or payout.",

@@ -96,6 +96,9 @@ public with sharing class BillingService {
     public List<Student_Payment__c> exceptions;
     @AuraEnabled
     public List<Student_Payment__c> recent;
+    /** Latest college (programme) invoices, newest first. */
+    @AuraEnabled
+    public List<Student_Invoice__c> collegeInvoices;
     @AuraEnabled
     public Boolean canManage;
   }
@@ -1316,6 +1319,25 @@ public with sharing class BillingService {
     desk.recent = paymentList(
       'Status__c = \'Confirmed\' AND Method__c != \'Credit Note\''
     );
+    desk.collegeInvoices = [
+      SELECT
+        Id,
+        Name,
+        Status__c,
+        Total__c,
+        Balance_Due__c,
+        Due_Date__c,
+        Invoice_Kind__c,
+        Learner__r.Name,
+        Branch__r.Name,
+        Programme_Enrolment__r.Status__c,
+        Programme_Enrolment__r.Roll_Number__c
+      FROM Student_Invoice__c
+      WHERE Programme_Enrolment__c != NULL AND Status__c != 'Cancelled'
+      WITH USER_MODE
+      ORDER BY CreatedDate DESC
+      LIMIT 50
+    ];
     desk.canManage = FeatureManagement.checkPermission(MANAGE_PERMISSION);
     return desk;
   }
