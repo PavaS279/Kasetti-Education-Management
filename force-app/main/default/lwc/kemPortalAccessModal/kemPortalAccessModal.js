@@ -2,6 +2,7 @@ import { api } from "lwc";
 import LightningModal from "lightning/modal";
 import getFamily from "@salesforce/apex/PortalAccessController.getFamily";
 import prepareAccess from "@salesforce/apex/PortalAccessController.prepareAccess";
+import sendPasswordLink from "@salesforce/apex/PortalAccessController.sendPasswordLink";
 import giveAccess from "@salesforce/apex/PortalAccessController.giveAccess";
 import searchPeople from "@salesforce/apex/Learner360Controller.searchPeople";
 import { reduceErrors } from "c/kemUtils";
@@ -69,6 +70,7 @@ export default class KemPortalAccessModal extends LightningModal {
         ...p,
         status,
         statusClass,
+        canResend: Boolean(this.family?.canGive && p.hasLogin && p.active),
         showReason: !p.canGive && !p.hasLogin && Boolean(p.reason),
         isBusy: this.busyId === p.accountId
       };
@@ -125,6 +127,21 @@ export default class KemPortalAccessModal extends LightningModal {
       this.given++;
       this.givenMessage = `Login created (${result.username}). The welcome email with the link to set a password has been sent.`;
       await this.load();
+    } catch (error) {
+      this.errorMessage = reduceErrors(error).join(" ");
+    } finally {
+      this.busyId = undefined;
+    }
+  }
+
+  async handleResend(event) {
+    const id = event.currentTarget.dataset.id;
+    this.busyId = id;
+    this.errorMessage = undefined;
+    this.givenMessage = undefined;
+    try {
+      const email = await sendPasswordLink({ accountId: id });
+      this.givenMessage = `A link to set a new password has been emailed to ${email}.`;
     } catch (error) {
       this.errorMessage = reduceErrors(error).join(" ");
     } finally {

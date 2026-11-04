@@ -384,6 +384,38 @@ public with sharing class PortalAccessService {
     return result;
   }
 
+  /**
+   * Emails an existing, active portal login a link to set a new password
+   * (also used when the welcome email did not arrive).
+   */
+  public static String sendPasswordLink(Id accountId) {
+    requireGive();
+    Account p = [
+      SELECT Id, PersonContactId
+      FROM Account
+      WHERE Id = :accountId AND IsPersonAccount = TRUE
+      WITH USER_MODE
+    ];
+    List<User> logins = [
+      SELECT Id, Email
+      FROM User
+      WHERE ContactId = :p.PersonContactId AND IsActive = TRUE
+      WITH SYSTEM_MODE
+      LIMIT 1
+    ];
+    if (logins.isEmpty()) {
+      throw new AppException('This person has no active portal login.');
+    }
+    if (!Test.isRunningTest()) {
+      System.resetPassword(logins[0].Id, true);
+    }
+    Logger.info(
+      'PortalAccessService',
+      'Password link sent to portal user ' + logins[0].Id + '.'
+    );
+    return logins[0].Email;
+  }
+
   /** The family portal address, from settings (Portal_URL) or the org's site domain. */
   public static String portalUrl() {
     String configured = AppSettings.getString('Portal_URL', null);

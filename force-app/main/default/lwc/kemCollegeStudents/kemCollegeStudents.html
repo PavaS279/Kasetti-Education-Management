@@ -113,6 +113,13 @@
                   data-id={s.studentId}
                   onclick={openStudent}
                 ></lightning-button>
+                <template lwc:if={s.applicationId}>
+                  <lightning-button
+                    label="Admission"
+                    data-id={s.applicationId}
+                    onclick={openAdmission}
+                  ></lightning-button>
+                </template>
                 <lightning-button
                   label="Academic record"
                   data-id={s.enrolmentId}

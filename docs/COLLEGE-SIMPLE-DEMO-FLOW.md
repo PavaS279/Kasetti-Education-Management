@@ -92,7 +92,7 @@ Switch user: Setup → **Users** → **Login** next to the name; **Log out** ret
 
 ## Step 7 — Admission confirmed: roll number and confirmation letter
 
-👤 **Anjali Advisor** · 📍 the admission (refresh)
+👤 **Anjali Advisor** · 📍 the admission (refresh). An enrolled admission leaves Admissions Review, so open it from **Home** → **College Students** → the student → **Admission**.
 
 ✅ Programme enrolment **Enrolled** · roll number **KT26YBCS0nn** (next number in the sequence). In **Files**: **Admission Confirmation KT26YBCS0nn – {student}** (PDF) with the roll number; the student also gets an _Admission confirmed_ message.
 
@@ -107,7 +107,7 @@ Switch user: Setup → **Users** → **Login** next to the name; **Log out** ret
 
 ## Step 9 — The student's portal
 
-👤 **Student** · as Kasetti Tech: **Home** (KT College or KTEdutech) → **College Students** list → the student → **Student 360** (the Learner 360 page) → **Edit** to add an email if the row says _Portal: needs an email_ → **Portal access** card → **Give access** (needs a free Customer Community Plus licence); then the contact → ▾ → **Log in to Experience as User** → **My Learning**
+👤 **Student** · as Kasetti Tech: **Home** (KT College or KTEdutech) → **College Students** list → the student → **Student 360** (the Learner 360 page) → **Edit** to add an email if the row says _Portal: needs an email_ → **Portal access** card → **Give access** (needs a free Customer Community Plus licence; the welcome email carries the set-password link, and **Send password link** re-sends it); then the contact → ▾ → **Log in to Experience as User** → **My Learning**
 
 ✅ College card with the roll number and section, **Fees due ₹0**, and under **Documents** the admission letter, the confirmation letter, the invoice and the receipt.
 

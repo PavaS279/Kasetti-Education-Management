@@ -19,6 +19,15 @@ public with sharing class PortalAccessController {
   }
 
   @AuraEnabled
+  public static String sendPasswordLink(Id accountId) {
+    try {
+      return PortalAccessService.sendPasswordLink(accountId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
   public static PortalAccessService.GiveResult giveAccess(Id accountId) {
     try {
       return PortalAccessService.give(accountId);

@@ -89,13 +89,22 @@
                 disabled={p.isBusy}
               ></lightning-button>
             </template>
+            <template lwc:if={p.canResend}>
+              <lightning-button
+                label="Send password link"
+                icon-name="utility:email"
+                data-id={p.accountId}
+                onclick={handleResend}
+                disabled={p.isBusy}
+              ></lightning-button>
+            </template>
           </li>
         </template>
       </ul>
       <p class="hint">
         Parents see every child they are linked to with portal access; children
         under 13 use a parent's login. The welcome email is sent as soon as the
-        login is created.
+        login is created; if it does not arrive, use Send password link.
       </p>
     </template>
   </lightning-modal-body>

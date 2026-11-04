@@ -166,6 +166,10 @@ export default class KemCollegeStudents extends NavigationMixin(
     this.navigate(event.currentTarget.dataset.id, "Account");
   }
 
+  openAdmission(event) {
+    this.navigate(event.currentTarget.dataset.id, "IndividualApplication");
+  }
+
   openRecord(event) {
     this.navigate(event.currentTarget.dataset.id, "Programme_Enrolment__c");
   }

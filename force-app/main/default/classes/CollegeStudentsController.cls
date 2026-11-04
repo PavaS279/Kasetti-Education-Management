@@ -22,6 +22,8 @@ public without sharing class CollegeStudentsController {
     @AuraEnabled
     public Id enrolmentId;
     @AuraEnabled
+    public Id applicationId;
+    @AuraEnabled
     public Id studentId;
     @AuraEnabled
     public String student;
@@ -126,6 +128,7 @@ public without sharing class CollegeStudentsController {
             Student__r.PersonContactId,
             Roll_Number__c,
             Status__c,
+            Application__c,
             Campus__c,
             Campus__r.Name,
             Programme__r.Name,
@@ -148,6 +151,7 @@ public without sharing class CollegeStudentsController {
             Student__r.PersonContactId,
             Roll_Number__c,
             Status__c,
+            Application__c,
             Campus__c,
             Campus__r.Name,
             Programme__r.Name,
@@ -209,6 +213,7 @@ public without sharing class CollegeStudentsController {
     for (Programme_Enrolment__c e : enrolments) {
       Student row = new Student();
       row.enrolmentId = e.Id;
+      row.applicationId = e.Application__c;
       row.studentId = e.Student__c;
       row.student = e.Student__r.Name;
       row.rollNumber = e.Roll_Number__c;

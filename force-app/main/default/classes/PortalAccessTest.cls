@@ -165,6 +165,16 @@ private class PortalAccessTest {
           Assert.isFalse(p.canGive, 'Not twice');
         }
       }
+      Assert.isTrue(
+        PortalAccessController.sendPasswordLink(fam.guardianId).contains('@'),
+        'Password link goes to the login email'
+      );
+      try {
+        PortalAccessController.sendPasswordLink(fam.teenId);
+        Assert.fail('No login, no link');
+      } catch (AuraHandledException e) {
+        Assert.isTrue(true);
+      }
       try {
         PortalAccessService.give(fam.guardianId);
         Assert.fail('Already has a login');
