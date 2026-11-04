@@ -446,6 +446,19 @@ private class CollegeEnquiryFlowTest {
         WHERE Id = :admission.Id
       ];
       Assert.areEqual('Enrolled', done.College_Stage__c, 'Admission complete');
+      for (
+        ApplicationController.QueueColumn column : ApplicationController.getQueue(
+          null
+        )
+      ) {
+        for (IndividualApplication queued : column.applications) {
+          Assert.areNotEqual(
+            admission.Id,
+            queued.Id,
+            'An enrolled college admission leaves Admissions Review'
+          );
+        }
+      }
     }
     // Finance confirms fees without sharing the private admissions; the
     // confirmation letter must still be generated in their context.

@@ -158,6 +158,33 @@ public with sharing class ApplicationController {
     }
   }
 
+  private static final Set<String> FINISHED_COLLEGE_STAGES = new Set<String>{
+    'Enrolled',
+    'Application Decision',
+    'Enrollment Failed',
+    'Withdrawn'
+  };
+
+  /**
+   * College admissions whose college journey is over (enrolled, rejected,
+   * expired or withdrawn). Read in system mode: staff without the college
+   * fields must still get a correct queue; only Ids are returned.
+   */
+  private static Set<Id> finishedCollegeAdmissions() {
+    return new Map<Id, IndividualApplication>(
+        [
+          SELECT Id
+          FROM IndividualApplication
+          WHERE
+            College_Mode__c = TRUE
+            AND College_Stage__c IN :FINISHED_COLLEGE_STAGES
+          WITH SYSTEM_MODE
+          LIMIT 5000
+        ]
+      )
+      .keySet();
+  }
+
   @AuraEnabled(cacheable=true)
   public static List<QueueColumn> getQueue(Id branchId) {
     try {
@@ -182,11 +209,18 @@ public with sharing class ApplicationController {
       if (branchId != null) {
         query += ' AND Branch__c = :branchId';
       }
+      // A college admission keeps its governed Status (Processing) and moves on
+      // through College_Stage__c; once it is finished it leaves this queue.
+      Set<Id> finishedCollege = finishedCollegeAdmissions();
+      query += ' AND Id NOT IN :finishedCollege';
       query += ' ORDER BY AppliedDate ASC NULLS LAST LIMIT 500';
       for (
         SObject row : Database.queryWithBinds(
           query,
-          new Map<String, Object>{ 'branchId' => branchId },
+          new Map<String, Object>{
+            'branchId' => branchId,
+            'finishedCollege' => finishedCollege
+          },
           AccessLevel.USER_MODE
         )
       ) {
