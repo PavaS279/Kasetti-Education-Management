@@ -1,0 +1,143 @@
+<template>
+  <div class="page">
+    <section class="kem-hero">
+      <div class="hero">
+        <div>
+          <div class="kem-hero__subtitle">KT College</div>
+          <div class="kem-hero__title">College Students</div>
+        </div>
+        <lightning-button-icon
+          icon-name="utility:refresh"
+          variant="border-inverse"
+          alternative-text="Refresh"
+          onclick={handleRefresh}
+        ></lightning-button-icon>
+      </div>
+    </section>
+
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+
+    <template lwc:if={data}>
+      <div class="kpis kem-fade-in">
+        <template for:each={kpis} for:item="k">
+          <div key={k.key} class={k.className}>
+            <span class="kpi-label">{k.label}</span>
+            <span class="kpi-value">{k.value}</span>
+          </div>
+        </template>
+        <div class="kem-card kpi">
+          <span class="kpi-label">Fees due</span>
+          <lightning-formatted-number
+            class="kpi-value"
+            value={feesDue}
+            format-style="currency"
+            currency-code={currencyCode}
+            maximum-fraction-digits="0"
+          ></lightning-formatted-number>
+        </div>
+      </div>
+
+      <section class="kem-card panel kem-fade-in">
+        <div class="filters">
+          <lightning-input
+            class="search"
+            type="search"
+            label="Search"
+            placeholder="Name, roll number, branch or section"
+            value={searchTerm}
+            onchange={handleSearch}
+          ></lightning-input>
+          <lightning-combobox
+            label="Campus"
+            value={campusId}
+            options={campusOptions}
+            onchange={handleCampus}
+          ></lightning-combobox>
+          <lightning-combobox
+            label="Status"
+            value={status}
+            options={statusOptions}
+            onchange={handleStatus}
+          ></lightning-combobox>
+          <lightning-combobox
+            label="Show"
+            value={scope}
+            options={scopeOptions}
+            onchange={handleScope}
+          ></lightning-combobox>
+        </div>
+        <div class="kem-muted small count-line">{count} students</div>
+
+        <ul class="rows">
+          <template for:each={rows} for:item="s">
+            <li key={s.enrolmentId} class="row">
+              <div class="main">
+                <a
+                  href="#"
+                  class="strong"
+                  data-id={s.studentId}
+                  onclick={openStudent}
+                  >{s.student}</a
+                >
+                <div class="kem-muted small">
+                  {s.campus} · {s.branch} · {s.yearLabel} · {s.academicYear}
+                </div>
+              </div>
+              <div class="cell">
+                <div class="label">Roll number</div>
+                <div class="strong">{s.rollLabel}</div>
+              </div>
+              <div class="cell">
+                <div class="label">Section</div>
+                <div class={s.sectionClass}>{s.sectionLabel}</div>
+              </div>
+              <div class="cell">
+                <div class="label">Fees due</div>
+                <lightning-formatted-number
+                  class={s.dueClass}
+                  value={s.feesDue}
+                  format-style="currency"
+                  currency-code={currencyCode}
+                  maximum-fraction-digits="0"
+                ></lightning-formatted-number>
+              </div>
+              <span class={s.statusClass}>{s.statusLabel}</span>
+              <span class="kem-muted small portal">{s.portalLabel}</span>
+              <div class="actions">
+                <lightning-button
+                  label="Student 360"
+                  data-id={s.studentId}
+                  onclick={openStudent}
+                ></lightning-button>
+                <lightning-button
+                  label="Academic record"
+                  data-id={s.enrolmentId}
+                  onclick={openRecord}
+                ></lightning-button>
+              </div>
+            </li>
+          </template>
+        </ul>
+        <template lwc:if={isEmpty}>
+          <div class="kem-empty">
+            No college students match. A student appears here once the Dean
+            admits them.
+          </div>
+        </template>
+      </section>
+    </template>
+
+    <template lwc:if={isLoading}>
+      <div class="spinner-holder">
+        <lightning-spinner
+          alternative-text="Loading"
+          size="small"
+        ></lightning-spinner>
+      </div>
+    </template>
+  </div>
+</template>

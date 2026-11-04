@@ -1,0 +1,136 @@
+@import "c/kemStyles";
+
+:host {
+  display: block;
+  padding: 0.75rem;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hero {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.25rem;
+  border-top: 4px solid var(--kem-blue);
+}
+
+.kpi_warn {
+  border-top-color: var(--kem-amber, #c77700);
+}
+
+.kpi-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--kem-muted);
+}
+
+.kpi-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--kem-ink);
+}
+
+.panel {
+  padding: 1rem;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: 2fr repeat(3, minmax(9rem, 1fr));
+  gap: 0.75rem;
+}
+
+.count-line {
+  margin-top: 0.75rem;
+}
+
+.rows {
+  margin-top: 0.25rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  align-items: center;
+  padding: 0.75rem 0.25rem;
+  border-bottom: 1px solid var(--kem-line);
+}
+
+.row:hover {
+  background: var(--kem-canvas);
+}
+
+.main {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.cell {
+  flex: 0 0 9rem;
+}
+
+.label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--kem-muted);
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.warn,
+.due {
+  color: var(--kem-red);
+  font-weight: 600;
+}
+
+.portal {
+  flex: 0 0 9rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.spinner-holder {
+  position: relative;
+  min-height: 5rem;
+}
+
+@media (max-width: 64rem) {
+  .kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+}
