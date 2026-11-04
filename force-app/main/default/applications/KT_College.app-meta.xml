@@ -107,6 +107,9 @@
     <tabs>standard-home</tabs>
     <tabs>KEM_Admissions</tabs>
     <tabs>KEM_Applications</tabs>
+    <tabs>KEM_Finance_Desk</tabs>
+    <tabs>Student_Invoice__c</tabs>
+    <tabs>Student_Payment__c</tabs>
     <tabs>standard-Account</tabs>
     <tabs>standard-report</tabs>
     <tabs>standard-Dashboard</tabs>
