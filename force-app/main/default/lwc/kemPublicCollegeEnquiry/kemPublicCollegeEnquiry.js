@@ -1,4 +1,5 @@
 import { LightningElement } from "lwc";
+import { validateControls } from "c/kemInputRules";
 import getCatalogue from "@salesforce/apex/CollegePublicController.getCatalogue";
 import getRequirements from "@salesforce/apex/CollegePublicController.getRequirements";
 import checkEligibility from "@salesforce/apex/CollegePublicController.checkEligibility";
@@ -149,7 +150,20 @@ export default class KemPublicCollegeEnquiry extends LightningElement {
     return this.isSaving ? "Sending…" : "Send enquiry";
   }
 
+  /** Field checks (required, ranges, name, phone and email rules) on the current step. */
+  stepIsValid() {
+    return validateControls(
+      this.template.querySelectorAll(
+        "lightning-input, lightning-combobox, lightning-textarea"
+      )
+    );
+  }
+
   handleNext() {
+    if (!this.stepIsValid()) {
+      this.errorMessage = "Correct the highlighted fields to continue.";
+      return;
+    }
     const index = STEPS.findIndex((s) => s.value === this.step);
     this.step = STEPS[index + 1].value;
     this.errorMessage = undefined;
@@ -518,6 +532,9 @@ export default class KemPublicCollegeEnquiry extends LightningElement {
   }
 
   async handleSubmit() {
+    if (!this.stepIsValid()) {
+      return;
+    }
     this.isSaving = true;
     this.errorMessage = undefined;
     try {

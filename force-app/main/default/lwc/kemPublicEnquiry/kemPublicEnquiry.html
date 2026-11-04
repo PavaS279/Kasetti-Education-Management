@@ -116,6 +116,7 @@
               <div class="grid two-column">
                 <lightning-input
                   data-field="firstName"
+                  data-rule="name"
                   label="First name"
                   maxlength="40"
                   value={form.firstName}
@@ -123,6 +124,7 @@
                 ></lightning-input>
                 <lightning-input
                   data-field="lastName"
+                  data-rule="name"
                   label="Last name"
                   maxlength="80"
                   value={form.lastName}
@@ -139,6 +141,7 @@
                 ></lightning-input>
                 <lightning-input
                   data-field="phone"
+                  data-rule="phone"
                   type="tel"
                   label="Mobile"
                   maxlength="40"
@@ -148,6 +151,7 @@
                 <div class="span-two">
                   <lightning-input
                     data-field="email"
+                    data-rule="email"
                     type="email"
                     label="Email"
                     maxlength="80"
@@ -169,6 +173,7 @@
               <div class="grid two-column">
                 <lightning-input
                   data-field="guardianFirstName"
+                  data-rule="name"
                   label="First name"
                   maxlength="40"
                   value={form.guardianFirstName}
@@ -176,6 +181,7 @@
                 ></lightning-input>
                 <lightning-input
                   data-field="guardianLastName"
+                  data-rule="name"
                   label="Last name"
                   maxlength="80"
                   value={form.guardianLastName}
@@ -190,6 +196,7 @@
                 ></lightning-combobox>
                 <lightning-input
                   data-field="guardianPhone"
+                  data-rule="phone"
                   type="tel"
                   label="Phone"
                   maxlength="40"
@@ -199,6 +206,7 @@
                 <div class="span-two">
                   <lightning-input
                     data-field="guardianEmail"
+                    data-rule="email"
                     type="email"
                     label="Email"
                     maxlength="80"

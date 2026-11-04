@@ -23,7 +23,7 @@ private class CollegeAdmissionControllerTest {
   ) {
     CollegeAdmissionController.NewAdmission r = new CollegeAdmissionController.NewAdmission();
     r.firstName = 'Desk';
-    r.lastName = TestDataFactory.unique('Applicant');
+    r.lastName = TestDataFactory.uniqueName('Applicant');
     r.campusBranchId = intakeId;
     r.entryRoute = 'Regular';
     CollegeAdmissionController.Qualification q = new CollegeAdmissionController.Qualification();
@@ -33,7 +33,7 @@ private class CollegeAdmissionControllerTest {
     r.qualifications = new List<CollegeAdmissionController.Qualification>{ q };
     r.entrances = new List<CollegeAdmissionController.Entrance>();
     r.guardianFirstName = 'Desk';
-    r.guardianLastName = TestDataFactory.unique('Parent');
+    r.guardianLastName = TestDataFactory.uniqueName('Parent');
     r.consent = false;
     return r;
   }

@@ -248,10 +248,14 @@ public without sharing class PublicEnquiryController {
     ) {
       fail('Enter at least one email address or phone number.');
     }
-    validEmail(request.email, 'Learner email');
-    validEmail(request.guardianEmail, 'Guardian email');
-    validPhone(request.phone, 'Learner mobile');
-    validPhone(request.guardianPhone, 'Guardian phone');
+    InputValidator.name(request.lastName, 'Learner last name');
+    InputValidator.name(request.firstName, 'Learner first name');
+    InputValidator.name(request.guardianFirstName, 'Guardian first name');
+    InputValidator.name(request.guardianLastName, 'Guardian last name');
+    InputValidator.email(request.email, 'Learner email');
+    InputValidator.email(request.guardianEmail, 'Guardian email');
+    InputValidator.phone(request.phone, 'Learner mobile');
+    InputValidator.phone(request.guardianPhone, 'Guardian phone');
     if (
       String.isNotBlank(request.guardianRelationship) &&
       !RELATIONSHIPS.contains(request.guardianRelationship)
@@ -264,13 +268,11 @@ public without sharing class PublicEnquiryController {
     ) {
       fail('Select a valid delivery mode.');
     }
-    if (
-      request.birthdate != null &&
-      (request.birthdate > Date.today() ||
-      request.birthdate < Date.today().addYears(-120))
-    ) {
-      fail('Enter a valid learner date of birth.');
-    }
+    InputValidator.birthdate(
+      request.birthdate,
+      request.campusBranchId == null ? null : 14,
+      'learner date of birth'
+    );
     if (request.privacyConsent != true) {
       fail('Privacy consent is required.');
     }
@@ -342,25 +344,6 @@ public without sharing class PublicEnquiryController {
       fail('Select an active course.');
     }
     return courses[0].Id;
-  }
-
-  private static void validEmail(String value, String label) {
-    if (
-      String.isNotBlank(value) &&
-      !Pattern.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$', value.trim())
-    ) {
-      fail(label + ' is not valid.');
-    }
-  }
-
-  private static void validPhone(String value, String label) {
-    if (String.isBlank(value)) {
-      return;
-    }
-    String digits = value.replaceAll('[^0-9]', '');
-    if (digits.length() < 7 || digits.length() > 15) {
-      fail(label + ' is not valid.');
-    }
   }
 
   private static void required(String value, Integer max, String label) {

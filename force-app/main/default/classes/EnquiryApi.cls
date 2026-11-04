@@ -105,6 +105,8 @@ global with sharing class EnquiryApi {
     if (String.isBlank(payload.branchCode)) {
       throw new AppException('branchCode is required.');
     }
+    InputValidator.email(payload.email, 'email');
+    InputValidator.phone(payload.phone, 'phone');
   }
 
   private static Lead toLead(EnquiryPayload payload) {

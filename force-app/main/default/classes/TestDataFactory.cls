@@ -13,6 +13,23 @@ public class TestDataFactory {
   private static Integer counter = 0;
   private static User adminUser;
 
+  /** A unique name made of letters only, for fields validated as person names. */
+  public static String uniqueName(String prefix) {
+    counter++;
+    String digits =
+      String.valueOf(counter) +
+      String.valueOf(Math.abs(Crypto.getRandomInteger()));
+    String letters = '';
+    for (Integer i = 0; i < digits.length(); i++) {
+      letters += 'abcdefghij'
+        .substring(
+          Integer.valueOf(digits.substring(i, i + 1)),
+          Integer.valueOf(digits.substring(i, i + 1)) + 1
+        );
+    }
+    return prefix + ' ' + letters.capitalize();
+  }
+
   public static String unique(String prefix) {
     counter++;
     return prefix + '-' + counter + '-' + Crypto.getRandomInteger();

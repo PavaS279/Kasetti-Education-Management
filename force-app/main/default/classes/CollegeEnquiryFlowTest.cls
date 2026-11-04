@@ -75,7 +75,7 @@ private class CollegeEnquiryFlowTest {
         .left(60);
     request.formStartedAt = DateTime.now().getTime() - 5000;
     request.firstName = 'Ravi';
-    request.lastName = TestDataFactory.unique('Kumar');
+    request.lastName = TestDataFactory.uniqueName('Kumar');
     request.phone = '9876543210';
     request.privacyConsent = true;
     request.branchCode = intake.Campus__r.Branch_Code__c;
@@ -212,7 +212,7 @@ private class CollegeEnquiryFlowTest {
     Campus_Branch__c intake = [SELECT Id FROM Campus_Branch__c LIMIT 1];
     Account existing = PersonAccountService.buildPerson(
       'Pooja',
-      TestDataFactory.unique('Nayak'),
+      TestDataFactory.uniqueName('Nayak'),
       'pooja.nayak@example.com',
       null,
       [SELECT Campus__c FROM Campus_Branch__c LIMIT 1].Campus__c,

@@ -113,6 +113,14 @@ public without sharing class CollegePublicController {
     List<CollegeAdmissionController.Entrance> entrances
   ) {
     assertIntake(campusBranchId, entryRoute);
+    validateMarks(qualifications, entrances);
+  }
+
+  /** Marks and ranks: known levels and exams, each once, in range, sensible years. */
+  public static void validateMarks(
+    List<CollegeAdmissionController.Qualification> qualifications,
+    List<CollegeAdmissionController.Entrance> entrances
+  ) {
     List<CollegeAdmissionController.Qualification> declared = qualifications ==
       null
       ? new List<CollegeAdmissionController.Qualification>()
@@ -125,21 +133,43 @@ public without sharing class CollegePublicController {
         'Enter at most three results and two entrance ranks.'
       );
     }
+    Set<String> levelsSeen = new Set<String>();
     for (CollegeAdmissionController.Qualification q : declared) {
+      if (q != null && !levelsSeen.add(String.valueOf(q.level))) {
+        throw new AppException('Enter each result (SSLC, PUC, Diploma) once.');
+      }
+      if (q != null && !InputValidator.isResultYear(q.year)) {
+        throw new AppException(
+          'The year of a result must be between ' +
+            InputValidator.EARLIEST_RESULT_YEAR +
+            ' and this year.'
+        );
+      }
       if (
         q == null ||
         !LEVELS.contains(q.level) ||
-        q.percentage == null ||
-        q.percentage < 0 ||
-        q.percentage > 100 ||
+        !InputValidator.isPercentage(q.percentage) ||
         (String.isNotBlank(q.stream) && !STREAMS.contains(q.stream)) ||
         (String.isNotBlank(q.branchCode) &&
         !Pattern.matches('^[A-Za-z]{2}$', q.branchCode))
       ) {
-        throw new AppException('Check the marks you entered.');
+        throw new AppException(
+          'Check the marks you entered: each percentage is from 0 to 100 with at most two decimals.'
+        );
       }
     }
+    Set<String> examsSeen = new Set<String>();
     for (CollegeAdmissionController.Entrance e : ranks) {
+      if (e != null && !examsSeen.add(String.valueOf(e.exam))) {
+        throw new AppException('Enter each entrance exam once.');
+      }
+      if (e != null && !InputValidator.isResultYear(e.year)) {
+        throw new AppException(
+          'The entrance exam year must be between ' +
+            InputValidator.EARLIEST_RESULT_YEAR +
+            ' and this year.'
+        );
+      }
       if (
         e == null ||
         !EXAMS.contains(e.exam) ||

@@ -190,6 +190,7 @@
               <lightning-input
                 type="number"
                 min="1"
+                max="2000000"
                 label="Rank"
                 value={marks.rank}
                 data-field="rank"
@@ -263,6 +264,7 @@
             maxlength="40"
             value={form.firstName}
             data-field="firstName"
+            data-rule="name"
             onchange={handleField}
           ></lightning-input>
           <lightning-input
@@ -270,6 +272,7 @@
             maxlength="80"
             value={form.lastName}
             data-field="lastName"
+            data-rule="name"
             onchange={handleField}
             required
           ></lightning-input>
@@ -287,6 +290,7 @@
             maxlength="40"
             value={form.phone}
             data-field="phone"
+            data-rule="phone"
             onchange={handleField}
           ></lightning-input>
           <lightning-input
@@ -295,6 +299,7 @@
             maxlength="80"
             value={form.email}
             data-field="email"
+            data-rule="email"
             onchange={handleField}
             class="span-two"
           ></lightning-input>
@@ -308,6 +313,7 @@
             maxlength="40"
             value={form.guardianFirstName}
             data-field="guardianFirstName"
+            data-rule="name"
             onchange={handleField}
           ></lightning-input>
           <lightning-input
@@ -315,6 +321,7 @@
             maxlength="80"
             value={form.guardianLastName}
             data-field="guardianLastName"
+            data-rule="name"
             onchange={handleField}
           ></lightning-input>
           <lightning-combobox
@@ -330,6 +337,7 @@
             maxlength="40"
             value={form.guardianPhone}
             data-field="guardianPhone"
+            data-rule="phone"
             onchange={handleField}
           ></lightning-input>
         </div>

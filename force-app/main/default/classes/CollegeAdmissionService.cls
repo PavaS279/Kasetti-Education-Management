@@ -46,6 +46,42 @@ public with sharing class CollegeAdmissionService {
         'Enter at least one qualification (for example the SSLC result).'
       );
     }
+    // A converted enquiry reuses the student already on file.
+    if (existingStudentId == null) {
+      InputValidator.name(request.firstName, 'Student first name');
+      InputValidator.name(request.lastName, 'Student last name');
+      InputValidator.name(request.guardianFirstName, 'Guardian first name');
+      InputValidator.name(request.guardianLastName, 'Guardian last name');
+      InputValidator.email(request.email, 'Student email');
+      InputValidator.phone(request.phone, 'Student mobile');
+      InputValidator.phone(request.guardianPhone, 'Guardian phone');
+      InputValidator.birthdate(request.birthdate, 14, 'student date of birth');
+    }
+    // Rows the desk left empty are ignored; the rest obey the public rules.
+    List<CollegeAdmissionController.Qualification> filled = new List<CollegeAdmissionController.Qualification>();
+    for (CollegeAdmissionController.Qualification q : request.qualifications) {
+      if (q != null && (String.isNotBlank(q.level) || q.percentage != null)) {
+        filled.add(q);
+      }
+    }
+    List<CollegeAdmissionController.Entrance> filledRanks = new List<CollegeAdmissionController.Entrance>();
+    for (
+      CollegeAdmissionController.Entrance e : request.entrances == null
+        ? new List<CollegeAdmissionController.Entrance>()
+        : request.entrances
+    ) {
+      if (e != null && (String.isNotBlank(e.exam) || e.rank != null)) {
+        filledRanks.add(e);
+      }
+    }
+    if (filled.isEmpty()) {
+      throw new AppException(
+        'Enter at least one qualification (for example the SSLC result).'
+      );
+    }
+    CollegePublicController.validateMarks(filled, filledRanks);
+    request.qualifications = filled;
+    request.entrances = filledRanks;
     Campus_Branch__c intake = [
       SELECT
         Id,

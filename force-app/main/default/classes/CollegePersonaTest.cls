@@ -73,7 +73,7 @@ private class CollegePersonaTest {
     System.runAs(desk) {
       CollegeAdmissionController.NewAdmission request = new CollegeAdmissionController.NewAdmission();
       request.firstName = 'Persona';
-      request.lastName = TestDataFactory.unique('Student');
+      request.lastName = TestDataFactory.uniqueName('Student');
       request.campusBranchId = CollegeAdmissionController.getIntakes()[0].value;
       request.entryRoute = 'Regular';
       CollegeAdmissionController.Qualification q = new CollegeAdmissionController.Qualification();

@@ -1,4 +1,5 @@
 import { LightningElement } from "lwc";
+import { validateControls } from "c/kemInputRules";
 import getFormData from "@salesforce/apex/PublicEnquiryController.getFormData";
 import submit from "@salesforce/apex/PublicEnquiryController.submit";
 
@@ -111,10 +112,7 @@ export default class KemPublicEnquiry extends LightningElement {
         "lightning-input, lightning-combobox, lightning-textarea"
       )
     ];
-    const valid = controls.reduce((result, control) => {
-      control.reportValidity();
-      return result && control.checkValidity();
-    }, true);
+    const valid = validateControls(controls);
     if (!valid) return;
     if (
       !this.form.email &&
