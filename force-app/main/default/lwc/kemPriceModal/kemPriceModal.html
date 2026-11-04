@@ -1,0 +1,61 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <lightning-record-edit-form
+      object-api-name="Fee_Price__c"
+      onsuccess={handleSuccess}
+      onerror={handleError}
+      onsubmit={handleSubmit}
+    >
+      <lightning-messages></lightning-messages>
+      <div class="form-grid">
+        <lightning-input-field
+          field-name="Learning_Course__c"
+          value={courseId}
+          disabled
+        ></lightning-input-field>
+        <lightning-input-field
+          field-name="Fee_Type__c"
+          required
+        ></lightning-input-field>
+        <lightning-input-field
+          field-name="Amount__c"
+          required
+        ></lightning-input-field>
+        <lightning-input-field
+          field-name="Billing_Frequency__c"
+          required
+        ></lightning-input-field>
+        <lightning-input-field field-name="Branch__c"></lightning-input-field>
+        <lightning-input-field
+          field-name="Delivery_Mode__c"
+        ></lightning-input-field>
+        <lightning-input-field
+          field-name="Effective_From__c"
+          value={today}
+          required
+        ></lightning-input-field>
+        <lightning-input-field
+          field-name="Effective_To__c"
+        ></lightning-input-field>
+        <lightning-input-field
+          class="span-all"
+          field-name="Description__c"
+        ></lightning-input-field>
+      </div>
+      <div class="footer">
+        <lightning-button
+          label="Cancel"
+          onclick={handleCancel}
+        ></lightning-button>
+        <lightning-button
+          class="slds-m-left_x-small"
+          variant="brand"
+          type="submit"
+          label="Save price"
+          disabled={isSaving}
+        ></lightning-button>
+      </div>
+    </lightning-record-edit-form>
+  </lightning-modal-body>
+</template>

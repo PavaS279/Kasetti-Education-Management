@@ -1,0 +1,305 @@
+<template>
+  <template lwc:if={view}>
+    <div class="credit kem-fade-in">
+      <section class="kem-hero">
+        <div class="hero">
+          <div class="hero-text">
+            <div class="kem-hero__subtitle">
+              Credit note · {note.Branch__r.Name}
+            </div>
+            <div class="kem-hero__title">{note.Name}</div>
+            <div class="chips">
+              <span class={statusClass}>{note.Status__c}</span>
+              <span class="hero-chip">{note.Origin__c}</span>
+              <span class="hero-chip">Issued {issueLabel}</span>
+            </div>
+          </div>
+          <div class="amounts">
+            <div class="amount">
+              <span class="amount-label">Credit</span>
+              <lightning-formatted-number
+                class="amount-value"
+                value={amount}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+            </div>
+            <div class="amount">
+              <span class="amount-label">Used on invoices</span>
+              <lightning-formatted-number
+                class="amount-value"
+                value={applied}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+            </div>
+            <div class="amount">
+              <span class="amount-label">Refunded</span>
+              <lightning-formatted-number
+                class="amount-value"
+                value={refunded}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+            </div>
+            <div class="amount amount_due">
+              <span class="amount-label">Balance</span>
+              <lightning-formatted-number
+                class="amount-value balance"
+                value={balance}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+            </div>
+            <div
+              class="progress"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow={usedPercent}
+              aria-label={progressLabel}
+            >
+              <span style={progressStyle}></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <section class="kem-card panel parties">
+          <div class="party">
+            <span class="kem-muted small">Owed to</span>
+            <a href="#" data-id={note.Bill_To__c} onclick={handleNavigate}
+              >{payer}</a
+            >
+            <span class="kem-muted small">{note.Bill_To__r.Email}</span>
+          </div>
+          <div class="party">
+            <span class="kem-muted small">Learner</span>
+            <a
+              href="#"
+              data-id={note.Learner_Account__c}
+              onclick={handleNavigate}
+              >{learner}</a
+            >
+            <span class="kem-muted small">{className}</span>
+          </div>
+          <template lwc:if={source}>
+            <div class="party">
+              <span class="kem-muted small">Raised from</span>
+              <a href="#" data-id={source.id} onclick={handleNavigate}
+                >{source.label}</a
+              >
+            </div>
+          </template>
+          <div class="party">
+            <span class="kem-muted small">Reason</span>
+            <span>{note.Reason__c}</span>
+          </div>
+          <template lwc:if={hasReserved}>
+            <div class="reserved">
+              <lightning-formatted-number
+                value={view.reserved}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+              is reserved by refunds in progress.
+            </div>
+          </template>
+          <template lwc:if={hasActions}>
+            <div class="actions">
+              <template lwc:if={canRefund}>
+                <lightning-button
+                  variant="brand"
+                  label="Request refund"
+                  icon-name="utility:moneybag"
+                  onclick={handleRefund}
+                  disabled={isBusy}
+                ></lightning-button>
+              </template>
+              <template lwc:if={canVoid}>
+                <lightning-button
+                  variant="destructive-text"
+                  label="Void credit note"
+                  onclick={handleVoid}
+                  disabled={isBusy}
+                ></lightning-button>
+              </template>
+            </div>
+          </template>
+          <template lwc:if={isVoid}>
+            <div class="voided">Void: {note.Void_Reason__c}</div>
+          </template>
+        </section>
+
+        <div class="stack">
+          <template lwc:if={showInvoices}>
+            <section class="kem-card panel">
+              <div class="kem-section-title">Use on an open invoice</div>
+              <ul>
+                <template for:each={invoices} for:item="i">
+                  <li key={i.Id} class="row">
+                    <span class="row-icon row-icon_info" aria-hidden="true"
+                      ><lightning-icon
+                        icon-name="utility:file"
+                        size="x-small"
+                      ></lightning-icon
+                    ></span>
+                    <div class="row-main">
+                      <a
+                        href="#"
+                        class="strong"
+                        data-id={i.Id}
+                        onclick={handleNavigate}
+                        >{i.Name}</a
+                      >
+                      <div class="kem-muted small">
+                        {i.className} · due {i.dueLabel}
+                      </div>
+                    </div>
+                    <lightning-formatted-number
+                      class="strong"
+                      value={i.Balance_Due__c}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                    <lightning-button
+                      label="Apply"
+                      data-id={i.Id}
+                      title={i.applyLabel}
+                      onclick={handleApply}
+                      disabled={isBusy}
+                    ></lightning-button>
+                  </li>
+                </template>
+              </ul>
+            </section>
+          </template>
+
+          <section class="kem-card panel">
+            <div class="kem-section-title">Refunds</div>
+            <template lwc:if={hasRefunds}>
+              <ol class="timeline">
+                <template for:each={refunds} for:item="r">
+                  <li key={r.Id} class="row">
+                    <span class="row-icon" aria-hidden="true"
+                      ><lightning-icon
+                        icon-name={r.icon}
+                        size="x-small"
+                      ></lightning-icon
+                    ></span>
+                    <div class="row-main">
+                      <div class="strong">{r.Name} · {r.Method__c}</div>
+                      <div class="kem-muted small">
+                        Requested {r.requestedLabel} by {r.requestedBy}
+                        <template lwc:if={r.decidedBy}>
+                          · {r.decidedBy}</template
+                        >
+                        <template lwc:if={r.isPaid}>
+                          · paid {r.paidLabel} ({r.Reference__c})</template
+                        >
+                      </div>
+                      <template lwc:if={r.isRejected}>
+                        <div class="kem-muted small">
+                          Rejected: {r.Rejection_Reason__c}
+                        </div>
+                      </template>
+                      <template lwc:if={r.awaitsOther}>
+                        <div class="kem-muted small">
+                          Waiting for an approver other than the requester.
+                        </div>
+                      </template>
+                    </div>
+                    <lightning-formatted-number
+                      class="strong"
+                      value={r.Amount__c}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                    <span class={r.statusClass}>{r.Status__c}</span>
+                    <template lwc:if={r.canDecide}>
+                      <lightning-button-group>
+                        <lightning-button
+                          label="Approve"
+                          data-id={r.Id}
+                          onclick={handleApprove}
+                          disabled={isBusy}
+                        ></lightning-button>
+                        <lightning-button
+                          label="Reject"
+                          data-id={r.Id}
+                          onclick={handleReject}
+                          disabled={isBusy}
+                        ></lightning-button>
+                      </lightning-button-group>
+                    </template>
+                    <template lwc:if={r.canPay}>
+                      <lightning-button
+                        variant="brand"
+                        label="Mark paid"
+                        data-id={r.Id}
+                        onclick={handlePaid}
+                        disabled={isBusy}
+                      ></lightning-button>
+                    </template>
+                  </li>
+                </template>
+              </ol>
+            </template>
+            <template lwc:else>
+              <div class="kem-empty">No refunds requested.</div>
+            </template>
+          </section>
+
+          <section class="kem-card panel">
+            <div class="kem-section-title">Used on invoices</div>
+            <ul>
+              <template for:each={applications} for:item="a">
+                <li key={a.Id} class="row">
+                  <span class="row-icon row-icon_good" aria-hidden="true"
+                    ><lightning-icon
+                      icon-name="utility:check"
+                      size="x-small"
+                    ></lightning-icon
+                  ></span>
+                  <div class="row-main">
+                    <a
+                      href="#"
+                      class="strong"
+                      data-id={a.Student_Invoice__c}
+                      onclick={handleNavigate}
+                      >{a.invoiceName}</a
+                    >
+                    <div class="kem-muted small">{a.dateLabel} · {a.Name}</div>
+                  </div>
+                  <lightning-formatted-number
+                    class="strong"
+                    value={a.Amount__c}
+                    format-style="currency"
+                    currency-code={currencyCode}
+                  ></lightning-formatted-number>
+                </li>
+              </template>
+            </ul>
+            <template lwc:if={noApplications}>
+              <div class="kem-empty">Not used on any invoice yet.</div>
+            </template>
+          </section>
+        </div>
+      </div>
+    </div>
+  </template>
+  <template lwc:elseif={errorMessage}>
+    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+      {errorMessage}
+    </div>
+  </template>
+  <template lwc:else>
+    <div class="loading">
+      <lightning-spinner
+        alternative-text="Loading credit note"
+        size="small"
+      ></lightning-spinner>
+    </div>
+  </template>
+</template>

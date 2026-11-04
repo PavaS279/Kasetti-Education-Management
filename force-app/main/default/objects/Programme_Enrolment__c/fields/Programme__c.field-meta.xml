@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Programme__c</fullName>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <label>Programme</label>
+    <referenceTo>LearningProgram</referenceTo>
+    <relationshipLabel>Programme Enrolments</relationshipLabel>
+    <relationshipName>Programme_Enrolments</relationshipName>
+    <required>true</required>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

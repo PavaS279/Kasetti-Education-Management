@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Consent_Captured_By__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <label>Consent Captured By</label>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel>College Admissions Consented</relationshipLabel>
+    <relationshipName>College_Admissions_Consented</relationshipName>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <type>Lookup</type>
+</CustomField>

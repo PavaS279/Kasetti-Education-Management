@@ -1,0 +1,24 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:else>
+      <c-kem-discount-form
+        branches={branches}
+        courses={courses}
+        onsaved={handleSaved}
+        oncancel={handleCancel}
+      ></c-kem-discount-form>
+    </template>
+  </lightning-modal-body>
+</template>

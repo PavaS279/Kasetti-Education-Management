@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Allows the Dean to reopen final college results with a reason.</description>
+    <isLicensed>false</isLicensed>
+    <label>KEM Reopen Results</label>
+</CustomPermission>

@@ -12,6 +12,11 @@
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
     "prettier": "prettier --write \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
+    "org:login": "sf org login web --alias edu-dev --set-default --instance-url https://login.salesforce.com",
+    "org:login:sandbox": "sf org login web --alias edu-sandbox --set-default --instance-url https://test.salesforce.com",
+    "org:list": "sf org list",
+    "org:open": "sf org open",
+    "org:display": "sf org display",
     "prepare": "husky || true",
     "precommit": "lint-staged"
   },

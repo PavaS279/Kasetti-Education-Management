@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Lateral_Seat_Counters_Valid</fullName>
+    <active>true</active>
+    <description
+  >Lateral reserved and finalised seats must be non-negative and cannot exceed lateral intake.</description>
+    <errorConditionFormula
+  >OR(BLANKVALUE(Reserved_Lateral__c, 0) &lt; 0, BLANKVALUE(Finalised_Lateral__c, 0) &lt; 0, BLANKVALUE(Reserved_Lateral__c, 0) + BLANKVALUE(Finalised_Lateral__c, 0) &gt; BLANKVALUE(Intake_Lateral__c, 0))</errorConditionFormula>
+    <errorMessage
+  >Lateral reserved and finalised seats must be non-negative and cannot exceed lateral intake.</errorMessage>
+</ValidationRule>

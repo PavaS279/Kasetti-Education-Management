@@ -1,0 +1,132 @@
+<template>
+  <section class="kem-card panel">
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <template lwc:if={enrolment}>
+      <header>
+        <div>
+          <p class="eyebrow">PROGRAMME ENROLMENT</p>
+          <h2>{enrolment.Student__r.Name} · {rollNumber}</h2>
+          <p class="subtitle">
+            {enrolment.Programme__r.Name} · {enrolment.Branch__r.Name} ·
+            {enrolment.Campus__r.Name} · year
+            {enrolment.Current_Year_Of_Study__c} · {enrolment.Status__c}
+          </p>
+          <p class="subtitle">
+            Section: {sectionLabel} · joined {joiningLabel} · open backlogs
+            {openBacklogs}
+          </p>
+        </div>
+        <lightning-button-icon
+          icon-name="utility:refresh"
+          alternative-text="Refresh"
+          title="Refresh"
+          onclick={load}
+        ></lightning-button-icon>
+      </header>
+
+      <template lwc:if={showActions}>
+        <div class="actions">
+          <lightning-combobox
+            label="Section"
+            options={sectionOptions}
+            value={sectionId}
+            onchange={handleSection}
+            placeholder="Choose a section"
+          ></lightning-combobox>
+          <template lwc:if={notJoined}>
+            <lightning-input
+              type="date"
+              label="Joining date"
+              value={joiningDate}
+              onchange={handleJoiningDate}
+            ></lightning-input>
+            <lightning-button
+              label="Join section"
+              variant="brand"
+              onclick={handleJoin}
+            ></lightning-button>
+          </template>
+          <template lwc:else>
+            <lightning-input
+              label="Reason (repeat / discontinue)"
+              value={reason}
+              onchange={handleReason}
+            ></lightning-input>
+            <lightning-button
+              label="Promote"
+              variant="brand"
+              onclick={handlePromote}
+            ></lightning-button>
+            <lightning-button
+              label="Repeat year"
+              onclick={handleRepeat}
+            ></lightning-button>
+            <lightning-button
+              label="Complete programme"
+              onclick={handleComplete}
+            ></lightning-button>
+            <lightning-button
+              label="Discontinue"
+              variant="destructive-text"
+              onclick={handleDiscontinue}
+            ></lightning-button>
+          </template>
+        </div>
+      </template>
+
+      <h3>Term results</h3>
+      <template lwc:if={terms.length}>
+        <ul class="terms">
+          <template for:each={terms} for:item="t">
+            <li key={t.Id}>
+              Term {t.Term__c}: {t.Outcome__c} · {t.Percentage__c}% · backlogs
+              {t.Backlogs__c} · {t.Status__c}
+            </li>
+          </template>
+        </ul>
+      </template>
+      <template lwc:else
+        ><p class="empty">No final term results yet.</p></template
+      >
+
+      <h3>Subjects</h3>
+      <template lwc:if={subjects.length}>
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+          <thead>
+            <tr>
+              <th scope="col">Term</th>
+              <th scope="col">Subject</th>
+              <th scope="col">Attempt</th>
+              <th scope="col">Attendance</th>
+              <th scope="col">Internal</th>
+              <th scope="col">Exam</th>
+              <th scope="col">Total</th>
+              <th scope="col">Result</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={subjects} for:item="r">
+              <tr key={r.id}>
+                <td>{r.term}</td>
+                <td>{r.subject}</td>
+                <td>{r.attempt}</td>
+                <td>{r.attendanceLabel}</td>
+                <td>{r.internalMarks}</td>
+                <td>{r.examMarks}</td>
+                <td>{r.total} / {r.max}</td>
+                <td>{r.result}</td>
+                <td>{r.status}</td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </template>
+      <template lwc:else><p class="empty">No subjects yet.</p></template>
+    </template>
+  </section>
+</template>

@@ -1,0 +1,173 @@
+<template>
+  <template lwc:if={visible}>
+    <article class="kem-card panel">
+      <header class="head">
+        <div class="kem-section-title">{title}</div>
+        <div class="actions">
+          <template lwc:if={showCloneThis}>
+            <lightning-button
+              label="New branch from this one"
+              icon-name="utility:copy"
+              onclick={handleCloneThis}
+            ></lightning-button>
+          </template>
+          <lightning-button-icon
+            icon-name="utility:refresh"
+            alternative-text="Refresh"
+            onclick={handleRefresh}
+          ></lightning-button-icon>
+        </div>
+      </header>
+
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+
+      <template lwc:if={data}>
+        <template lwc:if={hasBranches}>
+          <div class="totals">
+            <template for:each={totals} for:item="t">
+              <div key={t.key} class="total">
+                <span class="total-value">{t.value}</span>
+                <span class="total-label">{t.label}</span>
+              </div>
+            </template>
+          </div>
+
+          <div class="toolbar">
+            <lightning-combobox
+              class="sort"
+              label="Sort by"
+              variant="label-inline"
+              value={sortBy}
+              options={sortOptions}
+              onchange={handleSort}
+            ></lightning-combobox>
+          </div>
+
+          <div class="grid">
+            <template for:each={branches} for:item="b">
+              <section key={b.branchId} class={b.className}>
+                <div class="branch-head">
+                  <div class="branch-title">
+                    <a href="#" data-id={b.branchId} onclick={handleOpen}
+                      >{b.name}</a
+                    >
+                    <span class="kem-muted small">{b.subtitle}</span>
+                  </div>
+                  <template lwc:if={b.current}>
+                    <span class="kem-badge kem-badge_success">This branch</span>
+                  </template>
+                  <template lwc:if={b.inactive}>
+                    <span class="kem-badge">Inactive</span>
+                  </template>
+                </div>
+
+                <div class="fill">
+                  <div class="fill-label">
+                    <span>Seats filled</span>
+                    <span class="strong">{b.fill}</span>
+                  </div>
+                  <div class="bar" role="presentation">
+                    <div class={b.fillClass} style={b.fillStyle}></div>
+                  </div>
+                  <span class="kem-muted small"
+                    >{b.seatsTaken} of {b.capacity} seats</span
+                  >
+                </div>
+
+                <dl class="metrics">
+                  <div class="metric">
+                    <dt>Classes</dt>
+                    <dd class="metric-value">{b.classes}</dd>
+                  </div>
+                  <div class="metric">
+                    <dt>Learners</dt>
+                    <dd class="metric-value">{b.learners}</dd>
+                  </div>
+                  <div class="metric">
+                    <dt>Attendance (30 days)</dt>
+                    <dd class={b.attendanceClass}>{b.attendance}</dd>
+                  </div>
+                  <div class="metric">
+                    <dt>Waiting</dt>
+                    <dd class="metric-value">{b.waiting}</dd>
+                  </div>
+                  <div class="metric">
+                    <dt>Open enquiries</dt>
+                    <dd class="metric-value">{b.openEnquiries}</dd>
+                  </div>
+                  <div class="metric">
+                    <dt>Rooms</dt>
+                    <dd class="metric-value">{b.rooms}</dd>
+                  </div>
+                  <template lwc:if={showFinance}>
+                    <div class="metric">
+                      <dt>Outstanding</dt>
+                      <dd class="metric-value">
+                        <lightning-formatted-number
+                          value={b.outstanding}
+                          format-style="currency"
+                          currency-code={currencyCode}
+                          maximum-fraction-digits="0"
+                        ></lightning-formatted-number>
+                      </dd>
+                    </div>
+                    <div class="metric">
+                      <dt>Overdue</dt>
+                      <dd class={b.overdueClass}>
+                        <lightning-formatted-number
+                          value={b.overdue}
+                          format-style="currency"
+                          currency-code={currencyCode}
+                          maximum-fraction-digits="0"
+                        ></lightning-formatted-number>
+                      </dd>
+                    </div>
+                    <div class="metric">
+                      <dt>Collected this month</dt>
+                      <dd class="metric-value">
+                        <lightning-formatted-number
+                          value={b.collectedThisMonth}
+                          format-style="currency"
+                          currency-code={currencyCode}
+                          maximum-fraction-digits="0"
+                        ></lightning-formatted-number>
+                      </dd>
+                    </div>
+                  </template>
+                </dl>
+
+                <template lwc:if={canClone}>
+                  <div class="branch-actions">
+                    <lightning-button
+                      variant="base"
+                      label="Use as template"
+                      icon-name="utility:copy"
+                      data-id={b.branchId}
+                      onclick={handleClone}
+                    ></lightning-button>
+                  </div>
+                </template>
+              </section>
+            </template>
+          </div>
+        </template>
+        <template lwc:else>
+          <p class="kem-muted empty">No branches yet.</p>
+        </template>
+      </template>
+      <template lwc:elseif={isLoading}>
+        <lightning-spinner
+          alternative-text="Loading"
+          size="small"
+        ></lightning-spinner>
+      </template>
+    </article>
+  </template>
+</template>

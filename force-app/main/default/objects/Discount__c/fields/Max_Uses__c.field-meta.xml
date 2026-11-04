@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Max_Uses__c</fullName>
+    <inlineHelpText>Blank for unlimited.</inlineHelpText>
+    <label>Maximum Uses</label>
+    <required>false</required>
+    <precision>6</precision>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+</CustomField>

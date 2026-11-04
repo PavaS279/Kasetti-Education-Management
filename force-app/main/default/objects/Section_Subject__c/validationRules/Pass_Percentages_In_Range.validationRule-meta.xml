@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Pass_Percentages_In_Range</fullName>
+    <active>true</active>
+    <description>Pass percentages must be between 0 and 100.</description>
+    <errorConditionFormula
+  >OR(BLANKVALUE(Internal_Pass_Percent__c, 0) &lt; 0, BLANKVALUE(Internal_Pass_Percent__c, 0) &gt; 1, BLANKVALUE(Exam_Pass_Percent__c, 0) &lt; 0, BLANKVALUE(Exam_Pass_Percent__c, 0) &gt; 1, BLANKVALUE(Total_Pass_Percent__c, 0) &lt; 0, BLANKVALUE(Total_Pass_Percent__c, 0) &gt; 1)</errorConditionFormula>
+    <errorMessage>Pass percentages must be between 0 and 100.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Percentage_Max_100</fullName>
+    <active>true</active>
+    <description>A percentage discount cannot exceed 100%.</description>
+    <errorConditionFormula
+  >AND(ISPICKVAL(Discount_Type__c, 'Percentage'), Value__c &gt; 100)</errorConditionFormula>
+    <errorDisplayField>Value__c</errorDisplayField>
+    <errorMessage>A percentage discount cannot exceed 100%.</errorMessage>
+</ValidationRule>

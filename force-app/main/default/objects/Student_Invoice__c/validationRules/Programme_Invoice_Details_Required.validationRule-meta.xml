@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Programme_Invoice_Details_Required</fullName>
+    <active>true</active>
+    <errorConditionFormula
+  >AND(NOT(ISBLANK(Programme_Enrolment__c)), OR(ISBLANK(Year_Of_Study__c), ISBLANK(TEXT(Invoice_Kind__c)), ISBLANK(Programme_Invoice_Key__c)))</errorConditionFormula>
+    <errorMessage
+  >A programme invoice requires year of study, invoice kind and its unique key.</errorMessage>
+</ValidationRule>

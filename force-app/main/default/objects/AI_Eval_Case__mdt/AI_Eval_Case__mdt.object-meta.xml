@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Offline evaluation cases for AI prompts. Each case supplies token values and checks the response.</description>
+    <label>AI Evaluation Case</label>
+    <pluralLabel>AI Evaluation Cases</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

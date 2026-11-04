@@ -1,0 +1,12 @@
+{
+  "activeViewId": "bf731ea7-940e-4d88-84fa-e8b958aee512",
+  "appPageId": "dd5747ff-594f-4073-9301-c22b43210bee",
+  "configurationTags": [],
+  "devName": "Public_Enquiry__c",
+  "id": "6c482931-2f8a-448f-85ce-a3267b37bc34",
+  "label": "Enquire Now",
+  "pageAccess": "Public",
+  "routeType": "custom-public-enquiry",
+  "type": "route",
+  "urlPrefix": "enquire"
+}

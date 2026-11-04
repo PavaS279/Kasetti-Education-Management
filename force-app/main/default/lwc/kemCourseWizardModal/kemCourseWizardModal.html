@@ -1,0 +1,178 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+
+    <h3 class="kem-section-title section">Course</h3>
+    <div class="form-grid">
+      <lightning-input
+        label="Course name"
+        value={name}
+        data-field="name"
+        onchange={handleField}
+        max-length="80"
+        placeholder="For example Python for Kids"
+        required
+        class="wide"
+      ></lightning-input>
+      <lightning-input
+        label="Course code"
+        value={code}
+        data-field="code"
+        onchange={handleField}
+        max-length="40"
+        field-level-help="Optional short code used in imports and reports, for example KT-CRS-PYT."
+      ></lightning-input>
+      <div class="ages">
+        <lightning-input
+          type="number"
+          label="Minimum age"
+          value={minAge}
+          data-field="minAge"
+          onchange={handleField}
+          min="2"
+          max="99"
+        ></lightning-input>
+        <lightning-input
+          type="number"
+          label="Maximum age"
+          value={maxAge}
+          data-field="maxAge"
+          onchange={handleField}
+          min="2"
+          max="99"
+        ></lightning-input>
+      </div>
+    </div>
+    <lightning-textarea
+      label="Description"
+      value={description}
+      data-field="description"
+      onchange={handleField}
+      max-length="2000"
+      placeholder="What learners do and achieve; shown to families"
+    ></lightning-textarea>
+
+    <template lwc:if={canPrice}>
+      <div class="price-head">
+        <h3 class="kem-section-title">Prices</h3>
+        <lightning-input
+          type="date"
+          label="Prices from"
+          value={pricesFrom}
+          data-field="pricesFrom"
+          onchange={handleField}
+          variant="label-inline"
+          class="from"
+        ></lightning-input>
+      </div>
+      <p class="kem-muted small">
+        Charged on enrolment and monthly or termly invoices; tax is added from
+        the branch. Leave the amount empty to skip a line. A branch price
+        overrides the all-branches price there.
+      </p>
+      <template lwc:if={hasPrices}>
+        <ul class="prices" aria-label="Prices">
+          <template for:each={priceRows} for:item="l">
+            <li key={l.key} class="price">
+              <lightning-combobox
+                label="Fee"
+                value={l.feeType}
+                options={feeTypeOptions}
+                data-index={l.index}
+                data-field="feeType"
+                onchange={handleLine}
+              ></lightning-combobox>
+              <lightning-combobox
+                label="Charged"
+                value={l.frequency}
+                options={frequencyOptions}
+                data-index={l.index}
+                data-field="frequency"
+                onchange={handleLine}
+              ></lightning-combobox>
+              <lightning-input
+                type="number"
+                label="Amount"
+                formatter="currency"
+                step="0.01"
+                min="0.01"
+                value={l.amount}
+                data-index={l.index}
+                data-field="amount"
+                onchange={handleLine}
+              ></lightning-input>
+              <lightning-combobox
+                label="Branch"
+                value={l.branchId}
+                options={branchOptions}
+                data-index={l.index}
+                data-field="branchId"
+                onchange={handleLine}
+              ></lightning-combobox>
+              <lightning-button-icon
+                icon-name="utility:delete"
+                alternative-text="Remove price"
+                title="Remove price"
+                variant="bare"
+                data-index={l.index}
+                onclick={handleRemoveLine}
+                class="remove"
+              ></lightning-button-icon>
+            </li>
+          </template>
+        </ul>
+      </template>
+      <lightning-button
+        label="Add price"
+        icon-name="utility:add"
+        variant="base"
+        onclick={handleAddLine}
+      ></lightning-button>
+      <template lwc:if={noTuition}>
+        <div class="kem-muted small warn">
+          <lightning-icon
+            icon-name="utility:warning"
+            size="xx-small"
+            variant="warning"
+          ></lightning-icon>
+          No tuition amount yet: enrolments on this course would be free until a
+          price is added.
+        </div>
+      </template>
+    </template>
+    <template lwc:elseif={isLoading}></template>
+    <template lwc:else>
+      <p class="kem-muted small section">
+        Prices are set by finance or an administrator after the course is
+        created.
+      </p>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      label="Create course"
+      onclick={handleCreate}
+      disabled={cannotSubmit}
+    ></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Create and add a class"
+      onclick={handleCreateAndClass}
+      disabled={cannotSubmit}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

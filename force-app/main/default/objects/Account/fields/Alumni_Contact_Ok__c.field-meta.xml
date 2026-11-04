@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Alumni_Contact_Ok__c</fullName>
+    <inlineHelpText
+  >Untick if the alumnus does not want news and invitations.</inlineHelpText>
+    <label>Alumni Contact Allowed</label>
+    <defaultValue>true</defaultValue>
+    <type>Checkbox</type>
+</CustomField>

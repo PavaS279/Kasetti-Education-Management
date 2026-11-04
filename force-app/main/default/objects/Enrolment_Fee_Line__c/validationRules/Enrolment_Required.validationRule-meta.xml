@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Enrolment_Required</fullName>
+    <active>true</active>
+    <description
+  >A fee snapshot belongs to exactly one section or programme enrolment.</description>
+    <errorConditionFormula
+  >OR(AND(ISBLANK(Enrolment__c), ISBLANK(Programme_Enrolment__c)), AND(NOT(ISBLANK(Enrolment__c)), NOT(ISBLANK(Programme_Enrolment__c))))</errorConditionFormula>
+    <errorMessage
+  >A fee line must belong to either a section enrolment or a programme enrolment, not both.</errorMessage>
+</ValidationRule>

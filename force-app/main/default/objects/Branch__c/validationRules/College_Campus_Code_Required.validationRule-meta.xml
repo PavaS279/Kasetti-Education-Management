@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Campus_Code_Required</fullName>
+    <active>true</active>
+    <description
+  >Enter a one-letter campus code for a college campus.</description>
+    <errorConditionFormula
+  >AND(ISPICKVAL(Institution_Type__c, 'College'), ISBLANK(Campus_Code__c))</errorConditionFormula>
+    <errorDisplayField>Campus_Code__c</errorDisplayField>
+    <errorMessage
+  >Enter a one-letter campus code for a college campus.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Mode_Required_Fields</fullName>
+    <active>true</active>
+    <errorConditionFormula
+  >AND(College_Mode__c, OR(ISBLANK(Learning_Program__c), ISBLANK(Academic_Year__c), ISBLANK(TEXT(Entry_Route__c)), ISBLANK(Entry_Year_Of_Study__c)))</errorConditionFormula>
+    <errorMessage
+  >College admissions require a programme, academic year, entry route and entry year.</errorMessage>
+</ValidationRule>

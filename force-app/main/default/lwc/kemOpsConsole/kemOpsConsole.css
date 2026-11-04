@@ -1,0 +1,152 @@
+@import "c/kemStyles";
+
+.panel {
+  padding: 1rem;
+}
+
+.head,
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.head {
+  margin-bottom: 0.75rem;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.health {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  padding: 0.75rem;
+  border-radius: var(--kem-radius-sm);
+}
+
+.health_ok {
+  background: #eef8f1;
+  --slds-c-icon-color-foreground-default: var(--kem-green);
+}
+
+.health_warn {
+  background: #fdf5e8;
+  --slds-c-icon-color-foreground-default: var(--kem-amber);
+}
+
+.health_bad {
+  background: #fbe3e2;
+  --slds-c-icon-color-foreground-default: var(--kem-red);
+}
+
+.issues {
+  margin-top: 0.25rem;
+  padding-left: 1rem;
+  list-style: disc;
+  font-size: 0.75rem;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-surface);
+}
+
+.tile-count {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--kem-navy);
+}
+
+.tile-label {
+  font-size: 0.6875rem;
+  color: var(--kem-muted);
+}
+
+.tile_warning {
+  border-color: var(--kem-amber);
+  background: #fffaf2;
+}
+
+.tile_error {
+  border-color: var(--kem-red);
+  background: #fff5f5;
+}
+
+.tile_error .tile-count {
+  color: var(--kem-red);
+}
+
+.tile_ok .tile-count {
+  color: var(--kem-blue);
+}
+
+.group-title {
+  display: block;
+  margin: 0.75rem 0 0.4rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--kem-muted);
+}
+
+.job,
+.run,
+.error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.6rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--kem-line);
+}
+
+.job-main {
+  display: flex;
+  flex: 1 1 12rem;
+  flex-direction: column;
+}
+
+.run_bad {
+  color: var(--kem-red);
+}
+
+.detail {
+  flex-basis: 100%;
+  font-size: 0.75rem;
+  color: var(--kem-red);
+}
+
+.error {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.toggle {
+  display: block;
+  margin-top: 0.5rem;
+}
+
+.loading {
+  position: relative;
+  min-height: 5rem;
+}

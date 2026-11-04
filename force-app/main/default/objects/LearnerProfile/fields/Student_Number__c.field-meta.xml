@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Student_Number__c</fullName>
+    <inlineHelpText
+  >Institution-wide learner number, generated when the learner profile is created.</inlineHelpText>
+    <label>Student Number</label>
+    <displayFormat>STU-{00000}</displayFormat>
+    <externalId>false</externalId>
+    <type>AutoNumber</type>
+</CustomField>

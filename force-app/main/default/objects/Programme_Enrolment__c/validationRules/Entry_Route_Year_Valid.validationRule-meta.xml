@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Entry_Route_Year_Valid</fullName>
+    <active>true</active>
+    <errorConditionFormula
+  >OR(AND(ISPICKVAL(Entry_Route__c, &quot;Regular&quot;), Entry_Year_Of_Study__c &lt;&gt; 1), AND(ISPICKVAL(Entry_Route__c, &quot;Lateral&quot;), Entry_Year_Of_Study__c &lt;&gt; 2))</errorConditionFormula>
+    <errorMessage
+  >Regular entry must start in year 1; lateral entry must start in year 2.</errorMessage>
+</ValidationRule>

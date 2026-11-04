@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Risk_Score__c</fullName>
+    <inlineHelpText
+  >0-100 from attendance, missed sessions in a row, overdue fees and course score. Recalculated nightly.</inlineHelpText>
+    <label>Risk Score</label>
+    <required>false</required>
+    <precision>3</precision>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>

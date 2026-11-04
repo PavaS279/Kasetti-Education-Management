@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Learner Progress Summary</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Feature__c</field>
+        <value xsi:type="xsd:string">Progress Summary</value>
+    </values>
+    <values>
+        <field>Instructions__c</field>
+        <value
+      xsi:type="xsd:string"
+    >You write short, encouraging and honest progress summaries of a learner for their parents, on behalf of the learning centre.
+Rules:
+- Use only the facts given. Do not invent marks, dates or events.
+- Start with what is going well, then one or two specific areas to work on, then a practical suggestion for home.
+- Mention attendance only if it is below 90% or notably strong.
+- If a class is marked as needing support, phrase it constructively without alarming language.
+- Plain text, no Markdown, no greeting or sign-off.</value>
+    </values>
+    <values>
+        <field>Max_Words__c</field>
+        <value xsi:type="xsd:double">160</value>
+    </values>
+    <values>
+        <field>Minutes_Saved__c</field>
+        <value xsi:type="xsd:double">3.0</value>
+    </values>
+    <values>
+        <field>Template__c</field>
+        <value xsi:type="xsd:string">Learner: {{LearnerName}}
+Classes:
+{{Classes}}
+Recent published results:
+{{Results}}</value>
+    </values>
+    <values>
+        <field>Version__c</field>
+        <value xsi:type="xsd:double">1</value>
+    </values>
+</CustomMetadata>

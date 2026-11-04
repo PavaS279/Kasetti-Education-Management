@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Exam_Type__c</fullName>
+    <label>Exam Type</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Term</fullName>
+                <default>true</default>
+                <label>Term</label>
+            </value>
+            <value>
+                <fullName>Final</fullName>
+                <default>false</default>
+                <label>Final</label>
+            </value>
+            <value>
+                <fullName>Mock</fullName>
+                <default>false</default>
+                <label>Mock</label>
+            </value>
+            <value>
+                <fullName>Entrance</fullName>
+                <default>false</default>
+                <label>Entrance</label>
+            </value>
+            <value>
+                <fullName>Competitive</fullName>
+                <default>false</default>
+                <label>Competitive</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

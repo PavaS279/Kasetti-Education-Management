@@ -1,0 +1,80 @@
+<template>
+  <ul class="rooms" aria-label="Rooms">
+    <template for:each={rows} for:item="r">
+      <li key={r.key} class="room">
+        <lightning-input
+          label="Room name"
+          value={r.name}
+          data-index={r.index}
+          data-field="name"
+          onchange={handleField}
+          max-length="80"
+          placeholder="For example Turing Lab"
+        ></lightning-input>
+        <lightning-combobox
+          label="Type"
+          value={r.roomType}
+          options={typeOptions}
+          data-index={r.index}
+          data-field="roomType"
+          onchange={handleField}
+        ></lightning-combobox>
+        <lightning-input
+          type="number"
+          label="Seats"
+          value={r.capacity}
+          data-index={r.index}
+          data-field="capacity"
+          onchange={handleField}
+          min="1"
+          max="1000"
+          required={r.name}
+        ></lightning-input>
+        <template lwc:if={r.isVirtual}>
+          <lightning-input
+            type="url"
+            label="Meeting link"
+            value={r.meetingUrl}
+            data-index={r.index}
+            data-field="meetingUrl"
+            onchange={handleField}
+            required={r.name}
+          ></lightning-input>
+        </template>
+        <template lwc:else>
+          <lightning-input
+            label="Equipment"
+            value={r.equipment}
+            data-index={r.index}
+            data-field="equipment"
+            onchange={handleField}
+            placeholder="Projector, whiteboard…"
+          ></lightning-input>
+        </template>
+        <template lwc:if={r.canRemove}>
+          <lightning-button-icon
+            icon-name="utility:delete"
+            alternative-text="Remove room"
+            title="Remove room"
+            variant="bare"
+            data-index={r.index}
+            onclick={handleRemove}
+            class="remove"
+          ></lightning-button-icon>
+        </template>
+        <template lwc:else>
+          <span class="remove"></span>
+        </template>
+      </li>
+    </template>
+  </ul>
+  <div class="foot">
+    <lightning-button
+      label="Add another room"
+      icon-name="utility:add"
+      variant="base"
+      onclick={handleAdd}
+    ></lightning-button>
+    <span class="kem-muted total">{namedRooms} rooms · {totalSeats} seats</span>
+  </div>
+</template>

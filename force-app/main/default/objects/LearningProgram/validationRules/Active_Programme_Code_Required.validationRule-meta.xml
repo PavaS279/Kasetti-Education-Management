@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Active_Programme_Code_Required</fullName>
+    <active>true</active>
+    <description
+  >Enter a programme code before activating this college programme.</description>
+    <errorConditionFormula
+  >AND(Active__c, ISBLANK(Programme_Code__c))</errorConditionFormula>
+    <errorDisplayField>Programme_Code__c</errorDisplayField>
+    <errorMessage
+  >Enter a programme code before activating this college programme.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata"><fullName
+  >Actioned_By__c</fullName><deleteConstraint>SetNull</deleteConstraint><label
+  >Actioned By</label><referenceTo>User</referenceTo><relationshipLabel
+  >Seat Reservation Actions</relationshipLabel><relationshipName
+  >Seat_Reservation_Actions</relationshipName><trackHistory
+  >false</trackHistory><type>Lookup</type></CustomField>

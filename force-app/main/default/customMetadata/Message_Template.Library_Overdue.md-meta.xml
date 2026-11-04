@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Library Overdue</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Body__c</field>
+        <value xsi:type="xsd:string">Dear {{RecipientFirstName}},
+
+{{ItemTitle}} borrowed by {{LearnerName}} was due back on {{DueDate}} and is now {{DaysOverdue}} day(s) overdue.
+
+Please return it to {{BranchName}} as soon as possible. A late fee of {{DailyFine}} per day applies.</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Sent daily while a library loan is overdue (on days 1, 7 and 14). Tokens: {{ItemTitle}}, {{DueDate}}, {{DaysOverdue}}, {{DailyFine}}.</value>
+    </values>
+    <values>
+        <field>Send_Email__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Send_Portal__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Subject__c</field>
+        <value xsi:type="xsd:string">{{ItemTitle}} is overdue</value>
+    </values>
+</CustomMetadata>

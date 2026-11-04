@@ -1,0 +1,75 @@
+<template>
+  <div class="shell">
+    <header>
+      <div>
+        <p class="eyebrow">KT COLLEGE</p>
+        <h1>College overview</h1>
+        <p class="subtitle">
+          Campuses, programmes, branches, intake, sections and curriculum—using
+          college wording only in this app.
+        </p>
+      </div>
+      <lightning-button-icon
+        icon-name="utility:refresh"
+        alternative-text="Refresh"
+        title="Refresh"
+        onclick={load}
+      ></lightning-button-icon>
+    </header>
+
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading college overview"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <template lwc:if={dashboard}>
+      <div class="summary" aria-label="College catalogue totals">
+        <span>{dashboard.campuses.length} campuses</span>
+        <span>{dashboard.programmes.length} programmes</span>
+        <span>{dashboard.campusBranches.length} campus branches</span>
+        <span>{dashboard.sections.length} sections</span>
+        <span>{dashboard.sectionSubjects} section subjects</span>
+      </div>
+      <div class="grid">
+        <template for:each={cards} for:item="card">
+          <article key={card.key} class="card">
+            <div class="card-head">
+              <h2>{card.label}</h2>
+              <span>{card.count}</span>
+            </div>
+            <template lwc:if={card.rows.length}>
+              <ul>
+                <template for:each={card.rows} for:item="row">
+                  <li key={row.id}>
+                    <div class="row-main">
+                      <a href="#" data-id={row.id} onclick={openRecord}
+                        >{row.name}</a
+                      >
+                      <template lwc:if={row.status}
+                        ><span class="badge">{row.status}</span></template
+                      >
+                    </div>
+                    <div class="detail">
+                      {row.detail}<template lwc:if={row.metricLabel}>
+                        · {row.metricLabel}</template
+                      >
+                    </div>
+                  </li>
+                </template>
+              </ul>
+            </template>
+            <template lwc:else
+              ><p class="empty">No records visible to you.</p></template
+            >
+          </article>
+        </template>
+      </div>
+    </template>
+  </div>
+</template>

@@ -1,0 +1,95 @@
+<template>
+  <div class="queue">
+    <section class="kem-hero kem-fade-in">
+      <div class="hero-row">
+        <div>
+          <div class="kem-hero__title">Admissions Review</div>
+          <div class="kem-hero__subtitle">
+            Applications waiting on review, decisions, and offer responses.
+          </div>
+        </div>
+        <div class="kpis">
+          <template for:each={columns} for:item="column">
+            <div key={column.stage} class="kem-kpi">
+              <div class="kem-kpi__value">{column.count}</div>
+              <div class="kem-kpi__label">{column.label}</div>
+            </div>
+          </template>
+        </div>
+      </div>
+      <div class="toolbar">
+        <lightning-combobox
+          class="toolbar-branch"
+          label="Branch"
+          variant="label-hidden"
+          placeholder="All branches"
+          value={branchId}
+          options={branchOptions}
+          onchange={handleBranch}
+        ></lightning-combobox>
+        <lightning-button-icon
+          icon-name="utility:refresh"
+          variant="border-inverse"
+          alternative-text="Refresh"
+          title="Refresh"
+          onclick={handleRefresh}
+        ></lightning-button-icon>
+      </div>
+    </section>
+    <template lwc:if={errorMessage}>
+      <div
+        class="slds-m-top_medium slds-notify slds-notify_alert slds-alert_error"
+        role="alert"
+      >
+        {errorMessage}
+      </div>
+    </template>
+    <div class="board">
+      <template for:each={columns} for:item="column">
+        <section key={column.stage} class="column" aria-label={column.label}>
+          <header class="column-header">
+            <span class="column-title">{column.label}</span>
+            <span class="kem-badge">{column.count}</span>
+          </header>
+          <template for:each={column.cards} for:item="card">
+            <article
+              key={card.Id}
+              class="kem-card kem-card_interactive card kem-fade-in"
+              data-id={card.Id}
+              onclick={handleOpen}
+              onkeydown={handleKey}
+              tabindex="0"
+              role="link"
+            >
+              <div class="card-top">
+                <span class={card.avatarClass}>{card.initials}</span>
+                <div class="card-text">
+                  <div class="card-name">{card.applicant}</div>
+                  <div class="kem-muted small">{card.course}</div>
+                </div>
+              </div>
+              <div class="badges">
+                <span class={card.checklistClass}>{card.checklistLabel}</span>
+                <span class={card.eligibilityClass}
+                  >{card.Eligibility_Status__c}</span
+                >
+                <template lwc:if={card.offerLabel}
+                  ><span class="kem-badge kem-badge_info"
+                    >{card.offerLabel}</span
+                  ></template
+                >
+              </div>
+              <div class="card-footer kem-muted">
+                <span>{card.Name}</span>
+                <span>{card.waiting}</span>
+              </div>
+            </article>
+          </template>
+          <template lwc:if={column.isEmpty}
+            ><div class="kem-empty">Nothing waiting</div></template
+          >
+        </section>
+      </template>
+    </div>
+  </div>
+</template>

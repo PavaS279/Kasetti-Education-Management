@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Group xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >KT College admission desk and Dean. A sharing rule gives this group edit access to every college admission (College Mode), whoever created it; add the desk and Dean users as members.</description>
+    <doesIncludeBosses>false</doesIncludeBosses>
+    <name>KEM College Admissions Team</name>
+</Group>

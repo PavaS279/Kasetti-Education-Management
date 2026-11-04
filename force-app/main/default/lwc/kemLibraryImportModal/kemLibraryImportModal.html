@@ -1,0 +1,94 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <p class="intro">
+      A CSV with a header row: <strong>Title</strong> and <strong>Code</strong>
+      are required; Type (Book, Device, Kit, Media, Other), Author, Subject,
+      Copies (1 if empty), Location, Loan days, Daily fine and Replacement cost
+      are optional. A code the branch already has adds the copies to that item.
+      <a href={templateHref} download="library-items-template.csv"
+        >Download a template</a
+      >
+    </p>
+    <div class="source">
+      <lightning-input
+        type="file"
+        label="CSV file"
+        accept=".csv,text/csv"
+        onchange={handleFile}
+      ></lightning-input>
+      <template lwc:if={fileName}>
+        <span class="kem-muted small">{fileName}</span>
+      </template>
+    </div>
+    <lightning-textarea
+      label="…or paste the lines"
+      value={csv}
+      onchange={handlePaste}
+      class="paste"
+    ></lightning-textarea>
+    <div class="preview-bar">
+      <lightning-button
+        label="Preview"
+        icon-name="utility:preview"
+        onclick={handlePreview}
+        disabled={cannotPreview}
+      ></lightning-button>
+      <span class="summary">{summary}</span>
+    </div>
+    <template lwc:if={isBusy}>
+      <lightning-spinner
+        alternative-text="Reading the file"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={preview}>
+      <div class="table-wrap">
+        <table
+          class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
+        >
+          <thead>
+            <tr>
+              <th scope="col">Line</th>
+              <th scope="col">Title</th>
+              <th scope="col">Code</th>
+              <th scope="col">Type</th>
+              <th scope="col">Copies</th>
+              <th scope="col">What happens</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={rows} for:item="r">
+              <tr key={r.key}>
+                <td>{r.line}</td>
+                <td>{r.title}</td>
+                <td>{r.code}</td>
+                <td>{r.itemType}</td>
+                <td>{r.copies}</td>
+                <td>
+                  <span class={r.actionClass}>{r.action}</span>
+                  <span class="kem-muted small message">{r.message}</span>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label={importLabel}
+      onclick={handleImport}
+      disabled={cannotImport}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

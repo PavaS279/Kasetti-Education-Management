@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningMessageChannel xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >A class's enrolments or seats changed; components on the class page refresh.</description>
+    <isExposed>false</isExposed>
+    <lightningMessageFields>
+        <description>The class (CourseOffering) Id.</description>
+        <fieldName>offeringId</fieldName>
+    </lightningMessageFields>
+    <masterLabel>KEM Class Changed</masterLabel>
+</LightningMessageChannel>

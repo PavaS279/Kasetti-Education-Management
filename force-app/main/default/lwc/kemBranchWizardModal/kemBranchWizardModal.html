@@ -1,0 +1,271 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <lightning-progress-indicator current-step={step} type="path" class="path">
+      <template for:each={steps} for:item="s">
+        <lightning-progress-step
+          key={s.value}
+          label={s.label}
+          value={s.value}
+        ></lightning-progress-step>
+      </template>
+    </lightning-progress-indicator>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+
+    <template lwc:if={isBranch}>
+      <div class="form-grid">
+        <lightning-input
+          label="Branch name"
+          value={form.name}
+          data-field="name"
+          onchange={handleField}
+          max-length="80"
+          placeholder="For example KT Edutech Jayanagar"
+          required
+          class="wide"
+        ></lightning-input>
+        <lightning-input
+          label="Branch code"
+          value={form.code}
+          data-field="code"
+          onchange={handleField}
+          max-length="20"
+          placeholder="JPN-01"
+          required
+          field-level-help="Short unique code used on reports and imports."
+        ></lightning-input>
+        <lightning-input
+          label="Invoice prefix"
+          value={form.invoicePrefix}
+          data-field="invoicePrefix"
+          onchange={handleField}
+          max-length="10"
+          placeholder="JPN"
+          required
+          field-level-help="Invoices at this branch are numbered JPN-000001, JPN-000002…"
+        ></lightning-input>
+        <lightning-combobox
+          label="Branch manager"
+          value={form.managerUserId}
+          options={managerOptions}
+          data-field="managerUserId"
+          onchange={handleField}
+          field-level-help="Approves refunds and sees the branch desks; can edit the branch's policies."
+        ></lightning-combobox>
+        <lightning-input
+          type="tel"
+          label="Phone"
+          value={form.phone}
+          data-field="phone"
+          onchange={handleField}
+        ></lightning-input>
+        <lightning-input
+          type="email"
+          label="Email"
+          value={form.email}
+          data-field="email"
+          onchange={handleField}
+        ></lightning-input>
+      </div>
+    </template>
+
+    <template lwc:if={isPolicies}>
+      <h3 class="kem-section-title section">Address</h3>
+      <div class="form-grid">
+        <lightning-input
+          label="Street"
+          value={form.street}
+          data-field="street"
+          onchange={handleField}
+          class="wide"
+        ></lightning-input>
+        <lightning-input
+          label="City"
+          value={form.city}
+          data-field="city"
+          onchange={handleField}
+        ></lightning-input>
+        <lightning-input
+          label="State"
+          value={form.state}
+          data-field="state"
+          onchange={handleField}
+        ></lightning-input>
+        <lightning-input
+          label="PIN code"
+          value={form.postalCode}
+          data-field="postalCode"
+          onchange={handleField}
+          pattern="[0-9]{6}"
+          message-when-pattern-mismatch="Enter the 6-digit PIN code."
+        ></lightning-input>
+        <lightning-input
+          label="Country"
+          value={form.country}
+          data-field="country"
+          onchange={handleField}
+        ></lightning-input>
+      </div>
+      <h3 class="kem-section-title section">Policies</h3>
+      <div class="form-grid">
+        <lightning-input
+          label="Opening hours"
+          value={form.operatingHours}
+          data-field="operatingHours"
+          onchange={handleField}
+          class="wide"
+        ></lightning-input>
+        <lightning-checkbox-group
+          label="Delivery"
+          options={modeOptions}
+          value={form.deliveryModes}
+          data-field="deliveryModes"
+          onchange={handleField}
+          required
+          class="wide modes"
+        ></lightning-checkbox-group>
+        <lightning-input
+          type="number"
+          label="Tax rate (%)"
+          value={form.taxRate}
+          data-field="taxRate"
+          onchange={handleField}
+          min="0"
+          max="100"
+          step="0.01"
+          field-level-help="GST added to invoices at this branch."
+        ></lightning-input>
+        <lightning-input
+          type="number"
+          label="Payment terms (days)"
+          value={form.invoiceDueDays}
+          data-field="invoiceDueDays"
+          onchange={handleField}
+          min="0"
+          max="90"
+        ></lightning-input>
+        <lightning-input
+          type="number"
+          label="Attendance minimum (%)"
+          value={form.attendanceThreshold}
+          data-field="attendanceThreshold"
+          onchange={handleField}
+          min="0"
+          max="100"
+          field-level-help="Below this, learners are flagged and can be withheld from exams."
+        ></lightning-input>
+        <lightning-input
+          type="number"
+          label="Cancellation notice (hours)"
+          value={form.cancellationHours}
+          data-field="cancellationHours"
+          onchange={handleField}
+          min="0"
+          max="168"
+        ></lightning-input>
+      </div>
+    </template>
+
+    <template lwc:if={isRooms}>
+      <p class="hint">Rooms can also be added later from the Set-up Centre.</p>
+      <c-kem-room-lines lines={rooms} onchange={handleRooms}></c-kem-room-lines>
+    </template>
+
+    <template lwc:if={isHolidays}>
+      <div class="suggest">
+        <lightning-combobox
+          label="Year"
+          value={year}
+          options={yearOptions}
+          onchange={handleYear}
+          class="year"
+        ></lightning-combobox>
+        <lightning-button
+          label="Suggest the year's holidays"
+          icon-name="utility:magicwand"
+          onclick={handleSuggest}
+          disabled={isBusy}
+        ></lightning-button>
+      </div>
+      <c-kem-holiday-lines
+        lines={holidays}
+        onchange={handleHolidays}
+      ></c-kem-holiday-lines>
+    </template>
+
+    <template lwc:if={isReview}>
+      <p class="hint">Nothing is saved until you open the branch.</p>
+      <dl class="summary">
+        <dt>Branch</dt>
+        <dd>
+          {form.name} ({form.code}) · invoices {form.invoicePrefix}-000001
+        </dd>
+        <dt>Manager</dt>
+        <dd>{managerName}</dd>
+        <dt>Address</dt>
+        <dd>{addressText}</dd>
+        <dt>Delivery</dt>
+        <dd>{modesText}</dd>
+        <dt>Policies</dt>
+        <dd>
+          GST {form.taxRate}% · pay within {form.invoiceDueDays} days ·
+          attendance minimum {form.attendanceThreshold}% · cancel
+          {form.cancellationHours} hours ahead
+        </dd>
+        <dt>Rooms</dt>
+        <dd>{roomSummary}</dd>
+        <dt>Holidays</dt>
+        <dd>{holidaySummary}</dd>
+      </dl>
+      <template lwc:if={noManager}>
+        <p class="hint">
+          No manager yet: refunds for this branch go to administrators until one
+          is chosen on the branch.
+        </p>
+      </template>
+      <p class="hint">
+        Next: add prices for this branch if they differ, give staff their roles
+        here, and create classes.
+      </p>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <template lwc:if={showBack}>
+      <lightning-button
+        class="slds-m-left_x-small"
+        label="Back"
+        onclick={handleBack}
+        disabled={isBusy}
+      ></lightning-button>
+    </template>
+    <template lwc:if={isReview}>
+      <lightning-button
+        class="slds-m-left_x-small"
+        variant="brand"
+        label="Open the branch"
+        onclick={handleCreate}
+        disabled={isBusy}
+      ></lightning-button>
+    </template>
+    <template lwc:else>
+      <lightning-button
+        class="slds-m-left_x-small"
+        variant="brand"
+        label="Next"
+        onclick={handleNext}
+        disabled={isLoading}
+      ></lightning-button>
+    </template>
+  </lightning-modal-footer>
+</template>

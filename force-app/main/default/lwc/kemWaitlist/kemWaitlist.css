@@ -1,0 +1,104 @@
+@import "c/kemStyles";
+
+.panel {
+  padding: 1rem;
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.seats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+}
+
+.seat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.4rem 0.25rem;
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-canvas);
+}
+
+.seat-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--kem-ink);
+}
+
+.seat-label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--kem-muted);
+  text-align: center;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.6rem;
+  align-items: center;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--kem-line);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.position {
+  min-width: 1.8rem;
+  font-weight: 800;
+  color: var(--kem-blue);
+}
+
+.main {
+  flex: 1;
+  min-width: 8rem;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.meta {
+  font-size: 0.75rem;
+  color: var(--kem-muted);
+}
+
+.meta_urgent {
+  color: var(--kem-amber);
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.toggle {
+  margin-top: 0.5rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--kem-blue);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rows_closed {
+  opacity: 0.85;
+}
+
+.small {
+  font-size: 0.75rem;
+}

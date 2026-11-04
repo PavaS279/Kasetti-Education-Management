@@ -1,0 +1,129 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <div
+        class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_small"
+        role="alert"
+      >
+        {errorMessage}
+      </div>
+    </template>
+    <template lwc:if={isAdd}>
+      <lightning-radio-group
+        name="mode"
+        label="Guardian"
+        type="button"
+        options={modeOptions}
+        value={mode}
+        onchange={handleMode}
+      ></lightning-radio-group>
+      <template lwc:if={isExisting}>
+        <lightning-input
+          class="slds-m-top_small"
+          type="search"
+          label="Search people by name, email, or mobile"
+          value={searchTerm}
+          onchange={handleSearch}
+        ></lightning-input>
+        <ul class="results" role="listbox" aria-label="Matching people">
+          <template for:each={results} for:item="person">
+            <li
+              key={person.Id}
+              class={person.className}
+              role="option"
+              aria-selected={person.selected}
+              data-id={person.Id}
+              onclick={handlePick}
+            >
+              <span class="kem-avatar tone-6">{person.initials}</span>
+              <div>
+                <div class="person-name">{person.Name}</div>
+                <div class="kem-muted small">{person.detail}</div>
+              </div>
+            </li>
+          </template>
+        </ul>
+      </template>
+      <template lwc:else>
+        <div class="form-grid slds-m-top_small">
+          <lightning-input
+            label="First name"
+            name="firstName"
+            value={input.firstName}
+            onchange={handleField}
+          ></lightning-input>
+          <lightning-input
+            label="Last name"
+            name="lastName"
+            required
+            value={input.lastName}
+            onchange={handleField}
+          ></lightning-input>
+          <lightning-input
+            type="email"
+            label="Email"
+            name="email"
+            value={input.email}
+            onchange={handleField}
+          ></lightning-input>
+          <lightning-input
+            type="tel"
+            label="Mobile"
+            name="phone"
+            value={input.phone}
+            onchange={handleField}
+          ></lightning-input>
+        </div>
+        <p class="kem-muted small slds-m-top_x-small">
+          If a person with this email or mobile already exists, they are linked
+          instead of creating a duplicate.
+        </p>
+      </template>
+    </template>
+    <div class="flags slds-m-top_medium">
+      <lightning-combobox
+        label="Relationship"
+        name="relationship"
+        value={input.relationship}
+        options={relationshipOptions}
+        onchange={handleField}
+      ></lightning-combobox>
+      <lightning-input
+        type="toggle"
+        label="Fee payer"
+        name="isFeePayer"
+        checked={input.isFeePayer}
+        onchange={handleToggle}
+      ></lightning-input>
+      <lightning-input
+        type="toggle"
+        label="Portal access"
+        name="portalAccess"
+        checked={input.portalAccess}
+        onchange={handleToggle}
+      ></lightning-input>
+      <lightning-input
+        type="toggle"
+        label="Emergency contact"
+        name="isEmergencyContact"
+        checked={input.isEmergencyContact}
+        onchange={handleToggle}
+      ></lightning-input>
+    </div>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button
+      label="Cancel"
+      onclick={handleCancel}
+      disabled={isSaving}
+    ></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Save"
+      onclick={handleSave}
+      disabled={isSaveDisabled}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

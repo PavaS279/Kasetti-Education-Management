@@ -1,0 +1,24 @@
+@import "c/kemStyles";
+
+.router {
+  position: relative;
+  min-height: 12rem;
+  padding: 1.5rem 1rem;
+}
+
+.choice {
+  max-width: 34rem;
+  margin: 2rem auto;
+  padding: 1.25rem 1.5rem;
+}
+
+.choice p {
+  margin: 0.5rem 0 1rem;
+  font-size: 0.8125rem;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

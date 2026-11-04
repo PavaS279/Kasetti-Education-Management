@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Alumni__c</fullName>
+    <inlineHelpText
+  >Set when a learner completes a class and has no other active enrolment (F4.11).</inlineHelpText>
+    <label>Alumnus</label>
+    <defaultValue>false</defaultValue>
+    <type>Checkbox</type>
+</CustomField>

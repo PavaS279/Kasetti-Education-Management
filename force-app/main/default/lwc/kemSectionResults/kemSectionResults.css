@@ -1,0 +1,43 @@
+.results {
+  display: block;
+  padding: 1rem 1.25rem;
+}
+header,
+.subject-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--slds-g-color-neutral-base-50, #747474);
+}
+h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+.subtitle,
+.detail,
+.empty {
+  color: var(--slds-g-color-neutral-base-50, #747474);
+}
+.detail {
+  display: block;
+}
+.subject {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--slds-g-color-neutral-base-90, #e5e5e5);
+}
+table {
+  margin-top: 0.5rem;
+}
+.reason {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}

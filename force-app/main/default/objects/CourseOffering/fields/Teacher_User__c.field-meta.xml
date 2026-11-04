@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Teacher_User__c</fullName>
+    <inlineHelpText
+  >The teacher's Salesforce user. Grants roster, attendance, and results access for this class.</inlineHelpText>
+    <label>Teacher (User)</label>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel>Taught Classes</relationshipLabel>
+    <relationshipName>Taught_Classes</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

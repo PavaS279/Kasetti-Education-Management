@@ -1,0 +1,60 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <p class="intro">
+      No sessions are created on holidays and breaks, and invoices and
+      attendance follow. A holiday a branch already has is skipped, so a list
+      can be applied again safely.
+    </p>
+    <div class="top">
+      <lightning-checkbox-group
+        label="Branches"
+        options={branchOptions}
+        value={selectedBranches}
+        onchange={handleBranches}
+        required
+        class="branches"
+      ></lightning-checkbox-group>
+      <div class="suggest">
+        <lightning-combobox
+          label="Year"
+          value={year}
+          options={yearOptions}
+          onchange={handleYear}
+          class="year"
+        ></lightning-combobox>
+        <lightning-button
+          label="Suggest the year's holidays"
+          icon-name="utility:magicwand"
+          onclick={handleSuggest}
+          disabled={isBusy}
+        ></lightning-button>
+      </div>
+    </div>
+    <c-kem-holiday-lines
+      lines={lines}
+      onchange={handleLines}
+    ></c-kem-holiday-lines>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label={saveLabel}
+      onclick={handleSave}
+      disabled={cannotSave}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

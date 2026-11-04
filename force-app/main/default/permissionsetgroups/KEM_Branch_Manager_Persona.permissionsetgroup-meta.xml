@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Branch manager: manages rooms, classes, staff allocation, and learners for their branch.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>KEM Branch Manager Persona</label>
+    <permissionSets>KEM_Branch_Manager</permissionSets>
+    <permissionSets>KEM_Branch_Manager_Edu</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Enquiry Reply Grounded</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Context_Json__c</field>
+        <value
+      xsi:type="xsd:string"
+    >{"RecipientName":"Rohit","LearnerName":"Ananya","LearnerAge":"10","Channel":"Website","DeliveryMode":"Classroom","Course":"Maths Foundation, ages 8–12","Prices":"Tuition ₹2,500.00 (Monthly); Admission ₹1,000.00 (One-time) (tax may apply)","Classes":"Maths Foundation - Saturday AM, Bengaluru Central, starts 07/11/2026, Saturdays 09:00, Classroom, 4 seats left","Branch":"Bengaluru Central, Bengaluru, phone 080-1234567","EnquiryNotes":"Wants weekend classes","CounsellorNote":"none","CounsellorName":"Asha"}</value>
+    </values>
+    <values>
+        <field>Expect_Json__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Must_Contain__c</field>
+        <value xsi:type="xsd:string">Rohit|2,500|Saturday|Asha</value>
+    </values>
+    <values>
+        <field>Must_Not_Contain__c</field>
+        <value xsi:type="xsd:string">discount|free trial guaranteed</value>
+    </values>
+    <values>
+        <field>Prompt__c</field>
+        <value xsi:type="xsd:string">Enquiry_Reply</value>
+    </values>
+</CustomMetadata>

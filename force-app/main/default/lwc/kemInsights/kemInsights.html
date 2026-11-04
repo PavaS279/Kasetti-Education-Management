@@ -1,0 +1,176 @@
+<template>
+  <template lwc:if={data}>
+    <div class="insights kem-fade-in">
+      <section class="kem-hero">
+        <div class="hero">
+          <div>
+            <div class="kem-hero__subtitle">{todayLabel}</div>
+            <div class="kem-hero__title">{title}</div>
+          </div>
+          <div class="hero-actions">
+            <lightning-button
+              variant="brand-outline"
+              label="Timetable"
+              icon-name="utility:event"
+              onclick={handleTimetable}
+            ></lightning-button>
+            <template lwc:if={hasDashboard}>
+              <lightning-button
+                variant="brand-outline"
+                label="Operations dashboard"
+                icon-name="utility:chart"
+                onclick={handleDashboard}
+              ></lightning-button>
+            </template>
+          </div>
+        </div>
+      </section>
+
+      <template lwc:if={hasAlerts}>
+        <div class="alerts">
+          <template for:each={alerts} for:item="a">
+            <button
+              key={a.key}
+              type="button"
+              class="alert"
+              data-target={a.target}
+              onclick={handleTile}
+            >
+              <lightning-icon
+                icon-name={a.icon}
+                size="x-small"
+                class="alert-icon"
+              ></lightning-icon>
+              <span>{a.text}</span>
+            </button>
+          </template>
+        </div>
+      </template>
+
+      <div class="grid">
+        <section class="kem-card panel today">
+          <div class="panel-head">
+            <div class="kem-section-title">Today's classes</div>
+          </div>
+          <ul>
+            <template for:each={sessions} for:item="s">
+              <li key={s.id}>
+                <button
+                  type="button"
+                  class={s.className}
+                  data-id={s.id}
+                  onclick={handleSession}
+                >
+                  <span class="session-time">{s.time}</span>
+                  <span class="session-main">
+                    <span class="strong">{s.className}</span>
+                    <span class="kem-muted small">{s.where}</span>
+                  </span>
+                  <span class={s.badgeClass}>{s.badge}</span>
+                </button>
+              </li>
+            </template>
+          </ul>
+          <template lwc:if={noSessions}>
+            <div class="kem-empty">No classes today.</div>
+          </template>
+        </section>
+
+        <div class="side">
+          <template lwc:if={data.showClasses}>
+            <section class="kem-card panel gauges">
+              <div class="gauge" style={occupancyStyle}>
+                <div class="ring"><span>{occupancy}%</span></div>
+                <div class="gauge-label">Seats filled</div>
+                <div class="kem-muted small">
+                  {data.seatsTaken} of {data.seatCapacity} in
+                  {data.activeClasses} classes
+                </div>
+              </div>
+              <template lwc:if={data.showAttendance}>
+                <div class="gauge gauge_green" style={attendanceStyle}>
+                  <div class="ring"><span>{attendanceLabel}</span></div>
+                  <div class="gauge-label">Attendance</div>
+                  <div class="kem-muted small">Last 30 days</div>
+                </div>
+              </template>
+            </section>
+          </template>
+
+          <template lwc:if={data.showFinance}>
+            <section class="kem-card panel money">
+              <button
+                type="button"
+                class="money-row"
+                data-target="KEM_Finance_Desk"
+                onclick={handleTile}
+              >
+                <span class="kem-muted small">Outstanding</span>
+                <lightning-formatted-number
+                  class="money-value"
+                  value={data.outstanding}
+                  format-style="currency"
+                  currency-code={currencyCode}
+                  maximum-fraction-digits="0"
+                ></lightning-formatted-number>
+              </button>
+              <div class="money-split">
+                <div>
+                  <span class="kem-muted small">Overdue</span>
+                  <lightning-formatted-number
+                    class="strong overdue"
+                    value={data.overdue}
+                    format-style="currency"
+                    currency-code={currencyCode}
+                    maximum-fraction-digits="0"
+                  ></lightning-formatted-number>
+                </div>
+                <div>
+                  <span class="kem-muted small">Collected this month</span>
+                  <lightning-formatted-number
+                    class="strong collected"
+                    value={data.collectedThisMonth}
+                    format-style="currency"
+                    currency-code={currencyCode}
+                    maximum-fraction-digits="0"
+                  ></lightning-formatted-number>
+                </div>
+              </div>
+            </section>
+          </template>
+        </div>
+      </div>
+
+      <template lwc:if={data.showAdmissions}>
+        <div class="tiles">
+          <template for:each={admissionsTiles} for:item="t">
+            <button
+              key={t.key}
+              type="button"
+              class="tile kem-card"
+              data-target={t.target}
+              onclick={handleTile}
+            >
+              <span class="tile-label">{t.label}</span>
+              <span class="tile-value">{t.value}</span>
+              <span class="kem-muted small">{t.hint}</span>
+            </button>
+          </template>
+        </div>
+      </template>
+    </div>
+  </template>
+  <template lwc:elseif={errorMessage}>
+    <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+      {errorMessage}
+    </div>
+  </template>
+  <template lwc:else>
+    <div class="loading">
+      <lightning-spinner
+        alternative-text="Loading insights"
+        size="small"
+      ></lightning-spinner>
+    </div>
+  </template>
+</template>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Min_Attendance__c</fullName>
+    <inlineHelpText
+  >Hall tickets are withheld below this attendance; empty uses the branch threshold.</inlineHelpText>
+    <label>Minimum Attendance</label>
+    <required>false</required>
+    <precision>5</precision>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <type>Percent</type>
+</CustomField>

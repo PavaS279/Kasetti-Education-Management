@@ -1,0 +1,50 @@
+@import "c/kemStyles";
+
+.panel {
+  padding: 1rem;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.5rem 0;
+}
+
+.link {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+}
+
+.link-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.checkout,
+.create {
+  display: block;
+  margin-top: 0.5rem;
+}

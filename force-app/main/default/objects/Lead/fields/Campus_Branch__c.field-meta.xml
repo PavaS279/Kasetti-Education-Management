@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Campus_Branch__c</fullName>
+    <label>Campus Branch</label>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description
+  >College intake the enquiry is for. Set only by the public college enquiry; marks the enquiry as a college enquiry.</description>
+    <inlineHelpText
+  >The college programme branch and campus the student enquired about.</inlineHelpText>
+    <referenceTo>Campus_Branch__c</referenceTo>
+    <relationshipLabel>College Enquiries</relationshipLabel>
+    <relationshipName>College_Enquiries</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

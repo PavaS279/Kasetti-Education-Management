@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Value_Positive</fullName>
+    <active>true</active>
+    <description>Discount value must be greater than zero.</description>
+    <errorConditionFormula>Value__c &lt;= 0</errorConditionFormula>
+    <errorDisplayField>Value__c</errorDisplayField>
+    <errorMessage>Discount value must be greater than zero.</errorMessage>
+</ValidationRule>

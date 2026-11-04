@@ -1,0 +1,101 @@
+@import "c/kemStyles";
+
+.panel {
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.head {
+  margin-bottom: 0.75rem;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.5rem 1rem;
+  align-items: end;
+}
+
+.buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.summary {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 1rem 0 0.5rem;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.accounts {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.accounts th,
+.accounts td {
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--kem-line);
+  text-align: left;
+}
+
+.accounts th {
+  color: var(--kem-muted);
+  font-weight: 600;
+}
+
+.accounts .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.group-title {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--kem-muted);
+}
+
+.exports {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.export {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+}
+
+.export-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.download {
+  white-space: nowrap;
+  font-weight: 600;
+}

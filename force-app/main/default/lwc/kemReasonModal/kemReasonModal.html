@@ -1,0 +1,25 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={message}>
+      <p class="slds-m-bottom_small kem-muted">{message}</p>
+    </template>
+    <lightning-textarea
+      label={reasonLabel}
+      required
+      value={reason}
+      max-length="255"
+      onchange={handleChange}
+    ></lightning-textarea>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant={confirmVariant}
+      label={confirmLabel}
+      disabled={isInvalid}
+      onclick={handleConfirm}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

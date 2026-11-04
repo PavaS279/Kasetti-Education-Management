@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Course_Score__c</fullName>
+    <inlineHelpText
+  >Weighted average of the published assessments of the class.</inlineHelpText>
+    <label>Course Score</label>
+    <required>false</required>
+    <precision>5</precision>
+    <scale>2</scale>
+    <type>Percent</type>
+</CustomField>

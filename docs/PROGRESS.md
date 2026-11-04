@@ -1,0 +1,133 @@
+# Progress Tracker
+
+> **Status 2026-10-06:** All phases (0–4) are complete — every feature built, deployed, unit-tested and checked end to end. Phase 1: one learner completes the full journey with financial reconciliation. Phase 2: exceptions and recurring operations work reliably. Phase 3: additional centres and higher volumes are supported (branch templates, limit-aware batches, LMS and ERP APIs, analytics, retention, online payments, library). Phase 4: AI with measured benefit under controlled access and review (Einstein assistants, the Agentforce staff assistant, document extraction, forecasting), plus transport, exams and hall tickets, and alumni and referrals.
+
+Legend: ✅ done · 🟡 in progress · ⬜ not started
+
+Each feature is complete only when it is **built, deployed to the org, unit-tested, and checked end to end**.
+
+## Phase 0 — Foundation
+
+| #   | Feature                                                                            | Built | Deployed      | Tests | E2E check                                | Notes                                                                       |
+| --- | ---------------------------------------------------------------------------------- | ----- | ------------- | ----- | ---------------------------------------- | --------------------------------------------------------------------------- |
+| 0.1 | Org analysis & data model decision                                                 | ✅    | n/a           | n/a   | n/a                                      | [01-solution-architecture.md](01-solution-architecture.md), ADR-001/002/003 |
+| 0.2 | Apex framework (trigger handler, logger, settings, status transitions, exceptions) | ✅    | ✅            | ✅    | ✅ live logger smoke test                |                                                                             |
+| 0.3 | Branch & Room model with policies                                                  | ✅    | ✅            | ✅    | ✅                                       | Branch manager managed sharing                                              |
+| 0.4 | Security model: 7 permission sets, Lightning app, tabs                             | ✅    | ✅            | ✅    | ✅ `SecurityModelTest` persona scenarios |                                                                             |
+| 0.5 | Statuses & policies definition                                                     | ✅    | ✅ (settings) | ✅    | n/a                                      | Transition records added per feature                                        |
+| 0.6 | Migration preparation (external IDs, load order, templates)                        | ✅    | n/a           | n/a   | n/a                                      | [05-data-migration.md](05-data-migration.md)                                |
+
+**Phase 0 completion condition — data model and access scenarios validated:** ✅
+
+## Phase 1 — Operational MVP
+
+| #    | Feature                                               | Built | Deployed | Tests | E2E check | Notes                                                                                 |
+| ---- | ----------------------------------------------------- | ----- | -------- | ----- | --------- | ------------------------------------------------------------------------------------- |
+| 1.1  | Enquiries: capture, assignment, follow-up, conversion | ✅    | ✅       | ✅    | ✅        | [F1.1-enquiries.md](features/F1.1-enquiries.md)                                       |
+| 1.2  | Learner & guardian records, Learner 360               | ✅    | ✅       | ✅    | ✅        | [F1.2-learners-guardians.md](features/F1.2-learners-guardians.md)                     |
+| 1.3  | Applications: checklist, decision, offer, acceptance  | ✅    | ✅       | ✅    | ✅        | [F1.3-applications.md](features/F1.3-applications.md)                                 |
+| 1.4  | Course prices and discounts                           | ✅    | ✅       | ✅    | ✅        | [F1.4-pricing-discounts.md](features/F1.4-pricing-discounts.md)                       |
+| 1.5  | Enrolment with seat control and agreed price          | ✅    | ✅       | ✅    | ✅        | [F1.5-enrolment.md](features/F1.5-enrolment.md)                                       |
+| 1.6  | Scheduling: sessions, conflicts, calendar             | ✅    | ✅       | ✅    | ✅        | [F1.6-scheduling.md](features/F1.6-scheduling.md)                                     |
+| 1.7  | Attendance                                            | ✅    | ✅       | ✅    | ✅        | [F1.7-attendance.md](features/F1.7-attendance.md)                                     |
+| 1.8  | Basic assessments                                     | ✅    | ✅       | ✅    | ✅        | [F1.8-assessments.md](features/F1.8-assessments.md)                                   |
+| 1.9  | Invoices, payments, reconciliation                    | ✅    | ✅       | ✅    | ✅        | [F1.9-billing.md](features/F1.9-billing.md)                                           |
+| 1.10 | Documents                                             | ✅    | ✅       | ✅    | ✅        | [F1.10-documents.md](features/F1.10-documents.md)                                     |
+| 1.11 | Basic portal                                          | ✅    | ✅       | ✅    | ✅        | [F1.11-portal.md](features/F1.11-portal.md) — site placement is a manual Builder step |
+| 1.12 | Dashboards                                            | ✅    | ✅       | ✅    | ✅        | [F1.12-dashboards.md](features/F1.12-dashboards.md)                                   |
+| 1.13 | Full learner journey with financial reconciliation    | ✅    | ✅       | ✅    | ✅        | [F1.13-full-journey.md](features/F1.13-full-journey.md)                               |
+
+**Phase 1 completion condition — one learner can complete the full journey with financial reconciliation:** ✅ (`FullJourneyTest` and the live run in [F1.13](features/F1.13-full-journey.md))
+
+## Phase 2 — Operational depth
+
+**Completion condition — exceptions and recurring operations work reliably:** ✅ (`Phase2JourneyTest`, the live checks of F2.1–F2.9, `scripts/demo/phase2-journey.sh` passing 31 of 31 checks live, and the operations console reporting healthy)
+
+| #   | Feature                                                            | Built | Deployed | Tests | E2E check | Notes                                                                                   |
+| --- | ------------------------------------------------------------------ | ----- | -------- | ----- | --------- | --------------------------------------------------------------------------------------- |
+| 2.1 | Waitlists: queue, held seats, offers with expiry, accept → enrol   | ✅    | ✅       | ✅    | ✅        | [F2.1-waitlists.md](features/F2.1-waitlists.md)                                         |
+| 2.2 | Transfers between classes with price difference                    | ✅    | ✅       | ✅    | ✅        | [F2.2-transfers.md](features/F2.2-transfers.md)                                         |
+| 2.3 | Recurring billing and instalment plans                             | ✅    | ✅       | ✅    | ✅        | [F2.3-recurring-billing-instalments.md](features/F2.3-recurring-billing-instalments.md) |
+| 2.4 | Refund automation and credit notes                                 | ✅    | ✅       | ✅    | ✅        | [F2.4-credit-notes-refunds.md](features/F2.4-credit-notes-refunds.md)                   |
+| 2.5 | Messaging (templated notifications with consent)                   | ✅    | ✅       | ✅    | ✅        | [F2.5-messaging.md](features/F2.5-messaging.md)                                         |
+| 2.6 | Resource substitution (teacher cover, room swaps)                  | ✅    | ✅       | ✅    | ✅        | [F2.6-resource-substitution.md](features/F2.6-resource-substitution.md)                 |
+| 2.7 | Advanced grading (weighted course grades, report cards)            | ✅    | ✅       | ✅    | ✅        | [F2.7-advanced-grading.md](features/F2.7-advanced-grading.md)                           |
+| 2.8 | Richer portal (documents, waitlist, instalments, messages, grades) | ✅    | ✅       | ✅    | ✅        | [F2.8-richer-portal.md](features/F2.8-richer-portal.md)                                 |
+| 2.9 | Operations console and Phase 2 journey                             | ✅    | ✅       | ✅    | ✅        | [F2.9-operations-console.md](features/F2.9-operations-console.md)                       |
+
+## Phase 3 — Scale and optimisation
+
+**Completion condition — additional centres and higher volumes supported:** ✅ (`Phase3JourneyTest`, `VolumeTest`, the live checks of F3.1–F3.9 and `scripts/demo/phase3-journey.sh` passing 26 of 26 checks live)
+
+Scope chosen by the institution (2026-10-05): a generic LMS API (no LMS yet), a generic ERP export/API, online payments in the portal, and a library/resources module. Administrators have edit access to every class and enrolment through the **KEM Administrators** group (owner sharing rules; the Education Cloud licence does not allow Modify All on these objects) (2026-10-06; the Modify All permission deployed on 2026-10-05 is not stored by the licence).
+
+| #   | Feature                                                                                       | Built | Deployed | Tests | E2E check | Notes                                                                     |
+| --- | --------------------------------------------------------------------------------------------- | ----- | -------- | ----- | --------- | ------------------------------------------------------------------------- |
+| 3.1 | Multi-branch templates (clone a branch's set-up; branch KPIs)                                 | ✅    | ✅       | ✅    | ✅        | [F3.1-multi-branch-templates.md](features/F3.1-multi-branch-templates.md) |
+| 3.2 | Scale and performance (bulk-safe batches, selective queries, volume tests)                    | ✅    | ✅       | ✅    | ✅        | [F3.2-scale-and-performance.md](features/F3.2-scale-and-performance.md)   |
+| 3.3 | Generic LMS integration API (outbound events, inbound REST for classes, rosters, grades)      | ✅    | ✅       | ✅    | ✅        | [F3.3-lms-integration.md](features/F3.3-lms-integration.md)               |
+| 3.4 | Generic ERP finance export (journal of invoices, payments, credits, refunds; CSV/JSON + REST) | ✅    | ✅       | ✅    | ✅        | [F3.4-erp-export.md](features/F3.4-erp-export.md)                         |
+| 3.5 | Advanced analytics (branch comparison, revenue trends, cohorts)                               | ✅    | ✅       | ✅    | ✅        | [F3.5-advanced-analytics.md](features/F3.5-advanced-analytics.md)         |
+| 3.6 | Retention workflows (at-risk scoring, follow-up tasks, re-enrolment campaigns)                | ✅    | ✅       | ✅    | ✅        | [F3.6-retention-workflows.md](features/F3.6-retention-workflows.md)       |
+| 3.7 | Online payments in the portal (gateway-agnostic payment links, signed webhook)                | ✅    | ✅       | ✅    | ✅        | [F3.7-online-payments.md](features/F3.7-online-payments.md)               |
+| 3.8 | Library and resources (catalogue, loans, due dates, fines)                                    | ✅    | ✅       | ✅    | ✅        | [F3.8-library.md](features/F3.8-library.md)                               |
+| 3.9 | Phase 3 journey, volume test and demo script                                                  | ✅    | ✅       | ✅    | ✅        | [F3.9-phase3-journey.md](features/F3.9-phase3-journey.md)                 |
+
+## Phase 4 — AI and expansion
+
+**Completion condition — measured benefit with controlled access and review:** ✅ (`Phase4JourneyTest`, the AI evaluation passing 11 of 11 live, the live checks of F4.1–F4.11, `scripts/demo/phase4-journey.sh` passing 31 of 31 checks live, and the report [ai/MEASURED-BENEFIT.md](ai/MEASURED-BENEFIT.md))
+
+Choices (2026-10-06): Salesforce Einstein (Models API, Trust Layer) and Agentforce; assistants for enquiry replies, document extraction, learner progress summaries, staff policy Q&A and record summaries; forecasting of enrolments/seats and revenue/collections; transport, exams and hall tickets, alumni and referrals. Analysis: [ai/AI-OPPORTUNITIES.md](ai/AI-OPPORTUNITIES.md).
+
+F4.1–F4.7 live (2026-10-06): Einstein assistants on the enquiry, application, learner, class, branch and Home pages, the **KEM Staff Assistant** Agentforce agent (active), the AI document reader, and the AI console; live evaluation 10 of 10. F4.8 forecasts (enrolments, seats, invoicing, cash) on the Home and Branch pages and as an Agentforce action. F4.9–F4.11 transport, exam and referral desks on each Branch page (no new tabs: the org's custom tab limit is reached), referrals also on Home; the family portal shows transport, hall tickets and a referral card. Staff need the **KEM AI User** permission set (assigned to Kasetti Tech).
+
+| #    | Feature                                                                                               | Built | Deployed | Tests | E2E check | Notes                                                                             |
+| ---- | ----------------------------------------------------------------------------------------------------- | ----- | -------- | ----- | --------- | --------------------------------------------------------------------------------- |
+| 4.1  | AI foundation: Einstein service, prompt catalogue, access control, review log, evaluation, AI console | ✅    | ✅       | ✅    | ✅        | [F4.1-ai-foundation.md](features/F4.1-ai-foundation.md)                           |
+| 4.2  | Enquiry reply drafts                                                                                  | ✅    | ✅       | ✅    | ✅        | [F4.2-F4.5-ai-assistants.md](features/F4.2-F4.5-ai-assistants.md)                 |
+| 4.3  | Learner progress summaries and report-card comment drafts                                             | ✅    | ✅       | ✅    | ✅        | [F4.2-F4.5-ai-assistants.md](features/F4.2-F4.5-ai-assistants.md)                 |
+| 4.4  | Record summaries (enquiry, application, class, branch daily brief, learner)                           | ✅    | ✅       | ✅    | ✅        | [F4.2-F4.5-ai-assistants.md](features/F4.2-F4.5-ai-assistants.md)                 |
+| 4.5  | Staff policy Q&A with sources                                                                         | ✅    | ✅       | ✅    | ✅        | [F4.2-F4.5-ai-assistants.md](features/F4.2-F4.5-ai-assistants.md)                 |
+| 4.6  | Agentforce staff assistant topic and actions                                                          | ✅    | ✅       | ✅    | ✅        | [F4.6-agentforce-staff-assistant.md](features/F4.6-agentforce-staff-assistant.md) |
+| 4.7  | Document extraction support for applications                                                          | ✅    | ✅       | ✅    | ✅        | [F4.7-document-extraction.md](features/F4.7-document-extraction.md)               |
+| 4.8  | Forecasting: enrolments and seats, revenue and collections                                            | ✅    | ✅       | ✅    | ✅        | [F4.8-forecasting.md](features/F4.8-forecasting.md)                               |
+| 4.9  | Transport: routes, stops, assignments, transport fees                                                 | ✅    | ✅       | ✅    | ✅        | [F4.9-transport.md](features/F4.9-transport.md)                                   |
+| 4.10 | Exams and hall tickets                                                                                | ✅    | ✅       | ✅    | ✅        | [F4.10-exams-and-hall-tickets.md](features/F4.10-exams-and-hall-tickets.md)       |
+| 4.11 | Alumni and referrals                                                                                  | ✅    | ✅       | ✅    | ✅        | [F4.11-alumni-and-referrals.md](features/F4.11-alumni-and-referrals.md)           |
+| 4.12 | Phase 4 journey, evaluation report and demo                                                           | ✅    | ✅       | ✅    | ✅        | [F4.12-phase4-journey.md](features/F4.12-phase4-journey.md)                       |
+
+## Phase 5 — Creation screens
+
+**Goal:** every set-up record has its own KTEdutech screen instead of the standard form (decisions 2026-10-07: an admin-only "Add staff member" screen; portal access sends the welcome email at once; the standard New buttons stay as a fallback for administrators; order 1 → 3 → 2 → 4 → 5 → 6).
+
+| #   | Feature                                                                                                         | Built | Deployed | Tests | E2E check | Notes                                                                               |
+| --- | --------------------------------------------------------------------------------------------------------------- | ----- | -------- | ----- | --------- | ----------------------------------------------------------------------------------- |
+| 5.1 | Set-up Centre on Home: tiles, create buttons, set-up gaps                                                       | ✅    | ✅       | ✅    | ✅        | [F5.1-setup-centre.md](features/F5.1-setup-centre.md)                               |
+| 5.2 | New course and New class wizards, faculty (stage 3)                                                             | ✅    | ✅       | ✅    | ✅        | [F5.2-course-class-wizards.md](features/F5.2-course-class-wizards.md)               |
+| 5.3 | New branch wizard, rooms, holidays, Add staff member (stage 2)                                                  | ✅    | ✅       | ✅    | ✅        | [F5.3-branch-rooms-holidays-staff.md](features/F5.3-branch-rooms-holidays-staff.md) |
+| 5.4 | New learner/family, New application, Give portal access (stage 4)                                               | ✅    | ✅       | ✅    | ✅        | [F5.4-family-application-portal.md](features/F5.4-family-application-portal.md)     |
+| 5.5 | Discounts form, library bulk add and import (stage 5)                                                           | ✅    | ✅       | ✅    | ✅        | [F5.5-discounts-library-import.md](features/F5.5-discounts-library-import.md)       |
+| 5.6 | Standard New buttons routed to the screens; administrators keep the standard form (stage 6)                     | ✅    | ✅       | ✅    | ✅        | [F5.6-new-button-routing.md](features/F5.6-new-button-routing.md)                   |
+| 5.7 | Set-up gaps fixed in place: Class set-up card, sessions follow teacher/room, complete layouts and related lists | ✅    | ✅       | ✅    | ✅        | [F5.7-setup-gap-fixes.md](features/F5.7-setup-gap-fixes.md)                         |
+
+## College mode — KT College (PUC, Diploma, BE at two campuses)
+
+**Goal:** the college model in [COLLEGE-DESIGN.md](COLLEGE-DESIGN.md) ([ADR-005](adr/ADR-005-college-mode-structure.md)), built additively next to the learning-centre mode.
+
+| #   | Phase                                                                                                                                                                                  | Built | Deployed | Tests | E2E check | Notes                                                                                              |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- | -------- | ----- | --------- | -------------------------------------------------------------------------------------------------- |
+| C0  | Technical architecture                                                                                                                                                                 | ✅    | —        | —     | —         | ADR-005 reopened for the `College_Admission` record type                                           |
+| C1  | Catalogue: campuses, programmes, branches, intake, subjects, sections, section subjects, KT College app                                                                                | ✅    | ✅       | ✅    | —         | Commit 0c45718                                                                                     |
+| C2  | Admissions: qualifications, versioned rules, eligibility evidence, documents, interview, seat reservation                                                                              | ✅    | ✅       | ✅    | —         | Commit 2bfe48c                                                                                     |
+| C3  | Fees: programme invoices, DD/cheque clearance, cash refused, roll release, expiry, Dean extend/cancel, reconciliation, College dues                                                    | ✅    | ✅       | ✅    | —         | Commits 709cee1, 60ff619                                                                           |
+| C4  | Academics: joining, section-subject timetable and attendance, subject and term results, finalise/reopen, promotion to completion                                                       | ✅    | ✅       | ✅    | —         | As-built notes: COLLEGE-DESIGN.md §19                                                              |
+| C5  | Student-first portal: programme card with roll number, today's periods, subject attendance and final results, programme fees, document upload; optional parent access                  | ✅    | ✅       | ✅    | —         | Deploy 0AfdN00000JgqIeSAJ                                                                          |
+| C6  | Demo data for both campuses, guided admission desk screen and admission panel, persona UAT, two full regressions, set-up guide and demo script; public college enquiry on `/s/enquire` | ✅    | ✅       | ✅    | —         | [COLLEGE-SETUP-GUIDE.md](COLLEGE-SETUP-GUIDE.md), [COLLEGE-DEMO-SCRIPT.md](COLLEGE-DEMO-SCRIPT.md) |
+
+**College backlog (after C5, before production readiness in C6)**
+
+- **Controlled repeat-year invoicing** — an explicit Accounts action (`KEM_Manage_Billing`) that raises the repeat-year annual invoice from the programme's current fee prices, with academic year and attempt in the uniqueness key (duplicate protection), recording who raised it and why (audit history). Not required for the first manager demo.
+
+**Decisions 2026-10-14:** no Programme Enrolments tab (navigation from the student record and the Dean's overdue list; revisit only if UAT shows staff cannot find records); the Dean's cancellation guard stays exactly as built (money or an uncleared instrument goes through Accounts: payment failure, credit note or the two-person refund).
+
+**Next (proposed, not approved yet):** one KTEdutech app for learning centres and colleges (retire the separate KT College app; college pages by record type; reuse Enquiries, Timetable, Finance Desk, Invoices, Gradebook and Learner 360; KTEdutech styling for every college screen); "Convert to college admission" from a website enquiry; controlled repeat-year invoicing.

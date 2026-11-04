@@ -1,0 +1,353 @@
+<apex:page
+  controller="KemDocumentController"
+  renderAs="pdf"
+  applyHtmlTag="false"
+  applyBodyTag="false"
+  showHeader="false"
+  sidebar="false"
+  standardStylesheets="false"
+>
+  <html>
+    <head>
+      <style type="text/css">
+        @page {
+          size: A4;
+          margin: 18mm 16mm 20mm 16mm;
+          @bottom-center {
+            content: "Page " counter(page) " of " counter(pages);
+            font-family: sans-serif;
+            font-size: 8pt;
+            color: #8a94a3;
+          }
+        }
+        body {
+          font-family:
+            Arial Unicode MS,
+            sans-serif;
+          font-size: 10pt;
+          color: #16243a;
+        }
+        .band {
+          background-color: #1b3a6b;
+          color: #ffffff;
+          padding: 14px 18px;
+        }
+        .band-table {
+          width: 100%;
+        }
+        .brand {
+          font-size: 18pt;
+          font-weight: bold;
+        }
+        .brand-sub {
+          font-size: 9pt;
+          color: #c9d8f2;
+        }
+        .doc-title {
+          font-size: 16pt;
+          font-weight: bold;
+          text-align: right;
+          letter-spacing: 1px;
+        }
+        .doc-number {
+          font-size: 10pt;
+          text-align: right;
+          color: #c9d8f2;
+        }
+        .section {
+          margin-top: 18px;
+        }
+        .label {
+          font-size: 8pt;
+          color: #5f6b7a;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+        .value {
+          font-size: 10.5pt;
+          font-weight: bold;
+        }
+        .muted {
+          color: #5f6b7a;
+          font-size: 9pt;
+        }
+        .grid {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        .grid td {
+          vertical-align: top;
+          padding: 0 10px 0 0;
+        }
+        table.lines {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 8px;
+        }
+        table.lines th {
+          background-color: #e8f0fd;
+          color: #1b3a6b;
+          font-size: 8pt;
+          text-transform: uppercase;
+          text-align: left;
+          padding: 7px 8px;
+        }
+        table.lines td {
+          padding: 7px 8px;
+          border-bottom: 1px solid #e3e8ef;
+        }
+        .num {
+          text-align: right;
+        }
+        .totals {
+          width: 45%;
+          margin-left: 55%;
+          border-collapse: collapse;
+          margin-top: 10px;
+        }
+        .totals td {
+          padding: 5px 8px;
+        }
+        .totals .grand td {
+          border-top: 2px solid #1b3a6b;
+          font-size: 12pt;
+          font-weight: bold;
+        }
+        .stamp {
+          display: inline-block;
+          padding: 4px 10px;
+          border: 2px solid #2e844a;
+          color: #2e844a;
+          font-weight: bold;
+          font-size: 11pt;
+          letter-spacing: 1px;
+        }
+        .grade-box {
+          text-align: center;
+          padding: 12px;
+          border: 2px solid #1b3a6b;
+        }
+        .grade-big {
+          font-size: 28pt;
+          font-weight: bold;
+          color: #1b3a6b;
+        }
+        .provisional {
+          color: #c77700;
+          font-weight: bold;
+        }
+        .bands td {
+          padding: 3px 8px;
+          font-size: 8.5pt;
+          border-bottom: 1px solid #e3e8ef;
+        }
+        .feedback {
+          font-size: 8.5pt;
+          color: #5f6b7a;
+          font-style: italic;
+        }
+        .stamp-due {
+          border-color: #c77700;
+          color: #c77700;
+        }
+        .note {
+          margin-top: 20px;
+          padding: 10px 12px;
+          background-color: #f4f7fb;
+          border-left: 3px solid #2e6fd8;
+          font-size: 9pt;
+        }
+        .footer {
+          margin-top: 30px;
+          font-size: 8pt;
+          color: #8a94a3;
+          border-top: 1px solid #e3e8ef;
+          padding-top: 8px;
+        }
+        .signature {
+          margin-top: 40px;
+        }
+        .signature-line {
+          width: 200px;
+          border-top: 1px solid #16243a;
+          padding-top: 4px;
+          font-size: 9pt;
+        }
+      </style>
+    </head>
+    <body>
+      <c:KEM_Document_Header
+        institution="{!institutionName}"
+        branchName="{!branchName}"
+        branchAddress="{!branchAddress}"
+        branchContact="{!branchContact}"
+        title="REPORT CARD"
+        number="{!reportCard.className}"
+      />
+
+      <div class="section">
+        <table class="grid">
+          <tr>
+            <td style="width: 38%">
+              <div class="label">Learner</div>
+              <div class="value">{!reportCard.learnerName}</div>
+              <div class="label" style="margin-top: 6px">Course</div>
+              <div class="value">{!reportCard.courseName}</div>
+              <div class="muted">{!reportCard.className}</div>
+            </td>
+            <td style="width: 32%">
+              <div class="label">Teacher</div>
+              <div class="value">{!reportCard.teacherName}</div>
+              <div class="label" style="margin-top: 6px">Period</div>
+              <div class="value">
+                <apex:outputText value="{0, date, dd MMM yyyy}"
+                  ><apex:param value="{!reportCard.startDate}"
+                /></apex:outputText>
+                <apex:outputPanel
+                  rendered="{!NOT(ISBLANK(reportCard.endDate))}"
+                >
+                  –
+                  <apex:outputText value="{0, date, dd MMM yyyy}"
+                    ><apex:param value="{!reportCard.endDate}"
+                  /></apex:outputText>
+                </apex:outputPanel>
+              </div>
+              <div class="label" style="margin-top: 6px">Attendance</div>
+              <div class="value">
+                <apex:outputText
+                  value="{0, number, ##0.#}%"
+                  rendered="{!NOT(ISBLANK(reportCard.attendance))}"
+                  ><apex:param value="{!reportCard.attendance}"
+                /></apex:outputText>
+                <apex:outputText
+                  value="Not recorded"
+                  rendered="{!ISBLANK(reportCard.attendance)}"
+                />
+              </div>
+            </td>
+            <td>
+              <div class="grade-box">
+                <div class="label">Course grade</div>
+                <div class="grade-big">
+                  {!IF(ISBLANK(reportCard.grade), '—', reportCard.grade)}
+                </div>
+                <div class="value">
+                  <apex:outputText
+                    value="{0, number, ##0.0}%"
+                    rendered="{!NOT(ISBLANK(reportCard.score))}"
+                    ><apex:param value="{!reportCard.score}"
+                  /></apex:outputText>
+                </div>
+                <apex:outputPanel
+                  layout="block"
+                  styleClass="provisional"
+                  rendered="{!reportCard.status != 'Final'}"
+                  >PROVISIONAL</apex:outputPanel
+                >
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="section">
+        <div class="label">Assessments</div>
+        <table class="lines">
+          <thead>
+            <tr>
+              <th>Assessment</th>
+              <th>Date</th>
+              <th class="num">Weight</th>
+              <th class="num">Result</th>
+              <th class="num">%</th>
+              <th class="num">Grade</th>
+            </tr>
+          </thead>
+          <tbody>
+            <apex:repeat value="{!reportCard.lines}" var="l">
+              <tr>
+                <td>
+                  <strong>{!l.name}</strong>
+                  <div class="muted">{!l.assessmentType}</div>
+                  <apex:outputPanel
+                    layout="block"
+                    styleClass="feedback"
+                    rendered="{!NOT(ISBLANK(l.feedback))}"
+                    >{!l.feedback}</apex:outputPanel
+                  >
+                </td>
+                <td>
+                  <apex:outputText value="{0, date, dd MMM yyyy}"
+                    ><apex:param value="{!l.assessmentDate}"
+                  /></apex:outputText>
+                </td>
+                <td class="num">
+                  <apex:outputText
+                    value="{0, number, ##0.#}%"
+                    rendered="{!NOT(ISBLANK(l.share))}"
+                    ><apex:param value="{!l.share}"
+                  /></apex:outputText>
+                </td>
+                <td class="num">{!l.result}</td>
+                <td class="num">
+                  <apex:outputText
+                    value="{0, number, ##0.#}"
+                    rendered="{!NOT(ISBLANK(l.percent))}"
+                    ><apex:param value="{!l.percent}"
+                  /></apex:outputText>
+                </td>
+                <td class="num"><strong>{!l.grade}</strong></td>
+              </tr>
+            </apex:repeat>
+          </tbody>
+        </table>
+        <apex:outputPanel
+          layout="block"
+          styleClass="muted"
+          rendered="{!reportCard.equalWeights}"
+        >
+          All assessments count equally towards the course grade.
+        </apex:outputPanel>
+      </div>
+
+      <apex:outputPanel
+        layout="block"
+        styleClass="note"
+        rendered="{!NOT(ISBLANK(reportCard.comment))}"
+      >
+        <div class="label">Teacher's comment</div>
+        <div style="margin-top: 4px">{!reportCard.comment}</div>
+      </apex:outputPanel>
+
+      <div class="section">
+        <div class="label">Grade scale ({!reportCard.scale})</div>
+        <table class="bands">
+          <apex:repeat value="{!reportCard.bands}" var="b">
+            <tr>
+              <td><strong>{!b.grade}</strong></td>
+              <td>
+                from
+                <apex:outputText value="{0, number, ##0.#}%"
+                  ><apex:param value="{!b.minPercent}"
+                /></apex:outputText>
+              </td>
+            </tr>
+          </apex:repeat>
+        </table>
+      </div>
+
+      <div class="signature">
+        <div class="signature-line">Class teacher</div>
+      </div>
+
+      <div class="footer">
+        Issued
+        <apex:outputText value="{0, date, dd MMM yyyy}"
+          ><apex:param value="{!today}"
+        /></apex:outputText>
+        by {!institutionName}. Weighted course grade from published assessment
+        results.
+      </div>
+    </body>
+  </html>
+</apex:page>

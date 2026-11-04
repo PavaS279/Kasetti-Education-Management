@@ -1,0 +1,45 @@
+<template>
+  <div class="router">
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Opening"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <template lwc:if={showChoice}>
+      <article class="kem-card choice">
+        <h2 class="kem-section-title">{heading}</h2>
+        <p class="kem-muted">
+          The guided screen checks duplicates, clashes and missing details and
+          saves everything that belongs together. The standard form stays
+          available to administrators for anything the guided screen does not
+          cover.
+        </p>
+        <div class="buttons">
+          <lightning-button
+            variant="brand"
+            label="Guided screen (recommended)"
+            icon-name="utility:magicwand"
+            onclick={handleGuided}
+            class="guided"
+          ></lightning-button>
+          <lightning-button
+            label="Standard form"
+            onclick={handleStandard}
+            class="standard"
+          ></lightning-button>
+          <lightning-button
+            variant="base"
+            label="Cancel"
+            onclick={handleCancel}
+          ></lightning-button>
+        </div>
+      </article>
+    </template>
+  </div>
+</template>

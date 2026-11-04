@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>College_Section_Academic_Year</fullName>
+    <active>true</active>
+    <description>Enter the academic year for a college section.</description>
+    <errorConditionFormula
+  >AND(RecordType.DeveloperName = 'College_Section', ISBLANK(Academic_Year__c))</errorConditionFormula>
+    <errorDisplayField>Academic_Year__c</errorDisplayField>
+    <errorMessage>Enter the academic year for a college section.</errorMessage>
+</ValidationRule>

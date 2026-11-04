@@ -1,0 +1,427 @@
+<template>
+  <template lwc:if={visible}>
+    <article class="kem-card panel viz-root">
+      <header class="head">
+        <div class="kem-section-title">Analytics</div>
+        <div class="filters">
+          <lightning-combobox
+            class="filter"
+            label="Branch"
+            variant="label-hidden"
+            value={branchId}
+            options={branchOptions}
+            onchange={handleBranch}
+          ></lightning-combobox>
+          <lightning-combobox
+            class="filter"
+            label="Period"
+            variant="label-hidden"
+            value={months}
+            options={periodOptions}
+            onchange={handlePeriod}
+          ></lightning-combobox>
+          <lightning-button
+            label={tableLabel}
+            onclick={handleToggleTable}
+          ></lightning-button>
+        </div>
+      </header>
+
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+      <template lwc:if={isLoading}>
+        <lightning-spinner
+          alternative-text="Loading"
+          size="small"
+        ></lightning-spinner>
+      </template>
+
+      <template lwc:if={data}>
+        <div class="tiles">
+          <template for:each={tiles} for:item="t">
+            <div key={t.key} class="tile">
+              <span class="tile-value">{t.value}</span>
+              <span class="tile-label">{t.label}</span>
+            </div>
+          </template>
+        </div>
+
+        <template lwc:if={showTable}>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Month</th>
+                  <th class="num">Invoiced</th>
+                  <th class="num">Collected</th>
+                  <th class="num">New enrolments</th>
+                  <th class="num">Withdrawals</th>
+                  <th class="num">Attendance</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={tableRows} for:item="r">
+                  <tr key={r.key}>
+                    <td>{r.label}</td>
+                    <td class="num">{r.invoicedLabel}</td>
+                    <td class="num">{r.collectedLabel}</td>
+                    <td class="num">{r.newEnrolments}</td>
+                    <td class="num">{r.withdrawals}</td>
+                    <td class="num">{r.attendanceLabel}</td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </template>
+
+        <template lwc:if={showCharts}>
+          <div class="grid">
+            <template lwc:if={data.showFinance}>
+              <figure class="chart" onmouseleave={handleLeave}>
+                <figcaption class="chart-title">
+                  Invoiced and collected
+                </figcaption>
+                <div class="legend">
+                  <span class="legend-item"
+                    ><span class="swatch s1"></span>Invoiced</span
+                  >
+                  <span class="legend-item"
+                    ><span class="swatch s2"></span>Collected</span
+                  >
+                </div>
+                <svg
+                  class="svg"
+                  viewBox={viewBox}
+                  role="img"
+                  aria-label="Invoiced and collected by month"
+                >
+                  <template for:each={revenueChart.ticks} for:item="t">
+                    <g key={t.key}>
+                      <line
+                        class="grid-line"
+                        x1={plotLeft}
+                        x2={plotRight}
+                        y1={t.y}
+                        y2={t.y}
+                      ></line>
+                      <text
+                        class="tick"
+                        x={tickLabelX}
+                        y={t.y}
+                        text-anchor="end"
+                        dominant-baseline="middle"
+                      >
+                        {t.label}
+                      </text>
+                    </g>
+                  </template>
+                  <template for:each={revenueChart.groups} for:item="g">
+                    <g key={g.key}>
+                      <path class="bar s1-fill" d={g.path1}></path>
+                      <path class="bar s2-fill" d={g.path2}></path>
+                      <template lwc:if={g.showLabel}>
+                        <text
+                          class="tick"
+                          x={g.labelX}
+                          y={axisLabelY}
+                          text-anchor="middle"
+                        >
+                          {g.label}
+                        </text>
+                      </template>
+                      <rect
+                        class="hit"
+                        x={g.hitX}
+                        y="0"
+                        width={g.hitW}
+                        height={baselineY}
+                        data-chart="revenue"
+                        data-key={g.key}
+                        onmouseenter={handleHover}
+                      ></rect>
+                    </g>
+                  </template>
+                  <line
+                    class="axis"
+                    x1={plotLeft}
+                    x2={plotRight}
+                    y1={baselineY}
+                    y2={baselineY}
+                  ></line>
+                </svg>
+                <template lwc:if={revenueTip}>
+                  <div class="tooltip" style={revenueTip.style} role="status">
+                    <div class="tooltip-title">{revenueTip.title}</div>
+                    <template for:each={revenueTip.lines} for:item="l">
+                      <div key={l.key} class="tooltip-line">
+                        <span class={l.swatch}></span>{l.text}
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </figure>
+            </template>
+
+            <template lwc:if={data.showEnrolments}>
+              <figure class="chart" onmouseleave={handleLeave}>
+                <figcaption class="chart-title">Enrolment flow</figcaption>
+                <div class="legend">
+                  <span class="legend-item"
+                    ><span class="swatch s1"></span>New enrolments</span
+                  >
+                  <span class="legend-item"
+                    ><span class="swatch s2"></span>Withdrawals</span
+                  >
+                </div>
+                <svg
+                  class="svg"
+                  viewBox={viewBox}
+                  role="img"
+                  aria-label="New enrolments and withdrawals by month"
+                >
+                  <template for:each={enrolmentChart.ticks} for:item="t">
+                    <g key={t.key}>
+                      <line
+                        class="grid-line"
+                        x1={plotLeft}
+                        x2={plotRight}
+                        y1={t.y}
+                        y2={t.y}
+                      ></line>
+                      <text
+                        class="tick"
+                        x={tickLabelX}
+                        y={t.y}
+                        text-anchor="end"
+                        dominant-baseline="middle"
+                      >
+                        {t.label}
+                      </text>
+                    </g>
+                  </template>
+                  <template for:each={enrolmentChart.groups} for:item="g">
+                    <g key={g.key}>
+                      <path class="bar s1-fill" d={g.path1}></path>
+                      <path class="bar s2-fill" d={g.path2}></path>
+                      <template lwc:if={g.showLabel}>
+                        <text
+                          class="tick"
+                          x={g.labelX}
+                          y={axisLabelY}
+                          text-anchor="middle"
+                        >
+                          {g.label}
+                        </text>
+                      </template>
+                      <rect
+                        class="hit"
+                        x={g.hitX}
+                        y="0"
+                        width={g.hitW}
+                        height={baselineY}
+                        data-chart="enrolments"
+                        data-key={g.key}
+                        onmouseenter={handleHover}
+                      ></rect>
+                    </g>
+                  </template>
+                  <line
+                    class="axis"
+                    x1={plotLeft}
+                    x2={plotRight}
+                    y1={baselineY}
+                    y2={baselineY}
+                  ></line>
+                </svg>
+                <template lwc:if={enrolmentTip}>
+                  <div class="tooltip" style={enrolmentTip.style} role="status">
+                    <div class="tooltip-title">{enrolmentTip.title}</div>
+                    <template for:each={enrolmentTip.lines} for:item="l">
+                      <div key={l.key} class="tooltip-line">
+                        <span class={l.swatch}></span>{l.text}
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </figure>
+            </template>
+
+            <template lwc:if={data.showAttendance}>
+              <figure class="chart" onmouseleave={handleLeave}>
+                <figcaption class="chart-title">Attendance rate</figcaption>
+                <svg
+                  class="svg"
+                  viewBox={viewBox}
+                  role="img"
+                  aria-label="Attendance rate by month"
+                >
+                  <template for:each={attendanceChart.ticks} for:item="t">
+                    <g key={t.key}>
+                      <line
+                        class="grid-line"
+                        x1={plotLeft}
+                        x2={plotRight}
+                        y1={t.y}
+                        y2={t.y}
+                      ></line>
+                      <text
+                        class="tick"
+                        x={tickLabelX}
+                        y={t.y}
+                        text-anchor="end"
+                        dominant-baseline="middle"
+                      >
+                        {t.label}
+                      </text>
+                    </g>
+                  </template>
+                  <path class="line s1-stroke" d={attendanceChart.line}></path>
+                  <template for:each={attendanceChart.dots} for:item="p">
+                    <circle
+                      key={p.key}
+                      class="dot s1-fill"
+                      cx={p.x}
+                      cy={p.y}
+                      r="4"
+                    ></circle>
+                  </template>
+                  <template for:each={attendanceChart.columns} for:item="c">
+                    <g key={c.key}>
+                      <template lwc:if={c.showLabel}>
+                        <text
+                          class="tick"
+                          x={c.x}
+                          y={axisLabelY}
+                          text-anchor="middle"
+                        >
+                          {c.label}
+                        </text>
+                      </template>
+                      <rect
+                        class="hit"
+                        x={c.hitX}
+                        y="0"
+                        width={c.hitW}
+                        height={baselineY}
+                        data-chart="attendance"
+                        data-key={c.key}
+                        onmouseenter={handleHover}
+                      ></rect>
+                    </g>
+                  </template>
+                  <line
+                    class="axis"
+                    x1={plotLeft}
+                    x2={plotRight}
+                    y1={baselineY}
+                    y2={baselineY}
+                  ></line>
+                </svg>
+                <template lwc:if={attendanceTip}>
+                  <div
+                    class="tooltip"
+                    style={attendanceTip.style}
+                    role="status"
+                  >
+                    <div class="tooltip-title">{attendanceTip.title}</div>
+                    <template for:each={attendanceTip.lines} for:item="l">
+                      <div key={l.key} class="tooltip-line">
+                        <span class={l.swatch}></span>{l.text}
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </figure>
+            </template>
+
+            <template lwc:if={data.showEnrolments}>
+              <figure class="chart">
+                <figcaption class="chart-title">
+                  Retention by enrolment month
+                </figcaption>
+                <div class="kem-muted small">
+                  Share of each month's enrolments still enrolled, on hold or
+                  completed.
+                </div>
+                <div class="cohorts">
+                  <template for:each={cohorts} for:item="c">
+                    <div key={c.key} class="cohort">
+                      <span class="cohort-label">{c.label}</span>
+                      <span class={c.cellClass}>{c.retentionLabel}</span>
+                      <span class="kem-muted small"
+                        >{c.active} of {c.enrolled}</span
+                      >
+                    </div>
+                  </template>
+                </div>
+              </figure>
+            </template>
+
+            <template lwc:if={data.showFinance}>
+              <figure class="chart">
+                <figcaption class="chart-title">Receivables ageing</figcaption>
+                <ul class="ageing">
+                  <template for:each={ageing} for:item="b">
+                    <li key={b.key} class="ageing-row">
+                      <span class="ageing-label">{b.label}</span>
+                      <span class="ageing-track"
+                        ><span class="ageing-bar" style={b.barStyle}></span
+                      ></span>
+                      <span class="ageing-value">{b.amountLabel}</span>
+                      <span class="kem-muted small ageing-count"
+                        >{b.invoices} inv.</span
+                      >
+                    </li>
+                  </template>
+                </ul>
+              </figure>
+            </template>
+
+            <figure class="chart">
+              <figcaption class="chart-title">Courses</figcaption>
+              <template lwc:if={hasCourses}>
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Course</th>
+                      <th class="num">Classes</th>
+                      <th>Seats filled</th>
+                      <th class="num">Avg score</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={courses} for:item="c">
+                      <tr key={c.course}>
+                        <td>{c.course}</td>
+                        <td class="num">{c.classes}</td>
+                        <td>
+                          <span class="fill-cell">
+                            <span class="fill-track"
+                              ><span class="fill-bar" style={c.fillStyle}></span
+                            ></span>
+                            {c.fill}
+                          </span>
+                        </td>
+                        <td class="num">{c.score}</td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </template>
+              <template lwc:else>
+                <div class="kem-muted small">No running classes.</div>
+              </template>
+            </figure>
+          </div>
+        </template>
+      </template>
+    </article>
+  </template>
+</template>

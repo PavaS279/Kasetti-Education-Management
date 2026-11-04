@@ -1,0 +1,36 @@
+@import "c/kemStyles";
+
+.intro {
+  margin-bottom: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--kem-muted);
+}
+
+.top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: end;
+  margin-bottom: 0.75rem;
+}
+
+.branches {
+  max-height: 9rem;
+  overflow-y: auto;
+}
+
+.suggest {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.year {
+  width: 6.5rem;
+}
+
+@media (max-width: 40em) {
+  .top {
+    grid-template-columns: 1fr;
+  }
+}

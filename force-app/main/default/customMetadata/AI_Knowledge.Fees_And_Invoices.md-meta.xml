@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Fees and invoices</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Body__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Fees come from the course price list; a branch-specific price takes precedence over the organisation-wide price, and a delivery-mode price over an all-modes price. The price agreed at enrolment is kept on the enrolment: later price changes do not affect it.
+An invoice falls due {{Setting:Default_Invoice_Due_Days}} days after it is issued unless the branch sets its own due days. Tax is added at the branch tax rate (organisation default {{Setting:Default_Tax_Rate}} as a fraction).
+Monthly fees are billed automatically each month by recurring billing once the first month has been invoiced by staff.
+An invoice can be split into instalments by finance; the invoice due date then follows the next unpaid instalment.
+Discount codes are entered at enrolment; some discounts need finance approval before the enrolment can be invoiced.</value>
+    </values>
+    <values>
+        <field>Keywords__c</field>
+        <value
+      xsi:type="xsd:string"
+    >fee fees invoice invoices due date tax price prices discount discounts pay payment bill billing instalment instalments</value>
+    </values>
+    <values>
+        <field>Topic__c</field>
+        <value xsi:type="xsd:string">fees</value>
+    </values>
+</CustomMetadata>

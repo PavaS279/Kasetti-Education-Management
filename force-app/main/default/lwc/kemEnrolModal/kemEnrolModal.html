@@ -1,0 +1,208 @@
+<template>
+  <lightning-modal-header label={label}>
+    <ol class="steps" aria-label="Enrolment steps">
+      <template for:each={stepItems} for:item="s">
+        <li key={s.index} class={s.className}>
+          <span class="step-num">{s.number}</span>{s.label}
+        </li>
+      </template>
+    </ol>
+  </lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <div
+        class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_small"
+        role="alert"
+      >
+        {errorMessage}
+      </div>
+    </template>
+
+    <template lwc:if={isLearnerStep}>
+      <lightning-input
+        type="search"
+        label="Find a learner"
+        value={searchTerm}
+        onchange={handleSearch}
+        placeholder="Name, email, or mobile"
+      ></lightning-input>
+      <ul class="options" role="listbox" aria-label="Learners">
+        <template for:each={learnerOptions} for:item="l">
+          <li
+            key={l.Id}
+            class={l.className}
+            role="option"
+            aria-selected={l.selected}
+            data-id={l.Id}
+            data-name={l.Name}
+            onclick={handlePickLearner}
+          >
+            <span class="kem-avatar tone-1">{l.initials}</span>
+            <div>
+              <div class="strong">{l.Name}</div>
+              <div class="kem-muted small">{l.detail}</div>
+            </div>
+          </li>
+        </template>
+      </ul>
+    </template>
+
+    <template lwc:if={isClassStep}>
+      <p class="kem-muted small slds-m-bottom_small">
+        Learner: <strong>{selectedLearnerName}</strong>
+      </p>
+      <ul class="options" role="listbox" aria-label="Classes">
+        <template for:each={classOptions} for:item="c">
+          <li
+            key={c.Id}
+            class={c.className}
+            role="option"
+            aria-selected={c.selected}
+            data-id={c.Id}
+            onclick={handlePickClass}
+          >
+            <div class="class-main">
+              <div class="strong">{c.Name}</div>
+              <div class="kem-muted small">
+                {c.courseLabel} · {c.branchLabel} · {c.Delivery_Mode__c}
+              </div>
+              <div class="kem-muted small">{c.period}</div>
+            </div>
+            <div class="seats">
+              <div class="seat-bar"><span style={c.barStyle}></span></div>
+              <div class="small">{c.seatLabel}</div>
+            </div>
+          </li>
+        </template>
+        <template lwc:if={noClasses}
+          ><li class="kem-empty">
+            No open classes match. Open a class or widen the filters.
+          </li></template
+        >
+      </ul>
+    </template>
+
+    <template lwc:if={isReviewStep}>
+      <template lwc:if={preview}>
+        <div class="review-head">
+          <div>
+            <div class="strong">{selectedLearnerName}</div>
+            <div class="kem-muted small">{preview.offering.Name}</div>
+          </div>
+          <lightning-input
+            class="code"
+            label="Discount code"
+            value={discountCode}
+            onchange={handleCode}
+          ></lightning-input>
+        </div>
+        <table class="quote" aria-label="Agreed price">
+          <thead>
+            <tr>
+              <th>Fee</th>
+              <th class="num">Amount</th>
+              <th class="num">Discount</th>
+              <th class="num">Tax</th>
+              <th class="num">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={preview.quote.lines} for:item="line">
+              <tr key={line.feePriceId}>
+                <td>
+                  {line.feeType}
+                  <span class="kem-muted small">· {line.frequency}</span>
+                </td>
+                <td class="num">
+                  <lightning-formatted-number
+                    value={line.unitAmount}
+                    format-style="currency"
+                    currency-code={currencyCode}
+                  ></lightning-formatted-number>
+                </td>
+                <td class="num discount">
+                  <lightning-formatted-number
+                    value={line.discountAmount}
+                    format-style="currency"
+                    currency-code={currencyCode}
+                  ></lightning-formatted-number>
+                </td>
+                <td class="num">
+                  <lightning-formatted-number
+                    value={line.taxAmount}
+                    format-style="currency"
+                    currency-code={currencyCode}
+                  ></lightning-formatted-number>
+                </td>
+                <td class="num strong">
+                  <lightning-formatted-number
+                    value={line.total}
+                    format-style="currency"
+                    currency-code={currencyCode}
+                  ></lightning-formatted-number>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" class="num strong">Agreed total</td>
+              <td class="num grand">
+                <lightning-formatted-number
+                  value={preview.quote.grandTotal}
+                  format-style="currency"
+                  currency-code={currencyCode}
+                ></lightning-formatted-number>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+        <p class="kem-muted small slds-m-top_x-small">
+          The agreed price is saved with the enrolment; later price-list changes
+          do not affect it.
+        </p>
+        <template lwc:if={preview.quote.approvalRequired}
+          ><div class="kem-badge kem-badge_warning slds-m-top_x-small">
+            Discount needs finance approval before invoicing
+          </div></template
+        >
+        <template for:each={allWarnings} for:item="w"
+          ><div key={w} class="warning small">{w}</div></template
+        >
+      </template>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button
+      label="Cancel"
+      onclick={handleCancel}
+      disabled={isBusy}
+    ></lightning-button>
+    <template lwc:if={canGoBack}
+      ><lightning-button
+        class="slds-m-left_x-small"
+        label="Back"
+        onclick={handleBack}
+        disabled={isBusy}
+      ></lightning-button
+    ></template>
+    <template lwc:if={isReviewStep}>
+      <lightning-button
+        class="slds-m-left_x-small"
+        variant="brand"
+        label="Confirm enrolment"
+        onclick={handleConfirm}
+        disabled={isConfirmDisabled}
+      ></lightning-button>
+    </template>
+    <template lwc:else>
+      <lightning-button
+        class="slds-m-left_x-small"
+        variant="brand"
+        label="Next"
+        onclick={handleNext}
+        disabled={isNextDisabled}
+      ></lightning-button>
+    </template>
+  </lightning-modal-footer>
+</template>

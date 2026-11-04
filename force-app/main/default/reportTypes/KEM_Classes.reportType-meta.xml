@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
+    <baseObject>CourseOffering</baseObject>
+    <category>other</category>
+    <deployed>true</deployed>
+    <description>Kasetti classes with capacity and seats taken.</description>
+    <label>KEM Classes</label>
+    <sections>
+        <columns><checkedByDefault>true</checkedByDefault><field
+      >Name</field><table>CourseOffering</table></columns>
+        <columns><checkedByDefault>true</checkedByDefault><field
+      >Branch__c</field><table>CourseOffering</table></columns>
+        <columns><checkedByDefault>true</checkedByDefault><field
+      >Class_Status__c</field><table>CourseOffering</table></columns>
+        <columns><checkedByDefault>true</checkedByDefault><field
+      >EnrollmentCapacity</field><table>CourseOffering</table></columns>
+        <columns><checkedByDefault>true</checkedByDefault><field
+      >Seats_Taken__c</field><table>CourseOffering</table></columns>
+        <columns><checkedByDefault>true</checkedByDefault><field
+      >Seats_Available__c</field><table>CourseOffering</table></columns>
+        <columns><checkedByDefault>true</checkedByDefault><field
+      >StartDate</field><table>CourseOffering</table></columns>
+        <columns><checkedByDefault>true</checkedByDefault><field
+      >CreatedDate</field><table>CourseOffering</table></columns>
+        <masterLabel>Classes</masterLabel>
+    </sections>
+</ReportType>

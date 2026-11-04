@@ -1,0 +1,111 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <template lwc:if={isForm}>
+      <c-kem-discount-form
+        discount={editing}
+        branches={overview.branches}
+        courses={overview.courses}
+        onsaved={handleSaved}
+        oncancel={handleFormCancel}
+      ></c-kem-discount-form>
+    </template>
+    <template lwc:elseif={overview}>
+      <div class="toolbar">
+        <lightning-input
+          type="toggle"
+          label="Show switched-off codes"
+          checked={showInactive}
+          onchange={handleShowInactive}
+          message-toggle-active={inactiveCount}
+          message-toggle-inactive={inactiveCount}
+        ></lightning-input>
+        <template lwc:if={canEdit}>
+          <lightning-button
+            label="New discount"
+            icon-name="utility:add"
+            variant="brand"
+            onclick={handleNew}
+          ></lightning-button>
+        </template>
+      </div>
+      <template lwc:if={hasRows}>
+        <ul class="codes">
+          <template for:each={rows} for:item="d">
+            <li key={d.id} class="code">
+              <div class="main">
+                <div class="title">
+                  <span class="code-text">{d.code}</span>
+                  <span class={d.statusClass}>{d.status}</span>
+                  <template lwc:if={d.requiresApproval}>
+                    <span class="kem-badge">Needs approval</span>
+                  </template>
+                </div>
+                <div class="kem-muted small">{d.description}</div>
+                <div class="small">
+                  <strong>{d.valueText}</strong> · {d.scope}
+                </div>
+                <div class="kem-muted small">{d.dates}</div>
+              </div>
+              <div class="usage">
+                <span class="usage-value">{d.usage}</span>
+                <span class="kem-muted small"
+                  >{d.enrolments} enrolments ·
+                  <lightning-formatted-number
+                    value={d.amountGiven}
+                    format-style="currency"
+                    currency-code={currencyCode}
+                    maximum-fraction-digits="0"
+                  ></lightning-formatted-number>
+                  given</span
+                >
+                <template lwc:if={d.hasPending}>
+                  <span class="kem-badge kem-badge_warning"
+                    >{d.pendingApprovals} waiting for approval</span
+                  >
+                </template>
+              </div>
+              <template lwc:if={canEdit}>
+                <div class="actions">
+                  <lightning-button
+                    label="Edit"
+                    variant="base"
+                    data-id={d.id}
+                    onclick={handleEdit}
+                  ></lightning-button>
+                  <lightning-button
+                    label={d.toggleLabel}
+                    variant="base"
+                    data-id={d.id}
+                    onclick={handleToggle}
+                  ></lightning-button>
+                </div>
+              </template>
+            </li>
+          </template>
+        </ul>
+      </template>
+      <template lwc:else>
+        <div class="kem-empty">No discount codes yet.</div>
+      </template>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button
+      label="Done"
+      variant="brand"
+      onclick={handleClose}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

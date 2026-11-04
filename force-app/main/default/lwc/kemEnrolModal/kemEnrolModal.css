@@ -1,0 +1,163 @@
+@import "c/kemStyles";
+
+.steps {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+  list-style: none;
+  padding: 0;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--kem-muted);
+}
+
+.step-num {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--kem-canvas);
+  border: 1px solid var(--kem-line);
+}
+
+.step_current {
+  color: var(--kem-blue);
+}
+
+.step_current .step-num {
+  background: var(--kem-blue);
+  border-color: var(--kem-blue);
+  color: #fff;
+}
+
+.step_done .step-num {
+  background: var(--kem-green);
+  border-color: var(--kem-green);
+  color: #fff;
+}
+
+.options {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 22rem;
+  overflow-y: auto;
+}
+
+.option {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+  cursor: pointer;
+  transition:
+    border-color 0.15s var(--kem-ease),
+    background 0.15s var(--kem-ease);
+}
+
+.option:hover {
+  background: var(--kem-canvas);
+}
+
+.option_selected {
+  border-color: var(--kem-blue);
+  background: var(--kem-sky);
+}
+
+.class-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.seats {
+  width: 9rem;
+  text-align: right;
+}
+
+.seat-bar {
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #e7edf5;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.seat-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--kem-teal), var(--kem-blue));
+  border-radius: 999px;
+  transition: width 0.4s var(--kem-ease);
+}
+
+.review-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.code {
+  max-width: 12rem;
+}
+
+.quote {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.quote th {
+  text-align: left;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  color: var(--kem-muted);
+  border-bottom: 1px solid var(--kem-line);
+  padding: 0.35rem 0.25rem;
+}
+
+.quote td {
+  padding: 0.45rem 0.25rem;
+  border-bottom: 1px solid var(--kem-line);
+}
+
+.num {
+  text-align: right;
+}
+
+.discount {
+  color: var(--kem-green);
+}
+
+.grand {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.warning {
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--kem-radius-sm);
+  background: #fdf0dc;
+  color: #7a4a00;
+}
+
+.small {
+  font-size: 0.75rem;
+}

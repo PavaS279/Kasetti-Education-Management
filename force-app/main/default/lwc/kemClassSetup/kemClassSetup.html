@@ -1,0 +1,206 @@
+<template>
+  <template lwc:if={visible}>
+    <article class="kem-card panel" aria-label="Class set-up">
+      <template lwc:if={isLoading}>
+        <lightning-spinner
+          alternative-text="Loading"
+          size="small"
+        ></lightning-spinner>
+      </template>
+      <div class="head">
+        <span class="kem-section-title">Class set-up</span>
+        <template lwc:if={details}>
+          <template lwc:if={showEditButton}>
+            <lightning-button
+              label="Edit"
+              icon-name="utility:edit"
+              onclick={handleEdit}
+              class="edit"
+            ></lightning-button>
+          </template>
+        </template>
+      </div>
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+
+      <template lwc:if={result}>
+        <template lwc:if={result.hasClashes}>
+          <div class="clashes" role="status">
+            <strong
+              >Saved. {result.updated} upcoming sessions updated; these kept
+              their old teacher or room because of a clash:</strong
+            >
+            <ul>
+              <template for:each={result.clashes} for:item="c">
+                <li key={c.key}>{c.text}</li>
+              </template>
+            </ul>
+            <template lwc:if={result.more}>
+              <span class="small">and {result.more} more</span>
+            </template>
+            <span class="small"
+              >Change them on the Timetable, or choose another teacher, room or
+              time.</span
+            >
+          </div>
+        </template>
+      </template>
+
+      <template lwc:if={details}>
+        <template lwc:if={editing}>
+          <div class="form-grid">
+            <lightning-combobox
+              label="Branch"
+              value={form.branchId}
+              options={branchOptions}
+              data-field="branchId"
+              onchange={handleField}
+              required
+            ></lightning-combobox>
+            <lightning-combobox
+              label="Delivery"
+              value={form.deliveryMode}
+              options={modeOptions}
+              data-field="deliveryMode"
+              onchange={handleField}
+            ></lightning-combobox>
+            <div>
+              <lightning-combobox
+                label="Teacher (login)"
+                value={form.teacherUserId}
+                options={teacherOptions}
+                data-field="teacherUserId"
+                onchange={handleField}
+                field-level-help="Takes registers, enters marks and gets cover; the branch's teachers first, then other staff at the branch."
+                class="teacher"
+              ></lightning-combobox>
+              <template lwc:if={noTeachers}>
+                <p class="hint">
+                  No staff member has the Teacher role at this branch: add one
+                  in Home → Set-up Centre → Staff roles.
+                </p>
+              </template>
+            </div>
+            <lightning-combobox
+              label="Faculty shown to families"
+              value={form.facultyId}
+              options={facultyOptions}
+              data-field="facultyId"
+              onchange={handleField}
+              class="faculty"
+            ></lightning-combobox>
+            <div>
+              <lightning-combobox
+                label="Room"
+                value={form.roomId}
+                options={roomOptions}
+                data-field="roomId"
+                onchange={handleField}
+                class="room"
+              ></lightning-combobox>
+              <template lwc:if={roomTooSmall}>
+                <p class="hint hint_bad">
+                  Only {selectedRoomSeats} seats for a class of {form.capacity}.
+                </p>
+              </template>
+            </div>
+            <lightning-input
+              type="number"
+              label="Seats"
+              value={form.capacity}
+              data-field="capacity"
+              onchange={handleField}
+              min="1"
+              required
+            ></lightning-input>
+            <lightning-combobox
+              label="Status"
+              value={form.status}
+              options={statusOptions}
+              data-field="status"
+              onchange={handleField}
+            ></lightning-combobox>
+          </div>
+          <template lwc:if={showSessionNote}>
+            <p class="hint">
+              The new teacher or room is also set on the
+              {details.upcomingSessions} upcoming sessions (not on sessions
+              being covered). A session that would clash keeps its old value and
+              is listed.
+            </p>
+          </template>
+          <div class="actions">
+            <lightning-button
+              label="Cancel"
+              onclick={handleCancel}
+            ></lightning-button>
+            <lightning-button
+              variant="brand"
+              label="Save"
+              onclick={handleSave}
+              disabled={cannotSave}
+              class="save"
+            ></lightning-button>
+          </div>
+        </template>
+        <template lwc:else>
+          <dl class="facts">
+            <dt>Teacher</dt>
+            <dd>{teacherName}</dd>
+            <dt>Faculty</dt>
+            <dd>{facultyName}</dd>
+            <dt>Branch</dt>
+            <dd>{branchName}</dd>
+            <dt>Room</dt>
+            <dd>{roomName}</dd>
+            <dt>Seats</dt>
+            <dd>{seatsText}</dd>
+            <dt>Sessions</dt>
+            <dd>{details.upcomingSessions} upcoming</dd>
+          </dl>
+          <template lwc:if={hasProblems}>
+            <ul class="problems">
+              <template for:each={problems} for:item="p">
+                <li key={p.key}>
+                  <lightning-icon
+                    icon-name="utility:warning"
+                    size="xx-small"
+                    variant="warning"
+                    alternative-text=""
+                  ></lightning-icon>
+                  {p.text}
+                </li>
+              </template>
+            </ul>
+          </template>
+          <template lwc:else>
+            <p class="ok">
+              <lightning-icon
+                icon-name="utility:success"
+                size="xx-small"
+                variant="success"
+                alternative-text=""
+              ></lightning-icon>
+              Fully set up.
+            </p>
+          </template>
+          <template lwc:if={showDone}>
+            <div class="actions">
+              <lightning-button
+                variant="brand"
+                label="Done"
+                onclick={handleDone}
+              ></lightning-button>
+            </div>
+          </template>
+        </template>
+      </template>
+    </article>
+  </template>
+</template>

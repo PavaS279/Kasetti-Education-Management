@@ -1,0 +1,61 @@
+<template>
+  <lightning-modal-header label="Report an absence"></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <p class="intro">
+      Every session the teacher has in this period is flagged for cover.
+    </p>
+    <div class="form-grid">
+      <template lwc:if={canArrange}>
+        <lightning-combobox
+          class="full"
+          label="Teacher"
+          value={teacherId}
+          options={teacherOptions}
+          onchange={handleTeacher}
+        ></lightning-combobox>
+      </template>
+      <lightning-input
+        type="datetime"
+        label="From"
+        value={startAt}
+        onchange={handleStart}
+        required
+      ></lightning-input>
+      <lightning-input
+        type="datetime"
+        label="Until"
+        value={endAt}
+        onchange={handleEnd}
+        required
+      ></lightning-input>
+      <lightning-combobox
+        label="Reason"
+        value={reason}
+        options={reasonOptions}
+        onchange={handleReason}
+        required
+      ></lightning-combobox>
+      <lightning-input
+        label="Notes"
+        value={notes}
+        max-length="255"
+        onchange={handleNotes}
+      ></lightning-input>
+    </div>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Report absence"
+      onclick={handleSave}
+      disabled={cannotSave}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

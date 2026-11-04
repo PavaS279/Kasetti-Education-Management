@@ -1,0 +1,92 @@
+<template>
+  <template lwc:if={hasCheckDates}>
+    <p class="kem-muted note">
+      <lightning-icon
+        icon-name="utility:info"
+        size="xx-small"
+        alternative-text=""
+      ></lightning-icon>
+      Festival dates follow the lunar calendar: check those marked
+      <span class="kem-badge kem-badge_warning">Check date</span> against the
+      Karnataka government's holiday list before saving.
+    </p>
+  </template>
+  <ul class="holidays" aria-label="Holidays">
+    <template for:each={rows} for:item="h">
+      <li key={h.key} class={h.rowClass}>
+        <lightning-input
+          type="checkbox"
+          label="Include"
+          variant="label-hidden"
+          checked={h.include}
+          data-index={h.index}
+          data-field="include"
+          onchange={handleField}
+          class="tick"
+        ></lightning-input>
+        <div class="name">
+          <lightning-input
+            label="Holiday or break"
+            value={h.name}
+            data-index={h.index}
+            data-field="name"
+            onchange={handleField}
+            max-length="80"
+          ></lightning-input>
+          <span class="tags">
+            <template lwc:if={h.checkDate}>
+              <span class="kem-badge kem-badge_warning">Check date</span>
+            </template>
+            <template lwc:if={h.isPast}>
+              <span class="kem-badge">Past</span>
+            </template>
+          </span>
+        </div>
+        <lightning-input
+          type="date"
+          label="From"
+          value={h.startDate}
+          data-index={h.index}
+          data-field="startDate"
+          onchange={handleField}
+          required={h.include}
+        ></lightning-input>
+        <lightning-input
+          type="date"
+          label="To"
+          value={h.endDate}
+          data-index={h.index}
+          data-field="endDate"
+          onchange={handleField}
+          min={h.startDate}
+        ></lightning-input>
+        <lightning-combobox
+          label="Type"
+          value={h.closureType}
+          options={typeOptions}
+          data-index={h.index}
+          data-field="closureType"
+          onchange={handleField}
+        ></lightning-combobox>
+        <lightning-button-icon
+          icon-name="utility:delete"
+          alternative-text="Remove"
+          title="Remove"
+          variant="bare"
+          data-index={h.index}
+          onclick={handleRemove}
+          class="remove"
+        ></lightning-button-icon>
+      </li>
+    </template>
+  </ul>
+  <div class="foot">
+    <lightning-button
+      label="Add a holiday or break"
+      icon-name="utility:add"
+      variant="base"
+      onclick={handleAdd}
+    ></lightning-button>
+    <span class="kem-muted total">{chosen} chosen</span>
+  </div>
+</template>

@@ -1,0 +1,186 @@
+<template>
+  <template lwc:if={available}>
+    <article class="kem-card panel">
+      <div class="head">
+        <span class="title"
+          ><lightning-icon
+            icon-name="utility:einstein"
+            size="x-small"
+          ></lightning-icon
+          ><span class="kem-section-title">AI document reader</span></span
+        >
+        <template lwc:if={isReview}>
+          <span class="small muted">{summary}</span>
+        </template>
+      </div>
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+      <template lwc:if={isBusy}>
+        <div class="busy">
+          <lightning-spinner
+            alternative-text={busyLabel}
+            size="small"
+          ></lightning-spinner>
+          <span class="small muted">{busyLabel}…</span>
+        </div>
+      </template>
+
+      <template lwc:if={isChoose}>
+        <p class="small muted intro">
+          Reads the text of a birth certificate, report card, ID or application
+          form and suggests details for the learner and guardian. Nothing is
+          saved until you confirm.
+        </p>
+        <lightning-radio-group
+          name="source"
+          label="Document"
+          variant="label-hidden"
+          options={sources}
+          value={source}
+          type="button"
+          onchange={handleSource}
+        ></lightning-radio-group>
+        <div class="source">
+          <template lwc:if={isAttached}>
+            <template lwc:if={hasDocuments}>
+              <ul class="docs">
+                <template for:each={documentRows} for:item="d">
+                  <li key={d.contentVersionId} class="doc">
+                    <span class="doc-text">
+                      <span class="strong">{d.title}</span>
+                      <span class="small muted">{d.meta}</span>
+                      <template lwc:if={d.reason}>
+                        <span class="small warn">{d.reason}</span>
+                      </template>
+                    </span>
+                    <lightning-button
+                      label="Read"
+                      data-id={d.contentVersionId}
+                      onclick={handleReadAttached}
+                      disabled={d.disabled}
+                    ></lightning-button>
+                  </li>
+                </template>
+              </ul>
+            </template>
+            <template lwc:else>
+              <p class="small muted">
+                No files are attached to this application or its checklist yet.
+              </p>
+            </template>
+          </template>
+          <template lwc:if={isUpload}>
+            <lightning-input
+              type="file"
+              label="PDF or text file (up to 4 MB). The file is read here and is not stored."
+              accept=".pdf,.txt,.csv"
+              onchange={handleUpload}
+              disabled={isBusy}
+            ></lightning-input>
+          </template>
+          <template lwc:if={isPaste}>
+            <lightning-textarea
+              label="Document text"
+              value={pasted}
+              onchange={handlePaste}
+              max-length="12000"
+              class="paste"
+            ></lightning-textarea>
+            <div class="actions">
+              <lightning-button
+                variant="brand"
+                label="Read text"
+                icon-name="utility:einstein"
+                onclick={handleReadPasted}
+                disabled={pasteDisabled}
+              ></lightning-button>
+            </div>
+          </template>
+        </div>
+      </template>
+
+      <template lwc:if={isReview}>
+        <template lwc:if={guardianHint}>
+          <p class="small muted hint">{guardianHint}</p>
+        </template>
+        <template for:each={sections} for:item="s">
+          <div key={s.name} class="section">
+            <div class="section-title">{s.name}</div>
+            <template for:each={s.rows} for:item="p">
+              <div key={p.key} class={p.rowClass}>
+                <lightning-input
+                  type="checkbox"
+                  label={p.label}
+                  data-key={p.key}
+                  checked={p.selected}
+                  disabled={p.disabled}
+                  onchange={handleToggle}
+                  class="pick"
+                ></lightning-input>
+                <span class="current small muted" title="On record now"
+                  >{p.currentLabel}</span
+                >
+                <lightning-input
+                  label={p.label}
+                  variant="label-hidden"
+                  value={p.proposed}
+                  data-key={p.key}
+                  disabled={p.disabled}
+                  onchange={handleValue}
+                  class="value"
+                ></lightning-input>
+                <template lwc:if={p.note}>
+                  <span class="note small">{p.note}</span>
+                </template>
+              </div>
+            </template>
+          </div>
+        </template>
+        <template lwc:if={extraction.truncated}>
+          <p class="small muted">
+            Only the first part of a long document was read.
+          </p>
+        </template>
+        <div class="actions">
+          <lightning-button
+            label="Discard"
+            onclick={handleDiscard}
+            disabled={isBusy}
+          ></lightning-button>
+          <lightning-button
+            variant="brand"
+            label={applyLabel}
+            onclick={handleApply}
+            disabled={applyDisabled}
+          ></lightning-button>
+        </div>
+        <p class="small muted footer">
+          Einstein · check each value against the document before applying
+        </p>
+      </template>
+
+      <template lwc:if={isDone}>
+        <div class="done">
+          <lightning-icon
+            icon-name="utility:success"
+            size="x-small"
+            variant="success"
+          ></lightning-icon>
+          <span>{appliedSummary}.</span>
+        </div>
+        <div class="actions">
+          <lightning-button
+            label="Read another document"
+            onclick={reset}
+          ></lightning-button>
+        </div>
+      </template>
+    </article>
+  </template>
+</template>

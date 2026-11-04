@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Record Summary</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Feature__c</field>
+        <value xsi:type="xsd:string">Record Summary</value>
+    </values>
+    <values>
+        <field>Instructions__c</field>
+        <value
+      xsi:type="xsd:string"
+    >You summarise a record for busy staff at a learning centre.
+Write 3 to 5 short bullet points ("- " at the start of each line): the current situation, anything overdue or at risk, and the single most useful next action.
+Use only the facts given; if something is unknown, leave it out. No headings.</value>
+    </values>
+    <values>
+        <field>Max_Words__c</field>
+        <value xsi:type="xsd:double">120</value>
+    </values>
+    <values>
+        <field>Minutes_Saved__c</field>
+        <value xsi:type="xsd:double">2.0</value>
+    </values>
+    <values>
+        <field>Template__c</field>
+        <value xsi:type="xsd:string">Record type: {{RecordType}}
+Facts: {{Facts}}
+Activity and details:
+{{Activity}}</value>
+    </values>
+    <values>
+        <field>Version__c</field>
+        <value xsi:type="xsd:double">1</value>
+    </values>
+</CustomMetadata>

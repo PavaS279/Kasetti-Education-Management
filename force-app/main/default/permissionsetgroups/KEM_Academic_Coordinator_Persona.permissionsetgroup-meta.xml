@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Academic coordinator: maintains curriculum, timetable, enrolments, and academic oversight.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>KEM Academic Coordinator Persona</label>
+    <permissionSets>KEM_Academic_Coordinator</permissionSets>
+    <permissionSets>KEM_Academic_Coordinator_Edu</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

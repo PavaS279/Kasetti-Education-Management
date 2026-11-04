@@ -1,0 +1,105 @@
+<template>
+  <template lwc:if={available}>
+    <article class="kem-card panel">
+      <div class="head">
+        <lightning-icon
+          icon-name="utility:einstein"
+          size="x-small"
+        ></lightning-icon>
+        <span class="kem-section-title">Ask about our policies</span>
+      </div>
+      <div class="ask">
+        <lightning-input
+          class="question"
+          type="search"
+          label="Question"
+          variant="label-hidden"
+          placeholder="e.g. Who can approve a refund I requested?"
+          value={question}
+          onchange={handleQuestion}
+          onkeyup={handleKey}
+        ></lightning-input>
+        <lightning-button
+          variant="brand"
+          label="Ask"
+          onclick={handleAsk}
+          disabled={cannotAsk}
+        ></lightning-button>
+      </div>
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+      <template lwc:if={isBusy}>
+        <lightning-spinner
+          alternative-text="Finding the answer"
+          size="small"
+        ></lightning-spinner>
+      </template>
+      <template lwc:if={answer}>
+        <div class="answer">
+          <p class="kem-muted small">{asked}</p>
+          <p>{answer.answer}</p>
+          <div class="meta">
+            <span class={confidenceClass}>{confidenceLabel}</span>
+            <template lwc:if={hasSources}>
+              <span class="sources"
+                >Sources:
+                <template for:each={answer.sources} for:item="s">
+                  <span key={s} class="source">{s}</span>
+                </template>
+              </span>
+            </template>
+          </div>
+          <div class="meta">
+            <span class="kem-muted small"
+              >Einstein · answers only from the institution's policies</span
+            >
+            <template lwc:if={reviewed}>
+              <span class="kem-muted small">Thanks for the feedback</span>
+            </template>
+            <template lwc:else>
+              <span>
+                <lightning-button-icon
+                  icon-name="utility:like"
+                  alternative-text="Helpful"
+                  title="Helpful"
+                  data-helpful="true"
+                  onclick={handleFeedback}
+                  size="small"
+                ></lightning-button-icon>
+                <lightning-button-icon
+                  icon-name="utility:dislike"
+                  alternative-text="Not helpful"
+                  title="Not helpful"
+                  data-helpful="false"
+                  onclick={handleFeedback}
+                  size="small"
+                ></lightning-button-icon>
+              </span>
+            </template>
+          </div>
+        </div>
+      </template>
+      <template lwc:else>
+        <div class="examples">
+          <template for:each={examples} for:item="e">
+            <button
+              key={e.key}
+              type="button"
+              class="example"
+              data-text={e.text}
+              onclick={handleExample}
+            >
+              {e.text}
+            </button>
+          </template>
+        </div>
+      </template>
+    </article>
+  </template>
+</template>

@@ -1,0 +1,40 @@
+<template>
+  <section class="kem-card panel kem-fade-in">
+    <div class="panel-head">
+      <div class="kem-section-title">Documents</div>
+      <lightning-button
+        label={actionLabel}
+        icon-name="doctype:pdf"
+        onclick={handleGenerate}
+        disabled={isBusy}
+      ></lightning-button>
+    </div>
+    <template lwc:if={errorMessage}>
+      <div class="slds-text-color_error small">{errorMessage}</div>
+    </template>
+    <ul class="list">
+      <template for:each={items} for:item="d">
+        <li key={d.contentDocumentId}>
+          <button
+            type="button"
+            class="item"
+            data-id={d.contentDocumentId}
+            onclick={handleOpen}
+          >
+            <lightning-icon
+              icon-name="doctype:pdf"
+              size="small"
+            ></lightning-icon>
+            <span class="item-main">
+              <span class="item-name">{d.title}</span>
+              <span class="kem-muted small">{d.meta}</span>
+            </span>
+          </button>
+        </li>
+      </template>
+    </ul>
+    <template lwc:if={isBusy}>
+      <div class="kem-muted small">Preparing the PDF…</div>
+    </template>
+  </section>
+</template>

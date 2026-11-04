@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >API user for external systems (LMS, ERP, payment gateway middleware): reads classes, rosters and the finance journal, writes grades, polls and acknowledges integration events.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>KEM Integration Persona</label>
+    <permissionSets>KEM_Integration</permissionSets>
+    <permissionSets>KEM_Integration_Edu</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

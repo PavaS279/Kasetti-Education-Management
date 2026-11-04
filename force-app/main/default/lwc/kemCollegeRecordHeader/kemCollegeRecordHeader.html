@@ -1,0 +1,21 @@
+<template>
+  <div class="header">
+    <template lwc:if={header}>
+      <div class="icon">
+        <lightning-icon
+          icon-name="standard:education"
+          size="small"
+          alternative-text=""
+        ></lightning-icon>
+      </div>
+      <div>
+        <p class="label">{header.label}</p>
+        <h1>{header.name}</h1>
+        <p class="detail">{header.detail}</p>
+      </div>
+    </template>
+    <template lwc:if={errorMessage}
+      ><p class="error" role="alert">{errorMessage}</p></template
+    >
+  </div>
+</template>

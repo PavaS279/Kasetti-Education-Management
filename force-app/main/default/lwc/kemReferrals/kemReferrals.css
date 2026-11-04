@@ -1,0 +1,104 @@
+@import "c/kemStyles";
+
+.panel {
+  position: relative;
+  padding: 1rem;
+}
+
+.head,
+.title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.head {
+  margin-bottom: 0.75rem;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.muted {
+  color: var(--kem-muted);
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-sky);
+}
+
+.tile-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.tile-label {
+  font-size: 0.75rem;
+  color: var(--kem-muted);
+}
+
+.section-title {
+  margin: 0.75rem 0 0.3rem;
+  font-weight: 700;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--kem-line);
+  text-align: left;
+}
+
+.data-table th {
+  color: var(--kem-muted);
+  font-weight: 600;
+}
+
+.actions {
+  white-space: nowrap;
+}
+
+.two {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.ranking li {
+  display: flex;
+  flex-direction: column;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--kem-line);
+}
+
+.invite {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.4rem;
+}

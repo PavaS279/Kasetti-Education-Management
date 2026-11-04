@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Library</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Body__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Learners can borrow items from their branch library. The loan period is {{Setting:Library_Loan_Days}} days unless the item sets its own. A loan can be renewed {{Setting:Library_Max_Renewals}} times before its due date.
+Late returns are fined {{Setting:Library_Daily_Fine}} per day up to {{Setting:Library_Max_Fine}}. A lost item is charged at its replacement cost. A learner with an overdue loan cannot borrow until it is returned.</value>
+    </values>
+    <values>
+        <field>Keywords__c</field>
+        <value
+      xsi:type="xsd:string"
+    >library book books borrow loan loans renew return fine fines late lost kit device</value>
+    </values>
+    <values>
+        <field>Topic__c</field>
+        <value xsi:type="xsd:string">library</value>
+    </values>
+</CustomMetadata>

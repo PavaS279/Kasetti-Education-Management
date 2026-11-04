@@ -1,0 +1,148 @@
+<template>
+  <template lwc:if={visible}>
+    <section class="kem-card panel kem-fade-in">
+      <div class="head">
+        <div>
+          <div class="kem-section-title">ERP export</div>
+          <div class="kem-muted small">
+            Invoices, payments, credit notes and refunds as balanced journal
+            lines. A daily export of yesterday also runs at 03:15.
+          </div>
+        </div>
+      </div>
+
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+
+      <div class="filters">
+        <lightning-input
+          type="date"
+          label="From"
+          value={fromDate}
+          onchange={handleFrom}
+        ></lightning-input>
+        <lightning-input
+          type="date"
+          label="To"
+          value={toDate}
+          onchange={handleTo}
+        ></lightning-input>
+        <lightning-combobox
+          label="Branch"
+          value={branchId}
+          options={branchOptions}
+          onchange={handleBranch}
+        ></lightning-combobox>
+        <div class="buttons">
+          <lightning-button
+            label="Preview"
+            onclick={handlePreview}
+            disabled={cannotRun}
+          ></lightning-button>
+          <lightning-button
+            variant="brand"
+            label="Export CSV"
+            icon-name="utility:download"
+            onclick={handleExport}
+            disabled={cannotRun}
+          ></lightning-button>
+        </div>
+      </div>
+
+      <template lwc:if={journal}>
+        <div class="summary">
+          <span class="strong">{journal.documents} documents</span>
+          <span class={balanceClass}>{balanceLabel}</span>
+        </div>
+        <template lwc:if={hasAccounts}>
+          <div class="table-wrap">
+            <table class="accounts">
+              <thead>
+                <tr>
+                  <th>Account</th>
+                  <th>Name</th>
+                  <th class="num">Debit</th>
+                  <th class="num">Credit</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={accounts} for:item="a">
+                  <tr key={a.account}>
+                    <td>{a.account}</td>
+                    <td>{a.accountName}</td>
+                    <td class="num">
+                      <lightning-formatted-number
+                        value={a.debit}
+                        format-style="currency"
+                        currency-code={currencyCode}
+                      ></lightning-formatted-number>
+                    </td>
+                    <td class="num">
+                      <lightning-formatted-number
+                        value={a.credit}
+                        format-style="currency"
+                        currency-code={currencyCode}
+                      ></lightning-formatted-number>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2" class="strong">Total</td>
+                  <td class="num strong">
+                    <lightning-formatted-number
+                      value={journal.totalDebit}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                  </td>
+                  <td class="num strong">
+                    <lightning-formatted-number
+                      value={journal.totalCredit}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </template>
+        <template lwc:else>
+          <div class="kem-empty">No finance documents in this period.</div>
+        </template>
+      </template>
+
+      <div class="group-title">Recent exports</div>
+      <template lwc:if={hasExports}>
+        <ul class="exports">
+          <template for:each={exports} for:item="e">
+            <li key={e.exportId} class="export">
+              <div class="export-main">
+                <span class="strong">{e.exportNumber}</span>
+                <span class="kem-muted small"
+                  >{e.period} · {e.scope} · {e.runType} · {e.lines} lines</span
+                >
+              </div>
+              <template lwc:if={e.downloadUrl}>
+                <a href={e.downloadUrl} target="_blank" class="download"
+                  >Download CSV</a
+                >
+              </template>
+            </li>
+          </template>
+        </ul>
+      </template>
+      <template lwc:else>
+        <div class="kem-muted small">No exports yet.</div>
+      </template>
+    </section>
+  </template>
+</template>

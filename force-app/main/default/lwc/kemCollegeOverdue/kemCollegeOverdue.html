@@ -1,0 +1,74 @@
+<template>
+  <template lwc:if={visible}>
+    <section class="kem-card overdue">
+      <header>
+        <div>
+          <p class="eyebrow">DEAN</p>
+          <h2>Overdue provisional admissions</h2>
+          <p class="subtitle">
+            Past the payment date but kept because money is paid or a DD/cheque
+            is awaiting clearance. Extend the date or cancel the admission.
+          </p>
+        </div>
+        <lightning-button-icon
+          icon-name="utility:refresh"
+          alternative-text="Refresh"
+          title="Refresh"
+          onclick={load}
+        ></lightning-button-icon>
+      </header>
+      <template lwc:if={errorMessage}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      </template>
+      <template lwc:if={hasRows}>
+        <ul class="rows">
+          <template for:each={rows} for:item="row">
+            <li key={row.enrolmentId}>
+              <div class="main">
+                <strong>{row.studentName}</strong>
+                <span>{row.branchName} · {row.campusName}</span>
+                <span
+                  >Due by {row.paymentDueBy} · paid {row.paid} · awaiting
+                  clearance {row.awaitingClearance} · balance
+                  {row.balanceDue}</span
+                >
+              </div>
+              <div class="actions">
+                <lightning-input
+                  type="date"
+                  label="New payment date"
+                  data-id={row.enrolmentId}
+                  data-field="date"
+                ></lightning-input>
+                <lightning-input
+                  label="Reason"
+                  data-id={row.enrolmentId}
+                  data-field="reason"
+                ></lightning-input>
+                <lightning-button
+                  label="Extend"
+                  data-id={row.enrolmentId}
+                  onclick={handleExtend}
+                ></lightning-button>
+                <lightning-button
+                  label="Cancel admission"
+                  variant="destructive-text"
+                  data-id={row.enrolmentId}
+                  onclick={handleCancel}
+                ></lightning-button>
+              </div>
+            </li>
+          </template>
+        </ul>
+      </template>
+      <template lwc:elseif={loaded}>
+        <p class="empty">No overdue provisional admissions.</p>
+      </template>
+    </section>
+  </template>
+</template>

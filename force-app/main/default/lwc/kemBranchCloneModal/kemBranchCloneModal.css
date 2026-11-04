@@ -1,0 +1,94 @@
+@import "c/kemStyles";
+
+.intro {
+  margin-bottom: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--kem-muted);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.group-title {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--kem-muted);
+}
+
+.parts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 0.5rem;
+}
+
+.part {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--kem-line);
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-surface);
+}
+
+.part-count {
+  font-size: 0.75rem;
+  color: var(--kem-muted);
+  white-space: nowrap;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.stat {
+  padding: 0.6rem;
+  border-radius: var(--kem-radius-sm);
+  background: var(--kem-sky);
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--kem-navy);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--kem-muted);
+}
+
+.notes {
+  padding-left: 1rem;
+  list-style: disc;
+  font-size: 0.8125rem;
+}
+
+.success {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: var(--kem-radius-sm);
+  background: #eef8f1;
+  font-weight: 700;
+  --slds-c-icon-color-foreground-default: var(--kem-green);
+}
+
+@media (max-width: 30em) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

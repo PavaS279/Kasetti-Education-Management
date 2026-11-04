@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Declared_Marks__c</fullName>
+    <label>Declared Marks</label>
+    <description
+  >Marks and entrance ranks as typed by the visitor on the public college enquiry (JSON). Unverified: the desk confirms them against the marks card when converting the enquiry.</description>
+    <length>4000</length>
+    <required>false</required>
+    <type>LongTextArea</type>
+    <visibleLines>4</visibleLines>
+</CustomField>

@@ -1,0 +1,10 @@
+<!--
+  Standard "New" button override (Phase 5 stage 6). Aura is required for
+  button overrides; the work is done by the c-kem-new-router LWC.
+-->
+<aura:component
+  implements="lightning:actionOverride,lightning:hasPageReference"
+  access="global"
+>
+  <c:kemNewRouter pageReference="{!v.pageReference}" />
+</aura:component>

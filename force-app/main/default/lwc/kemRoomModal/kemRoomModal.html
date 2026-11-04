@@ -1,0 +1,40 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <p class="intro">
+      Rooms let the timetable check clashes and seat classes and exams. A class
+      cannot be bigger than its room.
+    </p>
+    <lightning-combobox
+      label="Branch"
+      value={selectedBranch}
+      options={branchOptions}
+      onchange={handleBranch}
+      placeholder="Choose a branch"
+      required
+      class="branch"
+    ></lightning-combobox>
+    <c-kem-room-lines lines={lines} onchange={handleLines}></c-kem-room-lines>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Add rooms"
+      onclick={handleSave}
+      disabled={cannotSave}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

@@ -1,0 +1,520 @@
+<template>
+  <div class="portal">
+    <template lwc:if={home}>
+      <section class="kem-hero hero kem-fade-in">
+        <div class="hero-inner">
+          <div>
+            <div class="kem-hero__title">{greetingText}</div>
+            <div class="kem-hero__subtitle">{subtitle}</div>
+          </div>
+          <button
+            type="button"
+            class="inbox-button"
+            aria-expanded={showInbox}
+            onclick={handleInbox}
+          >
+            <lightning-icon
+              icon-name="utility:email"
+              size="x-small"
+            ></lightning-icon>
+            <span>{inboxLabel}</span>
+          </button>
+          <template lwc:if={showSwitcher}>
+            <div class="chips" role="group" aria-label="Choose a learner">
+              <template for:each={learnerChips} for:item="l">
+                <button
+                  key={l.learnerContactId}
+                  type="button"
+                  class={l.className}
+                  aria-pressed={l.pressed}
+                  data-id={l.learnerContactId}
+                  onclick={handleSelect}
+                >
+                  <span class={l.avatarClass}>{l.initials}</span>
+                  <span>{l.label}</span>
+                </button>
+              </template>
+            </div>
+          </template>
+        </div>
+      </section>
+
+      <template lwc:if={showInbox}>
+        <section class="kem-card panel inbox kem-fade-in" aria-label="Messages">
+          <div class="kem-section-title">Messages</div>
+          <ul>
+            <template for:each={messages} for:item="m">
+              <li key={m.id} class={m.className}>
+                <button
+                  type="button"
+                  class="message-head"
+                  data-id={m.id}
+                  aria-expanded={m.expanded}
+                  onclick={handleOpenMessage}
+                >
+                  <span class="strong">{m.subject}</span>
+                  <span class="kem-muted small">{m.when}</span>
+                </button>
+                <template lwc:if={m.open}>
+                  <div class="message-body">{m.body}</div>
+                </template>
+              </li>
+            </template>
+          </ul>
+          <template lwc:if={noMessages}>
+            <div class="kem-empty">No messages yet.</div>
+          </template>
+        </section>
+      </template>
+
+      <template lwc:if={hasAdmissions}>
+        <section
+          class="kem-card panel admissions kem-fade-in"
+          aria-label="Admission documents"
+        >
+          <div class="kem-section-title">Admission documents</div>
+          <div class="kem-muted small">
+            Upload each document as a PDF, JPG or PNG (up to 3 MB). Our
+            admissions team reviews it and the status changes here.
+          </div>
+          <template lwc:if={admissionNotice}>
+            <div class="notice small" role="status">{admissionNotice}</div>
+          </template>
+          <template lwc:if={admissionError}>
+            <div class="error small" role="alert">{admissionError}</div>
+          </template>
+          <template for:each={admissionCards} for:item="app">
+            <div key={app.applicationId} class="admission">
+              <div class="admission-head">
+                <strong>{app.learnerName}</strong>
+                <span class="kem-muted small">{app.subtitle}</span>
+                <span class={app.neededClass}>{app.neededLabel}</span>
+              </div>
+              <ul class="doc-items">
+                <template for:each={app.rows} for:item="item">
+                  <li key={item.itemId} class="doc-item">
+                    <div class="doc-text">
+                      <div>
+                        <span class="doc-name">{item.name}</span>
+                        <template lwc:if={item.required}>
+                          <span class="kem-badge">Required</span>
+                        </template>
+                        <span class={item.statusClass}>{item.statusLabel}</span>
+                      </div>
+                      <template lwc:if={item.instruction}>
+                        <div class="kem-muted small">{item.instruction}</div>
+                      </template>
+                      <template lwc:if={item.rejectReason}>
+                        <div class="error small">
+                          Please upload again: {item.rejectReason}
+                        </div>
+                      </template>
+                      <template lwc:if={item.filesLabel}>
+                        <div class="kem-muted small">
+                          Sent: {item.filesLabel}
+                        </div>
+                      </template>
+                    </div>
+                    <template lwc:if={item.canUpload}>
+                      <lightning-input
+                        type="file"
+                        label={item.uploadLabel}
+                        variant="label-hidden"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        data-id={item.itemId}
+                        data-name={item.name}
+                        onchange={handleAdmissionFile}
+                        disabled={item.busy}
+                      ></lightning-input>
+                    </template>
+                  </li>
+                </template>
+              </ul>
+            </div>
+          </template>
+        </section>
+      </template>
+
+      <template lwc:if={referral}>
+        <section
+          class="kem-card panel refer kem-fade-in"
+          aria-label="Refer a friend"
+        >
+          <div>
+            <div class="kem-section-title">Refer a friend</div>
+            <div class="small">{referralSummary}</div>
+            <template lwc:if={referralStats}>
+              <div class="kem-muted small">{referralStats}</div>
+            </template>
+          </div>
+          <template lwc:if={hasReferralCode}>
+            <span class="refer-code">{referral.code}</span>
+          </template>
+          <template lwc:else>
+            <lightning-button
+              label="Get my referral code"
+              onclick={handleReferralCode}
+            ></lightning-button>
+          </template>
+        </section>
+      </template>
+
+      <template lwc:if={hasLearners}>
+        <template lwc:if={card}>
+          <div class="learner-head kem-fade-in">
+            <div>
+              <div class="learner-name">{card.name}</div>
+              <template lwc:if={card.studentNumber}>
+                <div class="kem-muted small">{card.studentNumber}</div>
+              </template>
+            </div>
+          </div>
+
+          <div class="tiles kem-fade-in">
+            <template for:each={summary} for:item="t">
+              <div key={t.key} class={t.className}>
+                <span class="tile-label">{t.label}</span>
+                <span class="tile-value">{t.value}</span>
+                <template lwc:if={t.hint}>
+                  <span class="tile-hint">{t.hint}</span>
+                </template>
+              </div>
+            </template>
+            <div class={balanceClass}>
+              <span class="tile-label">Balance due</span>
+              <lightning-formatted-number
+                class="tile-value"
+                value={balanceDue}
+                format-style="currency"
+                currency-code={currencyCode}
+              ></lightning-formatted-number>
+              <span class="tile-hint">{overdueLabel}</span>
+            </div>
+          </div>
+
+          <template lwc:if={collegeSummary}>
+            <c-kem-portal-college
+              summary={collegeSummary}
+            ></c-kem-portal-college>
+          </template>
+          <nav class="segments" role="tablist" aria-label="Learner information">
+            <template for:each={views} for:item="v">
+              <button
+                key={v.value}
+                type="button"
+                role="tab"
+                class={v.className}
+                aria-selected={v.selected}
+                data-value={v.value}
+                onclick={handleView}
+              >
+                <lightning-icon
+                  icon-name={v.icon}
+                  size="x-small"
+                  class="seg-icon"
+                ></lightning-icon>
+                <span>{v.label}</span>
+              </button>
+            </template>
+          </nav>
+
+          <section class="kem-card panel kem-fade-in" role="tabpanel">
+            <template lwc:if={showTimetable}>
+              <template lwc:if={hasWaitlist}>
+                <div class="waitlist">
+                  <template for:each={waitlist} for:item="w">
+                    <div key={w.id} class={w.className}>
+                      <lightning-icon
+                        icon-name="utility:clock"
+                        size="x-small"
+                      ></lightning-icon>
+                      <div>
+                        <div class="strong">{w.className}</div>
+                        <div class="small">{w.text}</div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </template>
+              <template for:each={days} for:item="d">
+                <div key={d.key} class="day">
+                  <div class="day-label">{d.label}</div>
+                  <template for:each={d.sessions} for:item="s">
+                    <div key={s.id} class={s.className}>
+                      <div class="session-time">{s.time}</div>
+                      <div class="session-main">
+                        <div class="strong">{s.className}</div>
+                        <div class="kem-muted small">
+                          {s.where} · {s.teacher}
+                        </div>
+                      </div>
+                      <template lwc:if={s.cancelled}>
+                        <span class="kem-badge kem-badge_danger"
+                          >Cancelled</span
+                        >
+                      </template>
+                      <template lwc:if={s.canJoin}>
+                        <a
+                          class="join"
+                          href={s.meetingUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          >Join</a
+                        >
+                      </template>
+                    </div>
+                  </template>
+                </div>
+              </template>
+              <template lwc:if={noSessions}>
+                <div class="kem-empty">No classes in the next two weeks.</div>
+              </template>
+            </template>
+
+            <template lwc:if={showResults}>
+              <template lwc:if={hasGrades}>
+                <div class="grades">
+                  <template for:each={grades} for:item="g">
+                    <div key={g.enrolmentId} class="course">
+                      <span class={g.gradeClass}>{g.gradeLabel}</span>
+                      <div class="course-main">
+                        <div class="strong">{g.className}</div>
+                        <div class="kem-muted small">
+                          Course grade {g.scoreLabel} · {g.statusLabel}
+                        </div>
+                      </div>
+                      <template lwc:if={g.reportCardVersionId}>
+                        <lightning-button
+                          variant="base"
+                          label="Report card"
+                          icon-name="utility:download"
+                          data-id={g.reportCardVersionId}
+                          onclick={handleDownload}
+                        ></lightning-button>
+                      </template>
+                    </div>
+                  </template>
+                </div>
+              </template>
+              <template for:each={results} for:item="r">
+                <div key={r.id} class="result">
+                  <span class={r.gradeClass}>{r.gradeLabel}</span>
+                  <div class="result-main">
+                    <div class="strong">{r.assessment}</div>
+                    <div class="kem-muted small">{r.meta}</div>
+                    <template lwc:if={r.feedback}>
+                      <div class="feedback">“{r.feedback}”</div>
+                    </template>
+                  </div>
+                  <div class="score">{r.scoreLabel}</div>
+                </div>
+              </template>
+              <template lwc:if={noResults}>
+                <div class="kem-empty">No published results yet.</div>
+              </template>
+            </template>
+
+            <template lwc:if={showAttendance}>
+              <ul>
+                <template for:each={attendance} for:item="a">
+                  <li key={a.id} class="mark">
+                    <span class={a.dotClass} aria-hidden="true"></span>
+                    <div class="mark-main">
+                      <div class="strong">{a.className}</div>
+                      <div class="kem-muted small">{a.when}</div>
+                    </div>
+                    <span class="mark-status">{a.statusLabel}</span>
+                  </li>
+                </template>
+              </ul>
+              <template lwc:if={noAttendance}>
+                <div class="kem-empty">No attendance recorded yet.</div>
+              </template>
+            </template>
+
+            <template lwc:if={showFees}>
+              <template lwc:if={paymentNotice}>
+                <div class="payment-notice" role="status">{paymentNotice}</div>
+              </template>
+              <template for:each={invoices} for:item="i">
+                <div key={i.id} class={i.className}>
+                  <div class="invoice-main">
+                    <div class="strong">{i.invoiceNumber}</div>
+                    <div class="kem-muted small">
+                      {i.className}{i.period} · {i.dueLabel}
+                    </div>
+                    <template lwc:if={i.hasPlan}>
+                      <ol class="plan" aria-label="Instalments">
+                        <template for:each={i.plan} for:item="p">
+                          <li key={p.key} class={p.className}>
+                            <span class="small">{p.dueLabel}</span>
+                            <lightning-formatted-number
+                              class="strong small"
+                              value={p.amount}
+                              format-style="currency"
+                              currency-code={currencyCode}
+                            ></lightning-formatted-number>
+                            <span class="small">{p.statusLabel}</span>
+                          </li>
+                        </template>
+                      </ol>
+                    </template>
+                  </div>
+                  <div class="invoice-side">
+                    <lightning-formatted-number
+                      class="strong"
+                      value={i.balance}
+                      format-style="currency"
+                      currency-code={currencyCode}
+                    ></lightning-formatted-number>
+                    <span class={i.statusClass}>{i.status}</span>
+                    <template lwc:if={i.canPay}>
+                      <lightning-button
+                        class="pay"
+                        variant="brand"
+                        label="Pay online"
+                        data-id={i.id}
+                        onclick={handlePay}
+                        disabled={payingId}
+                      ></lightning-button>
+                    </template>
+                  </div>
+                </div>
+              </template>
+              <template lwc:if={noInvoices}>
+                <div class="kem-empty">No invoices.</div>
+              </template>
+              <template lwc:if={hasCredit}>
+                <div class="credit">
+                  You have
+                  <lightning-formatted-number
+                    class="strong"
+                    value={creditBalance}
+                    format-style="currency"
+                    currency-code={currencyCode}
+                  ></lightning-formatted-number>
+                  in credit. It is used on your next invoice automatically.
+                </div>
+              </template>
+            </template>
+
+            <template lwc:if={showLibrary}>
+              <template for:each={loans} for:item="l">
+                <div key={l.id} class={l.className}>
+                  <div>
+                    <div class="strong">{l.title}</div>
+                    <div class="kem-muted small">{l.dueLabel}</div>
+                  </div>
+                  <div class="loan-side">
+                    <template lwc:if={l.overdueLabel}>
+                      <span class="kem-badge kem-badge_danger"
+                        >{l.overdueLabel}</span
+                      >
+                    </template>
+                    <template lwc:if={l.hasFine}>
+                      <span class="small">
+                        Late fee
+                        <lightning-formatted-number
+                          class="strong"
+                          value={l.fine}
+                          format-style="currency"
+                          currency-code={currencyCode}
+                        ></lightning-formatted-number>
+                      </span>
+                    </template>
+                  </div>
+                </div>
+              </template>
+              <template lwc:if={noLoans}>
+                <div class="kem-empty">No library loans.</div>
+              </template>
+            </template>
+
+            <template lwc:if={showTransport}>
+              <template for:each={transport} for:item="t">
+                <div key={t.key} class="transport">
+                  <div>
+                    <div class="strong">{t.route}</div>
+                    <div>{t.stop} · {t.direction}</div>
+                    <div class="kem-muted small">{t.times}</div>
+                  </div>
+                  <div class="kem-muted small">
+                    <div>{t.vehicle}</div>
+                    <div>Driver {t.driverLine}</div>
+                    <div>{t.since}</div>
+                  </div>
+                </div>
+              </template>
+              <template lwc:if={noTransport}>
+                <div class="kem-empty">No school transport.</div>
+              </template>
+            </template>
+
+            <template lwc:if={showDocuments}>
+              <ul>
+                <template for:each={documents} for:item="d">
+                  <li key={d.versionId} class="doc">
+                    <lightning-icon
+                      icon-name={d.icon}
+                      size="small"
+                    ></lightning-icon>
+                    <div class="doc-main">
+                      <div class="strong">{d.title}</div>
+                      <div class="kem-muted small">
+                        {d.kind} · {d.dateLabel}
+                      </div>
+                    </div>
+                    <lightning-button
+                      label="Download"
+                      icon-name="utility:download"
+                      title={d.downloadLabel}
+                      data-id={d.versionId}
+                      onclick={handleDownload}
+                      disabled={d.busy}
+                    ></lightning-button>
+                  </li>
+                </template>
+              </ul>
+              <template lwc:if={noDocuments}>
+                <div class="kem-empty">No documents yet.</div>
+              </template>
+            </template>
+          </section>
+        </template>
+        <template lwc:elseif={detailError}>
+          <div
+            class="slds-notify slds-notify_alert slds-alert_error"
+            role="alert"
+          >
+            {detailError}
+          </div>
+        </template>
+        <template lwc:if={isLoadingDetail}>
+          <div class="loading">
+            <lightning-spinner
+              alternative-text="Loading"
+              size="small"
+            ></lightning-spinner>
+          </div>
+        </template>
+      </template>
+      <template lwc:else>
+        <div class="kem-card panel kem-empty">
+          No learners are linked to your account yet. Please contact the
+          admissions team.
+        </div>
+      </template>
+    </template>
+    <template lwc:elseif={errorMessage}>
+      <div class="kem-card panel notice">{errorMessage}</div>
+    </template>
+    <template lwc:else>
+      <div class="loading">
+        <lightning-spinner
+          alternative-text="Loading your portal"
+          size="small"
+        ></lightning-spinner>
+      </div>
+    </template>
+  </div>
+</template>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Term_Positive</fullName>
+    <active>true</active>
+    <description>Term must be greater than zero.</description>
+    <errorConditionFormula>Term__c &lt;= 0</errorConditionFormula>
+    <errorDisplayField>Term__c</errorDisplayField>
+    <errorMessage>Term must be greater than zero.</errorMessage>
+</ValidationRule>

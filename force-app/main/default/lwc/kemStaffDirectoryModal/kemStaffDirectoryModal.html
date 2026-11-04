@@ -1,0 +1,118 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={isLoading}>
+      <lightning-spinner
+        alternative-text="Loading"
+        size="small"
+      ></lightning-spinner>
+    </template>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <lightning-input
+      type="search"
+      label="Find staff"
+      variant="label-hidden"
+      placeholder="Find by name, email or branch"
+      value={search}
+      onchange={handleSearch}
+      class="search"
+    ></lightning-input>
+    <template lwc:if={hasPeople}>
+      <ul class="people">
+        <template for:each={people} for:item="p">
+          <li key={p.userId} class="person">
+            <div class="who">
+              <span class="name">{p.name}</span>
+              <span class={p.statusClass}>{p.statusLabel}</span>
+              <span class="kem-muted small">{p.persona} · {p.email}</span>
+              <template lwc:if={p.lastLogin}>
+                <span class="kem-muted small"
+                  >Last login
+                  <lightning-formatted-date-time
+                    value={p.lastLogin}
+                    day="numeric"
+                    month="short"
+                    year="numeric"
+                  ></lightning-formatted-date-time
+                ></span>
+              </template>
+            </div>
+            <div class="chips">
+              <template for:each={p.roles} for:item="r">
+                <span key={r.id} class="chip">
+                  {r.role} · {r.branch}
+                  <button
+                    type="button"
+                    class="chip-end"
+                    title="End this role"
+                    aria-label="End this role"
+                    data-id={r.id}
+                    data-label={r.role}
+                    onclick={handleEnd}
+                  >
+                    ×
+                  </button>
+                </span>
+              </template>
+              <template lwc:if={p.noRoles}>
+                <span class="kem-muted small">No branch roles</span>
+              </template>
+              <template lwc:if={p.isAdding}>
+                <span class="add-form">
+                  <lightning-combobox
+                    label="Branch"
+                    variant="label-hidden"
+                    value={newBranch}
+                    options={branchOptions}
+                    onchange={handleNewBranch}
+                  ></lightning-combobox>
+                  <lightning-combobox
+                    label="Role"
+                    variant="label-hidden"
+                    value={newRole}
+                    options={roleOptions}
+                    onchange={handleNewRole}
+                  ></lightning-combobox>
+                  <lightning-button
+                    label="Add"
+                    variant="brand"
+                    onclick={handleAdd}
+                    disabled={cannotAdd}
+                  ></lightning-button>
+                  <lightning-button
+                    label="Cancel"
+                    variant="base"
+                    onclick={handleCancelAdd}
+                  ></lightning-button>
+                </span>
+              </template>
+              <template lwc:else>
+                <lightning-button
+                  label="Add role"
+                  icon-name="utility:add"
+                  variant="base"
+                  data-user={p.userId}
+                  onclick={handleStartAdd}
+                ></lightning-button>
+              </template>
+            </div>
+          </li>
+        </template>
+      </ul>
+    </template>
+    <template lwc:elseif={overview}>
+      <div class="kem-empty">No staff match.</div>
+    </template>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button
+      label="Done"
+      variant="brand"
+      onclick={handleClose}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

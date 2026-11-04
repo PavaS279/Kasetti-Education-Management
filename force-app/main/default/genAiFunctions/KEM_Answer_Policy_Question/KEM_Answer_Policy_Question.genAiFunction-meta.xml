@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Answers questions about Kasetti institution policies and procedures (fees and invoices, payments, refunds and credit, attendance, admissions and offers, waitlists and transfers, grading and report cards, library, messaging consent, AI use) from the institution&apos;s knowledge base, with sources.</description>
+    <invocationTarget>AgentPolicyAnswer</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <masterLabel>Answer a KEM Policy Question</masterLabel>
+</GenAiFunction>

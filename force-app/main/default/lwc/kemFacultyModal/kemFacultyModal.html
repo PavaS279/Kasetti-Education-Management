@@ -1,0 +1,64 @@
+<template>
+  <lightning-modal-header label={heading}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+    <p class="intro">
+      Faculty are the teachers named on classes, timetables and report cards.
+      They do not need a Salesforce login; to give a teacher a login for
+      registers and marks, add them as a staff member.
+    </p>
+    <div class="form-grid">
+      <lightning-input
+        label="First name"
+        value={firstName}
+        data-field="firstName"
+        onchange={handleField}
+        max-length="40"
+      ></lightning-input>
+      <lightning-input
+        label="Last name"
+        value={lastName}
+        data-field="lastName"
+        onchange={handleField}
+        max-length="80"
+        required
+      ></lightning-input>
+      <lightning-input
+        type="email"
+        label="Email"
+        value={email}
+        data-field="email"
+        onchange={handleField}
+      ></lightning-input>
+      <lightning-input
+        type="tel"
+        label="Phone"
+        value={phone}
+        data-field="phone"
+        onchange={handleField}
+      ></lightning-input>
+      <lightning-input
+        label="Subject"
+        value={subject}
+        data-field="subject"
+        onchange={handleField}
+        placeholder="For example Robotics"
+        max-length="60"
+      ></lightning-input>
+    </div>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleCancel}></lightning-button>
+    <lightning-button
+      class="slds-m-left_x-small"
+      variant="brand"
+      label="Add faculty member"
+      onclick={handleSubmit}
+      disabled={cannotSubmit}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

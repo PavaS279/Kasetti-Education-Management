@@ -1,0 +1,66 @@
+@import "c/kemStyles";
+
+.section {
+  margin: 0.25rem 0 0.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.ages {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.price-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.prices {
+  list-style: none;
+  margin: 0.5rem 0;
+  padding: 0;
+}
+
+.price {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1.4fr auto;
+  gap: 0.5rem;
+  align-items: end;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid var(--kem-line);
+}
+
+.remove {
+  padding-bottom: 0.375rem;
+}
+
+.warn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 40em) {
+  .form-grid,
+  .price {
+    grid-template-columns: 1fr;
+  }
+}

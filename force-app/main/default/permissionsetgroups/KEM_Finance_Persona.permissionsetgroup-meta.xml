@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Finance user: manages fees, invoices, payments, allocations, and reconciliation.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>KEM Finance Persona</label>
+    <permissionSets>KEM_Finance</permissionSets>
+    <permissionSets>KEM_Finance_Edu</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

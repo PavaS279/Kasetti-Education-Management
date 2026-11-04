@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Invoice_Anchor_Valid</fullName>
+    <active>true</active>
+    <errorConditionFormula
+  >AND(NOT(ISBLANK(Enrolment__c)), NOT(ISBLANK(Programme_Enrolment__c)))</errorConditionFormula>
+    <errorMessage
+  >An invoice cannot belong to both a section enrolment and a programme enrolment.</errorMessage>
+</ValidationRule>

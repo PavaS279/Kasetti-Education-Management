@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata
+  xmlns="http://soap.sforce.com/2006/04/metadata"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+>
+    <label>Payments and reconciliation</label>
+    <protected>false</protected>
+    <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Body__c</field>
+        <value
+      xsi:type="xsd:string"
+    >Payments can be cash, card, UPI, bank transfer, cheque or online gateway. A payment is allocated to the oldest open invoices of the payer and a receipt is issued.
+Differences up to {{Setting:Payment_Tolerance}} are accepted as rounding. Anything left over becomes a reconciliation exception that finance resolves; an overpayment is held as credit.
+Online payment in the family portal is {{Setting:Payment_Gateway_Mode}} (Off means families pay at the branch).</value>
+    </values>
+    <values>
+        <field>Keywords__c</field>
+        <value
+      xsi:type="xsd:string"
+    >payment payments receipt reconcile reconciliation overpayment underpaid tolerance cash upi card bank cheque gateway online</value>
+    </values>
+    <values>
+        <field>Topic__c</field>
+        <value xsi:type="xsd:string">payments</value>
+    </values>
+</CustomMetadata>

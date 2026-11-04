@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>CUST_NAME</field>
+    </columns>
+    <columns>
+        <field>Student_Payment__c.Status__c</field>
+    </columns>
+    <columns>
+        <field>Student_Payment__c.Reconciliation_Status__c</field>
+    </columns>
+    <columns>
+        <aggregateTypes>Sum</aggregateTypes>
+        <field>Student_Payment__c.Amount__c</field>
+    </columns>
+    <description>Payments by method with reconciliation status.</description>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Student_Payment__c.Method__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>KEM Collections by Method</name>
+    <reportType>CustomEntity$Student_Payment__c</reportType>
+    <scope>organization</scope>
+    <showDetails>false</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>CUST_CREATED_DATE</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>
