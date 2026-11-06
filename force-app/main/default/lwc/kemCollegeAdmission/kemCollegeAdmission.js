@@ -11,6 +11,7 @@ import admit from "@salesforce/apex/CollegeAdmissionController.admit";
 import reject from "@salesforce/apex/CollegeAdmissionController.reject";
 import givePortal from "@salesforce/apex/CollegeAdmissionController.givePortal";
 import sendPortalLink from "@salesforce/apex/CollegeAdmissionController.sendPortalLink";
+import setQuota from "@salesforce/apex/CollegeAdmissionController.setQuota";
 import requestException from "@salesforce/apex/CollegeAdmissionController.requestException";
 import approveException from "@salesforce/apex/CollegeAdmissionController.approveException";
 import declineException from "@salesforce/apex/CollegeAdmissionController.declineException";
@@ -41,6 +42,7 @@ export default class KemCollegeAdmission extends NavigationMixin(
   remarks = "";
   rejectReason = "";
   exceptionReason = "";
+  quotaChoice;
   deanRemarks = "";
 
   outcomeOptions = [
@@ -160,6 +162,31 @@ export default class KemCollegeAdmission extends NavigationMixin(
     return (
       this.admission?.stage === "Ready For Decision" &&
       this.admission?.outcome === "Pass"
+    );
+  }
+  get hasQuotas() {
+    return Boolean(this.admission?.quotas?.length);
+  }
+  get quotaLabel() {
+    return this.admission?.quotaName || "CET (default)";
+  }
+  get quotaOptions() {
+    return (this.admission?.quotas || []).map((q) => ({
+      label: `${q.name} — ${q.available} of ${q.seats} seats left${q.rankExam ? ` · needs a ${q.rankExam} rank` : ""}`,
+      value: q.quotaId
+    }));
+  }
+  get quotaValue() {
+    return this.quotaChoice || this.admission?.quotaId;
+  }
+  handleQuotaChoice(event) {
+    this.quotaChoice = event.detail.value;
+  }
+  handleSaveQuota() {
+    return this.run(
+      () =>
+        setQuota({ applicationId: this.recordId, quotaId: this.quotaValue }),
+      "Quota saved"
     );
   }
   get showPortal() {

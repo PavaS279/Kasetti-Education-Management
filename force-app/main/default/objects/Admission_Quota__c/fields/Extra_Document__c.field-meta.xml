@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Extra_Document__c</fullName>
+    <description
+  >A document added to the applicant's checklist for this quota (for example Income certificate). Blank: none.</description>
+    <label>Extra Document</label>
+    <length>80</length>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <type>Text</type>
+</CustomField>

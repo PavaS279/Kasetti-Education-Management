@@ -57,10 +57,41 @@ public with sharing class CollegeSetupController {
     public Boolean admissionsOpen = false;
     @AuraEnabled
     public Boolean deanExceptionsAllowed = true;
+    /** Regular seats per active quota (every active quota listed, 0 when unset). */
+    @AuraEnabled
+    public List<SplitEntry> split = new List<SplitEntry>();
     @AuraEnabled
     public Rule regularRule;
     @AuraEnabled
     public Rule lateralRule;
+  }
+
+  public class QuotaDef {
+    @AuraEnabled
+    public Id id { get; set; }
+    @AuraEnabled
+    public String name { get; set; }
+    @AuraEnabled
+    public String code { get; set; }
+    @AuraEnabled
+    public String rankExam { get; set; }
+    @AuraEnabled
+    public String extraDocument { get; set; }
+    @AuraEnabled
+    public Boolean active { get; set; }
+    @AuraEnabled
+    public Decimal sortOrder { get; set; }
+  }
+
+  public class SplitEntry {
+    @AuraEnabled
+    public Id quotaId { get; set; }
+    @AuraEnabled
+    public String name { get; set; }
+    @AuraEnabled
+    public Decimal seats { get; set; }
+    @AuraEnabled
+    public Integer taken { get; set; }
   }
 
   public class Change implements Comparable {
@@ -93,6 +124,8 @@ public with sharing class CollegeSetupController {
     public List<Row> rows = new List<Row>();
     @AuraEnabled
     public List<Change> history = new List<Change>();
+    @AuraEnabled
+    public List<QuotaDef> quotas = new List<QuotaDef>();
   }
 
   public class IntakeChange {
@@ -158,6 +191,22 @@ public with sharing class CollegeSetupController {
       result.canEdit = canEdit();
       Reader reader = new Reader();
       Map<String, Rule> rules = reader.rules();
+      List<Admission_Quota__c> quotas = reader.quotas();
+      for (Admission_Quota__c q : quotas) {
+        QuotaDef d = new QuotaDef();
+        d.id = q.Id;
+        d.name = q.Name;
+        d.code = q.Code__c;
+        d.rankExam = q.Rank_Exam__c;
+        d.extraDocument = q.Extra_Document__c;
+        d.active = q.Active__c;
+        d.sortOrder = q.Sort_Order__c;
+        result.quotas.add(d);
+      }
+      Map<String, Decimal> seats = reader.seats();
+      Map<String, Integer> taken = reader.taken(
+        quotas.isEmpty() ? null : CollegeQuotaService.defaultQuota()?.Id
+      );
       for (Campus_Branch__c cb : reader.intakes()) {
         Row r = new Row();
         r.id = cb.Id;
@@ -172,6 +221,18 @@ public with sharing class CollegeSetupController {
           nvl(cb.Reserved_Lateral__c) + nvl(cb.Finalised_Lateral__c);
         r.admissionsOpen = cb.Admissions_Open__c;
         r.deanExceptionsAllowed = cb.Dean_Exceptions_Allowed__c;
+        for (Admission_Quota__c q : quotas) {
+          if (!q.Active__c) {
+            continue;
+          }
+          String key = cb.Id + '|' + q.Id;
+          SplitEntry e = new SplitEntry();
+          e.quotaId = q.Id;
+          e.name = q.Name;
+          e.seats = seats.containsKey(key) ? seats.get(key) : 0;
+          e.taken = taken.containsKey(key) ? taken.get(key) : 0;
+          r.split.add(e);
+        }
         r.regularRule = ruleFor(rules, cb, 'Regular');
         r.lateralRule = ruleFor(rules, cb, 'Lateral');
         result.rows.add(r);
@@ -233,6 +294,129 @@ public with sharing class CollegeSetupController {
         ),
         AccessLevel.SYSTEM_MODE
       );
+      return getSetup();
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  /** Adds or changes a quota in the list (CET, Management, COMEDK, SNQ, ...). */
+  @AuraEnabled
+  public static Setup saveQuota(QuotaDef quota) {
+    try {
+      assertCanEdit();
+      if (
+        quota == null ||
+        String.isBlank(quota.name) ||
+        String.isBlank(quota.code)
+      ) {
+        throw new AppException('Enter the quota name and a short code.');
+      }
+      String code = quota.code.trim().toUpperCase();
+      if (!Pattern.matches('^[A-Z0-9_]{2,20}$', code)) {
+        throw new AppException(
+          'The code is 2 to 20 letters, digits or underscores (for example SNQ).'
+        );
+      }
+      Database.upsert(
+        new Admission_Quota__c(
+          Id = quota.id,
+          Name = quota.name.trim().left(80),
+          Code__c = code,
+          Rank_Exam__c = String.isBlank(quota.rankExam)
+            ? null
+            : quota.rankExam.trim().left(40),
+          Extra_Document__c = String.isBlank(quota.extraDocument)
+            ? null
+            : quota.extraDocument.trim().left(80),
+          Active__c = quota.active != false,
+          Sort_Order__c = quota.sortOrder
+        ),
+        AccessLevel.SYSTEM_MODE
+      );
+      return getSetup();
+    } catch (DmlException e) {
+      throw AppException.toAura(
+        new AppException(
+          e.getDmlType(0) == StatusCode.DUPLICATE_VALUE
+            ? 'Another quota already uses this code.'
+            : e.getDmlMessage(0)
+        )
+      );
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  /** Regular seats per quota for one campus branch: they must add up to the regular intake. */
+  @AuraEnabled
+  public static Setup saveSplit(Id campusBranchId, List<SplitEntry> split) {
+    try {
+      assertCanEdit();
+      Campus_Branch__c cb = [
+        SELECT Id, Intake_Regular__c
+        FROM Campus_Branch__c
+        WHERE Id = :campusBranchId
+        WITH SYSTEM_MODE
+        FOR UPDATE
+      ];
+      Map<Id, Integer> taken = CollegeQuotaService.takenBy(campusBranchId);
+      Map<Id, Admission_Quota__c> names = new Map<Id, Admission_Quota__c>(
+        [SELECT Id, Name FROM Admission_Quota__c WITH SYSTEM_MODE]
+      );
+      Decimal total = 0;
+      List<String> parts = new List<String>();
+      List<Seat_Quota__c> rows = new List<Seat_Quota__c>();
+      for (SplitEntry e : split == null ? new List<SplitEntry>() : split) {
+        if (!names.containsKey(e.quotaId)) {
+          throw new AppException('Unknown quota.');
+        }
+        if (!wholeNumber(e.seats)) {
+          throw new AppException('Seats are whole numbers of 0 or more.');
+        }
+        String name = names.get(e.quotaId).Name;
+        Integer used = taken.containsKey(e.quotaId) ? taken.get(e.quotaId) : 0;
+        if (e.seats < used) {
+          throw new AppException(
+            name + ' cannot go below the ' + used + ' seats already taken.'
+          );
+        }
+        total += e.seats;
+        parts.add(name + ' ' + e.seats.intValue());
+        rows.add(
+          new Seat_Quota__c(
+            Campus_Branch__c = campusBranchId,
+            Admission_Quota__c = e.quotaId,
+            Seats__c = e.seats,
+            Unique_Key__c = campusBranchId + '|' + e.quotaId
+          )
+        );
+      }
+      Decimal intake = cb.Intake_Regular__c == null ? 0 : cb.Intake_Regular__c;
+      if (total != intake) {
+        throw new AppException(
+          String.join(parts, ' + ') +
+            ' = ' +
+            total.intValue() +
+            '; the regular intake is ' +
+            intake.intValue() +
+            '. Make them equal.'
+        );
+      }
+      // Match existing rows by campus branch and quota (also rows made without a key).
+      Map<Id, Id> existing = new Map<Id, Id>();
+      for (Seat_Quota__c sq : [
+        SELECT Id, Admission_Quota__c
+        FROM Seat_Quota__c
+        WHERE Campus_Branch__c = :campusBranchId
+        WITH SYSTEM_MODE
+      ]) {
+        existing.put(sq.Admission_Quota__c, sq.Id);
+      }
+      for (Seat_Quota__c sq : rows) {
+        sq.Id = existing.get(sq.Admission_Quota__c);
+      }
+      Database.upsert(rows, AccessLevel.SYSTEM_MODE);
       return getSetup();
     } catch (Exception e) {
       throw AppException.toAura(e);
@@ -328,6 +512,72 @@ public with sharing class CollegeSetupController {
 
   /** Reads college setup for every viewer, after the access check above. */
   private without sharing class Reader {
+    List<Admission_Quota__c> quotas() {
+      return [
+        SELECT
+          Id,
+          Name,
+          Code__c,
+          Rank_Exam__c,
+          Extra_Document__c,
+          Active__c,
+          Sort_Order__c
+        FROM Admission_Quota__c
+        WITH SYSTEM_MODE
+        ORDER BY Sort_Order__c NULLS LAST, Name
+        LIMIT 50
+      ];
+    }
+
+    /** Seats per campus branch and quota, keyed "campusBranchId|quotaId". */
+    Map<String, Decimal> seats() {
+      Map<String, Decimal> result = new Map<String, Decimal>();
+      for (Seat_Quota__c sq : [
+        SELECT Campus_Branch__c, Admission_Quota__c, Seats__c
+        FROM Seat_Quota__c
+        WITH SYSTEM_MODE
+        LIMIT 5000
+      ]) {
+        result.put(
+          sq.Campus_Branch__c + '|' + sq.Admission_Quota__c,
+          sq.Seats__c
+        );
+      }
+      return result;
+    }
+
+    /** Regular seats taken per campus branch and quota (no quota: the default one). */
+    Map<String, Integer> taken(Id fallbackQuotaId) {
+      Map<String, Integer> result = new Map<String, Integer>();
+      for (AggregateResult row : [
+        SELECT
+          Campus_Branch__c intake,
+          Admission_Quota__c quota,
+          COUNT(Id) total
+        FROM Seat_Reservation__c
+        WHERE
+          Entry_Route__c = 'Regular'
+          AND Status__c IN ('Reserved', 'Finalised')
+        WITH SYSTEM_MODE
+        GROUP BY Campus_Branch__c, Admission_Quota__c
+      ]) {
+        Id quotaId = (Id) row.get('quota');
+        if (quotaId == null) {
+          quotaId = fallbackQuotaId;
+        }
+        if (quotaId == null) {
+          continue;
+        }
+        String key = String.valueOf(row.get('intake')) + '|' + quotaId;
+        result.put(
+          key,
+          (result.containsKey(key) ? result.get(key) : 0) +
+          Integer.valueOf(row.get('total'))
+        );
+      }
+      return result;
+    }
+
     List<Campus_Branch__c> intakes() {
       return [
         SELECT

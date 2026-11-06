@@ -116,6 +116,15 @@
             </template>
           </div>
         </template>
+        <template lwc:if={showQuota}>
+          <lightning-combobox
+            class="quota"
+            label="Admission quota"
+            options={quotaOptions}
+            value={quotaId}
+            onchange={handleQuota}
+          ></lightning-combobox>
+        </template>
       </template>
 
       <!-- Step 2: only the marks this branch needs, checked live -->

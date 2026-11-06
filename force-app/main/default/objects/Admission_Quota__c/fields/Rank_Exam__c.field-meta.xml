@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Rank_Exam__c</fullName>
+    <description
+  >Entrance exam whose rank the applicant must have for this quota (for example KCET). Blank: no rank needed.</description>
+    <label>Rank Exam</label>
+    <length>40</length>
+    <required>false</required>
+    <trackHistory>true</trackHistory>
+    <type>Text</type>
+</CustomField>

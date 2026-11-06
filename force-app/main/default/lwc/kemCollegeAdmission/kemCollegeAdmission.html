@@ -18,6 +18,25 @@
         <span class={verdictClass}>{admission.eligibility}</span>
       </header>
       <p class="notes">{admission.eligibilityNotes}</p>
+      <template lwc:if={hasQuotas}>
+        <div class="quota-line">
+          <span class="small">Quota: <strong>{quotaLabel}</strong></span>
+          <template lwc:if={admission.canChangeQuota}>
+            <lightning-combobox
+              class="quota-pick"
+              label="Change quota"
+              variant="label-hidden"
+              options={quotaOptions}
+              value={quotaValue}
+              onchange={handleQuotaChoice}
+            ></lightning-combobox>
+            <lightning-button
+              label="Save quota"
+              onclick={handleSaveQuota}
+            ></lightning-button>
+          </template>
+        </div>
+      </template>
       <template lwc:if={hasSuggestions}>
         <div class="suggestions">
           <strong>Eligible instead for:</strong>

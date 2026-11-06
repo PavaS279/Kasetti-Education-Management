@@ -54,6 +54,8 @@ public with sharing class CollegeAdmissionController {
     @AuraEnabled
     public List<Entrance> entrances { get; set; }
     @AuraEnabled
+    public Id quotaId { get; set; }
+    @AuraEnabled
     public String guardianFirstName { get; set; }
     @AuraEnabled
     public String guardianLastName { get; set; }
@@ -235,6 +237,14 @@ public with sharing class CollegeAdmissionController {
     public String exceptionDecidedBy;
     @AuraEnabled
     public CollegePortalAccessService.Status portal;
+    @AuraEnabled
+    public Id quotaId;
+    @AuraEnabled
+    public String quotaName;
+    @AuraEnabled
+    public List<CollegeQuotaService.QuotaSeats> quotas = new List<CollegeQuotaService.QuotaSeats>();
+    @AuraEnabled
+    public Boolean canChangeQuota = false;
   }
 
   /** Campus branches open for admission in the current intake. */
@@ -486,6 +496,16 @@ public with sharing class CollegeAdmissionController {
   }
 
   @AuraEnabled
+  public static Admission setQuota(Id applicationId, Id quotaId) {
+    try {
+      CollegeQuotaService.setQuota(applicationId, quotaId);
+      return load(applicationId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
   public static Admission reject(Id applicationId, String reason) {
     try {
       InterviewService.reject(applicationId, reason);
@@ -512,6 +532,9 @@ public with sharing class CollegeAdmissionController {
         Decision__c,
         Decision_Reason__c,
         Exception_Status__c,
+        Admission_Quota__c,
+        Admission_Quota__r.Name,
+        Campus_Branch__c,
         Exception_Reason__c,
         Exception_Remarks__c,
         Exception_Requested_By__r.Name,
@@ -549,6 +572,24 @@ public with sharing class CollegeAdmissionController {
     result.exceptionRequestedBy = a.Exception_Requested_By__r?.Name;
     result.exceptionDecidedBy = a.Exception_Decided_By__r?.Name;
     result.portal = CollegePortalAccessService.status(a);
+    result.quotaId = a.Admission_Quota__c;
+    result.quotaName = a.Admission_Quota__r?.Name;
+    Boolean beforeAdmit = new Set<String>{
+        'Processing',
+        'In Review',
+        'Documents Verified',
+        InterviewService.AWAITING_DEAN
+      }
+      .contains(a.College_Stage__c);
+    // The quota choice matters only until Admit; afterwards the name is enough.
+    if (a.Entry_Route__c == 'Regular' && beforeAdmit) {
+      result.quotas = CollegeQuotaService.seatsFor(a.Campus_Branch__c);
+      result.canChangeQuota =
+        !result.quotas.isEmpty() &&
+        FeatureManagement.checkPermission(
+          CollegeDocumentService.VERIFY_PERMISSION
+        );
+    }
     if (a.Eligibility_Status__c == 'Not Eligible') {
       result.suggestions = AdmissionEligibilityService.suggestions(a.Id);
     }

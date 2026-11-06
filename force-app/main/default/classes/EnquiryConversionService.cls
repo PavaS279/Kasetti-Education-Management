@@ -43,6 +43,10 @@ public with sharing class EnquiryConversionService {
     @AuraEnabled
     public String entryRoute;
     @AuraEnabled
+    public Id quotaId;
+    @AuraEnabled
+    public String quotaName;
+    @AuraEnabled
     public Boolean consent;
     @AuraEnabled
     public List<CollegeAdmissionController.Qualification> qualifications;
@@ -319,6 +323,7 @@ public with sharing class EnquiryConversionService {
     admission.birthdate = enquiry.Learner_Birthdate__c;
     admission.campusBranchId = college.campusBranchId;
     admission.entryRoute = college.entryRoute;
+    admission.quotaId = college.quotaId;
     admission.qualifications = request.qualifications != null
       ? request.qualifications
       : college.qualifications;
@@ -358,6 +363,8 @@ public with sharing class EnquiryConversionService {
         Campus_Branch__r.Branch__r.Name,
         Campus_Branch__r.Academic_Year__c,
         Entry_Route__c,
+        Admission_Quota__c,
+        Admission_Quota__r.Name,
         Declared_Marks__c,
         Privacy_Consent__c
       FROM Lead
@@ -369,6 +376,8 @@ public with sharing class EnquiryConversionService {
     }
     CollegeEnquiry college = new CollegeEnquiry();
     college.campusBranchId = row.Campus_Branch__c;
+    college.quotaId = row.Admission_Quota__c;
+    college.quotaName = row.Admission_Quota__r?.Name;
     // Campus branch names are auto-numbers; show what the desk recognises.
     college.campusBranchName =
       row.Campus_Branch__r.Campus__r.Name +

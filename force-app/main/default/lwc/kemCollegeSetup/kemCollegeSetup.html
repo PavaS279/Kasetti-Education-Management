@@ -121,6 +121,197 @@
         </ul>
       </template>
 
+      <template lwc:if={showQuotas}>
+        <h3 class="section">Quota list</h3>
+        <ul class="rows">
+          <template for:each={quotaRows} for:item="q">
+            <li key={q.key} class="row">
+              <template lwc:if={q.editing}>
+                <div class="edit">
+                  <lightning-input
+                    label="Name"
+                    required
+                    value={draft.name}
+                    data-field="name"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <lightning-input
+                    label="Code"
+                    required
+                    max-length="20"
+                    value={draft.code}
+                    data-field="code"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <lightning-input
+                    label="Rank needed from exam (blank: none)"
+                    value={draft.rankExam}
+                    data-field="rankExam"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <lightning-input
+                    label="Extra document (blank: none)"
+                    value={draft.extraDocument}
+                    data-field="extraDocument"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <lightning-input
+                    type="number"
+                    label="Order"
+                    step="1"
+                    value={draft.sortOrder}
+                    data-field="sortOrder"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <lightning-input
+                    type="toggle"
+                    label="Active"
+                    checked={draft.active}
+                    data-field="active"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <div class="buttons">
+                    <lightning-button
+                      variant="brand"
+                      label="Save quota"
+                      disabled={isSaving}
+                      onclick={handleSaveQuota}
+                    ></lightning-button>
+                    <lightning-button
+                      label="Cancel"
+                      onclick={handleCancel}
+                    ></lightning-button>
+                  </div>
+                </div>
+              </template>
+              <template lwc:else>
+                <div class="main">
+                  <span class="strong">{q.name} · {q.code}</span>
+                  <span class="kem-muted small"
+                    >{q.rankLabel} · extra document: {q.docLabel}</span
+                  >
+                </div>
+                <span class="kem-badge">{q.activeLabel}</span>
+                <template lwc:if={canEdit}>
+                  <lightning-button
+                    label="Edit"
+                    data-id={q.id}
+                    onclick={handleEditQuota}
+                  ></lightning-button>
+                </template>
+              </template>
+            </li>
+          </template>
+        </ul>
+        <template lwc:if={addingQuota}>
+          <div class="edit new-quota">
+            <lightning-input
+              label="Name"
+              required
+              value={draft.name}
+              data-field="name"
+              onchange={handleDraft}
+            ></lightning-input>
+            <lightning-input
+              label="Code"
+              required
+              max-length="20"
+              value={draft.code}
+              data-field="code"
+              onchange={handleDraft}
+            ></lightning-input>
+            <lightning-input
+              label="Rank needed from exam (blank: none)"
+              value={draft.rankExam}
+              data-field="rankExam"
+              onchange={handleDraft}
+            ></lightning-input>
+            <lightning-input
+              label="Extra document (blank: none)"
+              value={draft.extraDocument}
+              data-field="extraDocument"
+              onchange={handleDraft}
+            ></lightning-input>
+            <div class="buttons">
+              <lightning-button
+                variant="brand"
+                label="Save quota"
+                disabled={isSaving}
+                onclick={handleSaveQuota}
+              ></lightning-button>
+              <lightning-button
+                label="Cancel"
+                onclick={handleCancel}
+              ></lightning-button>
+            </div>
+          </div>
+        </template>
+        <template lwc:elseif={canEdit}>
+          <lightning-button
+            class="add"
+            label="Add quota"
+            icon-name="utility:add"
+            onclick={handleAddQuota}
+          ></lightning-button>
+        </template>
+
+        <h3 class="section">Regular seats per quota</h3>
+        <p class="kem-muted small">
+          The quota seats of a branch must add up to its regular seats. A branch
+          with no split keeps a single regular pool.
+        </p>
+        <ul class="rows">
+          <template for:each={splitRows} for:item="r">
+            <li key={r.key} class="row">
+              <div class="main">
+                <span class="strong">{r.name}</span>
+                <span class="kem-muted small">{r.summary}</span>
+              </div>
+              <template lwc:if={r.editing}>
+                <div class="edit">
+                  <template for:each={r.entries} for:item="e">
+                    <lightning-input
+                      key={e.key}
+                      type="number"
+                      label={e.name}
+                      min="0"
+                      step="1"
+                      required
+                      value={e.seats}
+                      data-quota={e.quotaId}
+                      onchange={handleSplitSeats}
+                    ></lightning-input>
+                  </template>
+                  <span class={r.totalClass}>{r.totalLabel}</span>
+                  <div class="buttons">
+                    <lightning-button
+                      variant="brand"
+                      label="Save"
+                      disabled={isSaving}
+                      onclick={handleSaveSplit}
+                    ></lightning-button>
+                    <lightning-button
+                      label="Cancel"
+                      onclick={handleCancel}
+                    ></lightning-button>
+                  </div>
+                </div>
+              </template>
+              <template lwc:else>
+                <span class={r.totalClass}>{r.totalLabel}</span>
+                <template lwc:if={canEdit}>
+                  <lightning-button
+                    label="Edit"
+                    data-id={r.id}
+                    onclick={handleEditSplit}
+                  ></lightning-button>
+                </template>
+              </template>
+            </li>
+          </template>
+        </ul>
+      </template>
+
       <template lwc:if={showRules}>
         <p class="kem-muted small">
           Saving creates a new version of the rule; the earlier version stays on

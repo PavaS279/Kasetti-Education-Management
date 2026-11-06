@@ -2,6 +2,7 @@ import { LightningElement } from "lwc";
 import { validateControls } from "c/kemInputRules";
 import getCatalogue from "@salesforce/apex/CollegePublicController.getCatalogue";
 import getRequirements from "@salesforce/apex/CollegePublicController.getRequirements";
+import getQuotas from "@salesforce/apex/CollegePublicController.getQuotas";
 import checkEligibility from "@salesforce/apex/CollegePublicController.checkEligibility";
 import submit from "@salesforce/apex/PublicEnquiryController.submit";
 
@@ -64,6 +65,8 @@ export default class KemPublicCollegeEnquiry extends LightningElement {
   campusBranchId;
   route = "Regular";
   requirements = {};
+  quotas = [];
+  quotaId;
   marks = {};
   preview;
   form = { privacyConsent: false, website: "" };
@@ -261,8 +264,26 @@ export default class KemPublicCollegeEnquiry extends LightningElement {
     this.loadRequirements();
   }
 
+  get showQuota() {
+    return this.quotas.length > 0;
+  }
+  get quotaOptions() {
+    return this.quotas.map((q) => ({
+      label: q.rankExam ? `${q.label} (needs a ${q.rankExam} rank)` : q.label,
+      value: q.value
+    }));
+  }
+  get quotaName() {
+    return this.quotas.find((q) => q.value === this.quotaId)?.label;
+  }
+  handleQuota(event) {
+    this.quotaId = event.detail.value;
+  }
+
   resetBranch() {
     this.campusBranchId = undefined;
+    this.quotas = [];
+    this.quotaId = undefined;
     this.requirements = {};
     this.preview = undefined;
   }
@@ -277,6 +298,14 @@ export default class KemPublicCollegeEnquiry extends LightningElement {
       });
       if (!this.requirements.open) {
         this.errorMessage = this.requirements.message;
+      }
+      // Quotas with seats left (regular entry only); none: no choice to make.
+      this.quotas =
+        this.route === "Regular" && this.requirements.open
+          ? await getQuotas({ campusBranchId: this.campusBranchId })
+          : [];
+      if (!this.quotas.some((q) => q.value === this.quotaId)) {
+        this.quotaId = this.quotas.length ? this.quotas[0].value : undefined;
       }
       this.marks = {
         ...this.marks,
@@ -553,6 +582,7 @@ export default class KemPublicCollegeEnquiry extends LightningElement {
           courseExternalId: this.branch.externalId,
           campusBranchId: this.campusBranchId,
           entryRoute: this.route,
+          quotaId: this.quotaId || null,
           qualifications: this.qualifications(),
           entrances: this.entrances(),
           message: this.summary(),

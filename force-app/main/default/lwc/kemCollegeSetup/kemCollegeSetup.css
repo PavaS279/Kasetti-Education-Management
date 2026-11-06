@@ -80,3 +80,21 @@ h2 {
   display: flex;
   gap: 0.5rem;
 }
+
+.section {
+  font-weight: 600;
+  margin: 1rem 0 0.25rem;
+}
+.total {
+  font-size: 0.8125rem;
+}
+.total.ok {
+  color: var(--kem-success, #2e844a);
+}
+.total.bad {
+  color: var(--kem-error, #ba0517);
+}
+.new-quota,
+.add {
+  margin-top: 0.5rem;
+}

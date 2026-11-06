@@ -23,7 +23,10 @@ public without sharing class CollegeSeatService {
         Entry_Route__c,
         Interview_Outcome__c,
         Eligibility_Status__c,
-        Exception_Status__c
+        Exception_Status__c,
+        AccountId,
+        Admission_Quota__c,
+        Learning_Course__r.Name
       FROM IndividualApplication
       WHERE Id = :applicationId
       WITH SYSTEM_MODE
@@ -61,7 +64,12 @@ public without sharing class CollegeSeatService {
         'No ' + admission.Entry_Route__c.toLowerCase() + ' intake seats remain.'
       );
     }
+    Id quotaId = CollegeQuotaService.claim(
+      admission,
+      admission.Learning_Course__r?.Name
+    );
     Seat_Reservation__c reservation = new Seat_Reservation__c(
+      Admission_Quota__c = quotaId,
       Campus_Branch__c = intake.Id,
       Application__c = applicationId,
       Entry_Route__c = admission.Entry_Route__c,

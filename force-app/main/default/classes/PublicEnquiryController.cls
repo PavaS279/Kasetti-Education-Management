@@ -90,6 +90,8 @@ public without sharing class PublicEnquiryController {
     @AuraEnabled
     public String entryRoute { get; set; }
     @AuraEnabled
+    public Id quotaId { get; set; }
+    @AuraEnabled
     public List<CollegeAdmissionController.Qualification> qualifications {
       get;
       set;
@@ -312,6 +314,20 @@ public without sharing class PublicEnquiryController {
       : request.entrances;
     enquiry.Campus_Branch__c = request.campusBranchId;
     enquiry.Entry_Route__c = request.entryRoute;
+    if (request.quotaId != null && request.entryRoute == 'Regular') {
+      Boolean open = false;
+      for (
+        CollegeQuotaService.QuotaSeats q : CollegeQuotaService.openQuotas(
+          request.campusBranchId
+        )
+      ) {
+        open = open || q.quotaId == request.quotaId;
+      }
+      if (!open) {
+        fail('The chosen quota has no seats left; choose another.');
+      }
+      enquiry.Admission_Quota__c = request.quotaId;
+    }
     enquiry.Declared_Marks__c = JSON.serialize(declared, true);
   }
 
