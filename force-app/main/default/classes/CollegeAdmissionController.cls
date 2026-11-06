@@ -233,6 +233,8 @@ public with sharing class CollegeAdmissionController {
     public String exceptionRequestedBy;
     @AuraEnabled
     public String exceptionDecidedBy;
+    @AuraEnabled
+    public CollegePortalAccessService.Status portal;
   }
 
   /** Campus branches open for admission in the current intake. */
@@ -465,6 +467,25 @@ public with sharing class CollegeAdmissionController {
   }
 
   @AuraEnabled
+  public static Admission givePortal(Id applicationId) {
+    try {
+      CollegePortalAccessService.request(applicationId);
+      return load(applicationId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static String sendPortalLink(Id applicationId) {
+    try {
+      return CollegePortalAccessService.sendPasswordLink(applicationId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
   public static Admission reject(Id applicationId, String reason) {
     try {
       InterviewService.reject(applicationId, reason);
@@ -478,6 +499,7 @@ public with sharing class CollegeAdmissionController {
     IndividualApplication a = [
       SELECT
         Id,
+        AccountId,
         College_Mode__c,
         College_Stage__c,
         Entry_Route__c,
@@ -526,6 +548,7 @@ public with sharing class CollegeAdmissionController {
     result.exceptionRemarks = a.Exception_Remarks__c;
     result.exceptionRequestedBy = a.Exception_Requested_By__r?.Name;
     result.exceptionDecidedBy = a.Exception_Decided_By__r?.Name;
+    result.portal = CollegePortalAccessService.status(a);
     if (a.Eligibility_Status__c == 'Not Eligible') {
       result.suggestions = AdmissionEligibilityService.suggestions(a.Id);
     }

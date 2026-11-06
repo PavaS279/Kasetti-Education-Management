@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description
+  >Published when a college student is admitted, or when the admission counsellor clicks Give portal access. Its trigger runs as an administrator (see PlatformEventSubscriberConfig PortalAccessRequestConfig), so the counsellor needs no user-management rights: it creates the portal login and sends the welcome email with the password link.</description>
+    <eventType>HighVolume</eventType>
+    <label>Portal Access Request</label>
+    <pluralLabel>Portal Access Requests</pluralLabel>
+    <publishBehavior>PublishAfterCommit</publishBehavior>
+</CustomObject>

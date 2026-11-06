@@ -9,6 +9,8 @@ import scheduleInterview from "@salesforce/apex/CollegeAdmissionController.sched
 import recordOutcome from "@salesforce/apex/CollegeAdmissionController.recordOutcome";
 import admit from "@salesforce/apex/CollegeAdmissionController.admit";
 import reject from "@salesforce/apex/CollegeAdmissionController.reject";
+import givePortal from "@salesforce/apex/CollegeAdmissionController.givePortal";
+import sendPortalLink from "@salesforce/apex/CollegeAdmissionController.sendPortalLink";
 import requestException from "@salesforce/apex/CollegeAdmissionController.requestException";
 import approveException from "@salesforce/apex/CollegeAdmissionController.approveException";
 import declineException from "@salesforce/apex/CollegeAdmissionController.declineException";
@@ -158,6 +160,52 @@ export default class KemCollegeAdmission extends NavigationMixin(
     return (
       this.admission?.stage === "Ready For Decision" &&
       this.admission?.outcome === "Pass"
+    );
+  }
+  get showPortal() {
+    return Boolean(
+      this.admission?.portal && this.admission?.programmeEnrolmentId
+    );
+  }
+  get portalHint() {
+    const label = this.admission?.portal?.label;
+    if (label === "Needs an email") {
+      return "Add the student's email on Student 360, then give access.";
+    }
+    if (label === "Active") {
+      return "The student signs in to see the admission letter, invoice and receipts.";
+    }
+    if (label === "No free portal licence") {
+      return "Free a licence (deactivate a cancelled student's login) and try again.";
+    }
+    return "";
+  }
+  handleGivePortal() {
+    return this.run(
+      () => givePortal({ applicationId: this.recordId }),
+      "Portal access requested — the login and the password email follow in a few seconds; refresh to see it"
+    );
+  }
+  async handleSendLink() {
+    try {
+      const email = await sendPortalLink({ applicationId: this.recordId });
+      this.dispatchEvent(
+        new ShowToastEvent({
+          title: `Password link sent to ${email}`,
+          variant: "success"
+        })
+      );
+    } catch (error) {
+      this.toastError(error);
+    }
+  }
+  toastError(error) {
+    this.dispatchEvent(
+      new ShowToastEvent({
+        title: "Not saved",
+        message: error?.body?.message,
+        variant: "error"
+      })
     );
   }
   handleExceptionReason(event) {

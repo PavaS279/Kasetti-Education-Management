@@ -111,11 +111,18 @@ The student meets the cut-off, so there is no Dean step:
 
 ✅ The section is shown on the enrolment with the term's subjects; the prompt disappears from the admission panel.
 
-## Step 9 — The student's portal
+## Step 9 — The student's portal (given at Admit)
 
-👤 **Student** · as Kasetti Tech: **Home** (KT College or KTEdutech) → **College Students** list → the student → **Student 360** (the Learner 360 page) → **Edit** to add an email if the row says _Portal: needs an email_ → **Portal access** card → **Give access** (needs a free Customer Community Plus licence; the welcome email carries the set-password link, and **Send password link** re-sends it); then the contact → ▾ → **Log in to Experience as User** → **My Learning**
+👤 **Student** · the login is created **automatically at Admit (Step 4)** when the student has an email address and a portal licence is free; the welcome email carries the link to set a password. So the student can already see the admission letter and the invoice **before paying**.
 
-✅ College card with the roll number and section, **Fees due ₹0**, and under **Documents** the admission letter, the confirmation letter, the invoice and the receipt.
+- On the admission panel the counsellor sees **Student portal: Active / Not given / Needs an email / No free portal licence**.
+- **Not given** → **Give portal access** (refresh after a few seconds). **Active** → **Send password link** re-sends the email.
+- **Needs an email** → Home → **College Students** → **Student 360** → **Edit**, add the email, then **Give portal access**.
+- To look as the student: as Kasetti Tech, the contact → ▾ → **Log in to Experience as User** → **My Learning**.
+
+✅ Before payment: admission letter, invoice with the pay-by date. After payment: college card with the roll number and section, **Fees due ₹0**, and under **Documents** the confirmation letter and the receipt.
+
+> Email needs Setup → **Deliverability** = _All email_ and a real sender address on the portal site (Setup → All Sites → Workspaces → Administration → Emails).
 
 ---
 

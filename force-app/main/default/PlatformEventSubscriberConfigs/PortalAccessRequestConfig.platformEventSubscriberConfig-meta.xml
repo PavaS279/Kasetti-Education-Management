@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PlatformEventSubscriberConfig xmlns="http://soap.sforce.com/2006/04/metadata">
+    <batchSize>1</batchSize>
+    <masterLabel>Portal Access Request (runs as administrator)</masterLabel>
+    <platformEventConsumer>PortalAccessRequestTrigger</platformEventConsumer>
+    <user>pavan.kumar.gs_krbnse6r44dox3@techkasetti.com</user>
+</PlatformEventSubscriberConfig>

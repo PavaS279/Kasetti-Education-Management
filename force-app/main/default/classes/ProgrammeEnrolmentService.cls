@@ -193,6 +193,8 @@ public without sharing class ProgrammeEnrolmentService {
       new Set<Id>{ applicationId },
       DocumentService.COLLEGE_ADMISSION_LETTER
     );
+    // Portal access before the fee: the student can see the letter and invoice.
+    CollegePortalAccessService.queueAutoAccess(admission.AccountId);
     return enrolment.Id;
   }
 

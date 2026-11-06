@@ -190,12 +190,22 @@ public with sharing class PortalAccessService {
   }
 
   private static String blocker(Account p, User existing, Integer free) {
+    return blocker(p, existing, free, false);
+  }
+
+  private static String blocker(
+    Account p,
+    User existing,
+    Integer free,
+    Boolean college
+  ) {
     if (existing != null) {
       return existing.IsActive
         ? 'Has a portal login'
         : 'Login deactivated (reactivate it in Setup → Users)';
     }
     if (
+      !college &&
       p.KEM_Role__c == 'Learner' &&
       (p.PersonBirthdate == null ||
       p.PersonBirthdate.addYears(MIN_LEARNER_AGE) > Date.today())
@@ -216,12 +226,12 @@ public with sharing class PortalAccessService {
   /** Step 1 (data): makes sure the account owner has a role. Returns true if the owner changed. */
   public static Boolean prepare(Id accountId) {
     requireGive();
-    Account a = [
-      SELECT Id, OwnerId, Owner.UserRoleId
-      FROM Account
-      WHERE Id = :accountId
-      WITH SYSTEM_MODE
-    ];
+    return prepareInternal(accountId);
+  }
+
+  /** prepare() without the staff permission check: callers check their own. */
+  public static Boolean prepareInternal(Id accountId) {
+    Account a = new SystemReader().person(accountId);
     if (a.Owner.UserRoleId != null) {
       return false;
     }
@@ -263,20 +273,15 @@ public with sharing class PortalAccessService {
   /** Step 2 (setup): the portal login, its licence and permissions; sends the welcome email. */
   public static GiveResult give(Id accountId) {
     requireGive();
-    Account p = [
-      SELECT
-        Id,
-        FirstName,
-        LastName,
-        PersonEmail,
-        PersonContactId,
-        KEM_Role__c,
-        PersonBirthdate,
-        Owner.UserRoleId
-      FROM Account
-      WHERE Id = :accountId AND IsPersonAccount = TRUE
-      WITH USER_MODE
-    ];
+    return giveInternal(accountId, false);
+  }
+
+  /**
+   * give() without the staff permission check: callers check their own.
+   * college: a college student, who may sign in without a birth date on file.
+   */
+  public static GiveResult giveInternal(Id accountId, Boolean college) {
+    Account p = new SystemReader().person(accountId);
     List<User> existing = [
       SELECT Id, IsActive
       FROM User
@@ -287,7 +292,8 @@ public with sharing class PortalAccessService {
     String reason = blocker(
       p,
       existing.isEmpty() ? null : existing[0],
-      freeLicences()
+      freeLicences(),
+      college
     );
     if (reason != null) {
       throw new AppException(reason + '.');
@@ -390,12 +396,12 @@ public with sharing class PortalAccessService {
    */
   public static String sendPasswordLink(Id accountId) {
     requireGive();
-    Account p = [
-      SELECT Id, PersonContactId
-      FROM Account
-      WHERE Id = :accountId AND IsPersonAccount = TRUE
-      WITH USER_MODE
-    ];
+    return sendPasswordLinkInternal(accountId);
+  }
+
+  /** sendPasswordLink() without the staff permission check. */
+  public static String sendPasswordLinkInternal(Id accountId) {
+    Account p = new SystemReader().person(accountId);
     List<User> logins = [
       SELECT Id, Email
       FROM User
@@ -424,5 +430,30 @@ public with sharing class PortalAccessService {
     }
     String host = URL.getOrgDomainUrl().getHost().substringBefore('.');
     return 'https://' + host + '.my.site.com/s/my-learning';
+  }
+
+  /** Reads the person after the caller's permission check, regardless of record sharing. */
+  private without sharing class SystemReader {
+    Account person(Id accountId) {
+      List<Account> rows = [
+        SELECT
+          Id,
+          FirstName,
+          LastName,
+          PersonEmail,
+          PersonContactId,
+          KEM_Role__c,
+          PersonBirthdate,
+          OwnerId,
+          Owner.UserRoleId
+        FROM Account
+        WHERE Id = :accountId AND IsPersonAccount = TRUE
+        WITH SYSTEM_MODE
+      ];
+      if (rows.isEmpty()) {
+        throw new AppException('Person not found.');
+      }
+      return rows[0];
+    }
   }
 }

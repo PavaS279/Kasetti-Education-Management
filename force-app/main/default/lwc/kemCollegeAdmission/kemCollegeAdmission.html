@@ -53,6 +53,28 @@
           ></lightning-button>
         </div>
       </template>
+      <template lwc:if={showPortal}>
+        <div class="portal" role="status">
+          <strong>Student portal: {admission.portal.label}</strong>
+          <span class="small">{portalHint}</span>
+          <template lwc:if={admission.portal.canGive}>
+            <lightning-button
+              class="slds-m-left_x-small"
+              label="Give portal access"
+              icon-name="utility:email"
+              onclick={handleGivePortal}
+            ></lightning-button>
+          </template>
+          <template lwc:if={admission.portal.canResend}>
+            <lightning-button
+              class="slds-m-left_x-small"
+              label="Send password link"
+              icon-name="utility:email"
+              onclick={handleSendLink}
+            ></lightning-button>
+          </template>
+        </div>
+      </template>
       <template lwc:if={admission.decision}>
         <div class="decided">
           Decision: {admission.decision} — {admission.decisionReason}

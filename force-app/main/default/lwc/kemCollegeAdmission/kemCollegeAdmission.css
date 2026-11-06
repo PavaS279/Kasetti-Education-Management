@@ -92,3 +92,13 @@ h3 {
 .exception_bad {
   background: var(--kem-surface-bad, #fdeceb);
 }
+
+.portal {
+  margin: 0.75rem 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  background: var(--kem-surface-alt, #f3f6fb);
+}
+.portal .small {
+  margin-left: 0.5rem;
+}
