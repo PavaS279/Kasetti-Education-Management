@@ -41,6 +41,14 @@ public with sharing class InterviewService {
       throw new AppException('Enter why the Dean should admit this applicant.');
     }
     IndividualApplication application = admission(applicationId);
+    if (
+      needsException(application) &&
+      application.Campus_Branch__r?.Dean_Exceptions_Allowed__c == false
+    ) {
+      throw new AppException(
+        'Dean exceptions are switched off for this branch in the college admission setup.'
+      );
+    }
     if (!needsException(application)) {
       throw new AppException(
         MEETS_CRITERIA.contains(application.Eligibility_Status__c)
@@ -284,7 +292,8 @@ public with sharing class InterviewService {
         Interviewer__c,
         Interview_Outcome__c,
         Eligibility_Status__c,
-        Exception_Status__c
+        Exception_Status__c,
+        Campus_Branch__r.Dean_Exceptions_Allowed__c
       FROM IndividualApplication
       WHERE Id = :applicationId
       WITH SYSTEM_MODE

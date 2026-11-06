@@ -1,0 +1,82 @@
+.setup {
+  padding: 1rem;
+}
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--kem-muted, #5c6b80);
+}
+h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0.75rem 0;
+  flex-wrap: wrap;
+}
+.tab {
+  border: 1px solid var(--kem-border, #d8dde6);
+  background: transparent;
+  border-radius: 1rem;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+}
+.tab_on {
+  background: var(--kem-brand, #0b5cab);
+  border-color: var(--kem-brand, #0b5cab);
+  color: #fff;
+}
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--kem-border, #eef1f5);
+}
+.main {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+.strong {
+  font-weight: 600;
+}
+.small {
+  font-size: 0.8125rem;
+}
+.cell {
+  min-width: 5rem;
+}
+.cell.wide {
+  min-width: 10rem;
+}
+.label {
+  font-size: 0.75rem;
+  color: var(--kem-muted, #5c6b80);
+}
+.edit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+  flex: 2 1 24rem;
+}
+.buttons {
+  display: flex;
+  gap: 0.5rem;
+}

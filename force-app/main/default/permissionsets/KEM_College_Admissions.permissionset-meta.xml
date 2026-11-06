@@ -5,6 +5,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>CollegeSetupController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>CollegeDocumentService</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -18,6 +22,11 @@
         <enabled>true</enabled>
         <name>KEM_Verify_Admission_Documents</name>
     </customPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Campus_Branch__c.Dean_Exceptions_Allowed__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
         <field>IndividualApplication.Exception_Status__c</field>
