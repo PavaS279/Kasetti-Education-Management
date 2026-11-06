@@ -29,7 +29,7 @@ Switch user: Setup → **Users** → **Login** next to the name; **Log out** ret
 
 👤 **Visitor** (no login) · 📍 Public enquiry, in a private window
 
-1. **College admission** → **Yelahanka Campus** → **Bachelor of Engineering (BE)** → **BE Computer Science and Engineering** → **Year 1** → **Continue**.
+1. **College admission** → **Yelahanka Campus** → **Bachelor of Engineering (BE)** → **BE Computer Science and Engineering** → **Year 1** → **Admission quota** (only quotas with seats left are offered; CET needs a KCET rank) → **Continue**.
 2. Marks: SSLC **91**, PUC **92** (Science), **KCET** rank **12400** → ✅ _Your marks meet the published cut-off._
 3. Your details: student name (new each run), mobile, email; parent optional → **Review** → tick consent → **Send enquiry**.
 
@@ -68,7 +68,9 @@ Switch user: Setup → **Users** → **Login** next to the name; **Log out** ret
 
 The student meets the cut-off, so there is no Dean step:
 
-1. **Admit** → stage **Fee Pending** · enrolment **Provisional** · roll number _issued when the fee is received_.
+The panel shows **Quota: CET** (or the quota chosen online). Before Admit the counsellor can change it (**Change quota** → **Save quota**); an SNQ-type quota adds its document (e.g. income certificate) to the checklist.
+
+1. **Admit** → the seat is taken from the quota (refused if it is full, e.g. _Management seats for BE-CSE are full (10 of 10)_, or if a CET applicant has no KCET rank) → stage **Fee Pending** · enrolment **Provisional** · roll number _issued when the fee is received_.
 
 ✅ A seat is reserved and the first-year invoice (₹1,50,000 tuition + ₹5,000 admission) is issued with a 7-day deadline.
 
