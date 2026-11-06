@@ -4,13 +4,13 @@ _Admission season at KT College, told in the order it happens in a real institut
 
 **Before you start:** complete [COLLEGE-SETUP-GUIDE.md](COLLEGE-SETUP-GUIDE.md) (users, permission sets, admissions team, Ravi's portal login). You present as five people; switch with Setup → **Users** → **Login** next to the name, and **Log out** to return to Kasetti Tech.
 
-| Who            | User               | Role in the story                                                  | App to use                                          |
-| -------------- | ------------------ | ------------------------------------------------------------------ | --------------------------------------------------- |
-| Admission desk | Adam Admissions    | Meets the student, checks cut-offs, verifies documents             | KT College (Home) and KTEdutech (Admissions Review) |
-| Dean           | Anjali Advisor     | Interviews, admits or rejects, assigns sections, finalises results | KT College                                          |
-| Accounts       | Andrea Advancement | Takes the fee by DD/cheque/online, clears it                       | KTEdutech                                           |
-| Faculty        | Tara Teacher       | Takes classes, attendance and marks                                | KTEdutech                                           |
-| Student        | Ravi Kumar         | Sees his roll number, timetable, attendance, results               | Portal → My Learning                                |
+| Who            | User                 | Role in the story                                                  | App to use                                          |
+| -------------- | -------------------- | ------------------------------------------------------------------ | --------------------------------------------------- |
+| Admission desk | Admission Counsellor | Meets the student, checks cut-offs, verifies documents             | KT College (Home) and KTEdutech (Admissions Review) |
+| Dean           | Anjali Advisor       | Interviews, admits or rejects, assigns sections, finalises results | KT College                                          |
+| Accounts       | Andrea Advancement   | Takes the fee by DD/cheque/online, clears it                       | KTEdutech                                           |
+| Faculty        | Tara Teacher         | Takes classes, attendance and marks                                | KTEdutech                                           |
+| Student        | Ravi Kumar           | Sees his roll number, timetable, attendance, results               | Portal → My Learning                                |
 
 The administrator (Kasetti Tech) is not shown. Say once at the start: _"Everything the administrator configures — campuses, programmes, cut-offs, fees, documents — is already set and stays in the background."_
 
@@ -30,7 +30,7 @@ The administrator (Kasetti Tech) is not shown. Say once at the start: _"Everythi
 5. **Review** — fees for the first year and the documents to bring → tick consent → **Send enquiry**.
    ✅ _Thank you_ with a reference number and the document list.
 
-👤 **Adam Admissions** · KTEdutech → **Admissions** (enquiry board) → the new **Website** enquiry: campus _Yelahanka Campus_, interest _BE Computer Science and Engineering_, and the marks with the self-check result in the description.
+👤 **Admission Counsellor** · KTEdutech → **Admissions** (enquiry board) → the new **Website** enquiry: campus _Yelahanka Campus_, interest _BE Computer Science and Engineering_, and the marks with the self-check result in the description.
 
 🗣 _"Families check the cut-off themselves at home, any time. The enquiry reaches the desk already qualified, with the marks and the branches the student can join."_
 
@@ -38,7 +38,7 @@ The administrator (Kasetti Tech) is not shown. Say once at the start: _"Everythi
 
 ## Stage 1 — Walk-in at the admission desk: is the student eligible?
 
-👤 **Adam Admissions** · App Launcher → **KT College** → **Home**
+👤 **Admission Counsellor** · App Launcher → **KT College** → **Home**
 
 **Step 1.1 — A walk-in who misses the cut-off.** On the **Walk-in admission** card click **New college admission**. A guided screen opens — nothing is saved until the last step.
 
@@ -71,7 +71,7 @@ The administrator (Kasetti Tech) is not shown. Say once at the start: _"Everythi
 
 ## Stage 2 — Documents and verification
 
-👤 **Adam Admissions** · **Admissions Review** → **Ravi Kumar [KEM College]** → the **College admission** panel
+👤 **Admission Counsellor** · **Admissions Review** → **Ravi Kumar [KEM College]** → the **College admission** panel
 
 **Step 2.1 — Consent.** Click **Record privacy consent**. ✅ "Privacy consent recorded".
 
@@ -243,13 +243,13 @@ Repeat Stages 2–5 for **Kiran Patil [KEM College]** (Diploma CS 82 %, DCET 3,2
 
 ## If something goes wrong during the demo
 
-| Symptom                                                         | Fix                                                                                                                         |
-| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **Next** stays disabled on _Marks and cut-off_                  | The student is not eligible for this branch: use **Switch** on a suggested branch, or check the marks and the entrance rank |
-| Adam or Anjali cannot see a `[KEM College]` admission           | Not in **KEM College Admissions Team** (set-up guide step 5)                                                                |
-| No **Dean** block on the admission                              | Anjali is missing **KEM College Dean** (set-up guide step 4)                                                                |
-| "Verify the required documents before scheduling"               | Finish Stage 2 (all required documents **Accepted**, then Mark documents verified)                                          |
-| "An outcome can be recorded only after the scheduled interview" | Schedule the interview at the current time or earlier                                                                       |
-| Roll number does not appear after the DD                        | The DD is still **Pending** — confirm it in Finance Desk                                                                    |
-| Ravi has no college card in the portal                          | He is not yet admitted (Stage 3), or his portal user was not created (set-up 6.1)                                           |
-| A seeded student was already used in an earlier demo            | Use a new walk-in from Stage 1 for the full journey, or another seeded applicant                                            |
+| Symptom                                                                   | Fix                                                                                                                         |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **Next** stays disabled on _Marks and cut-off_                            | The student is not eligible for this branch: use **Switch** on a suggested branch, or check the marks and the entrance rank |
+| The Admission Counsellor or Anjali cannot see a `[KEM College]` admission | Not in **KEM College Admissions Team** (set-up guide step 5)                                                                |
+| No **Dean** block on the admission                                        | Anjali is missing **KEM College Dean** (set-up guide step 4)                                                                |
+| "Verify the required documents before scheduling"                         | Finish Stage 2 (all required documents **Accepted**, then Mark documents verified)                                          |
+| "An outcome can be recorded only after the scheduled interview"           | Schedule the interview at the current time or earlier                                                                       |
+| Roll number does not appear after the DD                                  | The DD is still **Pending** — confirm it in Finance Desk                                                                    |
+| Ravi has no college card in the portal                                    | He is not yet admitted (Stage 3), or his portal user was not created (set-up 6.1)                                           |
+| A seeded student was already used in an earlier demo                      | Use a new walk-in from Stage 1 for the full journey, or another seeded applicant                                            |

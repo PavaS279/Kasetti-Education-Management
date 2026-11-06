@@ -9,7 +9,11 @@
         <enabled>true</enabled>
     </classAccesses>
     <description
-  >College admission checklist configuration, consent, document verification and read-only seat visibility.</description>
+  >College admission checklist configuration, consent, document verification, read-only seat visibility, and taking fee payments on college invoices of their campuses.</description>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>KEM_Collect_College_Fees</name>
+    </customPermissions>
     <customPermissions>
         <enabled>true</enabled>
         <name>KEM_Verify_Admission_Documents</name>
@@ -224,4 +228,8 @@
         <apexPage>KEM_College_Admission_Letter</apexPage>
         <enabled>true</enabled>
     </pageAccesses>
+    <tabSettings>
+        <tab>KEM_Finance_Desk</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
 </PermissionSet>

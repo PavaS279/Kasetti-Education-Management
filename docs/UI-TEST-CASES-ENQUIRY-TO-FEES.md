@@ -42,21 +42,21 @@ Track B demo records:
 
 ## 2. Personas
 
-| Persona        | User               | Username                                                                          | Used in             |
-| -------------- | ------------------ | --------------------------------------------------------------------------------- | ------------------- |
-| Visitor        | (no login)         | private / incognito window                                                        | A0                  |
-| Admission desk | Adam Admissions    | `adamadmissionsuser1708459704071618019.w9ggkb3izggz.dk2pxr8w62ss@techkasetti.com` | A0–A2, B1–B4, B6–B7 |
-| Dean           | Anjali Advisor     | `anjaliadvisoruser17084614018583395001.rkapknwbxzh6.asfwptgocb5j@techkasetti.com` | A3, A5, B8          |
-| Accounts       | Andrea Advancement | `andreaadvancementuser1708461643214542.k09qcubq0ix1.szcjc385fj75@techkasetti.com` | A4, B9–B10          |
-| Student        | Ravi Kumar         | portal (setup guide §6.1)                                                         | A6                  |
-| Guardian       | Rohit Sharma       | `rsharma.kemdemo@kasetti-portal.demo`                                             | B11                 |
+| Persona        | User                 | Username                                                                          | Used in             |
+| -------------- | -------------------- | --------------------------------------------------------------------------------- | ------------------- |
+| Visitor        | (no login)           | private / incognito window                                                        | A0                  |
+| Admission desk | Admission Counsellor | `adamadmissionsuser1708459704071618019.w9ggkb3izggz.dk2pxr8w62ss@techkasetti.com` | A0–A2, B1–B4, B6–B7 |
+| Dean           | Anjali Advisor       | `anjaliadvisoruser17084614018583395001.rkapknwbxzh6.asfwptgocb5j@techkasetti.com` | A3, A5, B8          |
+| Accounts       | Andrea Advancement   | `andreaadvancementuser1708461643214542.k09qcubq0ix1.szcjc385fj75@techkasetti.com` | A4, B9–B10          |
+| Student        | Ravi Kumar           | portal (setup guide §6.1)                                                         | A6                  |
+| Guardian       | Rohit Sharma         | `rsharma.kemdemo@kasetti-portal.demo`                                             | B11                 |
 
 ## 3. Preconditions (check before you start)
 
 | #   | Check                                                                                                                      | ☐   |
 | --- | -------------------------------------------------------------------------------------------------------------------------- | --- |
 | P1  | College set-up done ([COLLEGE-SETUP-GUIDE.md](COLLEGE-SETUP-GUIDE.md)): 2 campuses, 3 programmes, 22 branches, 22 sections | ☐   |
-| P2  | Adam and Anjali are in **KEM College Admissions Team**; Anjali has **KEM College Dean**                                    | ☐   |
+| P2  | The Admission Counsellor and Anjali are in **KEM College Admissions Team**; Anjali has **KEM College Dean**                | ☐   |
 | P3  | REV shows the five `[KEM College]` admissions (Ravi, Meghana, Sneha, Kiran, Arjun) at _Processing_                         | ☐   |
 | P4  | Ravi Kumar has **not** been used in an earlier run (otherwise use a new walk-in from A1)                                   | ☐   |
 | P5  | One **Customer Community Plus** licence free (Setup → Company Information) for Ravi's portal login                         | ☐   |
@@ -99,12 +99,12 @@ Track B demo records:
 | TC-A0.9  | Enter student name and mobile; leave parent empty                                                                                                                                            | Allowed; parent is optional (recommended under 18)                                                                                                         |        |          |
 | TC-A0.10 | Review: try **Send enquiry** without ticking consent                                                                                                                                         | Not possible until consent is ticked                                                                                                                       |        |          |
 | TC-A0.11 | Review shows first-year fees and document list → tick consent → **Send enquiry**                                                                                                             | _Thank you_ with a **reference number** and the document list                                                                                              |        |          |
-| TC-A0.12 | As **Adam** open [ADM](https://kasettitechnologiespvtltd.lightning.force.com/lightning/n/KEM_Admissions)                                                                                     | New **Website** enquiry in _New_: campus Yelahanka Campus, interest BE CSE, the marks and the self-check result in the description                         |        |          |
+| TC-A0.12 | As **the Admission Counsellor** open [ADM](https://kasettitechnologiespvtltd.lightning.force.com/lightning/n/KEM_Admissions)                                                                 | New **Website** enquiry in _New_: campus Yelahanka Campus, interest BE CSE, the marks and the self-check result in the description                         |        |          |
 | TC-A0.13 | Check records in [LEAD](https://kasettitechnologiespvtltd.lightning.force.com/lightning/o/Lead/list) / [ACC](https://kasettitechnologiespvtltd.lightning.force.com/lightning/o/Account/list) | Only the enquiry is created — no account, application or invoice                                                                                           |        |          |
 
 ### A1. Walk-in eligibility at the admission desk
 
-**Persona:** Adam Admissions · **Link:** [APP1](https://kasettitechnologiespvtltd.lightning.force.com/lightning/app/c__KT_College) → **Home** → **Walk-in admission** card
+**Persona:** Admission Counsellor · **Link:** [APP1](https://kasettitechnologiespvtltd.lightning.force.com/lightning/app/c__KT_College) → **Home** → **Walk-in admission** card
 
 | ID       | Steps                                                                                                                     | Expected result                                                                                                                                                                                                                            | Result | Evidence |
 | -------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | -------- |
@@ -125,7 +125,7 @@ Track B demo records:
 
 ### A2. Documents and verification
 
-**Persona:** Adam Admissions · **Link:** [REV](https://kasettitechnologiespvtltd.lightning.force.com/lightning/n/KEM_Applications) → Ravi Kumar [KEM College] → **College admission** panel
+**Persona:** Admission Counsellor · **Link:** [REV](https://kasettitechnologiespvtltd.lightning.force.com/lightning/n/KEM_Applications) → Ravi Kumar [KEM College] → **College admission** panel
 
 | ID      | Steps                                                                 | Expected result                                                                                                      | Result | Evidence |
 | ------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
@@ -144,7 +144,7 @@ Track B demo records:
 
 | ID      | Steps                                                                                  | Expected result                                                                                                                       | Result | Evidence |
 | ------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
-| TC-A3.1 | As **Adam**, open Ravi's admission                                                     | **No Dean block** (interview / admit / reject only for KEM College Dean)                                                              |        |          |
+| TC-A3.1 | As **the Admission Counsellor**, open Ravi's admission                                 | **No Dean block** (interview / admit / reject only for KEM College Dean)                                                              |        |          |
 | TC-A3.2 | As Anjali, on an admission still at _Processing_ (e.g. Pooja) → **Schedule interview** | "Verify the required documents before scheduling"                                                                                     |        |          |
 | TC-A3.3 | Ravi: schedule with a **future** time, then try **Record outcome**                     | "An outcome can be recorded only after the scheduled interview"                                                                       |        |          |
 | TC-A3.4 | Ravi: date/time now → **Schedule interview**                                           | Stage **Interview Scheduled**                                                                                                         |        |          |
@@ -209,13 +209,13 @@ Track B demo records:
 | ID       | Persona                   | Steps                                                                                     | Expected result                                                                                                                               | Result | Evidence |
 | -------- | ------------------------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
 | TC-A8.1  | Visitor                   | Submit a college enquiry on ENQ (new student name)                                        | On the Lead: **Campus Branch**, **Entry Route** and **Declared Marks** are filled                                                             |        |          |
-| TC-A8.2  | Adam                      | ADM → the enquiry → **Convert**                                                           | Window shows _College admission_, the intake, the route and the declared marks; no "Create admissions application" toggle                     |        |          |
-| TC-A8.3  | Adam                      | Leave the marks-card box unticked                                                         | **Convert** disabled                                                                                                                          |        |          |
-| TC-A8.4  | Adam                      | Correct one mark → tick _I have checked these marks against the marks card_ → **Convert** | Student record opens; REV shows the admission at **Processing**, **Eligible**, consent recorded, checklist ready; the corrected mark is saved |        |          |
+| TC-A8.2  | the Admission Counsellor  | ADM → the enquiry → **Convert**                                                           | Window shows _College admission_, the intake, the route and the declared marks; no "Create admissions application" toggle                     |        |          |
+| TC-A8.3  | the Admission Counsellor  | Leave the marks-card box unticked                                                         | **Convert** disabled                                                                                                                          |        |          |
+| TC-A8.4  | the Admission Counsellor  | Correct one mark → tick _I have checked these marks against the marks card_ → **Convert** | Student record opens; REV shows the admission at **Processing**, **Eligible**, consent recorded, checklist ready; the corrected mark is saved |        |          |
 | TC-A8.5  | Rahul (no college access) | Open a college enquiry → **Convert**                                                      | _Only the college admission desk can convert a college enquiry._                                                                              |        |          |
-| TC-A8.6  | Adam                      | Walk-in (**New college admission**) with the same email as an existing student            | The existing student is reused (no second account); a second open admission for the same programme → _already has an open admission_          |        |          |
+| TC-A8.6  | the Admission Counsellor  | Walk-in (**New college admission**) with the same email as an existing student            | The existing student is reused (no second account); a second open admission for the same programme → _already has an open admission_          |        |          |
 | TC-A8.7  | Andrea                    | Open a college admission and try to verify a document                                     | No verify buttons; the server refuses with _You do not have permission_                                                                       |        |          |
-| TC-A8.8  | Adam                      | Verify a document on an admission at Interview Scheduled or later                         | _Documents can be verified only before the Dean's interview_                                                                                  |        |          |
+| TC-A8.8  | the Admission Counsellor  | Verify a document on an admission at Interview Scheduled or later                         | _Documents can be verified only before the Dean's interview_                                                                                  |        |          |
 | TC-A8.9  | Anjali                    | **Admit** → wait a few seconds → admission **Files**                                      | **Admission Letter IA-… – {student}** PDF: programme, branch, year, invoice, pay-by date, payment methods, no cash                            |        |          |
 | TC-A8.10 | Andrea                    | Payments list → edit a **Pending** DD → Status **Confirmed** → Save                       | Refused: _Confirm the payment from the Finance Desk so it is allocated and the receipt is issued._                                            |        |          |
 | TC-A8.11 | Andrea                    | FIN → Awaiting confirmation → **Confirm**                                                 | Invoice Paid; roll number issued                                                                                                              |        |          |
@@ -230,7 +230,7 @@ Track B demo records:
 
 ### B1–B4. Enquiry
 
-**Persona:** Adam Admissions · **Link:** [ADM](https://kasettitechnologiespvtltd.lightning.force.com/lightning/n/KEM_Admissions)
+**Persona:** Admission Counsellor · **Link:** [ADM](https://kasettitechnologiespvtltd.lightning.force.com/lightning/n/KEM_Admissions)
 
 | ID      | Steps                                                                                                        | Expected result                                                                                                | Result | Evidence |
 | ------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- | ------ | -------- |
@@ -246,7 +246,7 @@ Track B demo records:
 
 ### B6–B8. Application, documents, offer
 
-**Persona:** Adam (B6–B7), Anjali or manager (B8) · **Link:** the application from B4, or [IA-0000000032](https://kasettitechnologiespvtltd.lightning.force.com/lightning/r/IndividualApplication/0iTdN000000Ina9UAC/view)
+**Persona:** the Admission Counsellor (B6–B7), Anjali or manager (B8) · **Link:** the application from B4, or [IA-0000000032](https://kasettitechnologiespvtltd.lightning.force.com/lightning/r/IndividualApplication/0iTdN000000Ina9UAC/view)
 
 | ID      | Steps                                                                                                   | Expected result                                                                          | Result | Evidence |
 | ------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------ | -------- |
@@ -304,11 +304,11 @@ Track B demo records:
 
 ## 6. Troubleshooting
 
-| Symptom                                            | Fix                                                                    |
-| -------------------------------------------------- | ---------------------------------------------------------------------- |
-| **Next** disabled on _Marks and cut-off_           | Student not eligible — **Switch** to a suggested branch or check marks |
-| Adam / Anjali can't see `[KEM College]` admissions | Add them to **KEM College Admissions Team** (set-up step 5)            |
-| No Dean block                                      | Assign **KEM College Dean** to Anjali (set-up step 4)                  |
-| Roll number missing after the DD                   | DD still **Pending** — confirm it in Finance Desk                      |
-| No college card in the portal                      | Not admitted yet, or portal user not created (set-up 6.1)              |
-| Ravi already used in an earlier run                | Run the full journey with a new walk-in from A1                        |
+| Symptom                                                                | Fix                                                                    |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Next** disabled on _Marks and cut-off_                               | Student not eligible — **Switch** to a suggested branch or check marks |
+| The Admission Counsellor / Anjali can't see `[KEM College]` admissions | Add them to **KEM College Admissions Team** (set-up step 5)            |
+| No Dean block                                                          | Assign **KEM College Dean** to Anjali (set-up step 4)                  |
+| Roll number missing after the DD                                       | DD still **Pending** — confirm it in Finance Desk                      |
+| No college card in the portal                                          | Not admitted yet, or portal user not created (set-up 6.1)              |
+| Ravi already used in an earlier run                                    | Run the full journey with a new walk-in from A1                        |

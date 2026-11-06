@@ -4,13 +4,13 @@ _One student, start to finish, in the order a real admission happens: online enq
 
 ## Before you start
 
-| Check                                                                                                                 | Done |
-| --------------------------------------------------------------------------------------------------------------------- | ---- |
-| Logged in as **Kasetti Tech**; Setup → Login Access Policies allows logging in as users                               | ☐    |
-| Adam has **KEM College Admissions**; Anjali has **KEM College Dean** + **KEM Eligibility Override** (done 2026-11-03) | ☐    |
-| Adam and Anjali are in **KEM College Admissions Team** (done 2026-11-03)                                              | ☐    |
-| A private/incognito browser window for the visitor                                                                    | ☐    |
-| Use a **new student name** every run (for example _Kavya Rao_ + today's date) and an example email address            | ☐    |
+| Check                                                                                                                                     | Done |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| Logged in as **Kasetti Tech**; Setup → Login Access Policies allows logging in as users                                                   | ☐    |
+| The Admission Counsellor has **KEM College Admissions**; Anjali has **KEM College Dean** + **KEM Eligibility Override** (done 2026-11-03) | ☐    |
+| The Admission Counsellor and Anjali are in **KEM College Admissions Team** (done 2026-11-03)                                              | ☐    |
+| A private/incognito browser window for the visitor                                                                                        | ☐    |
+| Use a **new student name** every run (for example _Kavya Rao_ + today's date) and an example email address                                | ☐    |
 
 Switch user: Setup → **Users** → **Login** next to the name; **Log out** returns to Kasetti Tech.
 
@@ -39,9 +39,9 @@ Switch user: Setup → **Users** → **Login** next to the name; **Log out** ret
 
 ## Step 2 — The enquiry is a lead; the desk converts it
 
-👤 **Adam Admissions** · 📍 App Launcher → **KT College** → **Admissions** tab (the enquiry board; also in the KTEdutech app) → the new **Website** enquiry in **New** → **Convert to learner** (or open the enquiry → **Convert**)
+👤 **Admission Counsellor** · 📍 App Launcher → **KT College** → **Admissions** tab (the enquiry board; also in the KTEdutech app) → the new **Website** enquiry in **New** → **Convert to learner** (or open the enquiry → **Convert**)
 
-0. Website enquiries for the college campuses are assigned to Adam, so the card is there with **Mine only** ticked too. Keep the branch filter on **All branches**; if the board was already open, press refresh.
+0. Website enquiries for the college campuses are assigned to the Admission Counsellor, so the card is there with **Mine only** ticked too. Keep the branch filter on **All branches**; if the board was already open, press refresh.
 1. The convert window shows **College admission · Yelahanka Campus · BE Computer Science and Engineering · 2026-27 · Year 1 (regular)** and the marks **as typed by the visitor** (SSLC 91, PUC Science 92, KCET 12400).
 2. Check them against the marks card; correct any value if needed.
 3. **Convert** stays disabled until you tick **I have checked these marks against the marks card** → tick → **Convert**.
@@ -54,7 +54,7 @@ Switch user: Setup → **Users** → **Login** next to the name; **Log out** ret
 
 ## Step 3 — Document verification
 
-👤 **Adam Admissions** · 📍 Admissions Review → the student's admission → **College admission** panel
+👤 **Admission Counsellor** · 📍 Admissions Review → the student's admission → **College admission** panel
 
 1. **Aadhaar card**: type the last 4 digits (e.g. `4321`) → **Verify** → _Accepted · ends 4321 · file removed_.
 2. SSLC marks card, PUC marks card, fitness certificate, entrance rank card → **Verify** each.
@@ -74,7 +74,7 @@ Switch user: Setup → **Users** → **Login** next to the name; **Log out** ret
 
 ## Step 5 — The admission letter
 
-👤 **Anjali Advisor** (or Adam) · 📍 the admission record → **Files** (refresh after a few seconds)
+👤 **Anjali Advisor** (or the Admission Counsellor) · 📍 the admission record → **Files** (refresh after a few seconds)
 
 ✅ **Admission Letter IA-… – {student}** (PDF): programme, branch, year, the invoice, the **pay-by date**, how to pay (DD, cheque, online — no cash), and that the seat is released if the fee is not received.
 
@@ -82,13 +82,13 @@ Switch user: Setup → **Users** → **Login** next to the name; **Log out** ret
 
 ## Step 6 — Fee payment
 
-👤 **Andrea Advancement** · 📍 App Launcher → **KT College** → **Finance Desk** → **College invoices** (the first tab; newest first) → click the student's invoice (e.g. YLK-000389, ₹1,55,000). The invoice page has the **Record payment** button. (Or: **Student Invoices** tab → list view **All** → the invoice.)
+👤 **Admission Counsellor** · 📍 App Launcher → **KT College** → **Finance Desk** → **College invoices** (only the counsellor's campuses) → click the student's invoice (e.g. YLK-000389, ₹1,55,000) → **Record payment**.
 
 1. **Record payment** → Method **Cash** → refused: _Payment method Cash is not allowed at this college campus._
 2. **Record payment** → **Demand Draft**, reference `DD-4512`, DD number `004512`, bank `Canara Bank`, date today → payment **Pending**.
 3. 📍 Back to **Finance Desk** → **Awaiting confirmation** → the payment → **Confirm** → invoice **Paid**.
 
-🗣 _"A draft is counted only when the bank clears it — and only through the Finance Desk. Editing the payment status directly is refused, so allocation, receipt and roll number can never be skipped."_
+🗣 _"The counsellor who admitted the student also takes the fee — but only for their own campuses. Refunds, credit notes and cancelling an invoice stay with Finance (Andrea) or the Dean."_
 
 ## Step 7 — Admission confirmed: roll number and confirmation letter
 
@@ -122,7 +122,7 @@ The student, admission, invoice and payment are part of the audit trail and stay
 | Symptom                                                         | Fix                                                                                 |
 | --------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | Convert window shows no college section                         | The enquiry did not come from the college page (no campus branch on it)             |
-| _Only the college admission desk can convert…_                  | Log in as Adam (KEM College Admissions)                                             |
+| _Only the college admission desk can convert…_                  | Log in as the Admission Counsellor (KEM College Admissions)                         |
 | _This student already has an open admission for this programme_ | The student was used before — use a new name                                        |
 | _Documents can be verified only before the Dean's interview_    | The admission is already past documents; continue from the Dean's step              |
 | No letter in Files                                              | Wait a few seconds and refresh; generation runs right after the action              |

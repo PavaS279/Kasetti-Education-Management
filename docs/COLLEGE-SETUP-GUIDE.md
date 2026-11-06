@@ -33,7 +33,7 @@ The demo data was loaded by scripts (`scripts/seed/college/seed-college.sh`). Yo
 | Curriculum       | 2 Year-1 subjects per branch; **Section A** for every campus branch                                                                                                                          |
 | Timetable        | Section **YLK · BE-CSE · 2026-27 · Y1 · A**: Engineering Mathematics I (Mon/Wed/Fri 09:00–10:00, A-101) and Programming in Python lab (Tue/Thu 10:00–12:00, L-201), faculty **Tara Teacher** |
 | Demo applicants  | Ravi Kumar, Meghana Rao, Sneha Gowda, Kiran Patil, Arjun Shetty (all tagged `[KEM College]`), each with an admission at _Processing_                                                         |
-| Staff users      | Adam Admissions, Anjali Advisor, Andrea Advancement, Tara Teacher, Rahul Registrar — **exist already**, without college access                                                               |
+| Staff users      | Admission Counsellor, Anjali Advisor, Andrea Advancement, Tara Teacher, Rahul Registrar — **exist already**, without college access                                                          |
 | Portal users     | **None for college.** You create them in step 6                                                                                                                                              |
 
 Cut-off examples (2026-27):
@@ -85,13 +85,13 @@ The staff users exist with their normal KTEdutech roles (**personas**). College 
 
 Setup → **Users** → click the user → **Permission Set Assignments** → **Edit Assignments** → move the set from _Available_ to _Enabled_ → **Save**.
 
-| Person in the demo           | User               | Already has (persona)             | Assign now                                          | Why                                                                                                                                |
-| ---------------------------- | ------------------ | --------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| **Admission desk** ("Admin") | Adam Admissions    | KEM Admissions Counsellor Persona | **KEM College Admissions**                          | Create college admissions, record consent, verify documents                                                                        |
-| **Dean**                     | Anjali Advisor     | KEM Academic Coordinator Persona  | **KEM College Dean** + **KEM Eligibility Override** | Interview, admit/reject, overdue admissions, joining, promotion, finalise/reopen results; override a refused verdict with a reason |
-| **Accounts**                 | Andrea Advancement | KEM Finance Persona               | nothing                                             | Already records payments, confirms DD/cheques and sees College dues                                                                |
-| **Faculty**                  | Tara Teacher       | KEM Teacher Persona               | nothing                                             | Already faculty on the demo section                                                                                                |
-| **Principal** (optional)     | Rahul Registrar    | KEM Branch Manager Persona        | nothing                                             | Read-only view of admissions, dues and results                                                                                     |
+| Person in the demo           | User                 | Already has (persona)             | Assign now                                          | Why                                                                                                                                |
+| ---------------------------- | -------------------- | --------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Admission desk** ("Admin") | Admission Counsellor | KEM Admissions Counsellor Persona | **KEM College Admissions**                          | Create college admissions, record consent, verify documents                                                                        |
+| **Dean**                     | Anjali Advisor       | KEM Academic Coordinator Persona  | **KEM College Dean** + **KEM Eligibility Override** | Interview, admit/reject, overdue admissions, joining, promotion, finalise/reopen results; override a refused verdict with a reason |
+| **Accounts**                 | Andrea Advancement   | KEM Finance Persona               | nothing                                             | Already records payments, confirms DD/cheques and sees College dues                                                                |
+| **Faculty**                  | Tara Teacher         | KEM Teacher Persona               | nothing                                             | Already faculty on the demo section                                                                                                |
+| **Principal** (optional)     | Rahul Registrar      | KEM Branch Manager Persona        | nothing                                             | Read-only view of admissions, dues and results                                                                                     |
 
 **See the difference yourself:** before assigning Anjali's sets, log in as Anjali (step 3) and open Ravi's admission → no **Dean** block. Assign **KEM College Dean**, log in again → the Dean block (interview, admit, reject) appears.
 
@@ -103,7 +103,7 @@ Setup → **Users** → click the user → **Permission Set Assignments** → **
 
 College admissions are private records. A sharing rule shares every college admission with one group, so the desk and the Dean see the same admissions whoever created them.
 
-Setup → **Public Groups** → **KEM College Admissions Team** → **Edit** → search _Users_ → add **Adam Admissions** and **Anjali Advisor** → **Save**.
+Setup → **Public Groups** → **KEM College Admissions Team** → **Edit** → search _Users_ → add **Admission Counsellor** and **Anjali Advisor** → **Save**.
 
 **See the difference yourself:** before adding Anjali, log in as Anjali → **Admissions Review** tab → the seeded admissions are not visible. After adding → they are.
 
@@ -143,18 +143,18 @@ Same as 6.1 for **Kiran Patil [KEM College]**.
 
 ## 7. Final checklist
 
-| ✔   | Check                                                                                                                                                                                |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| ☐   | Login Access Policies allow administrators to log in as users                                                                                                                        |
-| ☐   | Adam has **KEM College Admissions**                                                                                                                                                  |
-| ☐   | Anjali has **KEM College Dean** and **KEM Eligibility Override**                                                                                                                     |
-| ☐   | Adam and Anjali are members of **KEM College Admissions Team**                                                                                                                       |
-| ☐   | Log in as Adam: KT College Home shows the **Walk-in admission** card; **New college admission** opens the guided screen; Admissions Review shows the five `[KEM College]` admissions |
-| ☐   | Log in as Anjali: Ravi's admission shows the **Dean** block                                                                                                                          |
-| ☐   | Log in as Tara: **Timetable** shows the BE-CSE Y1 A periods                                                                                                                          |
-| ☐   | Customer Community Plus licence free for Ravi (and Suresh)                                                                                                                           |
-| ☐   | (Optional) Ravi's portal opens with **Log in to Experience as User**                                                                                                                 |
-| ☐   | Email delivery stays **Off** (Education Setting `Email_Delivery`) unless you want real emails                                                                                        |
+| ✔   | Check                                                                                                                                                                                                    |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ☐   | Login Access Policies allow administrators to log in as users                                                                                                                                            |
+| ☐   | the Admission Counsellor has **KEM College Admissions**                                                                                                                                                  |
+| ☐   | Anjali has **KEM College Dean** and **KEM Eligibility Override**                                                                                                                                         |
+| ☐   | the Admission Counsellor and Anjali are members of **KEM College Admissions Team**                                                                                                                       |
+| ☐   | Log in as the Admission Counsellor: KT College Home shows the **Walk-in admission** card; **New college admission** opens the guided screen; Admissions Review shows the five `[KEM College]` admissions |
+| ☐   | Log in as Anjali: Ravi's admission shows the **Dean** block                                                                                                                                              |
+| ☐   | Log in as Tara: **Timetable** shows the BE-CSE Y1 A periods                                                                                                                                              |
+| ☐   | Customer Community Plus licence free for Ravi (and Suresh)                                                                                                                                               |
+| ☐   | (Optional) Ravi's portal opens with **Log in to Experience as User**                                                                                                                                     |
+| ☐   | Email delivery stays **Off** (Education Setting `Email_Delivery`) unless you want real emails                                                                                                            |
 
 ---
 

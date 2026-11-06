@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingCriteriaRules>
+        <fullName>KEM_College_Invoices_Read</fullName>
+        <accessLevel>Read</accessLevel>
+        <description
+    >College invoices (Annual or Admission) are visible to the KEM College Admissions Team, so the admission counsellor can open them and take payments. Taking a payment is still limited to the counsellor's campuses in Apex.</description>
+        <label>KEM College Invoices Read</label>
+        <sharedTo>
+            <group>KEM_College_Admissions_Team</group>
+        </sharedTo>
+        <criteriaItems>
+            <field>Invoice_Kind__c</field>
+            <operation>equals</operation>
+            <value>Annual,Admission</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+</SharingRules>

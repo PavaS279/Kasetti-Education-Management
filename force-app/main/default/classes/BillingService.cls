@@ -9,6 +9,8 @@
  */
 public with sharing class BillingService {
   public static final String MANAGE_PERMISSION = 'KEM_Manage_Billing';
+  /** Record and confirm payments on college invoices at the user's campuses. */
+  public static final String COLLECT_PERMISSION = 'KEM_Collect_College_Fees';
   public static final Set<String> OPEN_STATUSES = new Set<String>{
     'Issued',
     'Partially Paid'
@@ -67,6 +69,9 @@ public with sharing class BillingService {
   public class InvoiceView {
     @AuraEnabled
     public Student_Invoice__c invoice;
+    /** Record and confirm payments on this invoice (finance, or the counsellor on a college invoice). */
+    @AuraEnabled
+    public Boolean canCollect = false;
     @AuraEnabled
     public List<Invoice_Line__c> lines;
     @AuraEnabled
@@ -101,6 +106,186 @@ public with sharing class BillingService {
     public List<Student_Invoice__c> collegeInvoices;
     @AuraEnabled
     public Boolean canManage;
+    /** True for the admission counsellor: only college invoices of their campuses. */
+    @AuraEnabled
+    public Boolean collegeOnly = false;
+    @AuraEnabled
+    public Boolean canCollect = false;
+  }
+
+  // ------------------------------------------------------- college fee desk
+
+  /** Campuses (branches) the running user works at, from Branch Staff. */
+  public static Set<Id> myCampusIds() {
+    Set<Id> ids = new Set<Id>();
+    for (Branch_Staff__c s : [
+      SELECT Branch__c
+      FROM Branch_Staff__c
+      WHERE User__c = :UserInfo.getUserId() AND Active__c = TRUE
+      WITH SYSTEM_MODE
+    ]) {
+      ids.add(s.Branch__c);
+    }
+    return ids;
+  }
+
+  /** True when the user may take payments on this invoice. */
+  public static Boolean canCollectOn(Id invoiceId) {
+    if (FeatureManagement.checkPermission(MANAGE_PERMISSION)) {
+      return true;
+    }
+    if (
+      invoiceId == null ||
+      !FeatureManagement.checkPermission(COLLECT_PERMISSION)
+    ) {
+      return false;
+    }
+    List<Student_Invoice__c> rows = [
+      SELECT Branch__c, Programme_Enrolment__c
+      FROM Student_Invoice__c
+      WHERE Id = :invoiceId
+      WITH SYSTEM_MODE
+    ];
+    return !rows.isEmpty() &&
+      rows[0].Programme_Enrolment__c != null &&
+      myCampusIds().contains(rows[0].Branch__c);
+  }
+
+  private static void assertCollect(Id invoiceId) {
+    if (!canCollectOn(invoiceId)) {
+      if (FeatureManagement.checkPermission(COLLECT_PERMISSION)) {
+        throw new AppException(
+          'You can take payments only on college invoices of your campuses.'
+        );
+      }
+      RecordAccess.assertPermission(MANAGE_PERMISSION);
+    }
+  }
+
+  /** The counsellor's desk: college invoices and pending payments of their campuses. */
+  private static FinanceDesk collegeDesk() {
+    FinanceDesk desk = new FinanceDesk();
+    desk.canManage = false;
+    desk.canCollect = true;
+    desk.collegeOnly = true;
+    desk.overdue = new List<Student_Invoice__c>();
+    desk.exceptions = new List<Student_Payment__c>();
+    desk.recent = new List<Student_Payment__c>();
+    Set<Id> campuses = myCampusIds();
+    CollegeFeeReader reader = new CollegeFeeReader();
+    desk.collegeInvoices = reader.invoices(campuses);
+    desk.pending = reader.pending(campuses);
+    for (Student_Invoice__c inv : reader.open(campuses)) {
+      Decimal balance = nvl(inv.Balance_Due__c);
+      desk.outstanding += balance;
+      if (inv.Overdue__c) {
+        desk.overdueAmount += balance;
+        desk.overdueCount++;
+        desk.overdue.add(inv);
+      }
+    }
+    desk.collectedThisMonth = reader.collectedSince(
+      campuses,
+      Date.today().toStartOfMonth()
+    );
+    return desk;
+  }
+
+  /**
+   * Reads college invoices and payments for the counsellor's campuses. Payments
+   * are private and not shared to the counsellor, so this reads without sharing
+   * after the permission check, limited to college invoices of those campuses.
+   */
+  private without sharing class CollegeFeeReader {
+    List<Student_Invoice__c> invoices(Set<Id> campuses) {
+      return [
+        SELECT
+          Id,
+          Name,
+          Status__c,
+          Total__c,
+          Balance_Due__c,
+          Due_Date__c,
+          Invoice_Kind__c,
+          Learner__r.Name,
+          Branch__r.Name,
+          Programme_Enrolment__r.Status__c,
+          Programme_Enrolment__r.Roll_Number__c
+        FROM Student_Invoice__c
+        WHERE
+          Programme_Enrolment__c != NULL
+          AND Status__c != 'Cancelled'
+          AND Branch__c IN :campuses
+        WITH SYSTEM_MODE
+        ORDER BY CreatedDate DESC
+        LIMIT 50
+      ];
+    }
+
+    List<Student_Invoice__c> open(Set<Id> campuses) {
+      return [
+        SELECT
+          Id,
+          Name,
+          Due_Date__c,
+          Balance_Due__c,
+          Status__c,
+          Overdue__c,
+          Bill_To__r.Name,
+          Learner__r.Name
+        FROM Student_Invoice__c
+        WHERE
+          Programme_Enrolment__c != NULL
+          AND Status__c IN :OPEN_STATUSES
+          AND Branch__c IN :campuses
+        WITH SYSTEM_MODE
+        ORDER BY Due_Date__c ASC
+        LIMIT 500
+      ];
+    }
+
+    List<Student_Payment__c> pending(Set<Id> campuses) {
+      return [
+        SELECT
+          Id,
+          Name,
+          Amount__c,
+          Unallocated_Amount__c,
+          Method__c,
+          Status__c,
+          Payment_Date__c,
+          Reference__c,
+          Receipt_Number__c,
+          Reconciliation_Status__c,
+          Reconciliation_Note__c,
+          Payer__r.Name,
+          Learner__r.Name,
+          Student_Invoice__c,
+          Student_Invoice__r.Name
+        FROM Student_Payment__c
+        WHERE
+          Status__c = 'Pending'
+          AND Student_Invoice__r.Programme_Enrolment__c != NULL
+          AND Student_Invoice__r.Branch__c IN :campuses
+        WITH SYSTEM_MODE
+        ORDER BY CreatedDate DESC
+        LIMIT 50
+      ];
+    }
+
+    Decimal collectedSince(Set<Id> campuses, Date since) {
+      AggregateResult total = [
+        SELECT SUM(Amount__c) total
+        FROM Student_Payment__c
+        WHERE
+          Status__c = 'Confirmed'
+          AND Payment_Date__c >= :since
+          AND Student_Invoice__r.Programme_Enrolment__c != NULL
+          AND Student_Invoice__r.Branch__c IN :campuses
+        WITH SYSTEM_MODE
+      ];
+      return nvl((Decimal) total.get('total'));
+    }
   }
 
   // ------------------------------------------------------------- invoices
@@ -884,7 +1069,7 @@ public with sharing class BillingService {
 
   /** Records a payment. Replaying a known gateway transaction returns the original payment. */
   public static PaymentResult recordPayment(PaymentRequest request) {
-    RecordAccess.assertPermission(MANAGE_PERMISSION);
+    assertCollect(request?.invoiceId);
     if (request == null || request.amount == null || request.amount <= 0) {
       throw new AppException('Enter a payment amount greater than zero.');
     }
@@ -989,8 +1174,8 @@ public with sharing class BillingService {
 
   /** Confirms a pending payment, issues the receipt number, and allocates it. */
   public static PaymentResult confirmPayment(Id paymentId) {
-    RecordAccess.assertPermission(MANAGE_PERMISSION);
     Student_Payment__c payment = loadPayment(paymentId, true);
+    assertCollect(payment.Student_Invoice__c);
     if (payment.Status__c != 'Pending') {
       throw new AppException('Only pending payments can be confirmed.');
     }
@@ -1016,8 +1201,8 @@ public with sharing class BillingService {
   }
 
   public static void failPayment(Id paymentId, String reason) {
-    RecordAccess.assertPermission(MANAGE_PERMISSION);
     Student_Payment__c payment = loadPayment(paymentId, true);
+    assertCollect(payment.Student_Invoice__c);
     if (payment.Status__c != 'Pending') {
       throw new AppException('Only pending payments can be marked as failed.');
     }
@@ -1238,6 +1423,7 @@ public with sharing class BillingService {
       ORDER BY Sequence__c
     ];
     view.canManage = FeatureManagement.checkPermission(MANAGE_PERMISSION);
+    view.canCollect = canCollectOn(invoiceId);
     return view;
   }
 
@@ -1269,6 +1455,12 @@ public with sharing class BillingService {
    * but are no longer worked from the desk.
    */
   public static FinanceDesk financeDesk() {
+    if (
+      !FeatureManagement.checkPermission(MANAGE_PERMISSION) &&
+      FeatureManagement.checkPermission(COLLECT_PERMISSION)
+    ) {
+      return collegeDesk();
+    }
     FinanceDesk desk = new FinanceDesk();
     for (AggregateResult row : [
       SELECT Overdue__c overdue, SUM(Balance_Due__c) balance, COUNT(Id) total
@@ -1339,6 +1531,7 @@ public with sharing class BillingService {
       LIMIT 50
     ];
     desk.canManage = FeatureManagement.checkPermission(MANAGE_PERMISSION);
+    desk.canCollect = desk.canManage;
     return desk;
   }
 
