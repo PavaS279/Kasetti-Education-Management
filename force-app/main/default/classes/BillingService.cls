@@ -140,12 +140,7 @@ public with sharing class BillingService {
     ) {
       return false;
     }
-    List<Student_Invoice__c> rows = [
-      SELECT Branch__c, Programme_Enrolment__c
-      FROM Student_Invoice__c
-      WHERE Id = :invoiceId
-      WITH SYSTEM_MODE
-    ];
+    List<Student_Invoice__c> rows = new CollegeFeeReader().invoice(invoiceId);
     return !rows.isEmpty() &&
       rows[0].Programme_Enrolment__c != null &&
       myCampusIds().contains(rows[0].Branch__c);
@@ -197,6 +192,15 @@ public with sharing class BillingService {
    * after the permission check, limited to college invoices of those campuses.
    */
   private without sharing class CollegeFeeReader {
+    List<Student_Invoice__c> invoice(Id invoiceId) {
+      return [
+        SELECT Branch__c, Programme_Enrolment__c
+        FROM Student_Invoice__c
+        WHERE Id = :invoiceId
+        WITH SYSTEM_MODE
+      ];
+    }
+
     List<Student_Invoice__c> invoices(Set<Id> campuses) {
       return [
         SELECT

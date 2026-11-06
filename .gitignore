@@ -49,3 +49,4 @@ $RECYCLE.BIN/
 
 # Local cleanup backups (personal data, never commit)
 .codex-worktrees/
+.claude/settings.local.json
