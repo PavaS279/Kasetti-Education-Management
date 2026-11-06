@@ -4,7 +4,7 @@
     <isExposed>true</isExposed>
     <masterLabel>KEM College Students</masterLabel>
     <description
-  >Every college student with roll number, section, fees due and portal access; opens Student 360 and the academic record.</description>
+  >Every college student with enrolment number, USN, section, fees due and portal access; opens Student 360 and the academic record.</description>
     <targets>
         <target>lightning__Tab</target>
         <target>lightning__AppPage</target>

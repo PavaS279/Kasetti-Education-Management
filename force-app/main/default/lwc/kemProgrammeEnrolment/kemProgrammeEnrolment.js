@@ -54,7 +54,7 @@ export default class KemProgrammeEnrolment extends LightningElement {
   }
 
   get rollNumber() {
-    return this.enrolment?.Roll_Number__c || "no roll number yet";
+    return this.enrolment?.Roll_Number__c || "no enrolment number yet";
   }
 
   get sectionLabel() {

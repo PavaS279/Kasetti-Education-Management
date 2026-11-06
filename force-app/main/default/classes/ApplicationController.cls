@@ -171,18 +171,38 @@ public with sharing class ApplicationController {
    * fields must still get a correct queue; only Ids are returned.
    */
   private static Set<Id> finishedCollegeAdmissions() {
-    return new Map<Id, IndividualApplication>(
-        [
-          SELECT Id
-          FROM IndividualApplication
-          WHERE
-            College_Mode__c = TRUE
-            AND College_Stage__c IN :FINISHED_COLLEGE_STAGES
-          WITH SYSTEM_MODE
-          LIMIT 5000
-        ]
-      )
-      .keySet();
+    // The Dean (without the admission desk) sees only college admissions that
+    // wait for the Dean: exception requests, and interviews of the old flow.
+    Boolean deanOnly =
+      FeatureManagement.checkPermission(InterviewService.PERMISSION) &&
+      !FeatureManagement.checkPermission(
+        CollegeDocumentService.VERIFY_PERMISSION
+      );
+    Set<String> deanStages = new Set<String>{
+      InterviewService.AWAITING_DEAN,
+      'Interview Scheduled',
+      'Ready For Decision'
+    };
+    Set<Id> hidden = new Set<Id>();
+    for (IndividualApplication a : [
+      SELECT Id, College_Stage__c
+      FROM IndividualApplication
+      WHERE
+        College_Mode__c = TRUE
+        AND (College_Stage__c IN :FINISHED_COLLEGE_STAGES
+        OR (College_Stage__c NOT IN :deanStages
+        AND College_Stage__c != NULL))
+      WITH SYSTEM_MODE
+      LIMIT 5000
+    ]) {
+      if (
+        FINISHED_COLLEGE_STAGES.contains(a.College_Stage__c) ||
+        (deanOnly && !deanStages.contains(a.College_Stage__c))
+      ) {
+        hidden.add(a.Id);
+      }
+    }
+    return hidden;
   }
 
   @AuraEnabled(cacheable=true)

@@ -58,7 +58,8 @@ describe("c-kem-portal-college", () => {
   it("shows roll number, today's period, published marks and term results", () => {
     const element = mount(SUMMARY);
     const text = element.shadowRoot.textContent;
-    expect(text).toContain("Roll number KT26YBCS001");
+    expect(text).toContain("Enrolment number KT26YBCS001");
+    expect(text).toContain("USN awaited");
     expect(text).toContain("B-201");
     expect(text).toContain("120 / 150");
     expect(text).toContain("95%");
@@ -84,7 +85,7 @@ describe("c-kem-portal-college", () => {
       terms: []
     });
     const text = element.shadowRoot.textContent;
-    expect(text).toContain("Roll number after the fee is received");
+    expect(text).toContain("Enrolment number after the fee is received");
     expect(text).toContain("Pay by 2026-10-20");
     expect(text).toContain("No classes today.");
   });

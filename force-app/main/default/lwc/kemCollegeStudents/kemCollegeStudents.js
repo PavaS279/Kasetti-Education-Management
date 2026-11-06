@@ -2,7 +2,8 @@ import { LightningElement } from "lwc";
 import { NavigationMixin } from "lightning/navigation";
 import CURRENCY from "@salesforce/i18n/currency";
 import getStudents from "@salesforce/apex/CollegeStudentsController.getStudents";
-import { reduceErrors } from "c/kemUtils";
+import setUsn from "@salesforce/apex/CollegeStudentsController.setUsn";
+import { reduceErrors, toast } from "c/kemUtils";
 
 const SCOPES = [
   { label: "Current students", value: "current" },
@@ -38,6 +39,9 @@ export default class KemCollegeStudents extends NavigationMixin(
 ) {
   currencyCode = CURRENCY;
   data;
+  usnEditing;
+  usnValue = "";
+  usnReason = "";
   errorMessage;
   isLoading = true;
   scope = "current";
@@ -102,7 +106,7 @@ export default class KemCollegeStudents extends NavigationMixin(
       .filter(
         (s) =>
           !term ||
-          [s.student, s.rollNumber, s.branch, s.section]
+          [s.student, s.rollNumber, s.usn, s.branch, s.section]
             .filter(Boolean)
             .some((v) => v.toLowerCase().includes(term))
       )
@@ -121,6 +125,12 @@ export default class KemCollegeStudents extends NavigationMixin(
             s.rollNumber ||
             (pending ? `pay by ${formatDate(s.paymentDueBy)}` : "—"),
           yearLabel: s.yearOfStudy ? `Year ${s.yearOfStudy}` : "",
+          usnLabel: s.usn || (s.rollNumber ? "USN awaited" : "—"),
+          usnClass: s.usn ? "strong" : "kem-muted",
+          canEnterUsn: Boolean(this.data?.canSetUsn && s.rollNumber && !s.usn),
+          canChangeUsn: Boolean(this.data?.canChangeUsn && s.usn),
+          editingUsn: this.usnEditing === s.enrolmentId,
+          needsReason: Boolean(s.usn),
           sectionLabel: s.section || (enrolled ? "No section yet" : "—"),
           sectionClass: !s.section && enrolled ? "warn" : "",
           portalLabel: s.hasPortal
@@ -131,6 +141,51 @@ export default class KemCollegeStudents extends NavigationMixin(
           dueClass: s.feesDue > 0 ? "due" : ""
         };
       });
+  }
+
+  handleEditUsn(event) {
+    const id = event.currentTarget.dataset.id;
+    const row = this.data.students.find((s) => s.enrolmentId === id);
+    this.usnEditing = id;
+    this.usnValue = row.usn || "";
+    this.usnReason = "";
+  }
+
+  handleUsnValue(event) {
+    this.usnValue = (event.target.value || "").toUpperCase();
+  }
+
+  handleUsnReason(event) {
+    this.usnReason = event.target.value;
+  }
+
+  handleCancelUsn() {
+    this.usnEditing = undefined;
+  }
+
+  async handleSaveUsn() {
+    const id = this.usnEditing;
+    try {
+      await setUsn({
+        enrolmentId: id,
+        usn: this.usnValue,
+        reason: this.usnReason
+      });
+      // Update the row in place (the list is cached).
+      this.data = {
+        ...this.data,
+        students: this.data.students.map((s) => {
+          if (s.enrolmentId !== id) {
+            return s;
+          }
+          return { ...s, usn: this.usnValue };
+        })
+      };
+      this.usnEditing = undefined;
+      toast(this, "USN saved", this.usnValue, "success");
+    } catch (error) {
+      toast(this, "USN not saved", reduceErrors(error).join(" "), "error");
+    }
   }
 
   get count() {

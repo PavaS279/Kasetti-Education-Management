@@ -18,6 +18,25 @@
         <span class={verdictClass}>{admission.eligibility}</span>
       </header>
       <p class="notes">{admission.eligibilityNotes}</p>
+      <template lwc:if={hasQuotas}>
+        <div class="quota-line">
+          <span class="small">Quota: <strong>{quotaLabel}</strong></span>
+          <template lwc:if={admission.canChangeQuota}>
+            <lightning-combobox
+              class="quota-pick"
+              label="Change quota"
+              variant="label-hidden"
+              options={quotaOptions}
+              value={quotaValue}
+              onchange={handleQuotaChoice}
+            ></lightning-combobox>
+            <lightning-button
+              label="Save quota"
+              onclick={handleSaveQuota}
+            ></lightning-button>
+          </template>
+        </div>
+      </template>
       <template lwc:if={hasSuggestions}>
         <div class="suggestions">
           <strong>Eligible instead for:</strong>
@@ -31,7 +50,7 @@
 
       <template lwc:if={admission.programmeEnrolmentId}>
         <div class="enrolled">
-          Programme enrolment {admission.enrolmentStatus} · roll number
+          Programme enrolment {admission.enrolmentStatus} · enrolment number
           {rollLabel}
           <lightning-button
             variant="base"
@@ -43,7 +62,7 @@
       <template lwc:if={showSectionPrompt}>
         <div class="next-step" role="status">
           <strong>Next: allot a section.</strong>
-          The fee is received and the roll number is issued. Choose the
+          The fee is received and the enrolment number is issued. Choose the
           student's section and joining date on the programme enrolment.
           <lightning-button
             class="slds-m-left_x-small"
@@ -51,6 +70,28 @@
             label="Allot section"
             onclick={openEnrolment}
           ></lightning-button>
+        </div>
+      </template>
+      <template lwc:if={showPortal}>
+        <div class="portal" role="status">
+          <strong>Student portal: {admission.portal.label}</strong>
+          <span class="small">{portalHint}</span>
+          <template lwc:if={admission.portal.canGive}>
+            <lightning-button
+              class="slds-m-left_x-small"
+              label="Give portal access"
+              icon-name="utility:email"
+              onclick={handleGivePortal}
+            ></lightning-button>
+          </template>
+          <template lwc:if={admission.portal.canResend}>
+            <lightning-button
+              class="slds-m-left_x-small"
+              label="Send password link"
+              icon-name="utility:email"
+              onclick={handleSendLink}
+            ></lightning-button>
+          </template>
         </div>
       </template>
       <template lwc:if={admission.decision}>
@@ -122,13 +163,73 @@
         ></lightning-button>
       </template>
 
-      <template lwc:if={admission.canDean}>
-        <h3>2 · Dean</h3>
+      <template lwc:if={showDeskDecision}>
+        <h3>2 · Decision</h3>
+        <template lwc:if={admission.admissible}>
+          <p class="small">{admitHint}</p>
+          <div class="row">
+            <lightning-button
+              variant="brand"
+              label="Admit"
+              onclick={handleAdmit}
+            ></lightning-button>
+          </div>
+        </template>
+        <template lwc:if={admission.needsException}>
+          <p class="small">
+            This applicant does not meet the criteria. Ask the Dean for an
+            exception with a reason, or close the admission.
+          </p>
+          <div class="row">
+            <lightning-textarea
+              class="exception-reason"
+              label="Reason for the Dean"
+              value={exceptionReason}
+              onchange={handleExceptionReason}
+            ></lightning-textarea>
+            <lightning-button
+              variant="brand"
+              label="Request Dean approval"
+              onclick={handleRequestException}
+            ></lightning-button>
+          </div>
+        </template>
+        <div class="row">
+          <lightning-input
+            label="Reason for not admitting"
+            value={rejectReason}
+            onchange={handleRejectReason}
+          ></lightning-input>
+          <lightning-button
+            variant="destructive-text"
+            label="Not admitted"
+            onclick={handleReject}
+          ></lightning-button>
+        </div>
+      </template>
+
+      <template lwc:if={hasException}>
+        <div class={exceptionClass}>
+          <strong>Dean exception: {admission.exceptionStatus}</strong>
+          <p class="small">
+            Requested by {admission.exceptionRequestedBy}:
+            {admission.exceptionReason}
+          </p>
+          <template lwc:if={admission.exceptionRemarks}>
+            <p class="small">
+              {admission.exceptionDecidedBy}: {admission.exceptionRemarks}
+            </p>
+          </template>
+        </div>
+      </template>
+
+      <template lwc:if={showDean}>
+        <h3>Dean · exception request</h3>
         <template lwc:if={showSchedule}>
           <div class="row">
             <lightning-input
               type="datetime"
-              label="Interview date and time"
+              label="Interview (optional)"
               value={interviewAt}
               onchange={handleInterviewAt}
             ></lightning-input>
@@ -160,15 +261,32 @@
             ></lightning-button>
           </div>
         </template>
-        <template lwc:if={showDecision}>
+        <template lwc:if={showExceptionDecision}>
           <div class="row">
-            <template lwc:if={canAdmit}>
-              <lightning-button
-                variant="brand"
-                label="Admit"
-                onclick={handleAdmit}
-              ></lightning-button>
-            </template>
+            <lightning-input
+              label="Dean's remarks"
+              value={deanRemarks}
+              onchange={handleDeanRemarks}
+            ></lightning-input>
+            <lightning-button
+              variant="brand"
+              label="Approve exception"
+              onclick={handleApproveException}
+            ></lightning-button>
+            <lightning-button
+              variant="destructive-text"
+              label="Decline"
+              onclick={handleDeclineException}
+            ></lightning-button>
+          </div>
+        </template>
+        <template lwc:if={showLegacyDecision}>
+          <div class="row">
+            <lightning-button
+              variant="brand"
+              label="Admit"
+              onclick={handleAdmit}
+            ></lightning-button>
             <lightning-input
               label="Reason for rejecting"
               value={rejectReason}

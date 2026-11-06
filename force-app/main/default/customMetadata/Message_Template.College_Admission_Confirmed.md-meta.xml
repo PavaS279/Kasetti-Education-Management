@@ -16,7 +16,7 @@
 
 The fee for {{StudentName}} has been received and the admission to {{ProgrammeName}} {{BranchOfStudy}} ({{AcademicYear}}) is confirmed.
 
-Roll number: {{RollNumber}}
+Enrolment number: {{RollNumber}}
 
 The joining date and timetable will follow from the Dean's office.
 
@@ -40,6 +40,6 @@ The joining date and timetable will follow from the Dean's office.
         <field>Subject__c</field>
         <value
       xsi:type="xsd:string"
-    >Admission confirmed - roll number {{RollNumber}}</value>
+    >Admission confirmed - enrolment number {{RollNumber}}</value>
     </values>
 </CustomMetadata>

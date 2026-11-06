@@ -124,7 +124,7 @@ private class CollegeSeatServiceTest {
       CollegeSeatService.reserve(wrongStage.Id, System.now().addDays(7));
       System.assert(false, 'Expected stage guard.');
     } catch (AppException expected) {
-      System.assert(expected.getMessage().contains('Ready For Decision'));
+      System.assert(expected.getMessage().contains('ready to admit'));
     }
     try {
       CollegeSeatService.reserve(

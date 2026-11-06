@@ -30,6 +30,38 @@ public without sharing class CollegePublicController {
   };
   private static final Integer MAX_RANK = 2000000;
 
+  public class QuotaOption {
+    @AuraEnabled
+    public String label;
+    @AuraEnabled
+    public Id value;
+    @AuraEnabled
+    public String rankExam;
+  }
+
+  /** Quotas of the intake that still have regular seats (none: no quota choice). */
+  @AuraEnabled
+  public static List<QuotaOption> getQuotas(Id campusBranchId) {
+    try {
+      assertIntake(campusBranchId, 'Regular');
+      List<QuotaOption> result = new List<QuotaOption>();
+      for (
+        CollegeQuotaService.QuotaSeats q : CollegeQuotaService.openQuotas(
+          campusBranchId
+        )
+      ) {
+        QuotaOption o = new QuotaOption();
+        o.label = q.name;
+        o.value = q.quotaId;
+        o.rankExam = q.rankExam;
+        result.add(o);
+      }
+      return result;
+    } catch (Exception e) {
+      throw handled(e, 'Quotas are not available right now.');
+    }
+  }
+
   @AuraEnabled(cacheable=true)
   public static List<CollegeAdmissionController.CampusChoice> getCatalogue() {
     try {

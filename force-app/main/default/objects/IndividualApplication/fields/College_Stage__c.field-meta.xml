@@ -25,6 +25,11 @@
                 <label>Documents Verified</label>
             </value>
             <value>
+                <fullName>Awaiting Dean Approval</fullName>
+                <default>false</default>
+                <label>Awaiting Dean Approval</label>
+            </value>
+            <value>
                 <fullName>Interview Scheduled</fullName>
                 <default>false</default>
                 <label>Interview Scheduled</label>

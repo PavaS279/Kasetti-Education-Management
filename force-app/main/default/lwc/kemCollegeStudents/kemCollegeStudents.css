@@ -134,3 +134,12 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+.usn-edit {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+.usn-edit .usn {
+  width: 8.5rem;
+}

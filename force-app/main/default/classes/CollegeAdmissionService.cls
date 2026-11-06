@@ -186,9 +186,16 @@ public with sharing class CollegeAdmissionService {
         College_Stage__c = 'Processing',
         Academic_Year__c = intake.Academic_Year__c,
         Entry_Route__c = request.entryRoute,
-        Entry_Year_Of_Study__c = request.entryRoute == 'Lateral' ? 2 : 1
+        Entry_Year_Of_Study__c = request.entryRoute == 'Lateral' ? 2 : 1,
+        Admission_Quota__c = request.entryRoute == 'Lateral'
+          ? null
+          : request.quotaId
       );
       Database.insert(admission, AccessLevel.SYSTEM_MODE);
+      CollegeQuotaService.addExtraDocument(
+        admission.Id,
+        admission.Admission_Quota__c
+      );
       if (request.consent == true) {
         CollegeDocumentService.captureConsent(admission.Id);
       }

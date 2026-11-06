@@ -65,6 +65,7 @@ const flush = () => new Promise((resolve) => process.nextTick(resolve));
 
 const DESK = {
   canManage: true,
+  canCollect: true,
   outstanding: 12000,
   overdueAmount: 4080,
   overdueCount: 1,
@@ -196,7 +197,51 @@ describe("c-kem-finance-desk", () => {
     expect(text).toContain("College invoices");
     expect(text).toContain("YLK-000389");
     expect(text).toContain("Spoorti B · Yelahanka Campus · due");
-    expect(text).toContain("roll number KT26YBCS001");
+    expect(text).toContain("enrolment number KT26YBCS001");
+    expect(
+      element.shadowRoot.querySelector('a[data-id="a0I000000000389"]')
+    ).not.toBeNull();
+  });
+
+  it("gives the admission counsellor a college-only desk", async () => {
+    getFinanceDesk.mockResolvedValue({
+      ...DESK,
+      canManage: false,
+      canCollect: true,
+      collegeOnly: true,
+      exceptions: [],
+      pending: [
+        {
+          Id: "a0P000000000009",
+          Name: "PAY-000009",
+          Amount__c: 155000,
+          Method__c: "Demand Draft",
+          Status__c: "Pending",
+          Student_Invoice__c: "a0I000000000389",
+          Student_Invoice__r: { Name: "YLK-000389" },
+          Payer__r: { Name: "Spoorti B" }
+        }
+      ],
+      collegeInvoices: []
+    });
+    const element = createElement("c-kem-finance-desk", { is: KemFinanceDesk });
+    document.body.appendChild(element);
+    await flush();
+    await flush();
+    expect(getRefundQueue).not.toHaveBeenCalled();
+    const tabs = [
+      ...element.shadowRoot.querySelectorAll("button[data-value]")
+    ].map((b) => b.dataset.value);
+    expect(tabs).toEqual(["college", "pending", "overdue"]);
+    expect(
+      element.shadowRoot.querySelector("lightning-button.discounts")
+    ).toBeNull();
+    element.shadowRoot.querySelector('button[data-value="pending"]').click();
+    await flush();
+    const labels = [
+      ...element.shadowRoot.querySelectorAll("lightning-button")
+    ].map((b) => b.label);
+    expect(labels).toContain("Confirm");
     expect(
       element.shadowRoot.querySelector('a[data-id="a0I000000000389"]')
     ).not.toBeNull();

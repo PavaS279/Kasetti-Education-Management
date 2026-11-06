@@ -1,0 +1,691 @@
+<template>
+  <section class="kem-card setup">
+    <header class="head">
+      <div>
+        <div class="eyebrow">KT College</div>
+        <h2>College Admission Setup</h2>
+        <p class="kem-muted small">{viewOnlyNote}</p>
+      </div>
+      <lightning-button-icon
+        icon-name="utility:refresh"
+        alternative-text="Refresh"
+        onclick={load}
+      ></lightning-button-icon>
+    </header>
+
+    <template lwc:if={errorMessage}>
+      <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+        {errorMessage}
+      </div>
+    </template>
+
+    <template lwc:if={setup}>
+      <div class="tabs" role="tablist">
+        <template for:each={tabs} for:item="t">
+          <button
+            key={t.value}
+            class={t.className}
+            data-value={t.value}
+            onclick={handleTab}
+            role="tab"
+          >
+            {t.label}
+          </button>
+        </template>
+      </div>
+
+      <template lwc:if={showIntake}>
+        <ul class="rows">
+          <template for:each={intakeRows} for:item="r">
+            <li key={r.key} class="row">
+              <div class="main">
+                <span class="strong">{r.name}</span>
+                <span class="kem-muted small"
+                  >Taken: regular {r.usedRegular}, lateral {r.usedLateral}</span
+                >
+              </div>
+              <template lwc:if={r.editing}>
+                <div class="edit">
+                  <lightning-input
+                    type="number"
+                    label="Regular seats"
+                    min="0"
+                    step="1"
+                    required
+                    value={draft.intakeRegular}
+                    onchange={handleRegularSeats}
+                  ></lightning-input>
+                  <lightning-input
+                    class="lateral-percent"
+                    type="number"
+                    label="Lateral % of regular"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={draft.lateralPercentage}
+                    onchange={handleLateralPercent}
+                  ></lightning-input>
+                  <lightning-input
+                    class="lateral-seats"
+                    type="number"
+                    label="Lateral seats"
+                    min="0"
+                    step="1"
+                    required
+                    value={draft.intakeLateral}
+                    onchange={handleLateralSeats}
+                  ></lightning-input>
+                  <span class="kem-muted small">{lateralHint}</span>
+                  <lightning-input
+                    type="toggle"
+                    label="Admissions open"
+                    checked={draft.admissionsOpen}
+                    data-field="admissionsOpen"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <lightning-input
+                    type="toggle"
+                    label="Dean exceptions allowed"
+                    checked={draft.deanExceptionsAllowed}
+                    data-field="deanExceptionsAllowed"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <div class="buttons">
+                    <lightning-button
+                      variant="brand"
+                      label="Save"
+                      disabled={isSaving}
+                      onclick={handleSaveIntake}
+                    ></lightning-button>
+                    <lightning-button
+                      label="Cancel"
+                      onclick={handleCancel}
+                    ></lightning-button>
+                  </div>
+                </div>
+              </template>
+              <template lwc:else>
+                <div class="cell">
+                  <div class="label">Regular</div>
+                  <div class="strong">{r.intakeRegular}</div>
+                </div>
+                <div class="cell">
+                  <div class="label">Lateral</div>
+                  <div class="strong">{r.lateralLabel}</div>
+                </div>
+                <div class="cell">
+                  <div class="label">Dean exceptions</div>
+                  <div>{r.deanLabel}</div>
+                </div>
+                <span class={r.openClass}>{r.openLabel}</span>
+                <template lwc:if={canEdit}>
+                  <lightning-button
+                    label="Edit"
+                    data-id={r.id}
+                    onclick={handleEditIntake}
+                  ></lightning-button>
+                </template>
+              </template>
+            </li>
+          </template>
+        </ul>
+      </template>
+
+      <template lwc:if={showQuotas}>
+        <h3 class="section">Quota list</h3>
+        <ul class="rows">
+          <template for:each={quotaRows} for:item="q">
+            <li key={q.key} class="row">
+              <template lwc:if={q.editing}>
+                <div class="edit">
+                  <lightning-input
+                    label="Name"
+                    required
+                    value={draft.name}
+                    data-field="name"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <lightning-input
+                    label="Code"
+                    required
+                    max-length="20"
+                    value={draft.code}
+                    data-field="code"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <lightning-input
+                    label="Rank needed from exam (blank: none)"
+                    value={draft.rankExam}
+                    data-field="rankExam"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <lightning-input
+                    label="Extra document (blank: none)"
+                    value={draft.extraDocument}
+                    data-field="extraDocument"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <lightning-input
+                    type="number"
+                    label="Order"
+                    step="1"
+                    value={draft.sortOrder}
+                    data-field="sortOrder"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <lightning-input
+                    type="toggle"
+                    label="Active"
+                    checked={draft.active}
+                    data-field="active"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <div class="buttons">
+                    <lightning-button
+                      variant="brand"
+                      label="Save quota"
+                      disabled={isSaving}
+                      onclick={handleSaveQuota}
+                    ></lightning-button>
+                    <lightning-button
+                      label="Cancel"
+                      onclick={handleCancel}
+                    ></lightning-button>
+                  </div>
+                </div>
+              </template>
+              <template lwc:else>
+                <div class="main">
+                  <span class="strong">{q.name} · {q.code}</span>
+                  <span class="kem-muted small"
+                    >{q.rankLabel} · extra document: {q.docLabel}</span
+                  >
+                </div>
+                <span class="kem-badge">{q.activeLabel}</span>
+                <template lwc:if={canEdit}>
+                  <lightning-button
+                    label="Edit"
+                    data-id={q.id}
+                    onclick={handleEditQuota}
+                  ></lightning-button>
+                </template>
+              </template>
+            </li>
+          </template>
+        </ul>
+        <template lwc:if={addingQuota}>
+          <div class="edit new-quota">
+            <lightning-input
+              label="Name"
+              required
+              value={draft.name}
+              data-field="name"
+              onchange={handleDraft}
+            ></lightning-input>
+            <lightning-input
+              label="Code"
+              required
+              max-length="20"
+              value={draft.code}
+              data-field="code"
+              onchange={handleDraft}
+            ></lightning-input>
+            <lightning-input
+              label="Rank needed from exam (blank: none)"
+              value={draft.rankExam}
+              data-field="rankExam"
+              onchange={handleDraft}
+            ></lightning-input>
+            <lightning-input
+              label="Extra document (blank: none)"
+              value={draft.extraDocument}
+              data-field="extraDocument"
+              onchange={handleDraft}
+            ></lightning-input>
+            <div class="buttons">
+              <lightning-button
+                variant="brand"
+                label="Save quota"
+                disabled={isSaving}
+                onclick={handleSaveQuota}
+              ></lightning-button>
+              <lightning-button
+                label="Cancel"
+                onclick={handleCancel}
+              ></lightning-button>
+            </div>
+          </div>
+        </template>
+        <template lwc:elseif={canEdit}>
+          <lightning-button
+            class="add"
+            label="Add quota"
+            icon-name="utility:add"
+            onclick={handleAddQuota}
+          ></lightning-button>
+        </template>
+
+        <h3 class="section">Regular seats per quota</h3>
+        <p class="kem-muted small">
+          The quota seats of a branch must add up to its regular seats. A branch
+          with no split keeps a single regular pool.
+        </p>
+        <ul class="rows">
+          <template for:each={splitRows} for:item="r">
+            <li key={r.key} class="row">
+              <div class="main">
+                <span class="strong">{r.name}</span>
+                <span class="kem-muted small">{r.summary}</span>
+              </div>
+              <template lwc:if={r.editing}>
+                <div class="edit">
+                  <template for:each={r.entries} for:item="e">
+                    <lightning-input
+                      key={e.key}
+                      type="number"
+                      label={e.name}
+                      min="0"
+                      step="1"
+                      required
+                      value={e.seats}
+                      data-quota={e.quotaId}
+                      onchange={handleSplitSeats}
+                    ></lightning-input>
+                  </template>
+                  <span class={r.totalClass}>{r.totalLabel}</span>
+                  <div class="buttons">
+                    <lightning-button
+                      variant="brand"
+                      label="Save"
+                      disabled={isSaving}
+                      onclick={handleSaveSplit}
+                    ></lightning-button>
+                    <lightning-button
+                      label="Cancel"
+                      onclick={handleCancel}
+                    ></lightning-button>
+                  </div>
+                </div>
+              </template>
+              <template lwc:else>
+                <span class={r.totalClass}>{r.totalLabel}</span>
+                <template lwc:if={canEdit}>
+                  <lightning-button
+                    label="Edit"
+                    data-id={r.id}
+                    onclick={handleEditSplit}
+                  ></lightning-button>
+                </template>
+              </template>
+            </li>
+          </template>
+        </ul>
+      </template>
+
+      <template lwc:if={showFees}>
+        <div class="fee-pickers">
+          <lightning-combobox
+            label="Branch"
+            options={courseOptions}
+            value={feeCourse}
+            onchange={handleFeeCourse}
+          ></lightning-combobox>
+          <lightning-combobox
+            label="Academic year"
+            options={yearOptions}
+            value={feeYear}
+            onchange={handleFeeYear}
+          ></lightning-combobox>
+          <lightning-combobox
+            label="Year of study"
+            options={studyYearOptions}
+            value={feeStudyYear}
+            onchange={handleFeeStudyYear}
+          ></lightning-combobox>
+        </div>
+        <p class="kem-muted small">
+          All campuses. A blank quota cell uses the default (CET) price; a blank
+          year-of-study cell uses the all-years price. Changes start on the date
+          you choose — invoices already issued keep their amounts.
+        </p>
+        <template lwc:if={fees}>
+          <div class="fee-table-wrap">
+            <table
+              class="slds-table slds-table_bordered slds-table_cell-buffer fee-table"
+            >
+              <thead>
+                <tr>
+                  <th scope="col">Fee</th>
+                  <template for:each={feeColumns} for:item="c">
+                    <th key={c.key} scope="col">{c.name}</th>
+                  </template>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={feeRows} for:item="r">
+                  <tr key={r.key}>
+                    <th scope="row">{r.label}</th>
+                    <template for:each={r.cells} for:item="c">
+                      <td key={c.key}>
+                        <template lwc:if={feeEditing}>
+                          <lightning-input
+                            class="fee"
+                            type="number"
+                            variant="label-hidden"
+                            label="Amount"
+                            min="0"
+                            step="0.01"
+                            value={c.amount}
+                            placeholder={c.placeholder}
+                            data-row={c.row}
+                            data-col={c.col}
+                            onchange={handleFeeCell}
+                          ></lightning-input>
+                        </template>
+                        <template lwc:else>
+                          <span class={c.displayClass}>{c.display}</span>
+                        </template>
+                      </td>
+                    </template>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          <template lwc:if={canEdit}>
+            <div class="buttons fee-actions">
+              <template lwc:if={feeEditing}>
+                <lightning-button
+                  label="Copy from CET"
+                  onclick={handleCopyFromCet}
+                ></lightning-button>
+                <lightning-button
+                  label="Copy from last year"
+                  onclick={handleCopyLastYear}
+                ></lightning-button>
+                <lightning-input
+                  type="date"
+                  label="Starts on"
+                  value={feeStarts}
+                  onchange={handleFeeStarts}
+                ></lightning-input>
+                <lightning-button
+                  variant="brand"
+                  label="Save fees"
+                  disabled={isSaving}
+                  onclick={handleSaveFees}
+                ></lightning-button>
+                <lightning-button
+                  label="Cancel"
+                  onclick={handleCancelFees}
+                ></lightning-button>
+              </template>
+              <template lwc:else>
+                <lightning-button
+                  label="Edit fees"
+                  onclick={handleEditFees}
+                ></lightning-button>
+              </template>
+            </div>
+          </template>
+        </template>
+      </template>
+
+      <template lwc:if={showVtu}>
+        <h3 class="section">Campus codes</h3>
+        <p class="kem-muted small">
+          A VTU USN starts with the region digit and the two-letter college code
+          (for example 1KT…).
+        </p>
+        <ul class="rows">
+          <template for:each={vtuCampusRows} for:item="c">
+            <li key={c.key} class="row">
+              <div class="main"><span class="strong">{c.name}</span></div>
+              <template lwc:if={c.editing}>
+                <div class="edit">
+                  <lightning-input
+                    label="Region digit"
+                    max-length="1"
+                    required
+                    value={draft.region}
+                    data-field="region"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <lightning-input
+                    label="College code"
+                    max-length="2"
+                    required
+                    value={draft.college}
+                    data-field="college"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <div class="buttons">
+                    <lightning-button
+                      variant="brand"
+                      label="Save"
+                      disabled={isSaving}
+                      onclick={handleSaveCampusCodes}
+                    ></lightning-button>
+                    <lightning-button
+                      label="Cancel"
+                      onclick={handleCancel}
+                    ></lightning-button>
+                  </div>
+                </div>
+              </template>
+              <template lwc:else>
+                <span class="strong">{c.codeLabel}</span>
+                <template lwc:if={canEdit}>
+                  <lightning-button
+                    label="Edit"
+                    data-id={c.id}
+                    onclick={handleEditCampusCodes}
+                  ></lightning-button>
+                </template>
+              </template>
+            </li>
+          </template>
+        </ul>
+
+        <h3 class="section">Branch codes</h3>
+        <ul class="rows">
+          <template for:each={vtuBranchRows} for:item="b">
+            <li key={b.key} class="row">
+              <div class="main"><span class="strong">{b.name}</span></div>
+              <template lwc:if={b.editing}>
+                <div class="edit">
+                  <lightning-input
+                    label="VTU branch code (blank: branch code)"
+                    max-length="2"
+                    value={draft.vtuCode}
+                    data-field="vtuCode"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <div class="buttons">
+                    <lightning-button
+                      variant="brand"
+                      label="Save"
+                      disabled={isSaving}
+                      onclick={handleSaveBranchCode}
+                    ></lightning-button>
+                    <lightning-button
+                      label="Cancel"
+                      onclick={handleCancel}
+                    ></lightning-button>
+                  </div>
+                </div>
+              </template>
+              <template lwc:else>
+                <span class="strong">{b.codeLabel}</span>
+                <template lwc:if={canEdit}>
+                  <lightning-button
+                    label="Edit"
+                    data-id={b.id}
+                    onclick={handleEditBranchCode}
+                  ></lightning-button>
+                </template>
+              </template>
+            </li>
+          </template>
+        </ul>
+
+        <template lwc:if={setup.canUploadUsn}>
+          <h3 class="section">Upload USNs</h3>
+          <p class="kem-muted small">
+            A CSV with two columns, Enrolment Number and USN (a header line is
+            optional). Every row is checked first; only valid rows are saved.
+            One student at a time: Home → College Students → Enter USN.
+          </p>
+          <div class="buttons fee-actions">
+            <lightning-input
+              type="file"
+              label="CSV file"
+              accept=".csv"
+              onchange={handleUsnFile}
+            ></lightning-input>
+            <lightning-button
+              label="Check"
+              disabled={cannotCheckUsns}
+              onclick={handleCheckUsns}
+            ></lightning-button>
+            <template lwc:if={canSaveUsns}>
+              <lightning-button
+                variant="brand"
+                label="Save valid rows"
+                disabled={isSaving}
+                onclick={handleSaveUsns}
+              ></lightning-button>
+            </template>
+            <template lwc:if={hasRejectedUsns}>
+              <lightning-button
+                label="Download rejected rows"
+                icon-name="utility:download"
+                onclick={handleDownloadRejected}
+              ></lightning-button>
+            </template>
+          </div>
+          <template lwc:if={usnResult}>
+            <p class="strong small">{usnSummary}</p>
+            <ul class="rows">
+              <template for:each={usnRows} for:item="r">
+                <li key={r.key} class="row">
+                  <span class={r.markClass}>{r.mark}</span>
+                  <div class="main">
+                    <span class="strong">{r.enrolmentNumber} → {r.usn}</span>
+                    <span class="kem-muted small">{r.student} {r.reason}</span>
+                  </div>
+                </li>
+              </template>
+            </ul>
+          </template>
+        </template>
+      </template>
+
+      <template lwc:if={showRules}>
+        <p class="kem-muted small">
+          Saving creates a new version of the rule; the earlier version stays on
+          record and admissions already evaluated keep it. An "All campuses"
+          rule applies at every campus that has no rule of its own.
+        </p>
+        <ul class="rows">
+          <template for:each={ruleRows} for:item="r">
+            <li key={r.key} class="row">
+              <div class="main">
+                <span class="strong">{r.name}</span>
+                <span class="kem-muted small"
+                  >{r.route} entry · {r.level} · version {r.version}</span
+                >
+              </div>
+              <template lwc:if={r.editing}>
+                <div class="edit">
+                  <lightning-input
+                    type="number"
+                    label="Minimum percentage"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    required
+                    value={draft.minPercentage}
+                    data-field="minPercentage"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <template for:each={r.editEntrances} for:item="e">
+                    <lightning-input
+                      key={e.key}
+                      type="number"
+                      label={e.label}
+                      min="1"
+                      step="1"
+                      value={e.maxRank}
+                      data-exam={e.exam}
+                      onchange={handleRank}
+                    ></lightning-input>
+                  </template>
+                  <div class="buttons">
+                    <lightning-button
+                      variant="brand"
+                      label="Save new version"
+                      disabled={isSaving}
+                      onclick={handleSaveRule}
+                    ></lightning-button>
+                    <lightning-button
+                      label="Cancel"
+                      onclick={handleCancel}
+                    ></lightning-button>
+                  </div>
+                </div>
+              </template>
+              <template lwc:else>
+                <div class="cell">
+                  <div class="label">Minimum</div>
+                  <div class="strong">{r.minPercentage}%</div>
+                </div>
+                <div class="cell wide">
+                  <div class="label">Entrance</div>
+                  <template for:each={r.entrances} for:item="e">
+                    <div key={e.key} class="small">{e.label}</div>
+                  </template>
+                </div>
+                <template lwc:if={canEdit}>
+                  <lightning-button
+                    label="Edit"
+                    data-id={r.ruleId}
+                    onclick={handleEditRule}
+                  ></lightning-button>
+                </template>
+              </template>
+            </li>
+          </template>
+        </ul>
+      </template>
+
+      <template lwc:if={showHistory}>
+        <ul class="rows">
+          <template for:each={historyRows} for:item="h">
+            <li key={h.key} class="row">
+              <div class="main">
+                <span class="strong">{h.what}</span>
+                <span class="kem-muted small">
+                  <lightning-formatted-date-time
+                    value={h.changedOn}
+                    year="numeric"
+                    month="short"
+                    day="2-digit"
+                    hour="2-digit"
+                    minute="2-digit"
+                  ></lightning-formatted-date-time>
+                  · {h.changedBy}</span
+                >
+              </div>
+              <span>{h.change}</span>
+            </li>
+          </template>
+        </ul>
+      </template>
+
+      <template lwc:if={isEmpty}>
+        <div class="kem-empty">No college campus branches yet.</div>
+      </template>
+    </template>
+  </section>
+</template>

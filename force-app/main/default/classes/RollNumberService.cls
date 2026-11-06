@@ -24,7 +24,7 @@ public without sharing class RollNumberService {
       String.isBlank(enrolment.Branch__r.Branch_Code__c)
     ) {
       throw new AppException(
-        'Complete the admission year and roll-number codes before issuing a roll number.'
+        'Complete the admission year and roll-number codes before issuing an enrolment number.'
       );
     }
     String year = String.valueOf(enrolment.Admission_Year__c.intValue());

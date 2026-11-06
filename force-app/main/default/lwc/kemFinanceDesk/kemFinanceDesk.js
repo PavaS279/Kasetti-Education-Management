@@ -38,6 +38,15 @@ function daysOverdue(value) {
   return Math.max(0, Math.round((today - due) / 86400000));
 }
 
+const EMPTY_REFUNDS = {
+  awaitingApproval: [],
+  awaitingPayout: [],
+  openCreditTotal: 0,
+  canManage: false,
+  canApprove: false
+};
+const COLLEGE_TABS = ["college", "pending", "overdue"];
+
 export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
   currencyCode = CURRENCY;
   desk;
@@ -52,10 +61,9 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
 
   async load() {
     try {
-      const [desk, refunds] = await Promise.all([
-        getFinanceDesk(),
-        getRefundQueue()
-      ]);
+      const desk = await getFinanceDesk();
+      // The counsellor's college desk has no refunds or credits.
+      const refunds = desk.collegeOnly ? EMPTY_REFUNDS : await getRefundQueue();
       this.desk = desk;
       this.refunds = refunds;
       this.errorMessage = undefined;
@@ -90,7 +98,11 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
         value: this.refunds.openCreditTotal,
         className: "kpi kem-card"
       }
-    ];
+    ].filter((k) => !(this.desk.collegeOnly && k.key === "credit"));
+  }
+
+  get showDiscounts() {
+    return !this.desk?.collegeOnly;
   }
 
   get tabs() {
@@ -101,7 +113,10 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
       refunds: this.refundCount,
       overdue: this.desk.overdue.length
     };
-    return TABS.map((t) => ({
+    const visible = this.desk.collegeOnly
+      ? TABS.filter((t) => COLLEGE_TABS.includes(t.value))
+      : TABS;
+    return visible.map((t) => ({
       ...t,
       count: counts[t.value],
       selected: t.value === this.activeTab ? "true" : "false",
@@ -158,7 +173,7 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
   get collegeInvoices() {
     return this.desk.collegeInvoices || [];
   }
-  /** College invoices: open ones show what is due, paid ones show the roll number. */
+  /** College invoices: open ones show what is due, paid ones show the enrolment number. */
   get collegeRows() {
     return this.collegeInvoices.map((i) => {
       const enrolment = i.Programme_Enrolment__r || {};
@@ -168,7 +183,7 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
         learner: i.Learner__r?.Name || "—",
         campus: i.Branch__r?.Name,
         detail: enrolment.Roll_Number__c
-          ? `roll number ${enrolment.Roll_Number__c}`
+          ? `enrolment number ${enrolment.Roll_Number__c}`
           : `due ${formatDate(i.Due_Date__c)}`,
         amount: open ? i.Balance_Due__c : i.Total__c,
         statusClass:
@@ -193,7 +208,14 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
   }
 
   get pendingRows() {
-    return this.desk.pending.map((p) => this.mapPayment(p));
+    // The counsellor cannot open payment records; their link opens the invoice.
+    return this.desk.pending.map((p) => ({
+      ...this.mapPayment(p),
+      linkId:
+        this.desk.collegeOnly && p.Student_Invoice__c
+          ? p.Student_Invoice__c
+          : p.Id
+    }));
   }
   get exceptionRows() {
     return this.desk.exceptions.map((p) => this.mapPayment(p));

@@ -115,7 +115,7 @@ export default class KemInvoice extends NavigationMixin(LightningElement) {
   }
   get canPay() {
     return (
-      this.view.canManage && ["Issued", "Partially Paid"].includes(this.status)
+      this.view.canCollect && ["Issued", "Partially Paid"].includes(this.status)
     );
   }
   get canCancel() {

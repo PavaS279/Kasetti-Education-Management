@@ -7,12 +7,14 @@
           <div class="kem-hero__title">Finance Desk</div>
         </div>
         <div class="hero-actions">
-          <lightning-button
-            label="Discounts"
-            icon-name="utility:percent"
-            onclick={handleDiscounts}
-            class="discounts"
-          ></lightning-button>
+          <template lwc:if={showDiscounts}>
+            <lightning-button
+              label="Discounts"
+              icon-name="utility:percent"
+              onclick={handleDiscounts}
+              class="discounts"
+            ></lightning-button>
+          </template>
           <lightning-button-icon
             icon-name="utility:refresh"
             variant="border-inverse"
@@ -63,7 +65,7 @@
                 <div class="main">
                   <a
                     href="#"
-                    data-id={p.Id}
+                    data-id={p.linkId}
                     onclick={handleNavigate}
                     class="strong"
                     >{p.Name}</a
@@ -79,7 +81,7 @@
                   format-style="currency"
                   currency-code={currencyCode}
                 ></lightning-formatted-number>
-                <template lwc:if={desk.canManage}>
+                <template lwc:if={desk.canCollect}>
                   <lightning-button-group>
                     <lightning-button
                       label="Confirm"

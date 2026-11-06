@@ -486,7 +486,7 @@ Lateral entrants start at Year 2; their programme percentage covers the years st
 
 ### 11.2 Security matrix (C = create, R = read, E = edit; "via service" = Apex enforces the rule)
 
-| Object / action                                                    | Admin |            Desk (Adam)             |             Dean (Anjali)             |      Faculty (Tara)       |    Accounts (Andrea)     | Principal (branch manager) |     Student / Parent (portal)      |
+| Object / action                                                    | Admin |  Desk (the Admission Counsellor)   |             Dean (Anjali)             |      Faculty (Tara)       |    Accounts (Andrea)     | Principal (branch manager) |     Student / Parent (portal)      |
 | ------------------------------------------------------------------ | :---: | :--------------------------------: | :-----------------------------------: | :-----------------------: | :----------------------: | :------------------------: | :--------------------------------: |
 | College set-up (rules, fees, documents, campus branches, subjects) |  CRE  |                 R                  |                   R                   |       R (subjects)        |         R (fees)         |             R              |                 —                  |
 | Admission, qualifications, entrance scores                         |  CRE  |                CRE                 |                  RE                   |             —             |            R             |             R              | own: view status, upload documents |
@@ -604,14 +604,14 @@ For the first manager review, **C1 → C2 → C3** carries the whole story the m
 
 | #   | Log in as (usernames in [NEXT-STEPS](NEXT-STEPS.md)) | Show                                                                                                                                                             |
 | --- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Adam Admissions** — Admission desk                 | New admission at Yelahanka, BE-CSE regular. PUC 86 % → not eligible, suggestions shown. A 92 % applicant with KCET 12,400 → eligible. Consent; upload documents. |
+| 1   | **Admission Counsellor** — Admission desk            | New admission at Yelahanka, BE-CSE regular. PUC 86 % → not eligible, suggestions shown. A 92 % applicant with KCET 12,400 → eligible. Consent; upload documents. |
 | 2   | (same screen)                                        | AI reads marks and rank cards; one mismatch flagged; desk verifies; Aadhaar file removed, last four digits kept → _Documents Verified_.                          |
 | 3   | **Anjali Advisor** — Dean                            | Schedule and record the interview, **Admit** → seat reserved, provisional enrolment, invoice ₹1,55,000, pay by date.                                             |
 | 4   | **Andrea Advancement** — Accounts                    | Record a DD (awaiting clearance); try _Cash_ → refused. Clear the DD → receipt; College dues updates.                                                            |
-| 5   | **Adam** / **Anjali**                                | "Admission confirmed" notification; roll number **KT26YBCS001**; Dean joins the student to Section A.                                                            |
+| 5   | **the Admission Counsellor** / **Anjali**            | "Admission confirmed" notification; roll number **KT26YBCS001**; Dean joins the student to Section A.                                                            |
 | 6   | **Student** (portal)                                 | Roll number, today's timetable, attendance by subject, nothing due, Final results, upload a pending document, the fee-received message.                          |
 | 7   | **Tara Teacher** — Faculty                           | Today's periods, attendance, internal marks; Dean finalises → the student sees the result.                                                                       |
-| 8   | **Adam** (optional)                                  | Diploma CSE graduate with DCET → BE-CSE Year 2 → `KT26YBCS401`; PUC Commerce → BE refused.                                                                       |
+| 8   | **the Admission Counsellor** (optional)              | Diploma CSE graduate with DCET → BE-CSE Year 2 → `KT26YBCS401`; PUC Commerce → BE refused.                                                                       |
 
 The administrator (Kasetti Tech) is never used in the demo.
 

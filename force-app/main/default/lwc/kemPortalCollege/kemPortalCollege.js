@@ -21,14 +21,18 @@ function dash(value) {
   return value === null || value === undefined ? "—" : String(value);
 }
 
-/** Student-first college card in the portal: programme, roll number, today, subjects and term results. */
+/** Student-first college card in the portal: programme, enrolment number, USN, today, subjects and term results. */
 export default class KemPortalCollege extends LightningElement {
   @api summary;
 
+  get usnLabel() {
+    return this.summary?.usn ? `USN ${this.summary.usn}` : "USN awaited";
+  }
+
   get rollLabel() {
     return this.summary?.rollNumber
-      ? `Roll number ${this.summary.rollNumber}`
-      : "Roll number after the fee is received";
+      ? `Enrolment number ${this.summary.rollNumber}`
+      : "Enrolment number after the fee is received";
   }
 
   get feesDue() {

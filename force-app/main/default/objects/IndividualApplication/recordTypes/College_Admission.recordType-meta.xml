@@ -41,6 +41,53 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>College_Stage__c</picklist>
+        <values>
+            <fullName>Application Decision</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Documents Verified</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Awaiting Dean Approval</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Enrolled</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Enrollment Failed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fee Pending</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In Review</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Interview Scheduled</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Processing</fullName>
+            <default>true</default>
+        </values>
+        <values>
+            <fullName>Ready For Decision</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Withdrawn</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>Decision__c</picklist>
         <values>
             <fullName>Admit</fullName>
@@ -71,6 +118,28 @@
         </values>
         <values>
             <fullName>Overridden</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Entry_Route__c</picklist>
+        <values>
+            <fullName>Lateral</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Regular</fullName>
+            <default>true</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Interview_Outcome__c</picklist>
+        <values>
+            <fullName>Pass</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reject</fullName>
             <default>false</default>
         </values>
     </picklistValues>

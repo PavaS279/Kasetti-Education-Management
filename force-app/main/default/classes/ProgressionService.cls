@@ -20,7 +20,7 @@ public without sharing class ProgressionService {
     Programme_Enrolment__c enrolment = lock(programmeEnrolmentId);
     if (enrolment.Status__c != 'Enrolled') {
       throw new AppException(
-        'Only an enrolled student with a roll number can join a section.'
+        'Only an enrolled student with an enrolment number can join a section.'
       );
     }
     if (joiningDate == null) {

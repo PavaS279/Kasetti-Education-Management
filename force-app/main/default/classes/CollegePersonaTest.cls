@@ -68,7 +68,6 @@ private class CollegePersonaTest {
     MessageService.disabled = true;
     CollegeDocumentService.suppressStatusUpdates = true;
 
-    Test.startTest();
     CollegeAdmissionController.Admission admission;
     System.runAs(desk) {
       CollegeAdmissionController.NewAdmission request = new CollegeAdmissionController.NewAdmission();
@@ -114,6 +113,8 @@ private class CollegePersonaTest {
         RowCause = 'Manual'
       );
     }
+    // The Dean and Accounts part runs with its own limits (the story is long).
+    Test.startTest();
     System.runAs(dean) {
       admission = CollegeAdmissionController.getAdmission(admission.id);
       System.assert(admission.canDean);

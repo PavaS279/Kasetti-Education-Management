@@ -60,6 +60,7 @@ const flush = () => new Promise((resolve) => process.nextTick(resolve));
 function view(overrides = {}) {
   return {
     canManage: true,
+    canCollect: true,
     invoice: {
       Id: "a0I000000000001",
       Name: "BLR-000001",
@@ -187,6 +188,7 @@ describe("c-kem-invoice", () => {
   it("is read-only without billing permission", async () => {
     const readOnly = view();
     readOnly.canManage = false;
+    readOnly.canCollect = false;
     getInvoice.mockResolvedValue(readOnly);
     const element = await mount();
     expect(button(element, "Record payment")).toBeUndefined();

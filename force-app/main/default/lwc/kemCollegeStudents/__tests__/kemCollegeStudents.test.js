@@ -1,9 +1,15 @@
 import { createElement } from "lwc";
 import KemCollegeStudents from "c/kemCollegeStudents";
 import getStudents from "@salesforce/apex/CollegeStudentsController.getStudents";
+import setUsn from "@salesforce/apex/CollegeStudentsController.setUsn";
 
 jest.mock(
   "@salesforce/apex/CollegeStudentsController.getStudents",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/CollegeStudentsController.setUsn",
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -107,6 +113,32 @@ describe("c-kem-college-students", () => {
     search.dispatchEvent(new CustomEvent("change"));
     await flush();
     expect(names(element)).toEqual(["Spoorti B"]);
+  });
+
+  it("enters a USN for an enrolled student", async () => {
+    getStudents.mockResolvedValue({ ...DATA, canSetUsn: true });
+    setUsn.mockResolvedValue();
+    const element = mount();
+    await flush();
+    expect(element.shadowRoot.textContent).toContain("USN awaited");
+    const enter = [
+      ...element.shadowRoot.querySelectorAll("lightning-button")
+    ].find((b) => b.label === "Enter USN");
+    enter.click();
+    await flush();
+    const input = element.shadowRoot.querySelector("lightning-input.usn");
+    input.value = "1kt26cs001";
+    input.dispatchEvent(new CustomEvent("change"));
+    [...element.shadowRoot.querySelectorAll("lightning-button-icon")]
+      .find((b) => b.alternativeText === "Save USN")
+      .click();
+    await flush();
+    expect(setUsn).toHaveBeenCalledWith({
+      enrolmentId: "a1E1",
+      usn: "1KT26CS001",
+      reason: ""
+    });
+    expect(element.shadowRoot.textContent).toContain("1KT26CS001");
   });
 
   it("reloads with past students", async () => {

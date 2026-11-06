@@ -16,6 +16,11 @@ jest.mock(
   { virtual: true }
 );
 jest.mock(
+  "@salesforce/apex/CollegePublicController.getQuotas",
+  () => ({ default: jest.fn().mockResolvedValue([]) }),
+  { virtual: true }
+);
+jest.mock(
   "@salesforce/apex/CollegePublicController.checkEligibility",
   () => ({ default: jest.fn() }),
   { virtual: true }

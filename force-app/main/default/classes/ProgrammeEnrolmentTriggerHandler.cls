@@ -28,7 +28,7 @@ public without sharing class ProgrammeEnrolmentTriggerHandler {
         String.isNotBlank(oldValue.Roll_Number__c) &&
         value.Roll_Number__c != oldValue.Roll_Number__c
       ) {
-        value.addError('A roll number cannot be changed or reused.');
+        value.addError('An enrolment number cannot be changed or reused.');
       }
       if (
         value.Status__c != oldValue.Status__c &&

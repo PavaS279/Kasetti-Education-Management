@@ -54,6 +54,8 @@ public with sharing class CollegeAdmissionController {
     @AuraEnabled
     public List<Entrance> entrances { get; set; }
     @AuraEnabled
+    public Id quotaId { get; set; }
+    @AuraEnabled
     public String guardianFirstName { get; set; }
     @AuraEnabled
     public String guardianLastName { get; set; }
@@ -217,6 +219,32 @@ public with sharing class CollegeAdmissionController {
     public Boolean canDesk = false;
     @AuraEnabled
     public Boolean canDean = false;
+    /** The counsellor (or Dean) may admit now. */
+    @AuraEnabled
+    public Boolean admissible = false;
+    /** Does not meet the criteria and no exception was asked for yet. */
+    @AuraEnabled
+    public Boolean needsException = false;
+    @AuraEnabled
+    public String exceptionStatus;
+    @AuraEnabled
+    public String exceptionReason;
+    @AuraEnabled
+    public String exceptionRemarks;
+    @AuraEnabled
+    public String exceptionRequestedBy;
+    @AuraEnabled
+    public String exceptionDecidedBy;
+    @AuraEnabled
+    public CollegePortalAccessService.Status portal;
+    @AuraEnabled
+    public Id quotaId;
+    @AuraEnabled
+    public String quotaName;
+    @AuraEnabled
+    public List<CollegeQuotaService.QuotaSeats> quotas = new List<CollegeQuotaService.QuotaSeats>();
+    @AuraEnabled
+    public Boolean canChangeQuota = false;
   }
 
   /** Campus branches open for admission in the current intake. */
@@ -419,6 +447,65 @@ public with sharing class CollegeAdmissionController {
   }
 
   @AuraEnabled
+  public static Admission requestException(Id applicationId, String reason) {
+    try {
+      InterviewService.requestException(applicationId, reason);
+      return load(applicationId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static Admission approveException(Id applicationId, String remarks) {
+    try {
+      InterviewService.approveException(applicationId, remarks);
+      return load(applicationId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static Admission declineException(Id applicationId, String reason) {
+    try {
+      InterviewService.declineException(applicationId, reason);
+      return load(applicationId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static Admission givePortal(Id applicationId) {
+    try {
+      CollegePortalAccessService.request(applicationId);
+      return load(applicationId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static String sendPortalLink(Id applicationId) {
+    try {
+      return CollegePortalAccessService.sendPasswordLink(applicationId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static Admission setQuota(Id applicationId, Id quotaId) {
+    try {
+      CollegeQuotaService.setQuota(applicationId, quotaId);
+      return load(applicationId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
   public static Admission reject(Id applicationId, String reason) {
     try {
       InterviewService.reject(applicationId, reason);
@@ -432,6 +519,7 @@ public with sharing class CollegeAdmissionController {
     IndividualApplication a = [
       SELECT
         Id,
+        AccountId,
         College_Mode__c,
         College_Stage__c,
         Entry_Route__c,
@@ -443,6 +531,14 @@ public with sharing class CollegeAdmissionController {
         Interview_Outcome__c,
         Decision__c,
         Decision_Reason__c,
+        Exception_Status__c,
+        Admission_Quota__c,
+        Admission_Quota__r.Name,
+        Campus_Branch__c,
+        Exception_Reason__c,
+        Exception_Remarks__c,
+        Exception_Requested_By__r.Name,
+        Exception_Decided_By__r.Name,
         Account.Name,
         Learning_Course__r.Name,
         Branch__r.Name
@@ -468,6 +564,32 @@ public with sharing class CollegeAdmissionController {
     result.outcome = a.Interview_Outcome__c;
     result.decision = a.Decision__c;
     result.decisionReason = a.Decision_Reason__c;
+    result.admissible = InterviewService.admissible(a);
+    result.needsException = InterviewService.needsException(a);
+    result.exceptionStatus = a.Exception_Status__c;
+    result.exceptionReason = a.Exception_Reason__c;
+    result.exceptionRemarks = a.Exception_Remarks__c;
+    result.exceptionRequestedBy = a.Exception_Requested_By__r?.Name;
+    result.exceptionDecidedBy = a.Exception_Decided_By__r?.Name;
+    result.portal = CollegePortalAccessService.status(a);
+    result.quotaId = a.Admission_Quota__c;
+    result.quotaName = a.Admission_Quota__r?.Name;
+    Boolean beforeAdmit = new Set<String>{
+        'Processing',
+        'In Review',
+        'Documents Verified',
+        InterviewService.AWAITING_DEAN
+      }
+      .contains(a.College_Stage__c);
+    // The quota choice matters only until Admit; afterwards the name is enough.
+    if (a.Entry_Route__c == 'Regular' && beforeAdmit) {
+      result.quotas = CollegeQuotaService.seatsFor(a.Campus_Branch__c);
+      result.canChangeQuota =
+        !result.quotas.isEmpty() &&
+        FeatureManagement.checkPermission(
+          CollegeDocumentService.VERIFY_PERMISSION
+        );
+    }
     if (a.Eligibility_Status__c == 'Not Eligible') {
       result.suggestions = AdmissionEligibilityService.suggestions(a.Id);
     }

@@ -24,6 +24,8 @@ public without sharing class CollegeStudentsController {
     @AuraEnabled
     public Id applicationId;
     @AuraEnabled
+    public String usn;
+    @AuraEnabled
     public Id studentId;
     @AuraEnabled
     public String student;
@@ -86,12 +88,27 @@ public without sharing class CollegeStudentsController {
     public Summary summary = new Summary();
     @AuraEnabled
     public List<Option> campuses = new List<Option>();
+    /** May enter a USN (college staff); changing one needs a System Administrator. */
+    @AuraEnabled
+    public Boolean canSetUsn = false;
+    @AuraEnabled
+    public Boolean canChangeUsn = false;
   }
 
   /**
    * @param scope 'current' (fee pending and enrolled, the default) or 'all'
    *        (also completed, discontinued, expired and cancelled)
    */
+  /** Enter (or, as a System Administrator, change with a reason) a student's USN. */
+  @AuraEnabled
+  public static void setUsn(Id enrolmentId, String usn, String reason) {
+    try {
+      CollegeUsnService.setUsn(enrolmentId, usn, reason);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
   @AuraEnabled(cacheable=true)
   public static StudentList getStudents(String scope) {
     try {
@@ -118,6 +135,8 @@ public without sharing class CollegeStudentsController {
 
   private static StudentList load(Boolean everyone) {
     StudentList result = new StudentList();
+    result.canSetUsn = CollegeUsnService.canSet();
+    result.canChangeUsn = CollegeSetupController.canEdit();
     List<Programme_Enrolment__c> enrolments = everyone
       ? [
           SELECT
@@ -127,6 +146,7 @@ public without sharing class CollegeStudentsController {
             Student__r.PersonEmail,
             Student__r.PersonContactId,
             Roll_Number__c,
+            USN__c,
             Status__c,
             Application__c,
             Campus__c,
@@ -150,6 +170,7 @@ public without sharing class CollegeStudentsController {
             Student__r.PersonEmail,
             Student__r.PersonContactId,
             Roll_Number__c,
+            USN__c,
             Status__c,
             Application__c,
             Campus__c,
@@ -217,6 +238,7 @@ public without sharing class CollegeStudentsController {
       row.studentId = e.Student__c;
       row.student = e.Student__r.Name;
       row.rollNumber = e.Roll_Number__c;
+      row.usn = e.USN__c;
       row.status = e.Status__c;
       row.campusId = e.Campus__c;
       row.campus = e.Campus__r.Name;

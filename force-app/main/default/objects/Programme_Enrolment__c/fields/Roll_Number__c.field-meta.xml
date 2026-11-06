@@ -3,7 +3,7 @@
     <fullName>Roll_Number__c</fullName>
     <caseSensitive>false</caseSensitive>
     <externalId>true</externalId>
-    <label>Roll Number</label>
+    <label>Enrolment Number</label>
     <length>11</length>
     <required>false</required>
     <trackHistory>true</trackHistory>
