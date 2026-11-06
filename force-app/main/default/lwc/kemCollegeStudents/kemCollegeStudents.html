@@ -47,7 +47,7 @@
             class="search"
             type="search"
             label="Search"
-            placeholder="Name, roll number, branch or section"
+            placeholder="Name, enrolment number, USN, branch or section"
             value={searchTerm}
             onchange={handleSearch}
           ></lightning-input>
@@ -88,8 +88,63 @@
                 </div>
               </div>
               <div class="cell">
-                <div class="label">Roll number</div>
+                <div class="label">Enrolment number</div>
                 <div class="strong">{s.rollLabel}</div>
+              </div>
+              <div class="cell">
+                <div class="label">USN</div>
+                <template lwc:if={s.editingUsn}>
+                  <div class="usn-edit">
+                    <lightning-input
+                      class="usn"
+                      label="USN"
+                      variant="label-hidden"
+                      placeholder="1KT26CS001"
+                      max-length="10"
+                      value={usnValue}
+                      onchange={handleUsnValue}
+                    ></lightning-input>
+                    <template lwc:if={s.needsReason}>
+                      <lightning-input
+                        class="usn-reason"
+                        label="Reason for the change"
+                        variant="label-hidden"
+                        placeholder="Reason for the change"
+                        value={usnReason}
+                        onchange={handleUsnReason}
+                      ></lightning-input>
+                    </template>
+                    <lightning-button-icon
+                      icon-name="utility:check"
+                      alternative-text="Save USN"
+                      onclick={handleSaveUsn}
+                    ></lightning-button-icon>
+                    <lightning-button-icon
+                      icon-name="utility:close"
+                      alternative-text="Cancel"
+                      onclick={handleCancelUsn}
+                    ></lightning-button-icon>
+                  </div>
+                </template>
+                <template lwc:else>
+                  <div class={s.usnClass}>{s.usnLabel}</div>
+                  <template lwc:if={s.canEnterUsn}>
+                    <lightning-button
+                      variant="base"
+                      label="Enter USN"
+                      data-id={s.enrolmentId}
+                      onclick={handleEditUsn}
+                    ></lightning-button>
+                  </template>
+                  <template lwc:if={s.canChangeUsn}>
+                    <lightning-button
+                      variant="base"
+                      label="Change"
+                      data-id={s.enrolmentId}
+                      onclick={handleEditUsn}
+                    ></lightning-button>
+                  </template>
+                </template>
               </div>
               <div class="cell">
                 <div class="label">Section</div>

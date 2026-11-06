@@ -44,6 +44,36 @@
   >Dean-only college interview and seat-transition authority. Eligibility override remains a separate permission.</description>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Programme_Enrolment__c.USN_Set_By__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Programme_Enrolment__c.USN_Set_On__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Programme_Enrolment__c.USN__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Branch__c.VTU_Region_Code__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Branch__c.VTU_College_Code__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>LearningCourse.VTU_Branch_Code__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Campus_Branch__c.Lateral_Basis__c</field>
         <readable>true</readable>
     </fieldPermissions>

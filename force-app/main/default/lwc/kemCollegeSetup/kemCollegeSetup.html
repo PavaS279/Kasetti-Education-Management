@@ -431,6 +431,156 @@
         </template>
       </template>
 
+      <template lwc:if={showVtu}>
+        <h3 class="section">Campus codes</h3>
+        <p class="kem-muted small">
+          A VTU USN starts with the region digit and the two-letter college code
+          (for example 1KT…).
+        </p>
+        <ul class="rows">
+          <template for:each={vtuCampusRows} for:item="c">
+            <li key={c.key} class="row">
+              <div class="main"><span class="strong">{c.name}</span></div>
+              <template lwc:if={c.editing}>
+                <div class="edit">
+                  <lightning-input
+                    label="Region digit"
+                    max-length="1"
+                    required
+                    value={draft.region}
+                    data-field="region"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <lightning-input
+                    label="College code"
+                    max-length="2"
+                    required
+                    value={draft.college}
+                    data-field="college"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <div class="buttons">
+                    <lightning-button
+                      variant="brand"
+                      label="Save"
+                      disabled={isSaving}
+                      onclick={handleSaveCampusCodes}
+                    ></lightning-button>
+                    <lightning-button
+                      label="Cancel"
+                      onclick={handleCancel}
+                    ></lightning-button>
+                  </div>
+                </div>
+              </template>
+              <template lwc:else>
+                <span class="strong">{c.codeLabel}</span>
+                <template lwc:if={canEdit}>
+                  <lightning-button
+                    label="Edit"
+                    data-id={c.id}
+                    onclick={handleEditCampusCodes}
+                  ></lightning-button>
+                </template>
+              </template>
+            </li>
+          </template>
+        </ul>
+
+        <h3 class="section">Branch codes</h3>
+        <ul class="rows">
+          <template for:each={vtuBranchRows} for:item="b">
+            <li key={b.key} class="row">
+              <div class="main"><span class="strong">{b.name}</span></div>
+              <template lwc:if={b.editing}>
+                <div class="edit">
+                  <lightning-input
+                    label="VTU branch code (blank: branch code)"
+                    max-length="2"
+                    value={draft.vtuCode}
+                    data-field="vtuCode"
+                    onchange={handleDraft}
+                  ></lightning-input>
+                  <div class="buttons">
+                    <lightning-button
+                      variant="brand"
+                      label="Save"
+                      disabled={isSaving}
+                      onclick={handleSaveBranchCode}
+                    ></lightning-button>
+                    <lightning-button
+                      label="Cancel"
+                      onclick={handleCancel}
+                    ></lightning-button>
+                  </div>
+                </div>
+              </template>
+              <template lwc:else>
+                <span class="strong">{b.codeLabel}</span>
+                <template lwc:if={canEdit}>
+                  <lightning-button
+                    label="Edit"
+                    data-id={b.id}
+                    onclick={handleEditBranchCode}
+                  ></lightning-button>
+                </template>
+              </template>
+            </li>
+          </template>
+        </ul>
+
+        <template lwc:if={setup.canUploadUsn}>
+          <h3 class="section">Upload USNs</h3>
+          <p class="kem-muted small">
+            A CSV with two columns, Enrolment Number and USN (a header line is
+            optional). Every row is checked first; only valid rows are saved.
+            One student at a time: Home → College Students → Enter USN.
+          </p>
+          <div class="buttons fee-actions">
+            <lightning-input
+              type="file"
+              label="CSV file"
+              accept=".csv"
+              onchange={handleUsnFile}
+            ></lightning-input>
+            <lightning-button
+              label="Check"
+              disabled={cannotCheckUsns}
+              onclick={handleCheckUsns}
+            ></lightning-button>
+            <template lwc:if={canSaveUsns}>
+              <lightning-button
+                variant="brand"
+                label="Save valid rows"
+                disabled={isSaving}
+                onclick={handleSaveUsns}
+              ></lightning-button>
+            </template>
+            <template lwc:if={hasRejectedUsns}>
+              <lightning-button
+                label="Download rejected rows"
+                icon-name="utility:download"
+                onclick={handleDownloadRejected}
+              ></lightning-button>
+            </template>
+          </div>
+          <template lwc:if={usnResult}>
+            <p class="strong small">{usnSummary}</p>
+            <ul class="rows">
+              <template for:each={usnRows} for:item="r">
+                <li key={r.key} class="row">
+                  <span class={r.markClass}>{r.mark}</span>
+                  <div class="main">
+                    <span class="strong">{r.enrolmentNumber} → {r.usn}</span>
+                    <span class="kem-muted small">{r.student} {r.reason}</span>
+                  </div>
+                </li>
+              </template>
+            </ul>
+          </template>
+        </template>
+      </template>
+
       <template lwc:if={showRules}>
         <p class="kem-muted small">
           Saving creates a new version of the rule; the earlier version stays on

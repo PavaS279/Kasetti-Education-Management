@@ -1,6 +1,6 @@
 # KT College — Simple Demo Flow: Enquiry to Class
 
-_One student, start to finish, in the order a real admission happens: online enquiry → lead → documents → admit (Dean only for exceptions) → fee → admission letter → roll number → section → student portal. About 25 minutes. Version 2026-11-03. The full story with refusals and academics is in [COLLEGE-DEMO-SCRIPT.md](COLLEGE-DEMO-SCRIPT.md)._
+_One student, start to finish, in the order a real admission happens: online enquiry → lead → documents → admit (Dean only for exceptions) → fee → admission letter → enrolment number → section → VTU USN → student portal. About 25 minutes. Version 2026-11-03. The full story with refusals and academics is in [COLLEGE-DEMO-SCRIPT.md](COLLEGE-DEMO-SCRIPT.md)._
 
 ## Before you start
 
@@ -70,7 +70,7 @@ The student meets the cut-off, so there is no Dean step:
 
 The panel shows **Quota: CET** (or the quota chosen online). Before Admit the counsellor can change it (**Change quota** → **Save quota**); an SNQ-type quota adds its document (e.g. income certificate) to the checklist.
 
-1. **Admit** → the seat is taken from the quota (refused if it is full, e.g. _Management seats for BE-CSE are full (10 of 10)_, or if a CET applicant has no KCET rank) → stage **Fee Pending** · enrolment **Provisional** · roll number _issued when the fee is received_.
+1. **Admit** → the seat is taken from the quota (refused if it is full, e.g. _Management seats for BE-CSE are full (10 of 10)_, or if a CET applicant has no KCET rank) → stage **Fee Pending** · enrolment **Provisional** · enrolment number _issued when the fee is received_.
 
 ✅ A seat is reserved and the first-year invoice is issued with a 7-day deadline, at the student's **quota fee** (default/CET: ₹1,50,000 tuition + ₹5,000 admission; other quotas as set on **College Admission Setup → Fees**).
 
@@ -98,11 +98,11 @@ The panel shows **Quota: CET** (or the quota chosen online). Before Admit the co
 
 🗣 _"The counsellor who admitted the student also takes the fee — but only for their own campuses. Refunds, credit notes and cancelling an invoice stay with Finance (Andrea) or the Dean."_
 
-## Step 7 — Admission confirmed: roll number and confirmation letter
+## Step 7 — Admission confirmed: enrolment number and confirmation letter
 
 👤 **Anjali Advisor** · 📍 the admission (refresh). An enrolled admission leaves Admissions Review, so open it from **Home** → **College Students** → the student → **Admission**.
 
-✅ Programme enrolment **Enrolled** · roll number **KT26YBCS0nn** (next number in the sequence). In **Files**: **Admission Confirmation KT26YBCS0nn – {student}** (PDF) with the roll number; the student also gets an _Admission confirmed_ message.
+✅ Programme enrolment **Enrolled** · enrolment number **KT26YBCS0nn** (next number in the sequence). In **Files**: **Admission Confirmation KT26YBCS0nn – {student}** (PDF) with the enrolment number; the student also gets an _Admission confirmed_ message.
 
 ## Step 8 — Class allotment
 
@@ -113,6 +113,18 @@ The panel shows **Quota: CET** (or the quota chosen online). Before Admit the co
 
 ✅ The section is shown on the enrolment with the term's subjects; the prompt disappears from the admission panel.
 
+## Step 8b — The university seat number (VTU USN)
+
+👤 **Anjali Advisor** (or the Admission Counsellor) · 📍 **Home** → **College Students** → the student → **Enter USN**
+
+The enrolment number is the college's own number. The **USN** comes later from VTU, for example `1KT26CS001` (region digit, college code, year of joining, branch code, serial).
+
+1. Once (System Administrator): **College Admission Setup → University (VTU)** → each campus's **region digit** and **college code**, and each branch's **VTU branch code** (blank uses the branch code).
+2. **Enter USN** → `1KT26CS001` → ✔. A USN that does not match the campus, the joining year or the branch, or is already used, is refused with the reason.
+3. Many at once: **University (VTU)** → **Upload USNs** → a CSV with **Enrolment Number, USN** → **Check** (every row ✔ or ✖ with the reason) → **Save valid rows**; **Download rejected rows** to fix and upload again.
+
+✅ The USN shows on the College Students list and on the student's portal. Once set, only a System Administrator can change it, with a reason (logged with who and when).
+
 ## Step 9 — The student's portal (given at Admit)
 
 👤 **Student** · the login is created **automatically at Admit (Step 4)** when the student has an email address and a portal licence is free; the welcome email carries the link to set a password. So the student can already see the admission letter and the invoice **before paying**.
@@ -122,7 +134,7 @@ The panel shows **Quota: CET** (or the quota chosen online). Before Admit the co
 - **Needs an email** → Home → **College Students** → **Student 360** → **Edit**, add the email, then **Give portal access**.
 - To look as the student: as Kasetti Tech, the contact → ▾ → **Log in to Experience as User** → **My Learning**.
 
-✅ Before payment: admission letter, invoice with the pay-by date. After payment: college card with the roll number and section, **Fees due ₹0**, and under **Documents** the confirmation letter and the receipt.
+✅ Before payment: admission letter, invoice with the pay-by date. After payment: college card with the enrolment number, the USN (or _USN awaited_) and the section, **Fees due ₹0**, and under **Documents** the confirmation letter and the receipt.
 
 > Email needs Setup → **Deliverability** = _All email_ and a real sender address on the portal site (Setup → All Sites → Workspaces → Administration → Emails).
 

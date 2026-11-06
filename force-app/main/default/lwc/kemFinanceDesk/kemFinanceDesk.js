@@ -173,7 +173,7 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
   get collegeInvoices() {
     return this.desk.collegeInvoices || [];
   }
-  /** College invoices: open ones show what is due, paid ones show the roll number. */
+  /** College invoices: open ones show what is due, paid ones show the enrolment number. */
   get collegeRows() {
     return this.collegeInvoices.map((i) => {
       const enrolment = i.Programme_Enrolment__r || {};
@@ -183,7 +183,7 @@ export default class KemFinanceDesk extends NavigationMixin(LightningElement) {
         learner: i.Learner__r?.Name || "—",
         campus: i.Branch__r?.Name,
         detail: enrolment.Roll_Number__c
-          ? `roll number ${enrolment.Roll_Number__c}`
+          ? `enrolment number ${enrolment.Roll_Number__c}`
           : `due ${formatDate(i.Due_Date__c)}`,
         amount: open ? i.Balance_Due__c : i.Total__c,
         statusClass:

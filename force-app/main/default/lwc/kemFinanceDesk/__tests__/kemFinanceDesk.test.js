@@ -197,7 +197,7 @@ describe("c-kem-finance-desk", () => {
     expect(text).toContain("College invoices");
     expect(text).toContain("YLK-000389");
     expect(text).toContain("Spoorti B · Yelahanka Campus · due");
-    expect(text).toContain("roll number KT26YBCS001");
+    expect(text).toContain("enrolment number KT26YBCS001");
     expect(
       element.shadowRoot.querySelector('a[data-id="a0I000000000389"]')
     ).not.toBeNull();

@@ -74,6 +74,28 @@ public with sharing class CollegeSetupController {
     public Rule lateralRule;
   }
 
+  public class VtuCampus {
+    @AuraEnabled
+    public Id id { get; set; }
+    @AuraEnabled
+    public String name { get; set; }
+    @AuraEnabled
+    public String region { get; set; }
+    @AuraEnabled
+    public String college { get; set; }
+  }
+
+  public class VtuBranch {
+    @AuraEnabled
+    public Id id { get; set; }
+    @AuraEnabled
+    public String name { get; set; }
+    @AuraEnabled
+    public String branchCode { get; set; }
+    @AuraEnabled
+    public String vtuCode { get; set; }
+  }
+
   public class QuotaDef {
     @AuraEnabled
     public Id id { get; set; }
@@ -134,6 +156,12 @@ public with sharing class CollegeSetupController {
     public List<Change> history = new List<Change>();
     @AuraEnabled
     public List<QuotaDef> quotas = new List<QuotaDef>();
+    @AuraEnabled
+    public List<VtuCampus> vtuCampuses = new List<VtuCampus>();
+    @AuraEnabled
+    public List<VtuBranch> vtuBranches = new List<VtuBranch>();
+    @AuraEnabled
+    public Boolean canUploadUsn = false;
   }
 
   public class IntakeChange {
@@ -254,6 +282,29 @@ public with sharing class CollegeSetupController {
         r.lateralRule = ruleFor(rules, cb, 'Lateral');
         result.rows.add(r);
       }
+      result.canUploadUsn = CollegeUsnService.canSet();
+      Map<Id, VtuCampus> campuses = new Map<Id, VtuCampus>();
+      Map<Id, VtuBranch> branches = new Map<Id, VtuBranch>();
+      for (Campus_Branch__c cb : reader.vtu()) {
+        if (!campuses.containsKey(cb.Campus__c)) {
+          VtuCampus c = new VtuCampus();
+          c.id = cb.Campus__c;
+          c.name = cb.Campus__r.Name;
+          c.region = cb.Campus__r.VTU_Region_Code__c;
+          c.college = cb.Campus__r.VTU_College_Code__c;
+          campuses.put(c.id, c);
+        }
+        if (!branches.containsKey(cb.Branch__c)) {
+          VtuBranch b = new VtuBranch();
+          b.id = cb.Branch__c;
+          b.name = cb.Branch__r.Name;
+          b.branchCode = cb.Branch__r.Branch_Code__c;
+          b.vtuCode = cb.Branch__r.VTU_Branch_Code__c;
+          branches.put(b.id, b);
+        }
+      }
+      result.vtuCampuses = campuses.values();
+      result.vtuBranches = branches.values();
       result.history = reader.history();
       result.history.sort();
       return result;
@@ -329,6 +380,76 @@ public with sharing class CollegeSetupController {
         AccessLevel.SYSTEM_MODE
       );
       return getSetup();
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  /** A campus's VTU region digit and two-letter college code (the start of every USN). */
+  @AuraEnabled
+  public static Setup saveCampusCodes(VtuCampus campus) {
+    try {
+      assertCanEdit();
+      String region = campus?.region == null ? '' : campus.region.trim();
+      String college = campus?.college == null
+        ? ''
+        : campus.college.trim().toUpperCase();
+      if (
+        !Pattern.matches('^[1-9]$', region) ||
+        !Pattern.matches('^[A-Z]{2}$', college)
+      ) {
+        throw new AppException(
+          'The region is one digit (1-9) and the college code two letters (for example 1 and KT).'
+        );
+      }
+      Database.update(
+        new Branch__c(
+          Id = campus.id,
+          VTU_Region_Code__c = region,
+          VTU_College_Code__c = college
+        ),
+        AccessLevel.SYSTEM_MODE
+      );
+      return getSetup();
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  /** A branch's two-letter VTU code (characters 6-7 of a USN); blank uses the branch code. */
+  @AuraEnabled
+  public static Setup saveBranchCode(VtuBranch branch) {
+    try {
+      assertCanEdit();
+      String code = branch?.vtuCode == null
+        ? ''
+        : branch.vtuCode.trim().toUpperCase();
+      if (code != '' && !Pattern.matches('^[A-Z]{2}$', code)) {
+        throw new AppException(
+          'The VTU branch code is two letters (for example CS).'
+        );
+      }
+      Database.update(
+        new LearningCourse(
+          Id = branch.id,
+          VTU_Branch_Code__c = code == '' ? null : code
+        ),
+        AccessLevel.SYSTEM_MODE
+      );
+      return getSetup();
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  /** CSV of Enrolment Number, USN: check every row, and save the valid ones when asked. */
+  @AuraEnabled
+  public static CollegeUsnService.UploadResult uploadUsns(
+    String csv,
+    Boolean saveValid
+  ) {
+    try {
+      return CollegeUsnService.upload(csv, saveValid);
     } catch (Exception e) {
       throw AppException.toAura(e);
     }
@@ -597,6 +718,25 @@ public with sharing class CollegeSetupController {
 
   /** Reads college setup for every viewer, after the access check above. */
   private without sharing class Reader {
+    List<Campus_Branch__c> vtu() {
+      return [
+        SELECT
+          Campus__c,
+          Campus__r.Name,
+          Campus__r.VTU_Region_Code__c,
+          Campus__r.VTU_College_Code__c,
+          Branch__c,
+          Branch__r.Name,
+          Branch__r.Branch_Code__c,
+          Branch__r.VTU_Branch_Code__c
+        FROM Campus_Branch__c
+        WHERE Campus__r.Institution_Type__c = 'College'
+        WITH SYSTEM_MODE
+        ORDER BY Campus__r.Name, Branch__r.Name
+        LIMIT 500
+      ];
+    }
+
     List<Admission_Quota__c> quotas() {
       return [
         SELECT

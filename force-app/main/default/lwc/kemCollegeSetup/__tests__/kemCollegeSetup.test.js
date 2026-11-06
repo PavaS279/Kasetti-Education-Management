@@ -9,6 +9,7 @@ import saveIntake from "@salesforce/apex/CollegeSetupController.saveIntake";
 import saveRule from "@salesforce/apex/CollegeSetupController.saveRule";
 import getFees from "@salesforce/apex/CollegeSetupController.getFees";
 import saveFees from "@salesforce/apex/CollegeSetupController.saveFees";
+import uploadUsns from "@salesforce/apex/CollegeSetupController.uploadUsns";
 
 jest.mock(
   "@salesforce/apex/CollegeSetupController.getSetup",
@@ -42,6 +43,21 @@ jest.mock(
 );
 jest.mock(
   "@salesforce/apex/CollegeSetupController.saveFees",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/CollegeSetupController.saveCampusCodes",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/CollegeSetupController.saveBranchCode",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/CollegeSetupController.uploadUsns",
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -237,6 +253,69 @@ describe("c-kem-college-setup", () => {
       { quotaId: null, amount: 150000 },
       { quotaId: "a0Q2", amount: 150000 }
     ]);
+  });
+
+  it("checks a USN file and shows each row", async () => {
+    getSetup.mockResolvedValue({
+      ...setup(true),
+      canUploadUsn: true,
+      vtuCampuses: [
+        { id: "a0B1", name: "Yelahanka Campus", region: "1", college: "KT" }
+      ],
+      vtuBranches: [{ id: "0lC1", name: "BE CSE", branchCode: "CS" }]
+    });
+    uploadUsns.mockResolvedValue({
+      accepted: 1,
+      rejected: 1,
+      saved: false,
+      rows: [
+        {
+          line: 2,
+          enrolmentNumber: "KT26YBCS001",
+          usn: "1KT26CS001",
+          ok: true
+        },
+        {
+          line: 3,
+          enrolmentNumber: "KT26YBCS002",
+          usn: "1KT25CS002",
+          ok: false,
+          reason: "The year in the USN is 25"
+        }
+      ]
+    });
+    const element = mount();
+    await flush();
+    tab(element.shadowRoot, "vtu").click();
+    await flush();
+    expect(element.shadowRoot.textContent).toContain("1KT");
+    expect(element.shadowRoot.textContent).toContain("CS (branch code)");
+    // The file is read in the browser; the component then sends its text.
+    element.usnCsvForTest = undefined;
+    const fileInput = [
+      ...element.shadowRoot.querySelectorAll("lightning-input")
+    ].find((i) => i.type === "file");
+    const file = new File(
+      ["Enrolment Number,USN\nKT26YBCS001,1KT26CS001"],
+      "usn.csv",
+      {
+        type: "text/csv"
+      }
+    );
+    Object.defineProperty(fileInput, "files", { value: [file] });
+    fileInput.dispatchEvent(new CustomEvent("change"));
+    // eslint-disable-next-line @lwc/lwc/no-async-operation
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    button(element.shadowRoot, "Check").click();
+    await flush();
+    expect(uploadUsns).toHaveBeenCalledWith({
+      csv: "Enrolment Number,USN\nKT26YBCS001,1KT26CS001",
+      saveValid: false
+    });
+    const text = element.shadowRoot.textContent;
+    expect(text).toContain("1 ready to save, 1 rejected");
+    expect(text).toContain("The year in the USN is 25");
+    expect(button(element.shadowRoot, "Save valid rows")).toBeDefined();
   });
 
   it("shows the change history", async () => {

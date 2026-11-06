@@ -225,14 +225,14 @@
           {!branchName} is <b>confirmed</b>.
         </p>
         <p>
-          <span class="label">Roll number</span><br />
+          <span class="label">Enrolment number</span><br />
           <span class="stamp">{!collegeEnrolment.Roll_Number__c}</span>
         </p>
         <p>
-          Your roll number stays the same for the whole programme. Please quote
-          it in all correspondence. The college will tell you your section and
-          timetable before classes begin; you can also see them in the student
-          portal.
+          Your enrolment number stays the same for the whole programme. Please
+          quote it in all correspondence. The college will tell you your section
+          and timetable before classes begin; you can also see them in the
+          student portal.
         </p>
       </apex:outputPanel>
 
@@ -249,7 +249,7 @@
         </p>
         <p>
           Your admission is <b>provisional</b> until the fee below is received.
-          Your roll number is issued as soon as the payment is confirmed.
+          Your enrolment number is issued as soon as the payment is confirmed.
         </p>
         <apex:outputPanel
           layout="block"

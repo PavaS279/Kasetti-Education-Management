@@ -64,6 +64,8 @@ public without sharing class CollegePortalService {
     @AuraEnabled
     public String rollNumber;
     @AuraEnabled
+    public String usn;
+    @AuraEnabled
     public String status;
     @AuraEnabled
     public String academicYear;
@@ -94,6 +96,7 @@ public without sharing class CollegePortalService {
         Id,
         Status__c,
         Roll_Number__c,
+        USN__c,
         Academic_Year__c,
         Current_Year_Of_Study__c,
         Joining_Date__c,
@@ -123,6 +126,7 @@ public without sharing class CollegePortalService {
     s.branch = e.Branch__r.Name;
     s.campus = e.Campus__r.Name;
     s.rollNumber = e.Roll_Number__c;
+    s.usn = e.USN__c;
     s.status = e.Status__c;
     s.academicYear = e.Academic_Year__c;
     s.yearOfStudy = e.Current_Year_Of_Study__c;

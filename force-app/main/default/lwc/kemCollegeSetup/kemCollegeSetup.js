@@ -6,6 +6,9 @@ import saveQuota from "@salesforce/apex/CollegeSetupController.saveQuota";
 import saveSplit from "@salesforce/apex/CollegeSetupController.saveSplit";
 import getFees from "@salesforce/apex/CollegeSetupController.getFees";
 import saveFees from "@salesforce/apex/CollegeSetupController.saveFees";
+import saveCampusCodes from "@salesforce/apex/CollegeSetupController.saveCampusCodes";
+import saveBranchCode from "@salesforce/apex/CollegeSetupController.saveBranchCode";
+import uploadUsns from "@salesforce/apex/CollegeSetupController.uploadUsns";
 import { reduceErrors, toast } from "c/kemUtils";
 
 /** Lateral seats for a percentage of the regular seats (nearest seat). */
@@ -44,6 +47,7 @@ const TABS = [
   { label: "Seats & admissions", value: "intake" },
   { label: "Quotas", value: "quotas" },
   { label: "Fees", value: "fees" },
+  { label: "University (VTU)", value: "vtu" },
   { label: "Eligibility rules", value: "rules" },
   { label: "Change history", value: "history" }
 ];
@@ -63,6 +67,9 @@ export default class KemCollegeSetup extends LightningElement {
   feeEditing = false;
   feeDraft;
   feeStarts = new Date().toISOString().slice(0, 10);
+  usnCsv;
+  usnFileName;
+  usnResult;
 
   connectedCallback() {
     this.load();
@@ -304,6 +311,159 @@ export default class KemCollegeSetup extends LightningElement {
         this.loadFees();
       }
     }
+  }
+
+  // ------------------------------------------------------------- VTU
+
+  get showVtu() {
+    return this.activeTab === "vtu";
+  }
+
+  get vtuCampusRows() {
+    return (this.setup?.vtuCampuses || []).map((c) => ({
+      ...c,
+      key: c.id,
+      codeLabel: c.region && c.college ? `${c.region}${c.college}` : "Not set",
+      editing: this.editingId === `vc-${c.id}`
+    }));
+  }
+
+  get vtuBranchRows() {
+    return (this.setup?.vtuBranches || []).map((b) => ({
+      ...b,
+      key: b.id,
+      codeLabel:
+        b.vtuCode ||
+        (b.branchCode ? `${b.branchCode} (branch code)` : "Not set"),
+      editing: this.editingId === `vb-${b.id}`
+    }));
+  }
+
+  handleEditCampusCodes(event) {
+    const c = this.setup.vtuCampuses.find(
+      (x) => x.id === event.currentTarget.dataset.id
+    );
+    this.editingId = `vc-${c.id}`;
+    this.draft = { ...c };
+  }
+
+  handleEditBranchCode(event) {
+    const b = this.setup.vtuBranches.find(
+      (x) => x.id === event.currentTarget.dataset.id
+    );
+    this.editingId = `vb-${b.id}`;
+    this.draft = { ...b };
+  }
+
+  async handleSaveCampusCodes() {
+    await this.save(
+      () =>
+        saveCampusCodes({
+          campus: {
+            id: this.draft.id,
+            region: this.draft.region,
+            college: this.draft.college
+          }
+        }),
+      "VTU codes saved"
+    );
+  }
+
+  async handleSaveBranchCode() {
+    await this.save(
+      () =>
+        saveBranchCode({
+          branch: { id: this.draft.id, vtuCode: this.draft.vtuCode }
+        }),
+      "VTU branch code saved"
+    );
+  }
+
+  handleUsnFile(event) {
+    const file = event.target.files?.[0];
+    this.usnResult = undefined;
+    if (!file) {
+      return;
+    }
+    this.usnFileName = file.name;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.usnCsv = reader.result;
+    };
+    reader.readAsText(file);
+  }
+
+  get cannotCheckUsns() {
+    return !this.usnCsv || this.isSaving;
+  }
+
+  get usnRows() {
+    return (this.usnResult?.rows || []).map((r) => ({
+      ...r,
+      key: `${r.line}`,
+      mark: r.ok ? "✔" : "✖",
+      markClass: r.ok ? "total ok" : "total bad"
+    }));
+  }
+
+  get usnSummary() {
+    if (!this.usnResult) {
+      return "";
+    }
+    const verb = this.usnResult.saved ? "saved" : "ready to save";
+    return `${this.usnResult.accepted} ${verb}, ${this.usnResult.rejected} rejected`;
+  }
+
+  get canSaveUsns() {
+    return Boolean(
+      this.usnResult && !this.usnResult.saved && this.usnResult.accepted > 0
+    );
+  }
+
+  get hasRejectedUsns() {
+    return Boolean(this.usnResult?.rejected);
+  }
+
+  async handleCheckUsns() {
+    await this.runUpload(false);
+  }
+
+  async handleSaveUsns() {
+    await this.runUpload(true);
+  }
+
+  async runUpload(saveValid) {
+    this.isSaving = true;
+    try {
+      this.usnResult = await uploadUsns({ csv: this.usnCsv, saveValid });
+      if (saveValid) {
+        toast(this, "USNs saved", this.usnSummary, "success");
+      }
+    } catch (error) {
+      toast(this, "Not checked", reduceErrors(error).join(" "), "error");
+    } finally {
+      this.isSaving = false;
+    }
+  }
+
+  /** The rejected rows with their reason, as a CSV to fix and upload again. */
+  handleDownloadRejected() {
+    const lines = ["Enrolment Number,USN,Reason"];
+    this.usnResult.rows
+      .filter((r) => !r.ok)
+      .forEach((r) =>
+        lines.push(
+          [
+            r.enrolmentNumber,
+            r.usn || "",
+            `"${(r.reason || "").replace(/"/g, "'")}"`
+          ].join(",")
+        )
+      );
+    const link = document.createElement("a");
+    link.href = `data:text/csv;charset=utf-8,${encodeURIComponent(lines.join("\n"))}`;
+    link.download = "usn-rejected.csv";
+    link.click();
   }
 
   // ------------------------------------------------------------- fees
