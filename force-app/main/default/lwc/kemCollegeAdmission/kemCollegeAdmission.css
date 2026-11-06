@@ -79,3 +79,16 @@ h3 {
   border-left: 3px solid var(--slds-g-color-brand-base-50, #0176d3);
   background: var(--slds-g-color-brand-base-95, #eef4ff);
 }
+
+.exception {
+  margin: 0.75rem 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  background: var(--kem-surface-warn, #fef6e6);
+}
+.exception_ok {
+  background: var(--kem-surface-ok, #ebf7ee);
+}
+.exception_bad {
+  background: var(--kem-surface-bad, #fdeceb);
+}

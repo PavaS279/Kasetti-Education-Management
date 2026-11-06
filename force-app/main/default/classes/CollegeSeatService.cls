@@ -21,7 +21,9 @@ public without sharing class CollegeSeatService {
         College_Stage__c,
         Campus_Branch__c,
         Entry_Route__c,
-        Interview_Outcome__c
+        Interview_Outcome__c,
+        Eligibility_Status__c,
+        Exception_Status__c
       FROM IndividualApplication
       WHERE Id = :applicationId
       WITH SYSTEM_MODE
@@ -29,11 +31,10 @@ public without sharing class CollegeSeatService {
     if (
       !admission.College_Mode__c ||
       admission.Campus_Branch__c == null ||
-      admission.College_Stage__c != 'Ready For Decision' ||
-      admission.Interview_Outcome__c != 'Pass'
+      !InterviewService.admissible(admission)
     ) {
       throw new AppException(
-        'A passed college admission at Ready For Decision is required.'
+        'Only an admission ready to admit can reserve a seat.'
       );
     }
     Campus_Branch__c intake = lockIntake(admission.Campus_Branch__c);

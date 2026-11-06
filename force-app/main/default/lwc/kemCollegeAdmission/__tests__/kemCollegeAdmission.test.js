@@ -3,6 +3,8 @@ import KemCollegeAdmission from "c/kemCollegeAdmission";
 import getAdmission from "@salesforce/apex/CollegeAdmissionController.getAdmission";
 import verifyDocument from "@salesforce/apex/CollegeAdmissionController.verifyDocument";
 import admit from "@salesforce/apex/CollegeAdmissionController.admit";
+import requestException from "@salesforce/apex/CollegeAdmissionController.requestException";
+import approveException from "@salesforce/apex/CollegeAdmissionController.approveException";
 
 jest.mock(
   "@salesforce/apex/CollegeAdmissionController.getAdmission",
@@ -41,6 +43,21 @@ jest.mock(
 );
 jest.mock(
   "@salesforce/apex/CollegeAdmissionController.reject",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/CollegeAdmissionController.requestException",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/CollegeAdmissionController.approveException",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/CollegeAdmissionController.declineException",
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -148,6 +165,87 @@ describe("c-kem-college-admission", () => {
     expect(element.shadowRoot.querySelector(".enrolled").textContent).toContain(
       "Provisional"
     );
+  });
+
+  it("lets the counsellor admit an eligible applicant without the Dean", async () => {
+    getAdmission.mockResolvedValue(
+      admission({ stage: "Documents Verified", admissible: true })
+    );
+    admit.mockResolvedValue(admission({ stage: "Fee Pending" }));
+    const element = mount();
+    await flush();
+    expect(element.shadowRoot.textContent).not.toContain("Dean · exception");
+    byProp(element.shadowRoot, "lightning-button", "label", "Admit").click();
+    await flush();
+    expect(admit).toHaveBeenCalledWith({ applicationId: "0iT1" });
+  });
+
+  it("sends an applicant who misses the criteria to the Dean", async () => {
+    getAdmission.mockResolvedValue(
+      admission({
+        stage: "Documents Verified",
+        eligibility: "Not Eligible",
+        needsException: true
+      })
+    );
+    requestException.mockResolvedValue(
+      admission({
+        stage: "Awaiting Dean Approval",
+        exceptionStatus: "Requested"
+      })
+    );
+    const element = mount();
+    await flush();
+    expect(
+      byProp(element.shadowRoot, "lightning-button", "label", "Admit")
+    ).toBeUndefined();
+    const reason = element.shadowRoot.querySelector(
+      "lightning-textarea.exception-reason"
+    );
+    reason.value = "Sports quota certificate";
+    reason.dispatchEvent(new CustomEvent("change"));
+    byProp(
+      element.shadowRoot,
+      "lightning-button",
+      "label",
+      "Request Dean approval"
+    ).click();
+    await flush();
+    expect(requestException).toHaveBeenCalledWith({
+      applicationId: "0iT1",
+      reason: "Sports quota certificate"
+    });
+    expect(element.shadowRoot.textContent).toContain(
+      "Dean exception: Requested"
+    );
+  });
+
+  it("lets the Dean approve an exception request", async () => {
+    getAdmission.mockResolvedValue(
+      admission({
+        stage: "Awaiting Dean Approval",
+        canDesk: false,
+        canDean: true,
+        exceptionStatus: "Requested",
+        exceptionReason: "Sports quota"
+      })
+    );
+    approveException.mockResolvedValue(
+      admission({ stage: "Documents Verified", exceptionStatus: "Approved" })
+    );
+    const element = mount();
+    await flush();
+    byProp(
+      element.shadowRoot,
+      "lightning-button",
+      "label",
+      "Approve exception"
+    ).click();
+    await flush();
+    expect(approveException).toHaveBeenCalledWith({
+      applicationId: "0iT1",
+      remarks: ""
+    });
   });
 
   it("stays empty for learning-centre applications", async () => {

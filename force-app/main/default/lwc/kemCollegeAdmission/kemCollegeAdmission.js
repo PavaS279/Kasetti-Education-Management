@@ -9,11 +9,20 @@ import scheduleInterview from "@salesforce/apex/CollegeAdmissionController.sched
 import recordOutcome from "@salesforce/apex/CollegeAdmissionController.recordOutcome";
 import admit from "@salesforce/apex/CollegeAdmissionController.admit";
 import reject from "@salesforce/apex/CollegeAdmissionController.reject";
+import requestException from "@salesforce/apex/CollegeAdmissionController.requestException";
+import approveException from "@salesforce/apex/CollegeAdmissionController.approveException";
+import declineException from "@salesforce/apex/CollegeAdmissionController.declineException";
 
 const UNDECIDED = [
   "Processing",
   "In Review",
   "Documents Verified",
+  "Interview Scheduled",
+  "Ready For Decision",
+  "Awaiting Dean Approval"
+];
+const DEAN_STAGES = [
+  "Awaiting Dean Approval",
   "Interview Scheduled",
   "Ready For Decision"
 ];
@@ -29,6 +38,8 @@ export default class KemCollegeAdmission extends NavigationMixin(
   outcome = "Pass";
   remarks = "";
   rejectReason = "";
+  exceptionReason = "";
+  deanRemarks = "";
 
   outcomeOptions = [
     { label: "Pass", value: "Pass" },
@@ -108,25 +119,83 @@ export default class KemCollegeAdmission extends NavigationMixin(
     );
   }
 
-  get showSchedule() {
-    return this.admission?.stage === "Documents Verified";
+  /** Counsellor's decision once the documents are verified. */
+  get showDeskDecision() {
+    return (
+      this.admission?.canDesk && this.admission?.stage === "Documents Verified"
+    );
   }
-
+  get admitHint() {
+    return this.admission?.exceptionStatus === "Approved"
+      ? "The Dean approved the exception. Admitting reserves the seat and issues the invoice."
+      : "Meets the criteria. Admitting reserves the seat and issues the invoice.";
+  }
+  get hasException() {
+    return Boolean(this.admission?.exceptionStatus);
+  }
+  get exceptionClass() {
+    const s = this.admission?.exceptionStatus;
+    if (s === "Approved") return "exception exception_ok";
+    if (s === "Declined") return "exception exception_bad";
+    return "exception";
+  }
+  /** The Dean only sees exception requests (and the old interview flow). */
+  get showDean() {
+    return (
+      this.admission?.canDean && DEAN_STAGES.includes(this.admission?.stage)
+    );
+  }
+  get showSchedule() {
+    return this.admission?.stage === "Awaiting Dean Approval";
+  }
   get showOutcome() {
     return this.admission?.stage === "Interview Scheduled";
   }
-
-  get showDecision() {
-    return this.undecided;
+  get showExceptionDecision() {
+    return this.admission?.stage === "Awaiting Dean Approval";
   }
-
-  get canAdmit() {
+  get showLegacyDecision() {
     return (
       this.admission?.stage === "Ready For Decision" &&
       this.admission?.outcome === "Pass"
     );
   }
-
+  handleExceptionReason(event) {
+    this.exceptionReason = event.target.value;
+  }
+  handleDeanRemarks(event) {
+    this.deanRemarks = event.target.value;
+  }
+  handleRequestException() {
+    return this.run(
+      () =>
+        requestException({
+          applicationId: this.recordId,
+          reason: this.exceptionReason
+        }),
+      "Sent to the Dean for approval"
+    );
+  }
+  handleApproveException() {
+    return this.run(
+      () =>
+        approveException({
+          applicationId: this.recordId,
+          remarks: this.deanRemarks
+        }),
+      "Exception approved — the counsellor can admit"
+    );
+  }
+  handleDeclineException() {
+    return this.run(
+      () =>
+        declineException({
+          applicationId: this.recordId,
+          reason: this.deanRemarks
+        }),
+      "Exception declined"
+    );
+  }
   handleInterviewAt(event) {
     this.interviewAt = event.target.value;
   }
@@ -169,7 +238,7 @@ export default class KemCollegeAdmission extends NavigationMixin(
   handleMarkVerified() {
     return this.run(
       () => markDocumentsVerified({ applicationId: this.recordId }),
-      "Documents verified — ready for the Dean"
+      "Documents verified"
     );
   }
 

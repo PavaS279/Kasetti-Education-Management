@@ -1,6 +1,6 @@
 # KT College — Simple Demo Flow: Enquiry to Class
 
-_One student, start to finish, in the order a real admission happens: online enquiry → lead → documents → Dean's approval → fee → admission letter → roll number → section → student portal. About 25 minutes. Version 2026-11-03. The full story with refusals and academics is in [COLLEGE-DEMO-SCRIPT.md](COLLEGE-DEMO-SCRIPT.md)._
+_One student, start to finish, in the order a real admission happens: online enquiry → lead → documents → admit (Dean only for exceptions) → fee → admission letter → roll number → section → student portal. About 25 minutes. Version 2026-11-03. The full story with refusals and academics is in [COLLEGE-DEMO-SCRIPT.md](COLLEGE-DEMO-SCRIPT.md)._
 
 ## Before you start
 
@@ -62,15 +62,21 @@ Switch user: Setup → **Users** → **Login** next to the name; **Log out** ret
 
 🗣 _"Only the admission desk can verify documents, and only before the Dean's interview. We keep the last four Aadhaar digits, never the number or the image."_
 
-## Step 4 — Dean's approval
+## Step 4 — Admit (the counsellor; the Dean only for exceptions)
 
-👤 **Anjali Advisor** · 📍 KT College → Admissions Review → the same admission → **Dean** block
+👤 **Admission Counsellor** · 📍 the same admission → **College admission** panel → **2 · Decision**
 
-1. **Schedule interview** (now) → stage **Interview Scheduled**.
-2. Outcome **Pass**, remarks → **Record outcome** → stage **Ready For Decision**.
-3. **Admit** → stage **Fee Pending** · enrolment **Provisional** · roll number _issued when the fee is received_.
+The student meets the cut-off, so there is no Dean step:
+
+1. **Admit** → stage **Fee Pending** · enrolment **Provisional** · roll number _issued when the fee is received_.
 
 ✅ A seat is reserved and the first-year invoice (₹1,50,000 tuition + ₹5,000 admission) is issued with a 7-day deadline.
+
+> **Only if the student does NOT meet the criteria** (eligibility _Not Eligible_): **Admit** is not offered. The counsellor types a **Reason for the Dean** (e.g. _PUC 58%, cut-off 60%; state-level sports certificate_) → **Request Dean approval** → stage **Awaiting Dean Approval**.
+> 👤 **Anjali Advisor (Dean)** · 📍 KT College → **Admissions Review** (the Dean sees only these requests) → the admission → **Dean · exception request** → optional interview → **Approve exception** (back to the counsellor, who clicks **Admit**) or **Decline** with a reason (admission closed).
+> The counsellor can also close it with **Not admitted** and a reason.
+
+🗣 _"Eligible students are admitted by the desk the same day. The Dean only sees the exceptions — with the reason, and the decision is recorded with who and when."_
 
 ## Step 5 — The admission letter
 

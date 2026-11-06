@@ -122,13 +122,73 @@
         ></lightning-button>
       </template>
 
-      <template lwc:if={admission.canDean}>
-        <h3>2 · Dean</h3>
+      <template lwc:if={showDeskDecision}>
+        <h3>2 · Decision</h3>
+        <template lwc:if={admission.admissible}>
+          <p class="small">{admitHint}</p>
+          <div class="row">
+            <lightning-button
+              variant="brand"
+              label="Admit"
+              onclick={handleAdmit}
+            ></lightning-button>
+          </div>
+        </template>
+        <template lwc:if={admission.needsException}>
+          <p class="small">
+            This applicant does not meet the criteria. Ask the Dean for an
+            exception with a reason, or close the admission.
+          </p>
+          <div class="row">
+            <lightning-textarea
+              class="exception-reason"
+              label="Reason for the Dean"
+              value={exceptionReason}
+              onchange={handleExceptionReason}
+            ></lightning-textarea>
+            <lightning-button
+              variant="brand"
+              label="Request Dean approval"
+              onclick={handleRequestException}
+            ></lightning-button>
+          </div>
+        </template>
+        <div class="row">
+          <lightning-input
+            label="Reason for not admitting"
+            value={rejectReason}
+            onchange={handleRejectReason}
+          ></lightning-input>
+          <lightning-button
+            variant="destructive-text"
+            label="Not admitted"
+            onclick={handleReject}
+          ></lightning-button>
+        </div>
+      </template>
+
+      <template lwc:if={hasException}>
+        <div class={exceptionClass}>
+          <strong>Dean exception: {admission.exceptionStatus}</strong>
+          <p class="small">
+            Requested by {admission.exceptionRequestedBy}:
+            {admission.exceptionReason}
+          </p>
+          <template lwc:if={admission.exceptionRemarks}>
+            <p class="small">
+              {admission.exceptionDecidedBy}: {admission.exceptionRemarks}
+            </p>
+          </template>
+        </div>
+      </template>
+
+      <template lwc:if={showDean}>
+        <h3>Dean · exception request</h3>
         <template lwc:if={showSchedule}>
           <div class="row">
             <lightning-input
               type="datetime"
-              label="Interview date and time"
+              label="Interview (optional)"
               value={interviewAt}
               onchange={handleInterviewAt}
             ></lightning-input>
@@ -160,15 +220,32 @@
             ></lightning-button>
           </div>
         </template>
-        <template lwc:if={showDecision}>
+        <template lwc:if={showExceptionDecision}>
           <div class="row">
-            <template lwc:if={canAdmit}>
-              <lightning-button
-                variant="brand"
-                label="Admit"
-                onclick={handleAdmit}
-              ></lightning-button>
-            </template>
+            <lightning-input
+              label="Dean's remarks"
+              value={deanRemarks}
+              onchange={handleDeanRemarks}
+            ></lightning-input>
+            <lightning-button
+              variant="brand"
+              label="Approve exception"
+              onclick={handleApproveException}
+            ></lightning-button>
+            <lightning-button
+              variant="destructive-text"
+              label="Decline"
+              onclick={handleDeclineException}
+            ></lightning-button>
+          </div>
+        </template>
+        <template lwc:if={showLegacyDecision}>
+          <div class="row">
+            <lightning-button
+              variant="brand"
+              label="Admit"
+              onclick={handleAdmit}
+            ></lightning-button>
             <lightning-input
               label="Reason for rejecting"
               value={rejectReason}

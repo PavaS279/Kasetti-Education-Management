@@ -217,6 +217,22 @@ public with sharing class CollegeAdmissionController {
     public Boolean canDesk = false;
     @AuraEnabled
     public Boolean canDean = false;
+    /** The counsellor (or Dean) may admit now. */
+    @AuraEnabled
+    public Boolean admissible = false;
+    /** Does not meet the criteria and no exception was asked for yet. */
+    @AuraEnabled
+    public Boolean needsException = false;
+    @AuraEnabled
+    public String exceptionStatus;
+    @AuraEnabled
+    public String exceptionReason;
+    @AuraEnabled
+    public String exceptionRemarks;
+    @AuraEnabled
+    public String exceptionRequestedBy;
+    @AuraEnabled
+    public String exceptionDecidedBy;
   }
 
   /** Campus branches open for admission in the current intake. */
@@ -419,6 +435,36 @@ public with sharing class CollegeAdmissionController {
   }
 
   @AuraEnabled
+  public static Admission requestException(Id applicationId, String reason) {
+    try {
+      InterviewService.requestException(applicationId, reason);
+      return load(applicationId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static Admission approveException(Id applicationId, String remarks) {
+    try {
+      InterviewService.approveException(applicationId, remarks);
+      return load(applicationId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static Admission declineException(Id applicationId, String reason) {
+    try {
+      InterviewService.declineException(applicationId, reason);
+      return load(applicationId);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
   public static Admission reject(Id applicationId, String reason) {
     try {
       InterviewService.reject(applicationId, reason);
@@ -443,6 +489,11 @@ public with sharing class CollegeAdmissionController {
         Interview_Outcome__c,
         Decision__c,
         Decision_Reason__c,
+        Exception_Status__c,
+        Exception_Reason__c,
+        Exception_Remarks__c,
+        Exception_Requested_By__r.Name,
+        Exception_Decided_By__r.Name,
         Account.Name,
         Learning_Course__r.Name,
         Branch__r.Name
@@ -468,6 +519,13 @@ public with sharing class CollegeAdmissionController {
     result.outcome = a.Interview_Outcome__c;
     result.decision = a.Decision__c;
     result.decisionReason = a.Decision_Reason__c;
+    result.admissible = InterviewService.admissible(a);
+    result.needsException = InterviewService.needsException(a);
+    result.exceptionStatus = a.Exception_Status__c;
+    result.exceptionReason = a.Exception_Reason__c;
+    result.exceptionRemarks = a.Exception_Remarks__c;
+    result.exceptionRequestedBy = a.Exception_Requested_By__r?.Name;
+    result.exceptionDecidedBy = a.Exception_Decided_By__r?.Name;
     if (a.Eligibility_Status__c == 'Not Eligible') {
       result.suggestions = AdmissionEligibilityService.suggestions(a.Id);
     }

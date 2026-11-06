@@ -228,9 +228,7 @@ private class ProgrammeEnrolmentServiceTest {
         InterviewService.admit(fixture.admission.Id);
         System.assert(false, 'Expected a passed interview.');
       } catch (AppException expected) {
-        System.assert(
-          expected.getMessage().contains('passed college admission')
-        );
+        System.assert(expected.getMessage().contains('Admit after'));
       }
     }
     User unauthorised = TestDataFactory.createUser(new List<String>());

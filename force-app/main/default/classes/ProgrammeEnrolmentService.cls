@@ -100,8 +100,7 @@ public without sharing class ProgrammeEnrolmentService {
   }
 
   public static Id admit(Id applicationId) {
-    RecordAccess.assertPermission(InterviewService.PERMISSION);
-    RecordAccess.assertEditable(applicationId);
+    InterviewService.assertCanDecide(applicationId);
     Savepoint checkpoint = Database.setSavepoint();
     try {
       return admitAtomic(applicationId);
@@ -119,6 +118,8 @@ public without sharing class ProgrammeEnrolmentService {
         College_Mode__c,
         College_Stage__c,
         Interview_Outcome__c,
+        Eligibility_Status__c,
+        Exception_Status__c,
         Branch__c,
         Learning_Course__c,
         Learning_Program__c,
@@ -196,13 +197,11 @@ public without sharing class ProgrammeEnrolmentService {
   }
 
   private static void validate(IndividualApplication admission) {
-    if (
-      !admission.College_Mode__c ||
-      admission.College_Stage__c != 'Ready For Decision' ||
-      admission.Interview_Outcome__c != 'Pass'
-    ) {
+    if (!admission.College_Mode__c || !InterviewService.admissible(admission)) {
       throw new AppException(
-        'Only a passed college admission at Ready For Decision can be admitted.'
+        admission.College_Stage__c == InterviewService.AWAITING_DEAN
+          ? 'The Dean has not yet decided the exception request.'
+          : 'Admit after the documents are verified, and only an applicant who meets the criteria or has the Dean\'s approval.'
       );
     }
     if (
