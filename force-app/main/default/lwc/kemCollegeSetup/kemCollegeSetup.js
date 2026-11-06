@@ -6,6 +6,27 @@ import saveQuota from "@salesforce/apex/CollegeSetupController.saveQuota";
 import saveSplit from "@salesforce/apex/CollegeSetupController.saveSplit";
 import { reduceErrors, toast } from "c/kemUtils";
 
+/** Lateral seats for a percentage of the regular seats (nearest seat). */
+export function seatsFor(regular, percentage) {
+  if (
+    regular === "" ||
+    percentage === "" ||
+    regular == null ||
+    percentage == null
+  ) {
+    return 0;
+  }
+  return Math.round((Number(regular) * Number(percentage)) / 100);
+}
+
+/** The percentage a number of lateral seats is of the regular seats (2 decimals). */
+export function percentOf(regular, lateral) {
+  if (!Number(regular) || lateral === "" || lateral == null) {
+    return null;
+  }
+  return Math.round((Number(lateral) * 10000) / Number(regular)) / 100;
+}
+
 const TABS = [
   { label: "Seats & admissions", value: "intake" },
   { label: "Quotas", value: "quotas" },
@@ -192,6 +213,10 @@ export default class KemCollegeSetup extends LightningElement {
       openLabel: r.admissionsOpen ? "Open" : "Closed",
       openClass: r.admissionsOpen ? "kem-badge kem-badge_success" : "kem-badge",
       deanLabel: r.deanExceptionsAllowed ? "Allowed" : "Off",
+      lateralLabel:
+        r.lateralBasis === "Percentage" && r.lateralPercentage != null
+          ? `${r.intakeLateral} (${r.lateralPercentage}%)`
+          : `${r.intakeLateral}`,
       editing: this.editingId === r.id
     }));
   }
@@ -262,7 +287,10 @@ export default class KemCollegeSetup extends LightningElement {
       intakeRegular: row.intakeRegular,
       intakeLateral: row.intakeLateral,
       admissionsOpen: row.admissionsOpen,
-      deanExceptionsAllowed: row.deanExceptionsAllowed
+      deanExceptionsAllowed: row.deanExceptionsAllowed,
+      lateralBasis: row.lateralBasis || "Seats",
+      lateralPercentage:
+        row.lateralPercentage ?? percentOf(row.intakeRegular, row.intakeLateral)
     };
   }
 
@@ -278,6 +306,44 @@ export default class KemCollegeSetup extends LightningElement {
         maxRank: e.maxRank
       }))
     };
+  }
+
+  /** Typing the percentage fills the seats, and the other way round. */
+  handleLateralPercent(event) {
+    const pct = event.target.value;
+    this.draft = {
+      ...this.draft,
+      lateralBasis: "Percentage",
+      lateralPercentage: pct,
+      intakeLateral: seatsFor(this.draft.intakeRegular, pct)
+    };
+  }
+
+  handleLateralSeats(event) {
+    const seats = event.target.value;
+    this.draft = {
+      ...this.draft,
+      lateralBasis: "Seats",
+      intakeLateral: seats,
+      lateralPercentage: percentOf(this.draft.intakeRegular, seats)
+    };
+  }
+
+  handleRegularSeats(event) {
+    const regular = event.target.value;
+    const next = { ...this.draft, intakeRegular: regular };
+    if (next.lateralBasis === "Percentage") {
+      next.intakeLateral = seatsFor(regular, next.lateralPercentage);
+    } else {
+      next.lateralPercentage = percentOf(regular, next.intakeLateral);
+    }
+    this.draft = next;
+  }
+
+  get lateralHint() {
+    return this.draft.lateralBasis === "Percentage"
+      ? "Set by percentage: the seats follow the regular seats."
+      : "Set by number of seats.";
   }
 
   handleDraft(event) {
@@ -315,7 +381,12 @@ export default class KemCollegeSetup extends LightningElement {
           change: {
             ...this.draft,
             intakeRegular: Number(this.draft.intakeRegular),
-            intakeLateral: Number(this.draft.intakeLateral)
+            intakeLateral: Number(this.draft.intakeLateral),
+            lateralPercentage:
+              this.draft.lateralPercentage === "" ||
+              this.draft.lateralPercentage == null
+                ? null
+                : Number(this.draft.lateralPercentage)
           }
         }),
       "Seats saved"

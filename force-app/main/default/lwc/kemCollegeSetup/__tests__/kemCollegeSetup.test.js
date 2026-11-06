@@ -1,5 +1,5 @@
 import { createElement } from "lwc";
-import KemCollegeSetup from "c/kemCollegeSetup";
+import KemCollegeSetup, { seatsFor, percentOf } from "c/kemCollegeSetup";
 import getSetup from "@salesforce/apex/CollegeSetupController.getSetup";
 import saveIntake from "@salesforce/apex/CollegeSetupController.saveIntake";
 import saveRule from "@salesforce/apex/CollegeSetupController.saveRule";
@@ -135,6 +135,36 @@ describe("c-kem-college-setup", () => {
         entrances: [{ exam: "KCET", maxRank: 20000 }]
       }
     });
+  });
+
+  it("links the lateral percentage and seats", async () => {
+    expect(seatsFor(60, 10)).toBe(6);
+    expect(percentOf(60, 6)).toBe(10);
+    expect(percentOf(0, 6)).toBeNull();
+    getSetup.mockResolvedValue(setup(true));
+    saveIntake.mockResolvedValue(setup(true));
+    const element = mount();
+    await flush();
+    button(element.shadowRoot, "Edit").click();
+    await flush();
+    const pct = element.shadowRoot.querySelector(
+      "lightning-input.lateral-percent"
+    );
+    pct.value = "15";
+    pct.dispatchEvent(new CustomEvent("change"));
+    await flush();
+    expect(
+      element.shadowRoot.querySelector("lightning-input.lateral-seats").value
+    ).toBe(9);
+    const seats = element.shadowRoot.querySelector(
+      "lightning-input.lateral-seats"
+    );
+    seats.value = "12";
+    seats.dispatchEvent(new CustomEvent("change"));
+    await flush();
+    expect(
+      element.shadowRoot.querySelector("lightning-input.lateral-percent").value
+    ).toBe(20);
   });
 
   it("shows the change history", async () => {

@@ -53,19 +53,29 @@
                     step="1"
                     required
                     value={draft.intakeRegular}
-                    data-field="intakeRegular"
-                    onchange={handleDraft}
+                    onchange={handleRegularSeats}
                   ></lightning-input>
                   <lightning-input
+                    class="lateral-percent"
+                    type="number"
+                    label="Lateral % of regular"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={draft.lateralPercentage}
+                    onchange={handleLateralPercent}
+                  ></lightning-input>
+                  <lightning-input
+                    class="lateral-seats"
                     type="number"
                     label="Lateral seats"
                     min="0"
                     step="1"
                     required
                     value={draft.intakeLateral}
-                    data-field="intakeLateral"
-                    onchange={handleDraft}
+                    onchange={handleLateralSeats}
                   ></lightning-input>
+                  <span class="kem-muted small">{lateralHint}</span>
                   <lightning-input
                     type="toggle"
                     label="Admissions open"
@@ -101,7 +111,7 @@
                 </div>
                 <div class="cell">
                   <div class="label">Lateral</div>
-                  <div class="strong">{r.intakeLateral}</div>
+                  <div class="strong">{r.lateralLabel}</div>
                 </div>
                 <div class="cell">
                   <div class="label">Dean exceptions</div>

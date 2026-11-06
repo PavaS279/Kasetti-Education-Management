@@ -24,6 +24,16 @@
     </customPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Campus_Branch__c.Lateral_Basis__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Campus_Branch__c.Lateral_Percentage__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Admission_Quota__c.Rank_Exam__c</field>
         <readable>true</readable>
     </fieldPermissions>

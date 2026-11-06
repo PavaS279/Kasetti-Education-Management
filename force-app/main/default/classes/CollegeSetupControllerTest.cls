@@ -79,6 +79,26 @@ private class CollegeSetupControllerTest {
       change.deanExceptionsAllowed = false;
       CollegeSetupController.saveIntake(change);
 
+      // 10% of 8 regular seats is 1 lateral seat (0.8 rounds to 1).
+      change.lateralBasis = 'Percentage';
+      change.lateralPercentage = 10;
+      change.intakeLateral = 99;
+      CollegeSetupController.saveIntake(change);
+      Assert.areEqual(
+        1,
+        [SELECT Intake_Lateral__c FROM Campus_Branch__c WHERE Id = :f.intake.Id]
+        .Intake_Lateral__c,
+        'The percentage decides the lateral seats'
+      );
+      change.lateralPercentage = 120;
+      try {
+        CollegeSetupController.saveIntake(change);
+        Assert.fail('At most 100%');
+      } catch (AuraHandledException e) {
+        Assert.isTrue(e.getMessage().contains('percentage'));
+      }
+      change.lateralBasis = 'Seats';
+      change.lateralPercentage = null;
       change.intakeRegular = 1.5;
       try {
         CollegeSetupController.saveIntake(change);
@@ -119,6 +139,14 @@ private class CollegeSetupControllerTest {
       [SELECT Status__c FROM Admission_Rule__c WHERE Id = :ruleId].Status__c,
       'The earlier version stays on record'
     );
+  }
+
+  @IsTest
+  static void lateralSeatsAndPercentageConvert() {
+    Assert.areEqual(6, CollegeSetupController.lateralSeats(60, 10));
+    Assert.areEqual(10.00, CollegeSetupController.lateralPercent(60, 6));
+    Assert.isNull(CollegeSetupController.lateralPercent(0, 6));
+    Assert.areEqual(0, CollegeSetupController.lateralSeats(null, 10));
   }
 
   @IsTest

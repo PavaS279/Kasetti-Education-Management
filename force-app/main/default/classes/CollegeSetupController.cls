@@ -57,6 +57,11 @@ public with sharing class CollegeSetupController {
     public Boolean admissionsOpen = false;
     @AuraEnabled
     public Boolean deanExceptionsAllowed = true;
+    /** Seats or Percentage: how the lateral seats are set. */
+    @AuraEnabled
+    public String lateralBasis;
+    @AuraEnabled
+    public Decimal lateralPercentage;
     /** Regular seats per active quota (every active quota listed, 0 when unset). */
     @AuraEnabled
     public List<SplitEntry> split = new List<SplitEntry>();
@@ -139,6 +144,10 @@ public with sharing class CollegeSetupController {
     public Boolean admissionsOpen { get; set; }
     @AuraEnabled
     public Boolean deanExceptionsAllowed { get; set; }
+    @AuraEnabled
+    public String lateralBasis { get; set; }
+    @AuraEnabled
+    public Decimal lateralPercentage { get; set; }
   }
 
   public class RuleChange {
@@ -221,6 +230,10 @@ public with sharing class CollegeSetupController {
           nvl(cb.Reserved_Lateral__c) + nvl(cb.Finalised_Lateral__c);
         r.admissionsOpen = cb.Admissions_Open__c;
         r.deanExceptionsAllowed = cb.Dean_Exceptions_Allowed__c;
+        r.lateralBasis = cb.Lateral_Basis__c == null
+          ? 'Seats'
+          : cb.Lateral_Basis__c;
+        r.lateralPercentage = cb.Lateral_Percentage__c;
         for (Admission_Quota__c q : quotas) {
           if (!q.Active__c) {
             continue;
@@ -267,6 +280,19 @@ public with sharing class CollegeSetupController {
         nvl(cb.Reserved_Regular__c) + nvl(cb.Finalised_Regular__c);
       Decimal usedLateral =
         nvl(cb.Reserved_Lateral__c) + nvl(cb.Finalised_Lateral__c);
+      // A percentage basis decides the lateral seats on the server.
+      Boolean byPercentage = change.lateralBasis == 'Percentage';
+      if (byPercentage) {
+        if (!InputValidator.isPercentage(change.lateralPercentage)) {
+          throw new AppException(
+            'The lateral percentage is from 0 to 100 with at most two decimals.'
+          );
+        }
+        change.intakeLateral = lateralSeats(
+          change.intakeRegular,
+          change.lateralPercentage
+        );
+      }
       if (
         !wholeNumber(change.intakeRegular) || !wholeNumber(change.intakeLateral)
       ) {
@@ -290,7 +316,11 @@ public with sharing class CollegeSetupController {
           Intake_Regular__c = change.intakeRegular,
           Intake_Lateral__c = change.intakeLateral,
           Admissions_Open__c = change.admissionsOpen == true,
-          Dean_Exceptions_Allowed__c = change.deanExceptionsAllowed == true
+          Dean_Exceptions_Allowed__c = change.deanExceptionsAllowed == true,
+          Lateral_Basis__c = byPercentage ? 'Percentage' : 'Seats',
+          Lateral_Percentage__c = byPercentage
+            ? change.lateralPercentage
+            : lateralPercent(change.intakeRegular, change.intakeLateral)
         ),
         AccessLevel.SYSTEM_MODE
       );
@@ -500,6 +530,25 @@ public with sharing class CollegeSetupController {
     return own != null ? own : rules.get('ALL' + tail);
   }
 
+  /** Lateral seats for a percentage of the regular seats, rounded to the nearest seat. */
+  public static Decimal lateralSeats(Decimal regular, Decimal percentage) {
+    if (regular == null || percentage == null) {
+      return 0;
+    }
+    return (regular *
+      percentage /
+      100)
+      .setScale(0, System.RoundingMode.HALF_UP);
+  }
+
+  /** The percentage a number of lateral seats is of the regular seats (2 decimals). */
+  public static Decimal lateralPercent(Decimal regular, Decimal lateral) {
+    if (regular == null || regular == 0 || lateral == null) {
+      return null;
+    }
+    return (lateral * 100 / regular).setScale(2, System.RoundingMode.HALF_UP);
+  }
+
   private static Decimal nvl(Decimal value) {
     return value == null ? 0 : value;
   }
@@ -594,7 +643,9 @@ public with sharing class CollegeSetupController {
           Reserved_Lateral__c,
           Finalised_Lateral__c,
           Admissions_Open__c,
-          Dean_Exceptions_Allowed__c
+          Dean_Exceptions_Allowed__c,
+          Lateral_Basis__c,
+          Lateral_Percentage__c
         FROM Campus_Branch__c
         WHERE Campus__r.Institution_Type__c = 'College'
         WITH SYSTEM_MODE
