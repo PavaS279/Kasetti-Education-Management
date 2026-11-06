@@ -72,7 +72,7 @@ The panel shows **Quota: CET** (or the quota chosen online). Before Admit the co
 
 1. **Admit** → the seat is taken from the quota (refused if it is full, e.g. _Management seats for BE-CSE are full (10 of 10)_, or if a CET applicant has no KCET rank) → stage **Fee Pending** · enrolment **Provisional** · roll number _issued when the fee is received_.
 
-✅ A seat is reserved and the first-year invoice (₹1,50,000 tuition + ₹5,000 admission) is issued with a 7-day deadline.
+✅ A seat is reserved and the first-year invoice is issued with a 7-day deadline, at the student's **quota fee** (default/CET: ₹1,50,000 tuition + ₹5,000 admission; other quotas as set on **College Admission Setup → Fees**).
 
 > **Only if the student does NOT meet the criteria** (eligibility _Not Eligible_): **Admit** is not offered. The counsellor types a **Reason for the Dean** (e.g. _PUC 58%, cut-off 60%; state-level sports certificate_) → **Request Dean approval** → stage **Awaiting Dean Approval**.
 > 👤 **Anjali Advisor (Dean)** · 📍 KT College → **Admissions Review** (the Dean sees only these requests) → the admission → **Dean · exception request** → optional interview → **Approve exception** (back to the counsellor, who clicks **Admit**) or **Decline** with a reason (admission closed).

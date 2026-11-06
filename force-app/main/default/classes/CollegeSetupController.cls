@@ -43,6 +43,9 @@ public with sharing class CollegeSetupController {
     public String campus;
     @AuraEnabled
     public String branch;
+    /** The college branch (programme course) the fees belong to. */
+    @AuraEnabled
+    public Id courseId;
     @AuraEnabled
     public String academicYear;
     @AuraEnabled
@@ -221,6 +224,7 @@ public with sharing class CollegeSetupController {
         r.id = cb.Id;
         r.campus = cb.Campus__r.Name;
         r.branch = cb.Branch__r.Name;
+        r.courseId = cb.Branch__c;
         r.academicYear = cb.Academic_Year__c;
         r.intakeRegular = cb.Intake_Regular__c;
         r.intakeLateral = cb.Intake_Lateral__c;
@@ -448,6 +452,38 @@ public with sharing class CollegeSetupController {
       }
       Database.upsert(rows, AccessLevel.SYSTEM_MODE);
       return getSetup();
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  /** Fees of one college branch, academic year and year of study (null: all years). */
+  @AuraEnabled
+  public static CollegeFeeSetupService.FeeGrid getFees(
+    Id courseId,
+    String academicYear,
+    Integer yearOfStudy
+  ) {
+    try {
+      assertCanView();
+      return CollegeFeeSetupService.grid(courseId, academicYear, yearOfStudy);
+    } catch (Exception e) {
+      throw AppException.toAura(e);
+    }
+  }
+
+  @AuraEnabled
+  public static CollegeFeeSetupService.FeeGrid saveFees(
+    CollegeFeeSetupService.FeeSave request
+  ) {
+    try {
+      assertCanEdit();
+      CollegeFeeSetupService.save(request);
+      return CollegeFeeSetupService.grid(
+        request.courseId,
+        request.academicYear,
+        request.yearOfStudy
+      );
     } catch (Exception e) {
       throw AppException.toAura(e);
     }

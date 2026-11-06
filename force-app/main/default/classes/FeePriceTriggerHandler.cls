@@ -1,6 +1,7 @@
 /**
  * Prevents overlapping active prices for the same course, branch scope,
- * delivery mode scope, fee type, and billing frequency.
+ * delivery mode scope, fee type, billing frequency, academic year, year of
+ * study and admission quota (a Management price does not overlap the default).
  */
 public with sharing class FeePriceTriggerHandler extends TriggerHandler {
   protected override void beforeInsert(List<SObject> newRecords) {
@@ -34,7 +35,10 @@ public with sharing class FeePriceTriggerHandler extends TriggerHandler {
         Fee_Type__c,
         Billing_Frequency__c,
         Effective_From__c,
-        Effective_To__c
+        Effective_To__c,
+        Academic_Year__c,
+        Year_Of_Study__c,
+        Admission_Quota__c
       FROM Fee_Price__c
       WHERE Learning_Course__c IN :courseIds AND Active__c = TRUE
       WITH SYSTEM_MODE
@@ -68,7 +72,10 @@ public with sharing class FeePriceTriggerHandler extends TriggerHandler {
       a.Branch__c == b.Branch__c &&
       a.Delivery_Mode__c == b.Delivery_Mode__c &&
       a.Fee_Type__c == b.Fee_Type__c &&
-      a.Billing_Frequency__c == b.Billing_Frequency__c;
+      a.Billing_Frequency__c == b.Billing_Frequency__c &&
+      a.Academic_Year__c == b.Academic_Year__c &&
+      a.Year_Of_Study__c == b.Year_Of_Study__c &&
+      a.Admission_Quota__c == b.Admission_Quota__c;
   }
 
   private static Boolean overlaps(Fee_Price__c a, Fee_Price__c b) {

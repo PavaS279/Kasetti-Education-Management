@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Admission_Quota__c</fullName>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <description
+  >The quota this price applies to (for example Management). Blank: the default price, used for CET and for any quota without its own price.</description>
+    <label>Admission Quota</label>
+    <referenceTo>Admission_Quota__c</referenceTo>
+    <relationshipLabel>Fee Prices</relationshipLabel>
+    <relationshipName>Fee_Prices</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

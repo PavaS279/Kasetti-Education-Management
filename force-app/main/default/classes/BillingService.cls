@@ -358,7 +358,8 @@ public with sharing class BillingService {
         Branch__c,
         Campus__c,
         Academic_Year__c,
-        Status__c
+        Status__c,
+        Application__r.Admission_Quota__c
       FROM Programme_Enrolment__c
       WHERE Id = :programmeEnrolmentId
       WITH SYSTEM_MODE
@@ -468,6 +469,12 @@ public with sharing class BillingService {
     return invoice.Id;
   }
 
+  private static Integer priceRank(Fee_Price__c price) {
+    return (price.Admission_Quota__c != null ? 4 : 0) +
+      (price.Year_Of_Study__c != null ? 2 : 0) +
+      (price.Branch__c != null ? 1 : 0);
+  }
+
   private static List<Fee_Price__c> programmePrices(
     Programme_Enrolment__c enrolment,
     Integer yearOfStudy,
@@ -475,6 +482,8 @@ public with sharing class BillingService {
   ) {
     Boolean separateAdmission =
       enrolment.Programme__r.Roll_Release_Rule__c == 'Admission Fee';
+    // The student's quota price wins over the default (no-quota) price.
+    Id quotaId = enrolment.Application__r?.Admission_Quota__c;
     Map<String, Fee_Price__c> selected = new Map<String, Fee_Price__c>();
     for (Fee_Price__c price : [
       SELECT
@@ -484,10 +493,14 @@ public with sharing class BillingService {
         Billing_Frequency__c,
         Description__c,
         Amount__c,
-        Effective_From__c
+        Effective_From__c,
+        Year_Of_Study__c,
+        Admission_Quota__c
       FROM Fee_Price__c
       WHERE
         Learning_Course__c = :enrolment.Branch__c
+        AND (Admission_Quota__c = NULL
+        OR Admission_Quota__c = :quotaId)
         AND (Branch__c = NULL
         OR Branch__c = :enrolment.Campus__c)
         AND Active__c = TRUE
@@ -510,11 +523,9 @@ public with sharing class BillingService {
         continue;
       String key = price.Fee_Type__c + '|' + price.Billing_Frequency__c;
       Fee_Price__c current = selected.get(key);
-      if (
-        current == null ||
-        (current.Branch__c == null &&
-        price.Branch__c != null)
-      ) {
+      // Most specific wins: quota, then year of study, then campus; the rows
+      // come newest first, so equal ranks keep the latest price.
+      if (current == null || priceRank(price) > priceRank(current)) {
         selected.put(key, price);
       }
     }

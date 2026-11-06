@@ -98,3 +98,21 @@ h2 {
 .add {
   margin-top: 0.5rem;
 }
+
+.fee-pickers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.fee-table-wrap {
+  overflow-x: auto;
+  margin: 0.5rem 0;
+}
+.fee-table td {
+  min-width: 7rem;
+}
+.fee-actions {
+  flex-wrap: wrap;
+  align-items: flex-end;
+}

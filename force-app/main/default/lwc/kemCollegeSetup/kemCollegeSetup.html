@@ -322,6 +322,115 @@
         </ul>
       </template>
 
+      <template lwc:if={showFees}>
+        <div class="fee-pickers">
+          <lightning-combobox
+            label="Branch"
+            options={courseOptions}
+            value={feeCourse}
+            onchange={handleFeeCourse}
+          ></lightning-combobox>
+          <lightning-combobox
+            label="Academic year"
+            options={yearOptions}
+            value={feeYear}
+            onchange={handleFeeYear}
+          ></lightning-combobox>
+          <lightning-combobox
+            label="Year of study"
+            options={studyYearOptions}
+            value={feeStudyYear}
+            onchange={handleFeeStudyYear}
+          ></lightning-combobox>
+        </div>
+        <p class="kem-muted small">
+          All campuses. A blank quota cell uses the default (CET) price; a blank
+          year-of-study cell uses the all-years price. Changes start on the date
+          you choose — invoices already issued keep their amounts.
+        </p>
+        <template lwc:if={fees}>
+          <div class="fee-table-wrap">
+            <table
+              class="slds-table slds-table_bordered slds-table_cell-buffer fee-table"
+            >
+              <thead>
+                <tr>
+                  <th scope="col">Fee</th>
+                  <template for:each={feeColumns} for:item="c">
+                    <th key={c.key} scope="col">{c.name}</th>
+                  </template>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={feeRows} for:item="r">
+                  <tr key={r.key}>
+                    <th scope="row">{r.label}</th>
+                    <template for:each={r.cells} for:item="c">
+                      <td key={c.key}>
+                        <template lwc:if={feeEditing}>
+                          <lightning-input
+                            class="fee"
+                            type="number"
+                            variant="label-hidden"
+                            label="Amount"
+                            min="0"
+                            step="0.01"
+                            value={c.amount}
+                            placeholder={c.placeholder}
+                            data-row={c.row}
+                            data-col={c.col}
+                            onchange={handleFeeCell}
+                          ></lightning-input>
+                        </template>
+                        <template lwc:else>
+                          <span class={c.displayClass}>{c.display}</span>
+                        </template>
+                      </td>
+                    </template>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          <template lwc:if={canEdit}>
+            <div class="buttons fee-actions">
+              <template lwc:if={feeEditing}>
+                <lightning-button
+                  label="Copy from CET"
+                  onclick={handleCopyFromCet}
+                ></lightning-button>
+                <lightning-button
+                  label="Copy from last year"
+                  onclick={handleCopyLastYear}
+                ></lightning-button>
+                <lightning-input
+                  type="date"
+                  label="Starts on"
+                  value={feeStarts}
+                  onchange={handleFeeStarts}
+                ></lightning-input>
+                <lightning-button
+                  variant="brand"
+                  label="Save fees"
+                  disabled={isSaving}
+                  onclick={handleSaveFees}
+                ></lightning-button>
+                <lightning-button
+                  label="Cancel"
+                  onclick={handleCancelFees}
+                ></lightning-button>
+              </template>
+              <template lwc:else>
+                <lightning-button
+                  label="Edit fees"
+                  onclick={handleEditFees}
+                ></lightning-button>
+              </template>
+            </div>
+          </template>
+        </template>
+      </template>
+
       <template lwc:if={showRules}>
         <p class="kem-muted small">
           Saving creates a new version of the rule; the earlier version stays on

@@ -1,8 +1,14 @@
 import { createElement } from "lwc";
-import KemCollegeSetup, { seatsFor, percentOf } from "c/kemCollegeSetup";
+import KemCollegeSetup, {
+  seatsFor,
+  percentOf,
+  previousYear
+} from "c/kemCollegeSetup";
 import getSetup from "@salesforce/apex/CollegeSetupController.getSetup";
 import saveIntake from "@salesforce/apex/CollegeSetupController.saveIntake";
 import saveRule from "@salesforce/apex/CollegeSetupController.saveRule";
+import getFees from "@salesforce/apex/CollegeSetupController.getFees";
+import saveFees from "@salesforce/apex/CollegeSetupController.saveFees";
 
 jest.mock(
   "@salesforce/apex/CollegeSetupController.getSetup",
@@ -16,6 +22,26 @@ jest.mock(
 );
 jest.mock(
   "@salesforce/apex/CollegeSetupController.saveRule",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/CollegeSetupController.saveQuota",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/CollegeSetupController.saveSplit",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/CollegeSetupController.getFees",
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  "@salesforce/apex/CollegeSetupController.saveFees",
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -37,6 +63,8 @@ function setup(canEdit) {
         usedLateral: 0,
         admissionsOpen: true,
         deanExceptionsAllowed: true,
+        courseId: "0lC1",
+        split: [],
         regularRule: {
           ruleId: "a0R1",
           version: 1,
@@ -165,6 +193,50 @@ describe("c-kem-college-setup", () => {
     expect(
       element.shadowRoot.querySelector("lightning-input.lateral-percent").value
     ).toBe(20);
+  });
+
+  it("edits fees by quota and copies the CET amounts", async () => {
+    expect(previousYear("2026-27")).toBe("2025-26");
+    const grid = {
+      quotas: [{ name: "Default (CET)" }, { id: "a0Q2", name: "Management" }],
+      rows: [
+        {
+          feeType: "Tuition",
+          frequency: "Annual",
+          cells: [
+            { quotaId: null, amount: 150000 },
+            { quotaId: "a0Q2", amount: null, fallback: 150000 }
+          ]
+        }
+      ]
+    };
+    getSetup.mockResolvedValue(setup(true));
+    getFees.mockResolvedValue(grid);
+    saveFees.mockResolvedValue(grid);
+    const element = mount();
+    await flush();
+    tab(element.shadowRoot, "fees").click();
+    await flush();
+    expect(getFees).toHaveBeenCalledWith({
+      courseId: "0lC1",
+      academicYear: "2026-27",
+      yearOfStudy: null
+    });
+    expect(element.shadowRoot.textContent).toContain("uses 150000");
+    button(element.shadowRoot, "Edit fees").click();
+    await flush();
+    button(element.shadowRoot, "Copy from CET").click();
+    await flush();
+    element.shadowRoot
+      .querySelectorAll("lightning-input")
+      .forEach((i) => (i.reportValidity = () => true));
+    button(element.shadowRoot, "Save fees").click();
+    await flush();
+    const sent = saveFees.mock.calls[0][0].request;
+    expect(sent.rows[0].cells).toEqual([
+      { quotaId: null, amount: 150000 },
+      { quotaId: "a0Q2", amount: 150000 }
+    ]);
   });
 
   it("shows the change history", async () => {
