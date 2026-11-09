@@ -58,9 +58,9 @@ Switch user: Setup → **Users** → **Login** next to the name; **Log out** ret
 
 1. **Aadhaar card**: type the last 4 digits (e.g. `4321`) → **Verify** → _Accepted · ends 4321 · file removed_.
 2. SSLC marks card, PUC marks card, fitness certificate, entrance rank card → **Verify** each.
-3. **Mark documents verified** → stage **Documents Verified**.
+3. **Mark documents verified** → stage **Documents Verified**. This works for a student below the cut-off too (panel note _Needs Dean approval_), as long as the branch allows Dean exceptions; the Dean request comes next, in Step 4.
 
-🗣 _"Only the admission desk can verify documents, and only before the Dean's interview. We keep the last four Aadhaar digits, never the number or the image."_
+🗣 _"Only the admission desk can verify documents, and always before Admit or a Dean request. We keep the last four Aadhaar digits, never the number or the image."_
 
 ## Step 4 — Admit (the counsellor; the Dean only for exceptions)
 
@@ -77,7 +77,7 @@ The panel shows **Quota: CET** (or the quota chosen online). Before Admit the co
 > **Only if the student does NOT meet the criteria** (eligibility _Not Eligible_) — the Dean exception:
 >
 > 1. **Getting the admission in.** Either the online enquiry is converted as in Step 2, or the counsellor enters a walk-in with **Home → New college admission**. On the **Marks and cut-off** step the panel says _Not eligible for this branch_; **Next** still works, with the note _"Below the cut-off — this admission will need the Dean's approval before Admit"_ and a **Reason for the Dean (recommended)** box (e.g. _PUC 68%, cut-off 90%; state-level sports certificate_). The entrance rank may be left blank if the student has none.
-> 2. **Before documents are verified** the admission panel shows **Needs Dean approval** with the reason noted. Verify the documents as in Step 3.
+> 2. **Before documents are verified** the admission panel shows **Needs Dean approval** with the reason noted. Verify each document and click **Mark documents verified** as in Step 3 — stage **Documents Verified**. The **2 · Decision** section appears only now.
 > 3. **2 · Decision:** **Admit** is not offered. The **Reason for the Dean** is already filled in → **Request Dean approval** → stage **Awaiting Dean Approval**.
 > 4. 👤 **Anjali Advisor (Dean)** · 📍 KT College → **Admissions Review** (the Dean sees only these requests) → the admission → **Dean · exception request** → optional interview → **Approve exception** (back to the counsellor, who clicks **Admit**) or **Decline** with a reason (admission closed).
 > 5. The counsellor can also close it with **Not admitted** and a reason.
@@ -152,12 +152,15 @@ The student, admission, invoice and payment are part of the audit trail and stay
 
 ## If something goes wrong
 
-| Symptom                                                         | Fix                                                                                 |
-| --------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| Convert window shows no college section                         | The enquiry did not come from the college page (no campus branch on it)             |
-| _Only the college admission desk can convert…_                  | Log in as the Admission Counsellor (KEM College Admissions)                         |
-| _This student already has an open admission for this programme_ | The student was used before — use a new name                                        |
-| _Documents can be verified only before the Dean's interview_    | The admission is already past documents; continue from the Dean's step              |
-| No letter in Files                                              | Wait a few seconds and refresh; generation runs right after the action              |
-| _Confirm the payment from the Finance Desk…_                    | The status was edited directly — use Finance Desk → Awaiting confirmation → Confirm |
-| No **Allot section** prompt                                     | The fee is not yet confirmed (enrolment still Provisional), or you are not the Dean |
+| Symptom                                                                                  | Fix                                                                                                                                                             |
+| ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Convert window shows no college section                                                  | The enquiry did not come from the college page (no campus branch on it)                                                                                         |
+| _Only the college admission desk can convert…_                                           | Log in as the Admission Counsellor (KEM College Admissions)                                                                                                     |
+| _This student already has an open admission for this programme_                          | The student was used before — use a new name                                                                                                                    |
+| _Documents can be verified only before the Dean's interview_                             | The admission is already past documents; continue from the Dean's step                                                                                          |
+| _This student is below the cut-off and Dean exceptions are switched off for this branch_ | Turn on **Dean exceptions allowed** for the branch (College Admission Setup → Seats & admissions, System Administrator), then **Mark documents verified** again |
+| No **2 · Decision** / **Request Dean approval**                                          | The documents are not yet marked verified — click **Mark documents verified** first                                                                             |
+| _The admission must be eligible before documents are verified_                           | Eligibility has not been checked yet (no marks on the admission); add the qualifications so the check runs                                                      |
+| No letter in Files                                                                       | Wait a few seconds and refresh; generation runs right after the action                                                                                          |
+| _Confirm the payment from the Finance Desk…_                                             | The status was edited directly — use Finance Desk → Awaiting confirmation → Confirm                                                                             |
+| No **Allot section** prompt                                                              | The fee is not yet confirmed (enrolment still Provisional), or you are not the Dean                                                                             |
