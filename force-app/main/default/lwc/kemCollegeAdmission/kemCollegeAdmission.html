@@ -163,6 +163,16 @@
         ></lightning-button>
       </template>
 
+      <template lwc:if={admission.needsDeanLater}>
+        <div class="exception" role="status">
+          <strong>Needs Dean approval.</strong>
+          This student is below the cut-off. Verify the documents first; then
+          send the request to the Dean from the Decision section.
+          <template lwc:if={admission.exceptionReason}>
+            <p class="small">Reason noted: {admission.exceptionReason}</p>
+          </template>
+        </div>
+      </template>
       <template lwc:if={showDeskDecision}>
         <h3>2 · Decision</h3>
         <template lwc:if={admission.admissible}>

@@ -220,6 +220,56 @@ describe("c-kem-college-admission", () => {
     );
   });
 
+  it("says up front that a student below the cut-off needs the Dean", async () => {
+    getAdmission.mockResolvedValue(
+      admission({
+        stage: "Processing",
+        eligibility: "Not Eligible",
+        needsDeanLater: true,
+        exceptionReason: "Sports quota certificate"
+      })
+    );
+    const element = mount();
+    await flush();
+    const text = element.shadowRoot.textContent;
+    expect(text).toContain("Needs Dean approval.");
+    expect(text).toContain("Reason noted: Sports quota certificate");
+  });
+
+  it("fills in the reason typed in the new-admission wizard", async () => {
+    getAdmission.mockResolvedValue(
+      admission({
+        stage: "Documents Verified",
+        eligibility: "Not Eligible",
+        needsException: true,
+        exceptionReason: "Sports quota certificate"
+      })
+    );
+    requestException.mockResolvedValue(
+      admission({
+        stage: "Awaiting Dean Approval",
+        exceptionStatus: "Requested"
+      })
+    );
+    const element = mount();
+    await flush();
+    expect(
+      element.shadowRoot.querySelector("lightning-textarea.exception-reason")
+        .value
+    ).toBe("Sports quota certificate");
+    byProp(
+      element.shadowRoot,
+      "lightning-button",
+      "label",
+      "Request Dean approval"
+    ).click();
+    await flush();
+    expect(requestException).toHaveBeenCalledWith({
+      applicationId: "0iT1",
+      reason: "Sports quota certificate"
+    });
+  });
+
   it("lets the Dean approve an exception request", async () => {
     getAdmission.mockResolvedValue(
       admission({

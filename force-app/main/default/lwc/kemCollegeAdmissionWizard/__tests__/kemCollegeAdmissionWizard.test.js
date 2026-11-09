@@ -130,7 +130,12 @@ describe("c-kem-college-admission-wizard", () => {
       byProp(root, "lightning-input", "label", "PUC percentage")
     ).toBeTruthy();
     expect(
-      byProp(root, "lightning-combobox", "label", "Entrance exam")
+      byProp(
+        root,
+        "lightning-combobox",
+        "label",
+        "Entrance exam (if the student has a rank)"
+      )
     ).toBeTruthy();
     expect(
       byProp(root, "lightning-combobox", "label", "Diploma branch")
@@ -159,6 +164,57 @@ describe("c-kem-college-admission-wizard", () => {
     expect(root.querySelector(".verdict").textContent).toContain(
       "BE Mechanical Engineering"
     );
+    // Below the cut-off the desk may continue and ask the Dean later.
+    expect(root.querySelector(".dean-note").textContent).toContain(
+      "need the Dean's approval"
+    );
+    expect(
+      root.querySelector("lightning-textarea.exception-reason")
+    ).not.toBeNull();
+    expect(byProp(root, "lightning-button", "label", "Next").disabled).toBe(
+      false
+    );
+  });
+
+  it("stops a student below the cut-off when Dean exceptions are off", async () => {
+    previewEligibility.mockResolvedValue({
+      status: "Not Eligible",
+      reason: "This branch needs 90%; the student has 68%.",
+      checks: [
+        { label: "PUC (Science) at least 90%", actual: "68%", passed: false }
+      ],
+      suggestions: []
+    });
+    getAdmissionCatalogue.mockResolvedValue(CATALOGUE);
+    getRequirements.mockResolvedValue({
+      ...BE_CSE,
+      deanExceptionsAllowed: false
+    });
+    const element = createElement("c-kem-college-admission-wizard", {
+      is: KemCollegeAdmissionWizard
+    });
+    document.body.appendChild(element);
+    await flush();
+    const root = element.shadowRoot;
+    root.querySelector('button[data-id="p1"]').click();
+    await flush();
+    root.querySelector('button[data-id="cb1"]').click();
+    await flush();
+    await flush();
+    byProp(root, "lightning-button", "label", "Next").click();
+    await flush();
+    const input = byProp(root, "lightning-input", "label", "PUC percentage");
+    input.value = "68";
+    input.dispatchEvent(new CustomEvent("change"));
+    await wait(450);
+    await flush();
+    await flush();
+    expect(root.querySelector(".dean-note").textContent).toContain(
+      "switched off"
+    );
+    expect(
+      root.querySelector("lightning-textarea.exception-reason")
+    ).toBeNull();
     expect(byProp(root, "lightning-button", "label", "Next").disabled).toBe(
       true
     );

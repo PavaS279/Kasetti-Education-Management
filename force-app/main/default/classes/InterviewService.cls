@@ -37,10 +37,14 @@ public with sharing class InterviewService {
   public static void requestException(Id applicationId, String reason) {
     RecordAccess.assertPermission(CollegeDocumentService.VERIFY_PERMISSION);
     RecordAccess.assertEditable(applicationId);
+    IndividualApplication application = admission(applicationId);
+    // The reason typed when the admission was created is used when none is given now.
+    if (String.isBlank(reason)) {
+      reason = application.Exception_Reason__c;
+    }
     if (String.isBlank(reason)) {
       throw new AppException('Enter why the Dean should admit this applicant.');
     }
-    IndividualApplication application = admission(applicationId);
     if (
       needsException(application) &&
       application.Campus_Branch__r?.Dean_Exceptions_Allowed__c == false
@@ -293,6 +297,7 @@ public with sharing class InterviewService {
         Interview_Outcome__c,
         Eligibility_Status__c,
         Exception_Status__c,
+        Exception_Reason__c,
         Campus_Branch__r.Dean_Exceptions_Allowed__c
       FROM IndividualApplication
       WHERE Id = :applicationId

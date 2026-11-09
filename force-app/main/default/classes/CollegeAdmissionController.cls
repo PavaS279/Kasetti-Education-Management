@@ -55,6 +55,9 @@ public with sharing class CollegeAdmissionController {
     public List<Entrance> entrances { get; set; }
     @AuraEnabled
     public Id quotaId { get; set; }
+    /** Below the cut-off: why the Dean should admit (sent with the request later). */
+    @AuraEnabled
+    public String exceptionReason { get; set; }
     @AuraEnabled
     public String guardianFirstName { get; set; }
     @AuraEnabled
@@ -144,6 +147,9 @@ public with sharing class CollegeAdmissionController {
     public Boolean entranceRequired = false;
     @AuraEnabled
     public List<EntranceOption> entrances = new List<EntranceOption>();
+    /** The counsellor may ask the Dean to admit a student below the cut-off. */
+    @AuraEnabled
+    public Boolean deanExceptionsAllowed = true;
     @AuraEnabled
     public Decimal entryYear;
     @AuraEnabled
@@ -225,6 +231,9 @@ public with sharing class CollegeAdmissionController {
     /** Does not meet the criteria and no exception was asked for yet. */
     @AuraEnabled
     public Boolean needsException = false;
+    /** Below the cut-off before the documents are verified: Dean approval will be needed. */
+    @AuraEnabled
+    public Boolean needsDeanLater = false;
     @AuraEnabled
     public String exceptionStatus;
     @AuraEnabled
@@ -566,6 +575,12 @@ public with sharing class CollegeAdmissionController {
     result.decisionReason = a.Decision_Reason__c;
     result.admissible = InterviewService.admissible(a);
     result.needsException = InterviewService.needsException(a);
+    result.needsDeanLater =
+      !result.needsException &&
+      a.Exception_Status__c == null &&
+      (a.College_Stage__c == 'Processing' ||
+      a.College_Stage__c == 'In Review') &&
+      a.Eligibility_Status__c == 'Not Eligible';
     result.exceptionStatus = a.Exception_Status__c;
     result.exceptionReason = a.Exception_Reason__c;
     result.exceptionRemarks = a.Exception_Remarks__c;

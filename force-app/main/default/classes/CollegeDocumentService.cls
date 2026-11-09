@@ -142,7 +142,8 @@ public with sharing class CollegeDocumentService {
         College_Mode__c,
         College_Stage__c,
         Privacy_Consent__c,
-        Eligibility_Status__c
+        Eligibility_Status__c,
+        Campus_Branch__r.Dean_Exceptions_Allowed__c
       FROM IndividualApplication
       WHERE Id = :applicationId
       WITH SYSTEM_MODE
@@ -158,12 +159,19 @@ public with sharing class CollegeDocumentService {
         'Capture privacy consent before verifying documents.'
       );
     }
-    if (
-      application.Eligibility_Status__c != 'Eligible' &&
-      application.Eligibility_Status__c != 'Overridden'
-    ) {
+    // A student below the cut-off may be verified and then sent to the Dean,
+    // unless Dean exceptions are switched off for the branch.
+    Boolean meets =
+      application.Eligibility_Status__c == 'Eligible' ||
+      application.Eligibility_Status__c == 'Overridden';
+    Boolean deanRoute =
+      application.Eligibility_Status__c == 'Not Eligible' &&
+      application.Campus_Branch__r?.Dean_Exceptions_Allowed__c != false;
+    if (!meets && !deanRoute) {
       throw new AppException(
-        'The admission must be eligible before documents are verified.'
+        application.Eligibility_Status__c == 'Not Eligible'
+          ? 'This student is below the cut-off and Dean exceptions are switched off for this branch.'
+          : 'The admission must be eligible before documents are verified.'
       );
     }
     for (DocumentChecklistItem item : [

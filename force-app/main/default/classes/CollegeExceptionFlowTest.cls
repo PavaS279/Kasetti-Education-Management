@@ -196,4 +196,128 @@ private class CollegeExceptionFlowTest {
       }
     }
   }
+
+  @IsTest
+  static void aReasonTypedAtCreationGoesToTheDeanAndTheStudentIsAdmitted() {
+    CollegeTestFactory.Fixture f = CollegeTestFactory.create(5, 7);
+    MessageService.disabled = true;
+    DocumentService.suppressJobs = true;
+    CollegeAdmissionController.NewAdmission request = new CollegeAdmissionController.NewAdmission();
+    request.firstName = 'Kiran';
+    request.lastName = TestDataFactory.uniqueName('Below');
+    request.campusBranchId = f.intake.Id;
+    request.entryRoute = 'Regular';
+    CollegeAdmissionController.Qualification sslc = new CollegeAdmissionController.Qualification();
+    sslc.level = 'SSLC';
+    sslc.percentage = 55;
+    request.qualifications = new List<CollegeAdmissionController.Qualification>{
+      sslc
+    };
+    request.exceptionReason = '  State-level sports certificate attached.  ';
+    Id applicationId;
+    System.runAs(f.dean) {
+      applicationId = CollegeAdmissionService.create(request, null);
+    }
+    Assert.areEqual(
+      'State-level sports certificate attached.',
+      [
+        SELECT Exception_Reason__c
+        FROM IndividualApplication
+        WHERE Id = :applicationId
+      ]
+      .Exception_Reason__c,
+      'The reason is kept for the request'
+    );
+    // Below the cut-off and not yet verified: the panel says the Dean is needed.
+    update new IndividualApplication(
+      Id = applicationId,
+      College_Stage__c = 'Processing',
+      Eligibility_Status__c = 'Not Eligible'
+    );
+    System.runAs(f.dean) {
+      Assert.isTrue(
+        CollegeAdmissionController.getAdmission(applicationId).needsDeanLater
+      );
+    }
+    update new IndividualApplication(
+      Id = applicationId,
+      College_Stage__c = 'Documents Verified'
+    );
+    Test.startTest();
+    System.runAs(f.dean) {
+      // No reason now: the one typed at creation is sent.
+      InterviewService.requestException(applicationId, null);
+      Assert.areEqual(
+        'Requested',
+        [
+          SELECT Exception_Status__c
+          FROM IndividualApplication
+          WHERE Id = :applicationId
+        ]
+        .Exception_Status__c
+      );
+      InterviewService.approveException(applicationId, 'Approved.');
+      InterviewService.admit(applicationId);
+    }
+    Test.stopTest();
+    Assert.areEqual(
+      'Fee Pending',
+      [
+        SELECT College_Stage__c
+        FROM IndividualApplication
+        WHERE Id = :applicationId
+      ]
+      .College_Stage__c
+    );
+  }
+
+  @IsTest
+  static void documentsOfAStudentBelowTheCutOffCanBeVerified() {
+    CollegeTestFactory.Fixture f = CollegeTestFactory.create(5, 7);
+    update new IndividualApplication(
+      Id = f.admission.Id,
+      College_Stage__c = 'Processing',
+      Eligibility_Status__c = 'Not Eligible',
+      Privacy_Consent__c = true,
+      Interview_Outcome__c = null
+    );
+    System.runAs(f.dean) {
+      CollegeDocumentService.markDocumentsVerified(f.admission.Id);
+    }
+    Assert.areEqual(
+      'Documents Verified',
+      [
+        SELECT College_Stage__c
+        FROM IndividualApplication
+        WHERE Id = :f.admission.Id
+      ]
+      .College_Stage__c,
+      'Verified, ready to ask the Dean'
+    );
+
+    // With Dean exceptions off for the branch, a student below the cut-off stops here.
+    IndividualApplication other;
+    System.runAs(f.dean) {
+      other = CollegeTestFactory.admission(f, 'Other');
+    }
+    update new Campus_Branch__c(
+      Id = f.intake.Id,
+      Dean_Exceptions_Allowed__c = false
+    );
+    update new IndividualApplication(
+      Id = other.Id,
+      College_Stage__c = 'Processing',
+      Eligibility_Status__c = 'Not Eligible',
+      Privacy_Consent__c = true,
+      Interview_Outcome__c = null
+    );
+    System.runAs(f.dean) {
+      try {
+        CollegeDocumentService.markDocumentsVerified(other.Id);
+        Assert.fail('Exceptions are off');
+      } catch (AppException e) {
+        Assert.isTrue(e.getMessage().contains('switched off'), e.getMessage());
+      }
+    }
+  }
 }

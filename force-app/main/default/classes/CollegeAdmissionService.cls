@@ -189,7 +189,10 @@ public with sharing class CollegeAdmissionService {
         Entry_Year_Of_Study__c = request.entryRoute == 'Lateral' ? 2 : 1,
         Admission_Quota__c = request.entryRoute == 'Lateral'
           ? null
-          : request.quotaId
+          : request.quotaId,
+        Exception_Reason__c = String.isBlank(request.exceptionReason)
+          ? null
+          : request.exceptionReason.trim().left(2000)
       );
       Database.insert(admission, AccessLevel.SYSTEM_MODE);
       CollegeQuotaService.addExtraDocument(
