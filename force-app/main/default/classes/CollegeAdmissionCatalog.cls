@@ -147,11 +147,13 @@ public without sharing class CollegeAdmissionCatalog {
         Reserved_Regular__c,
         Reserved_Lateral__c,
         Finalised_Regular__c,
-        Finalised_Lateral__c
+        Finalised_Lateral__c,
+        Dean_Exceptions_Allowed__c
       FROM Campus_Branch__c
       WHERE Id = :campusBranchId AND Campus__r.Institution_Type__c = 'College'
       WITH SYSTEM_MODE
     ];
+    result.deanExceptionsAllowed = intake.Dean_Exceptions_Allowed__c;
     Boolean lateral = entryRoute == 'Lateral';
     result.seatsLeft = lateral
       ? nvl(intake.Intake_Lateral__c) -

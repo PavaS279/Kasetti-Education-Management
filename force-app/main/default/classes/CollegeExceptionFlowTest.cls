@@ -196,4 +196,78 @@ private class CollegeExceptionFlowTest {
       }
     }
   }
+
+  @IsTest
+  static void aReasonTypedAtCreationGoesToTheDeanAndTheStudentIsAdmitted() {
+    CollegeTestFactory.Fixture f = CollegeTestFactory.create(5, 7);
+    MessageService.disabled = true;
+    DocumentService.suppressJobs = true;
+    CollegeAdmissionController.NewAdmission request = new CollegeAdmissionController.NewAdmission();
+    request.firstName = 'Kiran';
+    request.lastName = TestDataFactory.uniqueName('Below');
+    request.campusBranchId = f.intake.Id;
+    request.entryRoute = 'Regular';
+    CollegeAdmissionController.Qualification sslc = new CollegeAdmissionController.Qualification();
+    sslc.level = 'SSLC';
+    sslc.percentage = 55;
+    request.qualifications = new List<CollegeAdmissionController.Qualification>{
+      sslc
+    };
+    request.exceptionReason = '  State-level sports certificate attached.  ';
+    Id applicationId;
+    System.runAs(f.dean) {
+      applicationId = CollegeAdmissionService.create(request, null);
+    }
+    Assert.areEqual(
+      'State-level sports certificate attached.',
+      [
+        SELECT Exception_Reason__c
+        FROM IndividualApplication
+        WHERE Id = :applicationId
+      ]
+      .Exception_Reason__c,
+      'The reason is kept for the request'
+    );
+    // Below the cut-off and not yet verified: the panel says the Dean is needed.
+    update new IndividualApplication(
+      Id = applicationId,
+      College_Stage__c = 'Processing',
+      Eligibility_Status__c = 'Not Eligible'
+    );
+    System.runAs(f.dean) {
+      Assert.isTrue(
+        CollegeAdmissionController.getAdmission(applicationId).needsDeanLater
+      );
+    }
+    update new IndividualApplication(
+      Id = applicationId,
+      College_Stage__c = 'Documents Verified'
+    );
+    Test.startTest();
+    System.runAs(f.dean) {
+      // No reason now: the one typed at creation is sent.
+      InterviewService.requestException(applicationId, null);
+      Assert.areEqual(
+        'Requested',
+        [
+          SELECT Exception_Status__c
+          FROM IndividualApplication
+          WHERE Id = :applicationId
+        ]
+        .Exception_Status__c
+      );
+      InterviewService.approveException(applicationId, 'Approved.');
+      InterviewService.admit(applicationId);
+    }
+    Test.stopTest();
+    Assert.areEqual(
+      'Fee Pending',
+      [
+        SELECT College_Stage__c
+        FROM IndividualApplication
+        WHERE Id = :applicationId
+      ]
+      .College_Stage__c
+    );
+  }
 }

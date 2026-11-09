@@ -89,6 +89,8 @@ export default class KemCollegeAdmissionWizard extends LightningModal {
   get isReview() {
     return this.step === "review";
   }
+  exceptionReason = "";
+
   get canGoBack() {
     return this.step !== "programme";
   }
@@ -101,7 +103,12 @@ export default class KemCollegeAdmissionWizard extends LightningModal {
       return !this.campusBranchId || !this.requirements.open;
     }
     if (this.isMarks) {
-      return this.preview?.status !== "Eligible";
+      // Below the cut-off the desk may continue and ask the Dean later,
+      // unless Dean exceptions are switched off for this branch.
+      if (!this.preview) {
+        return true;
+      }
+      return this.preview.status !== "Eligible" && !this.exceptionsAllowed;
     }
     if (this.isStudent) {
       return (
@@ -364,6 +371,28 @@ export default class KemCollegeAdmissionWizard extends LightningModal {
     }
   }
 
+  get exceptionsAllowed() {
+    return this.requirements?.deanExceptionsAllowed !== false;
+  }
+
+  get belowCutOff() {
+    return Boolean(this.preview) && this.preview.status !== "Eligible";
+  }
+
+  get deanNote() {
+    return this.exceptionsAllowed
+      ? "Below the cut-off — this admission will need the Dean's approval before Admit. You can continue and send it to the Dean once the documents are verified."
+      : "Dean exceptions are switched off for this branch, so a student below the cut-off cannot be admitted here.";
+  }
+
+  get deanNoteClass() {
+    return this.exceptionsAllowed ? "dean-note" : "dean-note dean-note_off";
+  }
+
+  handleExceptionReason(event) {
+    this.exceptionReason = event.target.value;
+  }
+
   get checks() {
     return (this.preview?.checks || []).map((c) => ({
       ...c,
@@ -469,7 +498,8 @@ export default class KemCollegeAdmissionWizard extends LightningModal {
           entryRoute: this.route,
           qualifications: this.qualifications(),
           entrances: this.entrances(),
-          consent: this.consent
+          consent: this.consent,
+          exceptionReason: this.belowCutOff ? this.exceptionReason : null
         }
       });
       this.close(result.id);

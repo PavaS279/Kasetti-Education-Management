@@ -133,3 +133,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+.dean-note {
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  background: var(--kem-surface-warn, #fef6e6);
+}
+.dean-note_off {
+  background: var(--kem-surface-bad, #fdeceb);
+}

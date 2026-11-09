@@ -162,12 +162,11 @@
             </template>
             <template lwc:if={requirements.entranceRequired}>
               <lightning-combobox
-                label="Entrance exam"
+                label="Entrance exam (if the student has a rank)"
                 options={examOptions}
                 value={marks.exam}
                 data-field="exam"
                 onchange={handleMarkCombo}
-                required
               ></lightning-combobox>
               <lightning-input
                 type="number"
@@ -176,7 +175,6 @@
                 value={marks.rank}
                 data-field="rank"
                 onchange={handleMark}
-                required
               ></lightning-input>
             </template>
           </div>
@@ -226,6 +224,21 @@
             </p>
           </template>
         </aside>
+        <template lwc:if={belowCutOff}>
+          <div class={deanNoteClass} role="status">
+            <p>{deanNote}</p>
+            <template lwc:if={exceptionsAllowed}>
+              <lightning-textarea
+                class="exception-reason"
+                label="Reason for the Dean (recommended)"
+                placeholder="For example: state-level sports certificate attached"
+                max-length="2000"
+                value={exceptionReason}
+                onchange={handleExceptionReason}
+              ></lightning-textarea>
+            </template>
+          </div>
+        </template>
       </div>
     </template>
 

@@ -57,6 +57,7 @@ export default class KemCollegeAdmission extends NavigationMixin(
   async load() {
     try {
       this.admission = await getAdmission({ applicationId: this.recordId });
+      this.prefillReason();
       this.errorMessage = undefined;
     } catch (error) {
       this.admission = undefined;
@@ -235,6 +236,13 @@ export default class KemCollegeAdmission extends NavigationMixin(
       })
     );
   }
+  /** The reason typed in the new-admission wizard is ready for the request. */
+  prefillReason() {
+    if (!this.exceptionReason && this.admission?.exceptionReason) {
+      this.exceptionReason = this.admission.exceptionReason;
+    }
+  }
+
   handleExceptionReason(event) {
     this.exceptionReason = event.target.value;
   }

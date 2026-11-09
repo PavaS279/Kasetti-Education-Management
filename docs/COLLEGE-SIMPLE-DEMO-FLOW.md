@@ -74,9 +74,15 @@ The panel shows **Quota: CET** (or the quota chosen online). Before Admit the co
 
 ✅ A seat is reserved and the first-year invoice is issued with a 7-day deadline, at the student's **quota fee** (default/CET: ₹1,50,000 tuition + ₹5,000 admission; other quotas as set on **College Admission Setup → Fees**).
 
-> **Only if the student does NOT meet the criteria** (eligibility _Not Eligible_): **Admit** is not offered. The counsellor types a **Reason for the Dean** (e.g. _PUC 58%, cut-off 60%; state-level sports certificate_) → **Request Dean approval** → stage **Awaiting Dean Approval**.
-> 👤 **Anjali Advisor (Dean)** · 📍 KT College → **Admissions Review** (the Dean sees only these requests) → the admission → **Dean · exception request** → optional interview → **Approve exception** (back to the counsellor, who clicks **Admit**) or **Decline** with a reason (admission closed).
-> The counsellor can also close it with **Not admitted** and a reason.
+> **Only if the student does NOT meet the criteria** (eligibility _Not Eligible_) — the Dean exception:
+>
+> 1. **Getting the admission in.** Either the online enquiry is converted as in Step 2, or the counsellor enters a walk-in with **Home → New college admission**. On the **Marks and cut-off** step the panel says _Not eligible for this branch_; **Next** still works, with the note _"Below the cut-off — this admission will need the Dean's approval before Admit"_ and a **Reason for the Dean (recommended)** box (e.g. _PUC 68%, cut-off 90%; state-level sports certificate_). The entrance rank may be left blank if the student has none.
+> 2. **Before documents are verified** the admission panel shows **Needs Dean approval** with the reason noted. Verify the documents as in Step 3.
+> 3. **2 · Decision:** **Admit** is not offered. The **Reason for the Dean** is already filled in → **Request Dean approval** → stage **Awaiting Dean Approval**.
+> 4. 👤 **Anjali Advisor (Dean)** · 📍 KT College → **Admissions Review** (the Dean sees only these requests) → the admission → **Dean · exception request** → optional interview → **Approve exception** (back to the counsellor, who clicks **Admit**) or **Decline** with a reason (admission closed).
+> 5. The counsellor can also close it with **Not admitted** and a reason.
+>
+> If **Dean exceptions allowed** is switched off for the branch (College Admission Setup → Seats & admissions), **Next** stays disabled for a student below the cut-off and the request is refused.
 
 🗣 _"Eligible students are admitted by the desk the same day. The Dean only sees the exceptions — with the reason, and the decision is recorded with who and when."_
 
